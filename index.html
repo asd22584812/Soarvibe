@@ -14,10 +14,17 @@
     <title>SOARVIBE</title>
     <script>
         (function () {
-            var standalone = window.matchMedia('(display-mode: standalone)').matches
-                || window.matchMedia('(display-mode: fullscreen)').matches
-                || window.navigator.standalone === true;
-            if (standalone) document.documentElement.classList.add('pwa-standalone');
+            function applyMobileShell() {
+                var standalone = window.matchMedia('(display-mode: standalone)').matches
+                    || window.matchMedia('(display-mode: fullscreen)').matches
+                    || window.navigator.standalone === true;
+                var mobile = window.matchMedia('(max-width: 768px)').matches;
+                document.documentElement.classList.toggle('pwa-standalone', standalone);
+                document.documentElement.classList.toggle('mobile-fullscreen', mobile || standalone);
+            }
+            applyMobileShell();
+            window.addEventListener('resize', applyMobileShell);
+            window.addEventListener('orientationchange', applyMobileShell);
         })();
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -227,6 +234,48 @@
         }
         .date-field::-webkit-calendar-picker-indicator:hover {
             opacity: 0.58;
+        }
+        .date-input-wrap,
+        .time-input-wrap {
+            position: relative;
+            display: block;
+            width: 100%;
+        }
+        .date-input-icon,
+        .time-input-icon {
+            position: absolute;
+            right: 0.625rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1rem;
+            line-height: 1;
+            pointer-events: none;
+            z-index: 2;
+            opacity: 0.72;
+        }
+        .date-input-wrap .date-field,
+        .time-input-wrap .date-field {
+            padding-right: 2rem;
+        }
+        html.mobile-fullscreen .date-grid {
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+        }
+        html.mobile-fullscreen .date-field {
+            font-size: 16px;
+            min-height: 2.75rem;
+            padding-top: 0.55rem;
+            padding-bottom: 0.55rem;
+        }
+        html.mobile-fullscreen .date-field::-webkit-calendar-picker-indicator,
+        html.mobile-fullscreen .date-field::-webkit-inner-spin-button {
+            width: 1.35rem;
+            height: 1.35rem;
+            opacity: 0.72;
+        }
+        html.mobile-fullscreen .flight-times-row .date-field {
+            min-height: 2.75rem;
+            font-size: 16px;
         }
         .form-stack {
             position: relative;
@@ -1335,28 +1384,34 @@
             color: #F06292;
         }
         html.pwa-standalone body,
+        html.mobile-fullscreen body,
         @media (display-mode: standalone), (display-mode: fullscreen) {
             body {
-                padding: 0;
-                background: #263238;
+                padding: 0 !important;
+                background: #1a2327;
             }
             body > .app-shell {
-                width: 100%;
+                width: 100% !important;
                 max-width: none;
                 height: 100dvh;
+                min-height: 100dvh;
                 max-height: 100dvh;
-                border-radius: 0;
-                box-shadow: none;
+                border-radius: 0 !important;
+                box-shadow: none !important;
+                padding-top: env(safe-area-inset-top, 0px);
+                padding-bottom: env(safe-area-inset-bottom, 0px);
+                box-sizing: border-box;
             }
             body > .app-shell .glass-nav {
                 border-radius: 0;
-                padding-bottom: max(0.625rem, env(safe-area-inset-bottom));
+                padding-bottom: max(0.625rem, env(safe-area-inset-bottom, 0px));
             }
-            body > .app-shell #soarvibe-alert {
+            body > .app-shell #soarvibe-alert,
+            body > .app-shell #soarvibe-generating {
                 border-radius: 0;
             }
             body > .app-shell header.pt-7 {
-                padding-top: max(1.75rem, env(safe-area-inset-top));
+                padding-top: 1.25rem;
             }
         }
         .user-api-hint {
@@ -1440,14 +1495,20 @@
                 <section class="glass-card relative z-20 rounded-3xl p-3.5 shadow-sm pointer-events-auto">
                     <h2 class="text-base font-bold text-[#37474F] mb-2">2. 去幾天？</h2>
                     <p class="text-xs font-bold text-[#546E7A] mb-2">📅 選擇出發與回程日期</p>
-                    <div class="grid grid-cols-2 gap-2 relative z-20 pointer-events-auto">
+                    <div class="date-grid grid grid-cols-2 gap-2 relative z-20 pointer-events-auto">
                         <label class="block min-w-0">
                             <span class="text-[10px] font-bold text-[#78909C] mb-1 block">出發</span>
-                            <input type="date" id="date-start" name="date-start" class="date-field w-full rounded-xl border border-white/70 text-[#455A64] font-bold">
+                            <span class="date-input-wrap">
+                                <input type="date" id="date-start" name="date-start" class="date-field w-full rounded-xl border border-white/70 text-[#455A64] font-bold">
+                                <span class="date-input-icon" aria-hidden="true">📅</span>
+                            </span>
                         </label>
                         <label class="block min-w-0">
                             <span class="text-[10px] font-bold text-[#78909C] mb-1 block">回程</span>
-                            <input type="date" id="date-end" name="date-end" class="date-field w-full rounded-xl border border-white/70 text-[#455A64] font-bold">
+                            <span class="date-input-wrap">
+                                <input type="date" id="date-end" name="date-end" class="date-field w-full rounded-xl border border-white/70 text-[#455A64] font-bold">
+                                <span class="date-input-icon" aria-hidden="true">📅</span>
+                            </span>
                         </label>
                     </div>
                 </section>
@@ -1499,11 +1560,17 @@
                                 <div class="flight-times-row">
                                     <label class="min-w-0">
                                         <span class="field-label">出發時間</span>
-                                        <input type="time" id="flight-departure-time" class="date-field w-full rounded-lg border border-white/70" value="14:30" aria-label="出發時間">
+                                        <span class="time-input-wrap">
+                                            <input type="time" id="flight-departure-time" class="date-field w-full rounded-lg border border-white/70" value="14:30" aria-label="出發時間">
+                                            <span class="time-input-icon" aria-hidden="true">🕐</span>
+                                        </span>
                                     </label>
                                     <label class="min-w-0">
                                         <span class="field-label">回程時間</span>
-                                        <input type="time" id="flight-return-time" class="date-field w-full rounded-lg border border-white/70" value="18:00" aria-label="回程時間">
+                                        <span class="time-input-wrap">
+                                            <input type="time" id="flight-return-time" class="date-field w-full rounded-lg border border-white/70" value="18:00" aria-label="回程時間">
+                                            <span class="time-input-icon" aria-hidden="true">🕐</span>
+                                        </span>
                                     </label>
                                 </div>
                                 <div class="hotel-row-full">
@@ -5732,11 +5799,6 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     });
                     html += '</div>';
                 }
-                var dayHint = dayCount ? '共 ' + dayCount + ' · ' : '';
-                html += '<div class="bk-itinerary-teaser bk-itinerary-teaser-compact">';
-                html += '<span class="bk-teaser-icon">🗺️</span>';
-                html += '<div class="bk-teaser-text"><strong>' + escapeHtml(dest) + ' 專屬行程</strong>';
-                html += '<span>' + dayHint + 'Day-by-Day 動線請見下一頁起</span></div></div>';
                 html += '</div>';
                 return html;
             }
@@ -5809,19 +5871,24 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             function buildBookletItineraryHtml(hidden, dest, wm) {
                 var days = (hidden && hidden.days) || [];
                 if (!days.length) {
-                    return '<div class="bk-itinerary-flow bk-itinerary-empty">' + wm +
+                    return '<div class="bk-page bk-day-page bk-itinerary-start">' + wm +
                         '<div class="bk-page-head"><span class="bk-brand">SOARVIBE</span><span>專屬行程表</span></div>' +
                         '<p class="bk-muted">行程內容載入中或格式異常，請回 App 重新生成行程後再匯出小本本。</p></div>';
                 }
-                var html = '<div class="bk-itinerary-flow">';
-                html += wm;
-                html += '<div class="bk-itinerary-head">';
-                html += '<div class="bk-page-head"><span class="bk-brand">SOARVIBE</span><span>專屬行程表</span></div>';
-                html += '<h2 class="bk-section-title bk-section-title-compact">🗺️ ' + escapeHtml(dest) + ' · 每日動線</h2>';
-                html += '</div>';
+                var html = '';
                 days.forEach(function (day, idx) {
-                    var cls = 'bk-day' + (idx === 0 ? ' bk-day-first' : '');
-                    html += '<section class="' + cls + '">';
+                    var pageCls = 'bk-page bk-day-page' + (idx === 0 ? ' bk-itinerary-start' : ' bk-day-new');
+                    html += '<div class="' + pageCls + '">';
+                    html += wm;
+                    if (idx === 0) {
+                        html += '<div class="bk-itinerary-head">';
+                        html += '<div class="bk-page-head"><span class="bk-brand">SOARVIBE</span><span>專屬行程表</span></div>';
+                        html += '<h2 class="bk-section-title bk-section-title-compact">🗺️ ' + escapeHtml(dest) + ' · 每日動線</h2>';
+                        html += '</div>';
+                    } else {
+                        html += '<div class="bk-page-head"><span class="bk-brand">SOARVIBE</span><span>Day ' + escapeHtml(day.dayNum || String(idx + 1)) + '</span></div>';
+                    }
+                    html += '<section class="bk-day">';
                     html += '<h3 class="bk-day-title">📅 ' + escapeHtml(day.dateLabel || '') + ' · Day ' + escapeHtml(day.dayNum || String(idx + 1)) + '</h3>';
                     (day.phases || []).forEach(function (phase) {
                         var phaseLabel = phase.label || phase.period || '';
@@ -5833,10 +5900,47 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                         });
                     });
                     html += '</section>';
+                    html += '<div class="bk-footer">SOARVIBE 為您編排的專屬動線</div>';
+                    html += '</div>';
                 });
-                html += '<div class="bk-footer">SOARVIBE 為您編排的專屬動線</div>';
-                html += '</div>';
                 return html;
+            }
+
+            async function blobToDataUrl(blob) {
+                return new Promise(function (resolve) {
+                    var reader = new FileReader();
+                    reader.onload = function () {
+                        resolve(typeof reader.result === 'string' ? reader.result : '');
+                    };
+                    reader.onerror = function () { resolve(''); };
+                    reader.readAsDataURL(blob);
+                });
+            }
+
+            async function resolveBookletCoverDataUrl(destination) {
+                var cityKey = resolveEpithetCityKey(destination) || destination || '東京';
+                var cacheKey = 'SOARVIBE_BOOKLET_COVER_' + cityKey;
+                try {
+                    var cached = localStorage.getItem(cacheKey);
+                    if (cached && /^data:image\//i.test(cached)) {
+                        return cached;
+                    }
+                } catch (e) { /* silent */ }
+                var url = resolveBookletCoverUrl(destination);
+                if (!url) return '';
+                try {
+                    var resp = await fetch(url);
+                    if (resp.ok) {
+                        var data = await blobToDataUrl(await resp.blob());
+                        if (data) {
+                            try {
+                                localStorage.setItem(cacheKey, data);
+                            } catch (storageErr) { /* silent */ }
+                            return data;
+                        }
+                    }
+                } catch (e) { /* fetch failed — try Image fallback */ }
+                return loadBookletLogoViaImage(url);
             }
 
             function loadBookletLogoViaImage(src) {
@@ -5924,28 +6028,30 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             function buildBookletWatermarkCss() {
-                return '.bk-page,.bk-note-page,.bk-itinerary-flow{position:relative;overflow:visible}' +
+                return '.bk-page,.bk-note-page,.bk-day-page{position:relative;overflow:visible}' +
+                    '.bk-page:not(.bk-cover-page){padding:0 2mm 4mm}' +
                     '.bk-watermark{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);' +
                     'width:72%;max-width:115mm;pointer-events:none;z-index:0;text-align:center}' +
                     '.bk-watermark img{width:100%;height:auto;display:block;opacity:' + BOOKLET_WATERMARK_OPACITY + '}' +
                     '.bk-page>*:not(.bk-watermark),.bk-note-page>*:not(.bk-watermark),' +
-                    '.bk-itinerary-flow>*:not(.bk-watermark){position:relative;z-index:1}' +
+                    '.bk-day-page>*:not(.bk-watermark){position:relative;z-index:1}' +
                     '.bk-logo-img{display:block;max-height:' + BOOKLET_COVER_LOGO_MAX_HEIGHT +
                     ';width:auto;margin:0 auto 6mm;object-fit:contain;border-radius:8px}';
             }
 
             function buildBookletPrintCss() {
-                return '@page{size:A4;margin:12mm}' +
+                return '@page{size:A4 portrait;margin:10mm}' +
                     '*{box-sizing:border-box}' +
-                    'body{margin:0;font-family:"Noto Sans TC",sans-serif;color:#37474F;background:#fff;font-size:11pt;line-height:1.55}' +
-                    '.bk-page{page-break-after:always;padding:4mm 2mm 8mm;position:relative}' +
-                    '.bk-page:last-child{page-break-after:auto}' +
+                    'html,body{margin:0;padding:0;width:100%}' +
+                    'body{font-family:"Noto Sans TC",sans-serif;color:#37474F;background:#fff;font-size:11pt;line-height:1.55}' +
+                    '.bk-page{break-after:page;page-break-after:always;padding:0;position:relative}' +
+                    '.bk-page:last-child{break-after:auto;page-break-after:auto}' +
                     buildBookletWatermarkCss() +
-                    '.bk-cover-page{padding:0;margin:0;page-break-after:always;height:273mm;max-height:273mm;overflow:hidden}' +
-                    '.bk-book-cover{position:relative;width:100%;height:100%;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06)}' +
-                    '.bk-cover-bg{position:absolute;inset:0;background-size:cover;background-position:center;background-repeat:no-repeat;' +
-                    'background-color:#1e293b}' +
-                    '.bk-cover-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,23,42,.5) 0%,rgba(15,23,42,.2) 35%,rgba(15,23,42,.88) 100%)}' +
+                    '.bk-cover-page{padding:0;margin:0;break-after:page;page-break-after:always;width:100%;height:277mm;max-height:277mm;overflow:hidden;position:relative}' +
+                    '.bk-book-cover{position:relative;width:100%;height:277mm;overflow:hidden}' +
+                    '.bk-cover-bg{position:absolute;inset:0;background-size:cover;background-position:center;background-repeat:no-repeat;background-color:#1e293b}' +
+                    '.bk-cover-bg-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}' +
+                    '.bk-cover-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,23,42,.5) 0%,rgba(15,23,42,.2) 35%,rgba(15,23,42,.88) 100%);z-index:1}' +
                     '.bk-cover-spine{position:absolute;left:0;top:0;bottom:0;width:8mm;background:linear-gradient(90deg,rgba(240,98,146,.92),rgba(128,203,196,.55));z-index:2}' +
                     '.bk-cover-top{position:absolute;top:14mm;left:16mm;right:14mm;z-index:4;display:flex;align-items:center;justify-content:flex-end}' +
                     '.bk-cover-duration{font-size:11pt;font-weight:900;color:#fff;background:rgba(255,255,255,.18);padding:2mm 5mm;border-radius:999px;letter-spacing:.06em}' +
@@ -5974,68 +6080,61 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     '.bk-tips-title{font-size:11.5pt;font-weight:900;color:#37474F;margin:0 0 2.5mm}' +
                     '.bk-tips-list{margin:0;padding:0 0 0 5mm;font-size:10.5pt;line-height:1.65;color:#455A64}' +
                     '.bk-tips-list li{margin-bottom:1.5mm}' +
-                    '.bk-intro-page{display:flex;flex-direction:column;min-height:273mm}' +
-                    '.bk-intro-full{display:flex;flex-direction:column;flex:1;min-height:0}' +
+                    '.bk-intro-page{padding:0 2mm}' +
+                    '.bk-intro-full{display:flex;flex-direction:column}' +
                     '.bk-intro-region{font-size:13pt;font-weight:900;color:#F06292;letter-spacing:.06em;margin:0 0 3mm}' +
                     '.bk-intro-lead{font-size:11.5pt;line-height:1.85;color:#37474F;margin:0 0 5mm;text-align:justify;font-weight:700}' +
                     '.bk-culture-grid{display:grid;grid-template-columns:1fr 1fr;gap:3.5mm;margin-bottom:5mm}' +
-                    '.bk-culture-card{background:#FAFAFA;border:1px solid #E0E0E0;border-left:3px solid #80CBC4;border-radius:0 10px 10px 0;padding:4mm 5mm}' +
+                    '.bk-culture-card{background:#FAFAFA;border:1px solid #E0E0E0;border-left:3px solid #80CBC4;border-radius:0 10px 10px 0;padding:4mm 5mm;break-inside:avoid;page-break-inside:avoid}' +
                     '.bk-culture-title{font-size:11pt;font-weight:900;color:#37474F;margin:0 0 2mm;line-height:1.35}' +
                     '.bk-culture-text{font-size:10pt;line-height:1.7;color:#546E7A;margin:0;text-align:justify}' +
-                    '.bk-itinerary-teaser{display:flex;align-items:center;gap:4mm;padding:4mm 5mm;background:linear-gradient(90deg,rgba(240,98,146,.1),rgba(128,203,196,.1));border:1.5px solid rgba(128,203,196,.4);border-radius:10px}' +
-                    '.bk-itinerary-teaser-compact{margin-top:auto}' +
-                    '.bk-teaser-icon{font-size:18pt;line-height:1;flex-shrink:0}' +
-                    '.bk-teaser-text{display:flex;flex-direction:column;gap:.5mm}' +
-                    '.bk-teaser-text strong{font-size:11.5pt;color:#37474F}' +
-                    '.bk-teaser-text span{font-size:10pt;color:#546E7A}' +
-                    '.bk-itinerary-flow{padding:4mm 2mm 8mm;position:relative;page-break-before:always;page-break-after:always}' +
-                    '.bk-itinerary-head{margin-bottom:5mm}' +
+                    '.bk-itinerary-head{margin-bottom:4mm}' +
+                    '.bk-itinerary-start{break-before:page;page-break-before:always}' +
+                    '.bk-day-new{break-before:page;page-break-before:always}' +
                     '.bk-section-title-compact{font-size:13pt;margin-bottom:4mm}' +
-                    '.bk-day-first{margin-top:0}' +
                     '.bk-page-head{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #80CBC4;padding-bottom:3mm;margin-bottom:5mm;font-size:9.5pt;color:#78909C;font-weight:700}' +
                     '.bk-brand{font-weight:900;color:#F06292;letter-spacing:.08em}' +
                     '.bk-section-title{font-size:16pt;font-weight:900;color:#37474F;margin:0 0 5mm}' +
                     '.bk-check-intro{font-size:10.5pt;color:#546E7A;margin:0 0 4mm;line-height:1.6}' +
                     '.bk-check-grid{list-style:none;padding:0;margin:0 0 5mm;display:grid;grid-template-columns:1fr 1fr;gap:3mm 4mm}' +
-                    '.bk-check-item{display:flex;align-items:flex-start;gap:2mm;font-size:11pt;line-height:1.45}' +
+                    '.bk-check-item{display:flex;align-items:flex-start;gap:2mm;font-size:11pt;line-height:1.45;break-inside:avoid;page-break-inside:avoid}' +
                     '.bk-check-box{width:4.5mm;height:4.5mm;border:1.5px solid #546E7A;border-radius:1mm;flex-shrink:0;margin-top:1mm}' +
                     '.bk-check-icon{font-size:12pt;line-height:1.2;flex-shrink:0}' +
                     '.bk-check-text{flex:1}' +
-                    '.bk-checklist-extra{margin-bottom:5mm;padding:5mm 7mm;background:linear-gradient(135deg,#FFF8F0,#E8F5F3);border:1.5px solid rgba(128,203,196,.45);border-radius:12px}' +
+                    '.bk-checklist-extra{margin-bottom:5mm;padding:5mm 7mm;background:linear-gradient(135deg,#FFF8F0,#E8F5F3);border:1.5px solid rgba(128,203,196,.45);border-radius:12px;break-inside:avoid;page-break-inside:avoid}' +
                     '.bk-checklist-extra-title{font-size:11pt;font-weight:900;color:#37474F;margin:0 0 2.5mm}' +
                     '.bk-checklist-extra-list{margin:0;padding:0 0 0 5mm;font-size:10.5pt;line-height:1.65;color:#455A64;columns:2;column-gap:6mm}' +
                     '.bk-checklist-extra-list li{margin-bottom:1.5mm;break-inside:avoid}' +
-                    '.bk-check-final{padding:5mm 7mm;background:#F5F9FA;border:1.5px dashed #90A4AE;border-radius:12px}' +
+                    '.bk-check-final{padding:5mm 7mm;background:#F5F9FA;border:1.5px dashed #90A4AE;border-radius:12px;break-inside:avoid;page-break-inside:avoid}' +
                     '.bk-check-final-title{font-size:11pt;font-weight:900;color:#37474F;margin:0 0 2.5mm}' +
                     '.bk-check-final-list{margin:0;padding:0 0 0 5mm;font-size:10.5pt;line-height:1.65;color:#455A64}' +
                     '.bk-check-final-list li{margin-bottom:1.5mm}' +
-                    '.bk-check-page{display:flex;flex-direction:column;min-height:273mm}' +
-                    '.bk-day{margin-bottom:7mm;break-inside:avoid-page}' +
+                    '.bk-day{margin-bottom:0;break-inside:avoid-page;page-break-inside:avoid}' +
                     '.bk-day-title{font-size:13pt;font-weight:900;color:#F06292;margin:0 0 3mm}' +
                     '.bk-phase{font-size:11pt;font-weight:900;color:#546E7A;margin:3mm 0 2mm}' +
-                    '.bk-act{background:#FAFAFA;border-left:3px solid #80CBC4;border-radius:0 8px 8px 0;padding:3mm 4mm;margin-bottom:2.5mm;break-inside:avoid}' +
+                    '.bk-act{background:#FAFAFA;border-left:3px solid #80CBC4;border-radius:0 8px 8px 0;padding:3mm 4mm;margin-bottom:2.5mm;break-inside:avoid;page-break-inside:avoid}' +
                     '.bk-act-time{font-size:9.5pt;font-weight:900;color:#1565c0}' +
                     '.bk-act-title{font-size:11pt;font-weight:900;margin:1mm 0}' +
                     '.bk-act-hl,.bk-act-note{font-size:10pt;color:#546E7A;margin-top:1mm}' +
                     '.bk-food-grid{display:grid;grid-template-columns:1fr 1fr;gap:4mm}' +
-                    '.bk-food-card{border:1px solid #E0E0E0;border-radius:8px;padding:4mm;background:#FFFBF7;break-inside:avoid}' +
+                    '.bk-food-card{border:1px solid #E0E0E0;border-radius:8px;padding:4mm;background:#FFFBF7;break-inside:avoid;page-break-inside:avoid}' +
                     '.bk-food-name{font-weight:900;font-size:10.5pt;margin-bottom:1mm}' +
                     '.bk-food-meta{font-size:9.5pt;color:#1565c0;font-weight:700}' +
                     '.bk-food-addr{font-size:9.5pt;color:#546E7A;margin-top:1mm}' +
                     '.bk-food-tag{font-size:8.5pt;color:#78909C;margin-top:2mm}' +
                     '.bk-muted{font-size:10.5pt;color:#78909C;font-style:italic}' +
-                    '.bk-notes-start{page-break-before:always}' +
-                    '.bk-note-page{display:flex;flex-direction:column;page-break-after:always;page-break-inside:avoid;height:273mm;max-height:273mm;overflow:hidden}' +
+                    '.bk-notes-start{break-before:page;page-break-before:always}' +
+                    '.bk-note-page{display:flex;flex-direction:column;break-after:page;page-break-after:always;break-inside:avoid-page;page-break-inside:avoid;height:277mm;max-height:277mm;overflow:hidden;padding:0 2mm}' +
                     '.bk-note-hint{font-size:9.5pt;color:#78909C;margin:0 0 3mm;flex-shrink:0}' +
-                    '.bk-note-body{display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden}' +
-                    '.bk-lines-area{flex:1;min-height:0;margin-bottom:3mm;background-image:repeating-linear-gradient(transparent,transparent 6.5mm,#CFD8DC 6.5mm,#CFD8DC 7mm);background-size:100% 7mm}' +
-                    '.bk-stamp-zone{height:50mm;min-height:50mm;max-height:50mm;flex-shrink:0;margin-top:auto;border:2px dashed #90A4AE;border-radius:10px;position:relative;background:rgba(250,250,250,.6)}' +
+                    '.bk-note-body{display:flex;flex-direction:column;flex:1;min-height:0;break-inside:avoid-page;page-break-inside:avoid;overflow:hidden}' +
+                    '.bk-lines-area{flex:0 0 auto;height:205mm;max-height:205mm;margin-bottom:3mm;background-image:repeating-linear-gradient(transparent,transparent 6.5mm,#CFD8DC 6.5mm,#CFD8DC 7mm);background-size:100% 7mm;break-inside:avoid;page-break-inside:avoid}' +
+                    '.bk-stamp-zone{height:48mm;min-height:48mm;max-height:48mm;flex-shrink:0;border:2px dashed #90A4AE;border-radius:10px;position:relative;background:rgba(250,250,250,.6);break-inside:avoid;page-break-inside:avoid;break-before:avoid-page;page-break-before:avoid}' +
                     '.bk-stamp-zone-label{position:absolute;top:4mm;left:5mm;font-size:10pt;color:#78909C;font-weight:900;letter-spacing:.1em}' +
-                    '.bk-footer{margin-top:8mm;text-align:center;font-size:8pt;color:#B0BEC5}' +
-                    '@media print{body,.bk-watermark,.bk-watermark img,.bk-cover-bg,.bk-cover-overlay,.bk-cover-spine,.bk-fact-pill,.bk-culture-card,.bk-tips-box,.bk-itinerary-teaser,.bk-checklist-extra,.bk-check-final,.bk-stamp-zone{-webkit-print-color-adjust:exact;print-color-adjust:exact}}';
+                    '.bk-footer{margin-top:6mm;text-align:center;font-size:8pt;color:#B0BEC5}' +
+                    '@media print{body,.bk-watermark,.bk-watermark img,.bk-cover-bg,.bk-cover-bg-img,.bk-cover-overlay,.bk-cover-spine,.bk-fact-pill,.bk-culture-card,.bk-tips-box,.bk-checklist-extra,.bk-check-final,.bk-stamp-zone{-webkit-print-color-adjust:exact;print-color-adjust:exact}}';
             }
 
-            function buildTravelBookletPrintHtml(meta, hidden, foodSpots, watermarkDataUrl) {
+            function buildTravelBookletPrintHtml(meta, hidden, foodSpots, watermarkDataUrl, coverDataUrl) {
                 var styleLabel = getSelectedStyleLabel(meta);
                 var dest = (meta && meta.destination) || '目的地';
                 var dateRange = formatDateRange(meta) || '—';
@@ -6071,12 +6170,17 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 var notePages = '';
                 var ni;
                 var wm = buildBookletWatermarkHtml(watermarkDataUrl);
-                var coverImageUrl = resolveBookletCoverUrl(dest);
                 var profile = resolveBookletProfile(dest);
                 var tripNight = calcTripDayNight(meta);
                 var userName = resolveBookletUserName();
                 var coverTop = buildBookletCoverTopHtml(meta);
                 var coverPersonal = buildBookletCoverPersonalHtml(userName, profile);
+                var coverBgHtml = coverDataUrl
+                    ? '<img class="bk-cover-bg-img" src="' + coverDataUrl + '" alt="">'
+                    : '';
+                var coverBgStyle = coverDataUrl
+                    ? ''
+                    : 'background-color:#1e293b;';
                 for (ni = 1; ni <= 3; ni++) {
                     var noteCls = 'bk-page bk-note-page' + (ni === 1 ? ' bk-notes-start' : '');
                     notePages += '<div class="' + noteCls + '">' + wm +
@@ -6102,7 +6206,8 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
                     '<div class="bk-page bk-cover-page">' +
                     '<div class="bk-book-cover">' +
-                    '<div class="bk-cover-bg" style="background-image:url(\'' + coverImageUrl + '\')"></div>' +
+                    coverBgHtml +
+                    '<div class="bk-cover-bg" style="' + coverBgStyle + '"></div>' +
                     '<div class="bk-cover-overlay"></div>' +
                     '<div class="bk-cover-spine"></div>' +
                     coverTop +
@@ -6166,6 +6271,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     }
                     var foodSpots = collectBookletFoodSpots(hidden, window.soarvibeFoodSpotCache || []);
                     var watermarkDataUrl = await resolveBookletWatermarkDataUrl();
+                    var coverDataUrl = await resolveBookletCoverDataUrl(meta.destination);
                     if (watermarkDataUrl) {
                         console.log('[SOARVIBE] 小本本 LOGO 已嵌入浮水印');
                     } else if (isBookletLocalFile()) {
@@ -6173,7 +6279,12 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     } else {
                         console.warn('[SOARVIBE] 小本本 LOGO 載入失敗 → 請確認 soarvibe-logo.png 與 index.html 同目錄');
                     }
-                    var printHtml = buildTravelBookletPrintHtml(meta, hidden, foodSpots, watermarkDataUrl);
+                    if (coverDataUrl) {
+                        console.log('[SOARVIBE] 封面圖已嵌入列印');
+                    } else {
+                        console.warn('[SOARVIBE] 封面圖載入失敗 → 將使用純色封面');
+                    }
+                    var printHtml = buildTravelBookletPrintHtml(meta, hidden, foodSpots, watermarkDataUrl, coverDataUrl);
                     var printWin = null;
                     var blobUrl = '';
 
