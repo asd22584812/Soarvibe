@@ -234,6 +234,60 @@
         .date-field::-webkit-calendar-picker-indicator:hover {
             opacity: 0.58;
         }
+        .picker-field {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            width: 100%;
+            box-sizing: border-box;
+            min-height: 2.125rem;
+            padding: 0.4rem 0.55rem;
+            border-radius: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.92);
+            color-scheme: light;
+            box-shadow: inset 0 1px 3px rgba(55, 71, 79, 0.1), 0 1px 2px rgba(55, 71, 79, 0.06);
+            overflow: hidden;
+        }
+        .picker-display {
+            flex: 1;
+            min-width: 0;
+            font-family: 'Outfit', 'Noto Sans TC', sans-serif;
+            font-weight: 700;
+            font-size: 0.8125rem;
+            line-height: 1.25;
+            color: #78909C;
+            pointer-events: none;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .picker-display.has-value {
+            color: #455A64;
+        }
+        .picker-icon {
+            flex-shrink: 0;
+            font-size: 0.875rem;
+            line-height: 1;
+            opacity: 0.62;
+            pointer-events: none;
+        }
+        .picker-input {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            border: none;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 2;
+            font-size: 16px;
+            -webkit-appearance: none;
+            appearance: none;
+        }
         .form-stack {
             position: relative;
             z-index: 20;
@@ -1002,12 +1056,22 @@
             -webkit-backdrop-filter: blur(12px);
             flex-shrink: 0;
         }
+        @media (max-width: 768px), (display-mode: standalone) {
+            .user-wall-header {
+                padding-top: calc(env(safe-area-inset-top, 47px) + 0.5rem);
+            }
+            #user-wall {
+                border-radius: 0;
+            }
+        }
         .user-wall-back {
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 2.25rem;
-            height: 2.25rem;
+            width: 2.75rem;
+            height: 2.75rem;
+            min-width: 2.75rem;
+            min-height: 2.75rem;
             border: none;
             border-radius: 9999px;
             background: rgba(255, 255, 255, 0.55);
@@ -1031,7 +1095,7 @@
             margin: 0;
         }
         .user-wall-header-spacer {
-            width: 2.25rem;
+            width: 2.75rem;
             flex-shrink: 0;
         }
         #user-wall-scroll {
@@ -1299,7 +1363,7 @@
             left: 0;
             right: 0;
             top: 0;
-            bottom: 3.25rem;
+            bottom: calc(3.25rem + env(safe-area-inset-bottom, 0px));
             z-index: 55;
             display: flex;
             flex-direction: column;
@@ -1317,6 +1381,7 @@
             max-height: 100%;
             border-radius: 24px 24px 0 0;
             margin-bottom: 0;
+            padding-bottom: env(safe-area-inset-bottom, 0px);
             box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.12);
             display: flex;
             flex-direction: column;
@@ -1373,11 +1438,22 @@
             body > .app-shell #soarvibe-generating {
                 border-radius: 0 !important;
             }
-            body > .app-shell header.pt-7 {
-                padding-top: max(1.75rem, env(safe-area-inset-top, 0px));
+            body > .app-shell header.app-header {
+                padding-top: calc(env(safe-area-inset-top, 47px) + 0.625rem);
+                margin-bottom: 1rem;
             }
-            .date-field {
-                font-size: 16px;
+            body > .app-shell main.app-main {
+                padding-bottom: 0.75rem;
+            }
+            body > .app-shell .hot-recommend {
+                margin-bottom: 0;
+                padding-bottom: 0;
+            }
+            .picker-field {
+                min-height: 2.75rem;
+            }
+            .picker-display {
+                font-size: 0.875rem;
             }
         }
         .user-api-hint {
@@ -1425,12 +1501,12 @@
 
         <div class="phone-scroll relative z-10 flex-1 min-h-0 w-full overflow-y-auto overflow-x-hidden hide-scrollbar">
 
-        <header class="pt-7 pb-4 mb-6 text-center shrink-0 px-5">
+        <header class="app-header pt-7 pb-4 mb-6 text-center shrink-0 px-5">
             <h1 class="brand-title text-5xl font-[900] text-white uppercase leading-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]">SOARVIBE</h1>
             <p class="brand-tagline mt-2 text-xs text-white font-[900] leading-relaxed tracking-[0.3em]">提升你的旅程，翱翔你的風格</p>
         </header>
 
-        <main class="px-5 pb-6 min-w-0 overflow-x-hidden">
+        <main class="app-main px-5 pb-6 min-w-0 overflow-x-hidden">
 
             <div class="form-stack shrink-0 space-y-2">
                 <p class="greeting-outline text-sm font-bold text-white tracking-wide">👋 嗨！這次規劃去哪裡呢?</p>
@@ -1464,11 +1540,19 @@
                     <div class="grid grid-cols-2 gap-2 relative z-20 pointer-events-auto">
                         <label class="block min-w-0">
                             <span class="text-[10px] font-bold text-[#78909C] mb-1 block">出發</span>
-                            <input type="date" id="date-start" name="date-start" class="date-field w-full rounded-xl border border-white/70 text-[#455A64] font-bold">
+                            <div class="picker-field">
+                                <span class="picker-display" id="date-start-display">年 / 月 / 日</span>
+                                <span class="picker-icon" aria-hidden="true">📅</span>
+                                <input type="date" id="date-start" name="date-start" class="picker-input" aria-label="出發日期">
+                            </div>
                         </label>
                         <label class="block min-w-0">
                             <span class="text-[10px] font-bold text-[#78909C] mb-1 block">回程</span>
-                            <input type="date" id="date-end" name="date-end" class="date-field w-full rounded-xl border border-white/70 text-[#455A64] font-bold">
+                            <div class="picker-field">
+                                <span class="picker-display" id="date-end-display">年 / 月 / 日</span>
+                                <span class="picker-icon" aria-hidden="true">📅</span>
+                                <input type="date" id="date-end" name="date-end" class="picker-input" aria-label="回程日期">
+                            </div>
                         </label>
                     </div>
                 </section>
@@ -1520,11 +1604,19 @@
                                 <div class="flight-times-row">
                                     <label class="min-w-0">
                                         <span class="field-label">出發時間</span>
-                                        <input type="time" id="flight-departure-time" class="date-field w-full rounded-lg border border-white/70" value="14:30" aria-label="出發時間">
+                                        <div class="picker-field rounded-lg">
+                                            <span class="picker-display has-value" id="flight-departure-display">下午 2:30</span>
+                                            <span class="picker-icon" aria-hidden="true">🕐</span>
+                                            <input type="time" id="flight-departure-time" class="picker-input" value="14:30" aria-label="出發時間">
+                                        </div>
                                     </label>
                                     <label class="min-w-0">
                                         <span class="field-label">回程時間</span>
-                                        <input type="time" id="flight-return-time" class="date-field w-full rounded-lg border border-white/70" value="18:00" aria-label="回程時間">
+                                        <div class="picker-field rounded-lg">
+                                            <span class="picker-display has-value" id="flight-return-display">下午 6:00</span>
+                                            <span class="picker-icon" aria-hidden="true">🕐</span>
+                                            <input type="time" id="flight-return-time" class="picker-input" value="18:00" aria-label="回程時間">
+                                        </div>
                                     </label>
                                 </div>
                                 <div class="hotel-row-full">
@@ -1647,7 +1739,7 @@
                     <button type="button" id="savedTripsClose" class="text-sm font-bold text-[#78909C] px-2 py-1 rounded-lg active:opacity-70">關閉</button>
                 </div>
                 <div id="savedTripsList" class="px-4 pb-2 hide-scrollbar"></div>
-                <p id="savedTripsEmpty" class="hidden px-4 pb-4 text-xs text-[#78909C] text-center">尚無收藏，生成行程後點「收藏此行程」即可鎖定。</p>
+                <p id="savedTripsEmpty" class="hidden px-4 pb-5 text-xs text-[#78909C] text-center">尚無收藏，生成行程後點「收藏此行程」即可鎖定。</p>
             </div>
         </div>
 
@@ -4137,6 +4229,54 @@
                 return isoDate;
             }
 
+            function formatPickerDate(isoDate) {
+                if (!isoDate) return '年 / 月 / 日';
+                var parts = isoDate.split('-');
+                if (parts.length === 3) {
+                    return parts[0] + '年' + parseInt(parts[1], 10) + '月' + parseInt(parts[2], 10) + '日';
+                }
+                return formatSlashDate(isoDate);
+            }
+
+            function formatPickerTime(timeValue) {
+                if (!timeValue) return '選擇時間';
+                var bits = String(timeValue).split(':');
+                if (bits.length < 2) return timeValue;
+                var h = parseInt(bits[0], 10);
+                var m = bits[1];
+                if (isNaN(h)) return timeValue;
+                var ampm = h >= 12 ? '下午' : '上午';
+                var h12 = h % 12;
+                if (h12 === 0) h12 = 12;
+                return ampm + ' ' + h12 + ':' + m;
+            }
+
+            function updateDatePickerDisplays() {
+                var startDisplay = document.getElementById('date-start-display');
+                var endDisplay = document.getElementById('date-end-display');
+                if (startDisplay && dateStartInput) {
+                    startDisplay.textContent = formatPickerDate(dateStartInput.value);
+                    startDisplay.classList.toggle('has-value', !!dateStartInput.value);
+                }
+                if (endDisplay && dateEndInput) {
+                    endDisplay.textContent = formatPickerDate(dateEndInput.value);
+                    endDisplay.classList.toggle('has-value', !!dateEndInput.value);
+                }
+            }
+
+            function updateTimePickerDisplays() {
+                var depDisplay = document.getElementById('flight-departure-display');
+                var retDisplay = document.getElementById('flight-return-display');
+                if (depDisplay && flightDepartureTimeInput) {
+                    depDisplay.textContent = formatPickerTime(flightDepartureTimeInput.value);
+                    depDisplay.classList.toggle('has-value', !!flightDepartureTimeInput.value);
+                }
+                if (retDisplay && flightReturnTimeInput) {
+                    retDisplay.textContent = formatPickerTime(flightReturnTimeInput.value);
+                    retDisplay.classList.toggle('has-value', !!flightReturnTimeInput.value);
+                }
+            }
+
             function formatTimeOnly(isoDateTime) {
                 if (!isoDateTime) return '';
                 var parts = isoDateTime.split('T');
@@ -4152,6 +4292,7 @@
                 tripDateState.dateStart = dateStartInput.value || '';
                 tripDateState.dateEnd = dateEndInput.value || '';
                 updateFlightDateDisplays();
+                updateDatePickerDisplays();
             }
 
             function updateFlightDateDisplays() {
@@ -4179,6 +4320,7 @@
                 if (flightReturnTimeInput) {
                     flightReturnTimeInput.value = pickRandom(preset.returnTimes);
                 }
+                updateTimePickerDisplays();
             }
 
             function applyCityPreset(cityKey) {
@@ -7337,7 +7479,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', function () {
-                    navigator.serviceWorker.register('./service-worker.js?v=4').catch(function (err) {
+                    navigator.serviceWorker.register('./service-worker.js?v=5').catch(function (err) {
                         console.warn('[SOARVIBE] Service worker registration failed:', err);
                     });
                 });
@@ -7404,14 +7546,30 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             dateStartInput.addEventListener('change', function () {
                 syncTripDateState();
             });
+            dateStartInput.addEventListener('input', function () {
+                syncTripDateState();
+            });
             dateEndInput.addEventListener('change', function () {
                 syncTripDateState();
             });
+            dateEndInput.addEventListener('input', function () {
+                syncTripDateState();
+            });
             if (flightDepartureTimeInput) {
-                flightDepartureTimeInput.addEventListener('change', function () { /* time locked to global dates */ });
+                flightDepartureTimeInput.addEventListener('change', function () {
+                    updateTimePickerDisplays();
+                });
+                flightDepartureTimeInput.addEventListener('input', function () {
+                    updateTimePickerDisplays();
+                });
             }
             if (flightReturnTimeInput) {
-                flightReturnTimeInput.addEventListener('change', function () { /* time locked to global dates */ });
+                flightReturnTimeInput.addEventListener('change', function () {
+                    updateTimePickerDisplays();
+                });
+                flightReturnTimeInput.addEventListener('input', function () {
+                    updateTimePickerDisplays();
+                });
             }
             if (advancedTransportSelect) {
                 advancedTransportSelect.addEventListener('change', function () {
@@ -7424,6 +7582,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 });
             }
             syncTripDateState();
+            updateTimePickerDisplays();
 
             document.querySelectorAll('input[name="travel-style"]').forEach(function (radio) {
                 radio.addEventListener('change', function () {
