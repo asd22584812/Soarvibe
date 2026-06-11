@@ -1,4 +1,4 @@
-const CACHE_NAME = 'soarvibe-v1';
+const CACHE_NAME = 'soarvibe-v2';
 const STATIC_ASSETS = [
   './',
   './index.html',

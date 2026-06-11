@@ -235,48 +235,6 @@
         .date-field::-webkit-calendar-picker-indicator:hover {
             opacity: 0.58;
         }
-        .date-input-wrap,
-        .time-input-wrap {
-            position: relative;
-            display: block;
-            width: 100%;
-        }
-        .date-input-icon,
-        .time-input-icon {
-            position: absolute;
-            right: 0.625rem;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 1rem;
-            line-height: 1;
-            pointer-events: none;
-            z-index: 2;
-            opacity: 0.72;
-        }
-        .date-input-wrap .date-field,
-        .time-input-wrap .date-field {
-            padding-right: 2rem;
-        }
-        html.mobile-fullscreen .date-grid {
-            grid-template-columns: 1fr;
-            gap: 0.5rem;
-        }
-        html.mobile-fullscreen .date-field {
-            font-size: 16px;
-            min-height: 2.75rem;
-            padding-top: 0.55rem;
-            padding-bottom: 0.55rem;
-        }
-        html.mobile-fullscreen .date-field::-webkit-calendar-picker-indicator,
-        html.mobile-fullscreen .date-field::-webkit-inner-spin-button {
-            width: 1.35rem;
-            height: 1.35rem;
-            opacity: 0.72;
-        }
-        html.mobile-fullscreen .flight-times-row .date-field {
-            min-height: 2.75rem;
-            font-size: 16px;
-        }
         .form-stack {
             position: relative;
             z-index: 20;
@@ -1384,34 +1342,69 @@
             color: #F06292;
         }
         html.pwa-standalone body,
-        html.mobile-fullscreen body,
+        html.mobile-fullscreen body {
+            display: block !important;
+            padding: 0 !important;
+            min-height: 100dvh;
+            height: 100dvh;
+            overflow: hidden;
+            background: #1a2327;
+        }
+        html.pwa-standalone body > .app-shell,
+        html.mobile-fullscreen body > .app-shell {
+            width: 100% !important;
+            max-width: none !important;
+            height: 100dvh !important;
+            min-height: 100dvh !important;
+            max-height: 100dvh !important;
+            margin: 0 !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            padding-top: env(safe-area-inset-top, 0px);
+            padding-bottom: env(safe-area-inset-bottom, 0px);
+            box-sizing: border-box;
+        }
+        html.pwa-standalone body > .app-shell .glass-nav,
+        html.mobile-fullscreen body > .app-shell .glass-nav {
+            border-radius: 0 !important;
+            padding-bottom: max(0.625rem, env(safe-area-inset-bottom, 0px));
+        }
+        html.pwa-standalone body > .app-shell #soarvibe-alert,
+        html.pwa-standalone body > .app-shell #soarvibe-generating,
+        html.mobile-fullscreen body > .app-shell #soarvibe-alert,
+        html.mobile-fullscreen body > .app-shell #soarvibe-generating {
+            border-radius: 0 !important;
+        }
+        html.pwa-standalone body > .app-shell header.pt-7,
+        html.mobile-fullscreen body > .app-shell header.pt-7 {
+            padding-top: 1rem;
+        }
+        html.mobile-fullscreen .date-field,
+        html.mobile-fullscreen .flight-times-row .date-field {
+            font-size: 16px;
+            height: 2.75rem;
+            min-height: 0;
+            max-height: 2.75rem;
+            line-height: 1.2;
+            padding: 0 0.5rem;
+        }
+        html.mobile-fullscreen .date-field::-webkit-calendar-picker-indicator {
+            width: 1.25rem;
+            height: 1.25rem;
+            opacity: 0.55;
+        }
         @media (display-mode: standalone), (display-mode: fullscreen) {
             body {
+                display: block !important;
                 padding: 0 !important;
                 background: #1a2327;
             }
             body > .app-shell {
                 width: 100% !important;
-                max-width: none;
-                height: 100dvh;
-                min-height: 100dvh;
-                max-height: 100dvh;
+                max-width: none !important;
+                height: 100dvh !important;
                 border-radius: 0 !important;
                 box-shadow: none !important;
-                padding-top: env(safe-area-inset-top, 0px);
-                padding-bottom: env(safe-area-inset-bottom, 0px);
-                box-sizing: border-box;
-            }
-            body > .app-shell .glass-nav {
-                border-radius: 0;
-                padding-bottom: max(0.625rem, env(safe-area-inset-bottom, 0px));
-            }
-            body > .app-shell #soarvibe-alert,
-            body > .app-shell #soarvibe-generating {
-                border-radius: 0;
-            }
-            body > .app-shell header.pt-7 {
-                padding-top: 1.25rem;
             }
         }
         .user-api-hint {
@@ -1495,20 +1488,14 @@
                 <section class="glass-card relative z-20 rounded-3xl p-3.5 shadow-sm pointer-events-auto">
                     <h2 class="text-base font-bold text-[#37474F] mb-2">2. 去幾天？</h2>
                     <p class="text-xs font-bold text-[#546E7A] mb-2">📅 選擇出發與回程日期</p>
-                    <div class="date-grid grid grid-cols-2 gap-2 relative z-20 pointer-events-auto">
+                    <div class="grid grid-cols-2 gap-2 relative z-20 pointer-events-auto">
                         <label class="block min-w-0">
                             <span class="text-[10px] font-bold text-[#78909C] mb-1 block">出發</span>
-                            <span class="date-input-wrap">
-                                <input type="date" id="date-start" name="date-start" class="date-field w-full rounded-xl border border-white/70 text-[#455A64] font-bold">
-                                <span class="date-input-icon" aria-hidden="true">📅</span>
-                            </span>
+                            <input type="date" id="date-start" name="date-start" class="date-field w-full rounded-xl border border-white/70 text-[#455A64] font-bold">
                         </label>
                         <label class="block min-w-0">
                             <span class="text-[10px] font-bold text-[#78909C] mb-1 block">回程</span>
-                            <span class="date-input-wrap">
-                                <input type="date" id="date-end" name="date-end" class="date-field w-full rounded-xl border border-white/70 text-[#455A64] font-bold">
-                                <span class="date-input-icon" aria-hidden="true">📅</span>
-                            </span>
+                            <input type="date" id="date-end" name="date-end" class="date-field w-full rounded-xl border border-white/70 text-[#455A64] font-bold">
                         </label>
                     </div>
                 </section>
@@ -1560,17 +1547,11 @@
                                 <div class="flight-times-row">
                                     <label class="min-w-0">
                                         <span class="field-label">出發時間</span>
-                                        <span class="time-input-wrap">
-                                            <input type="time" id="flight-departure-time" class="date-field w-full rounded-lg border border-white/70" value="14:30" aria-label="出發時間">
-                                            <span class="time-input-icon" aria-hidden="true">🕐</span>
-                                        </span>
+                                        <input type="time" id="flight-departure-time" class="date-field w-full rounded-lg border border-white/70" value="14:30" aria-label="出發時間">
                                     </label>
                                     <label class="min-w-0">
                                         <span class="field-label">回程時間</span>
-                                        <span class="time-input-wrap">
-                                            <input type="time" id="flight-return-time" class="date-field w-full rounded-lg border border-white/70" value="18:00" aria-label="回程時間">
-                                            <span class="time-input-icon" aria-hidden="true">🕐</span>
-                                        </span>
+                                        <input type="time" id="flight-return-time" class="date-field w-full rounded-lg border border-white/70" value="18:00" aria-label="回程時間">
                                     </label>
                                 </div>
                                 <div class="hotel-row-full">
