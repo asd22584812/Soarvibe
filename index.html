@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#37474F">
     <meta name="description" content="SOARVIBE — AI 旅遊規劃，提升你的旅程，翱翔你的風格">
     <meta name="mobile-web-app-capable" content="yes">
@@ -358,6 +358,28 @@
         }
         #advanced-settings.is-open #advanced-chevron {
             transform: rotate(90deg);
+        }
+        #user-api-settings .user-api-panel {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.35s ease;
+        }
+        #user-api-settings.is-open .user-api-panel {
+            grid-template-rows: 1fr;
+        }
+        #user-api-settings .user-api-panel-inner {
+            min-height: 0;
+            overflow: hidden;
+        }
+        #user-api-chevron {
+            transition: transform 0.35s ease;
+            flex-shrink: 0;
+        }
+        #user-api-settings.is-open #user-api-chevron {
+            transform: rotate(90deg);
+        }
+        #user-api-settings {
+            margin-top: 0.75rem;
         }
         .city-card {
             cursor: pointer;
@@ -1405,11 +1427,15 @@
         #nav-favorite.nav-active {
             color: #F06292;
         }
-        /* 手機 / PWA：填滿螢幕，不用 scale（iOS 日期欄會壞掉） */
+        /* 手機 / PWA：填滿螢幕 + 等比例放大 UI（不動背景圖） */
         @media (max-width: 768px), (display-mode: standalone) {
+            html {
+                font-size: 118.75%;
+            }
             html, body {
                 height: 100%;
                 overflow: hidden;
+                touch-action: manipulation;
             }
             body {
                 display: block !important;
@@ -1454,6 +1480,15 @@
             }
             .picker-display {
                 font-size: 0.875rem;
+            }
+            #destination-input {
+                font-size: 16px !important;
+            }
+            #user-wall-scroll {
+                padding-bottom: 2.5rem;
+            }
+            #user-api-settings {
+                margin-top: 3rem;
             }
         }
         .user-api-hint {
@@ -1869,19 +1904,29 @@
                     </div>
                 </section>
 
-                <section class="user-tool-card user-glass-card" aria-labelledby="user-api-title">
-                    <h3 id="user-api-title" class="user-tool-title">API 金鑰設定</h3>
-                    <p class="user-api-hint">金鑰只儲存在這台裝置的瀏覽器，不會上傳到 GitHub 或任何伺服器。</p>
-                    <div class="user-note-block">
-                        <label for="user-api-gemini" class="user-note-label">Gemini AI 金鑰</label>
-                        <textarea id="user-api-gemini" class="user-note-textarea user-api-key-field" rows="3" placeholder="每行一把金鑰（AIzaSy… 或 AQ.…）" autocomplete="off" spellcheck="false"></textarea>
+                <section id="user-api-settings" class="user-tool-card user-glass-card" aria-labelledby="user-api-title">
+                    <button type="button" id="user-api-toggle" class="w-full flex items-center justify-between gap-2 text-left cursor-pointer" aria-expanded="false" aria-controls="user-api-panel">
+                        <span id="user-api-title" class="user-tool-title mb-0">🔐 開發者 API 金鑰（選填）</span>
+                        <span id="user-api-chevron" class="text-[#78909C] text-lg leading-none" aria-hidden="true">❯</span>
+                    </button>
+                    <p class="user-api-hint mt-2 mb-0">往下滑動展開；一般使用者可略過，不影響備援行程。</p>
+                    <div id="user-api-panel" class="user-api-panel">
+                        <div class="user-api-panel-inner">
+                            <div class="pt-3 mt-2 border-t border-white/45">
+                                <p class="user-api-hint">金鑰只儲存在這台裝置的瀏覽器，不會上傳到 GitHub 或任何伺服器。</p>
+                                <div class="user-note-block">
+                                    <label for="user-api-gemini" class="user-note-label">Gemini AI 金鑰</label>
+                                    <textarea id="user-api-gemini" class="user-note-textarea user-api-key-field" rows="3" placeholder="每行一把金鑰（AIzaSy… 或 AQ.…）" autocomplete="off" spellcheck="false"></textarea>
+                                </div>
+                                <div class="user-note-block">
+                                    <label for="user-api-maps" class="user-note-label">Google Maps 金鑰</label>
+                                    <input type="password" id="user-api-maps" class="user-nickname-input user-api-key-field" placeholder="AIzaSy…（地圖／Places 功能）" autocomplete="off" spellcheck="false" />
+                                </div>
+                                <p id="user-api-status" class="user-api-status">尚未設定金鑰</p>
+                                <button type="button" id="user-api-save" class="user-api-save-btn">儲存金鑰</button>
+                            </div>
+                        </div>
                     </div>
-                    <div class="user-note-block">
-                        <label for="user-api-maps" class="user-note-label">Google Maps 金鑰</label>
-                        <input type="password" id="user-api-maps" class="user-nickname-input user-api-key-field" placeholder="AIzaSy…（地圖／Places 功能）" autocomplete="off" spellcheck="false" />
-                    </div>
-                    <p id="user-api-status" class="user-api-status">尚未設定金鑰</p>
-                    <button type="button" id="user-api-save" class="user-api-save-btn">儲存金鑰</button>
                 </section>
             </div>
         </div>
@@ -2392,6 +2437,8 @@
             const userApiMaps = document.getElementById('user-api-maps');
             const userApiStatus = document.getElementById('user-api-status');
             const userApiSave = document.getElementById('user-api-save');
+            const userApiToggle = document.getElementById('user-api-toggle');
+            const userApiSettings = document.getElementById('user-api-settings');
             const userChecklist = document.getElementById('user-checklist');
             const USER_NICKNAME_KEY = 'soarvibe_user_nickname';
             const USER_GEMINI_KEYS_KEY = 'SOARVIBE_GEMINI_API_KEYS';
@@ -3859,9 +3906,6 @@
                 if (!hasSelectedTripDestination()) {
                     closeKkdayAffiliateMenu();
                     showModal(MSG_AFFILIATE_NO_DESTINATION, '📍');
-                    if (destinationInput) {
-                        destinationInput.focus();
-                    }
                     return;
                 }
                 switch (type) {
@@ -7321,9 +7365,18 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             function showModal(message, icon) {
+                if (document.activeElement && typeof document.activeElement.blur === 'function') {
+                    document.activeElement.blur();
+                }
                 alertTitle.textContent = message;
                 alertIcon.textContent = icon || '✈️';
                 alertEl.classList.remove('hidden');
+                var closeBtn = document.getElementById('alert-close');
+                if (closeBtn) {
+                    setTimeout(function () {
+                        closeBtn.focus({ preventScroll: true });
+                    }, 60);
+                }
             }
 
             function hideAlert() {
@@ -7368,26 +7421,18 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
                 if (!destination) {
                     showModal(MSG_DESTINATION_EMPTY, '📍');
-                    destinationInput.focus();
                     return;
                 }
                 if (isDestinationBlocked(destination)) {
                     showModal(MSG_DESTINATION_INVALID, '✈️');
-                    destinationInput.focus();
                     return;
                 }
                 if (!dateStartInput.value || !dateEndInput.value) {
                     showModal(MSG_DATES_INCOMPLETE, '📅');
-                    if (!dateStartInput.value) {
-                        dateStartInput.focus();
-                    } else {
-                        dateEndInput.focus();
-                    }
                     return;
                 }
                 if (isReturnBeforeDeparture()) {
                     showModal(MSG_DATES_REVERSED, '⏳');
-                    dateEndInput.focus();
                     return;
                 }
                 if (!getSelectedTravelStyle()) {
@@ -7475,11 +7520,17 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             if (userApiSave) {
                 userApiSave.addEventListener('click', saveApiKeysFromForm);
             }
+            if (userApiToggle && userApiSettings) {
+                userApiToggle.addEventListener('click', function () {
+                    var isOpen = userApiSettings.classList.toggle('is-open');
+                    userApiToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+                });
+            }
             updateApiKeyStatus();
 
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', function () {
-                    navigator.serviceWorker.register('./service-worker.js?v=5').catch(function (err) {
+                    navigator.serviceWorker.register('./service-worker.js?v=6').catch(function (err) {
                         console.warn('[SOARVIBE] Service worker registration failed:', err);
                     });
                 });
