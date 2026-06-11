@@ -42,6 +42,8 @@
             max-height: 100dvh;
             overflow: hidden;
             flex-shrink: 0;
+            border-radius: 48px;
+            box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.9);
         }
         .app-shell-bg {
             position: absolute;
@@ -1338,37 +1340,45 @@
         #nav-favorite.nav-active {
             color: #F06292;
         }
-        /* 手機：等比縮放 393×852 原稿，維持圖二圓角手機框與玻璃卡片比例 */
-        @media (max-width: 768px) {
+        /* 手機 / PWA：填滿螢幕，不用 scale（iOS 日期欄會壞掉） */
+        @media (max-width: 768px), (display-mode: standalone) {
             html, body {
                 height: 100%;
                 overflow: hidden;
             }
             body {
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
+                display: block !important;
                 padding: 0 !important;
+                margin: 0;
                 min-height: 100dvh;
                 height: 100dvh;
-                background: #030712;
+                background: #000;
             }
             body > .app-shell {
-                width: 393px !important;
-                height: 852px !important;
-                max-width: 393px !important;
-                max-height: 852px !important;
-                flex-shrink: 0;
+                width: 100% !important;
+                height: 100dvh !important;
+                min-height: 100dvh !important;
+                max-width: none !important;
+                max-height: none !important;
                 margin: 0 !important;
-                transform: scale(min(calc(100vw / 393), calc(100dvh / 852)));
-                transform-origin: center center;
-                border-radius: 48px !important;
-                box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.9) !important;
+                transform: none !important;
+                border-radius: 0 !important;
+                box-shadow: none !important;
             }
-        }
-        html.pwa-standalone body {
-            padding: 0 !important;
-            background: #030712;
+            body > .app-shell .glass-nav {
+                border-radius: 0 !important;
+                padding-bottom: max(0.625rem, env(safe-area-inset-bottom, 0px));
+            }
+            body > .app-shell #soarvibe-alert,
+            body > .app-shell #soarvibe-generating {
+                border-radius: 0 !important;
+            }
+            body > .app-shell header.pt-7 {
+                padding-top: max(1.75rem, env(safe-area-inset-top, 0px));
+            }
+            .date-field {
+                font-size: 16px;
+            }
         }
         .user-api-hint {
             font-size: 0.6875rem;
@@ -1408,7 +1418,7 @@
 </head>
 <body class="min-h-screen overflow-hidden bg-gray-950 flex items-center justify-center p-4">
 
-    <div class="app-shell relative flex flex-col w-[393px] h-[852px] shrink-0 rounded-[48px] overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)]">
+    <div class="app-shell relative flex flex-col overflow-hidden">
 
         <div class="app-shell-bg" aria-hidden="true"></div>
         <div class="absolute inset-0 z-0 bg-black/5 backdrop-blur-[6px] pointer-events-none" aria-hidden="true"></div>
@@ -7327,7 +7337,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', function () {
-                    navigator.serviceWorker.register('./service-worker.js').catch(function (err) {
+                    navigator.serviceWorker.register('./service-worker.js?v=4').catch(function (err) {
                         console.warn('[SOARVIBE] Service worker registration failed:', err);
                     });
                 });
