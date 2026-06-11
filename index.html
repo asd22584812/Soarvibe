@@ -627,6 +627,50 @@
             color: #78909C;
             margin-top: 0.2rem;
         }
+        #ai-content .activity-nav-btn,
+        .exclusive-nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            margin-top: 0.45rem;
+            padding: 0.35rem 0.65rem;
+            border: none;
+            border-radius: 9999px;
+            font-size: 0.6875rem;
+            font-weight: 900;
+            color: #1565c0;
+            background: rgba(255, 255, 255, 0.92);
+            box-shadow: 0 1px 4px rgba(21, 101, 192, 0.15);
+            cursor: pointer;
+        }
+        #ai-content .activity-nav-btn:active,
+        .exclusive-nav-btn:active {
+            transform: scale(0.97);
+        }
+        .exclusive-result-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 0.35rem;
+        }
+        #user-api-settings.boss-hidden {
+            display: none !important;
+        }
+        #boss-mode-badge {
+            position: fixed;
+            top: max(0.5rem, env(safe-area-inset-top, 0px));
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            padding: 0.35rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.6875rem;
+            font-weight: 800;
+            letter-spacing: 0.02em;
+            color: #fff;
+            background: linear-gradient(90deg, #F06292, #FFB74D);
+            box-shadow: 0 4px 14px rgba(240, 98, 146, 0.35);
+            pointer-events: none;
+        }
         #info-card {
             display: none;
             position: static;
@@ -947,12 +991,8 @@
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
             text-align: left;
-            cursor: pointer;
-            transition: transform 0.15s ease;
             width: 100%;
-        }
-        .exclusive-result-card:active {
-            transform: scale(0.98);
+            align-items: flex-start;
         }
         .exclusive-result-thumb {
             width: 4.5rem;
@@ -2450,13 +2490,76 @@
             const DEFAULT_USER_NICKNAME = '義翔 Roderick';
             const GENERATE_BTN_DEFAULT = generateBtn.textContent;
             const KKDAY_CID = '25299';
+            const urlParams = new URLSearchParams(window.location.search);
+            const isBoss = urlParams.get('boss') === 'soarvibe123';
+            const isLocalDev = /^(localhost|127\.0\.0\.1)$/i.test(window.location.hostname)
+                || window.location.protocol === 'file:';
+            const isBossMode = isBoss || isLocalDev;
+            /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
+            const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
+            const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
             const GOOGLE_PLACES_API_KEY = GOOGLE_MAPS_API_KEY;
+            const MSG_NAVER_MAP_HINT = 'SOARVIBE 提示：前往南韓自由行，強烈建議先下載「NAVER Map」App，即可享受一鍵精準真數據導航功能喔！🌸';
             const WAYSIM_BASE_URL = 'https://waysim.net';
             var googleMapsPlacesLoadPromise = null;
             var soarvibePlaceClass = null;
             var googleMapsBootstrapInstalled = false;
             var forexRateCache = { base: 'TWD', rates: null, fetchedAt: 0 };
+            var cachedBackendMapsKey = '';
+            var backendMapsKeyPromise = null;
+
+            function getSoarvibeApiBase() {
+                try {
+                    var stored = localStorage.getItem('SOARVIBE_API_BASE');
+                    if (stored) {
+                        return String(stored).trim().replace(/\/$/, '');
+                    }
+                } catch (e) { /* silent */ }
+                var base = String(SOARVIBE_API_BASE || '').trim();
+                if (!base || /YOUR_SUBDOMAIN|example\.com/i.test(base)) {
+                    return '';
+                }
+                return base.replace(/\/$/, '');
+            }
+
+            function shouldUseBackendProxy() {
+                return !!getSoarvibeApiBase();
+            }
+
+            function getBackendAuthHeaders() {
+                var headers = { 'Content-Type': 'application/json' };
+                if (isBoss) {
+                    headers['X-SOARVIBE-Token'] = 'soarvibe123';
+                }
+                return headers;
+            }
+
+            async function initBackendMapsKey() {
+                if (!shouldUseBackendProxy() || cachedBackendMapsKey) {
+                    return cachedBackendMapsKey;
+                }
+                if (backendMapsKeyPromise) {
+                    return backendMapsKeyPromise;
+                }
+                backendMapsKeyPromise = (async function () {
+                    try {
+                        var response = await fetch(getSoarvibeApiBase() + '/api/maps-key', {
+                            method: 'GET',
+                            headers: getBackendAuthHeaders()
+                        });
+                        if (!response.ok) return '';
+                        var data = await response.json();
+                        if (data && data.key && String(data.key).indexOf('AIzaSy') === 0) {
+                            cachedBackendMapsKey = String(data.key).trim();
+                        }
+                    } catch (e) {
+                        console.warn('[SOARVIBE] 後端 Maps 金鑰取得失敗:', e);
+                    }
+                    return cachedBackendMapsKey;
+                })();
+                return backendMapsKeyPromise;
+            }
 
             const REGION_PROFILE = {
                 '東京': { country: '日本', currency: 'JPY', currencyName: '日圓', waysimQuery: '日本 eSIM' },
@@ -2955,7 +3058,10 @@
                     var parsed = parseStructuredActivity(item);
                     return cleanPlaceName(parsed.title || parsed.raw);
                 }
-                return cleanPlaceName(item.title || item.text || '');
+                if (typeof item === 'object') {
+                    return cleanPlaceName(item.title || item.text || item.raw || '');
+                }
+                return '';
             }
 
             function collectItineraryEntries() {
@@ -3142,26 +3248,40 @@
                         ? '<img class="exclusive-result-thumb" src="' + escapeHtml(item.photoUrl) + '" alt="">'
                         : '<div class="exclusive-result-thumb exclusive-result-thumb-placeholder" aria-hidden="true">' +
                             escapeHtml(item.emoji || '📍') + '</div>';
-                    return '<button type="button" class="exclusive-result-card" data-result-id="' + escapeHtml(item.id) + '">' +
+                    return '<div class="exclusive-result-card" data-result-id="' + escapeHtml(item.id) + '">' +
                         thumb +
                         '<div class="exclusive-result-body">' +
                         '<p class="exclusive-result-name">' + escapeHtml(item.name) + '</p>' +
                         (item.rating ? '<p class="exclusive-result-meta">⭐ ' + escapeHtml(String(item.rating)) + '</p>' : '') +
                         (item.address ? '<p class="exclusive-result-desc">' + escapeHtml(item.address) + '</p>' : '') +
                         (item.tag ? '<span class="exclusive-result-tag">' + escapeHtml(item.tag) + '</span>' : '') +
-                        '</div></button>';
+                        '<div class="exclusive-result-actions">' +
+                        '<button type="button" class="exclusive-nav-btn" data-nav-name="' + escapeHtml(item.name || '') + '" data-nav-korean="' + escapeHtml(item.koreanName || '') + '">🧭 帶路導航</button>' +
+                        '</div></div></div>';
                 }).join('');
 
-                exclusiveResultsList.querySelectorAll('.exclusive-result-card').forEach(function (btn, idx) {
-                    btn.addEventListener('click', function () {
-                        if (onCardClick && items[idx]) {
-                            onCardClick(items[idx]);
-                        }
+                exclusiveResultsList.querySelectorAll('.exclusive-nav-btn').forEach(function (btn, idx) {
+                    btn.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        var cardItem = items[idx];
+                        if (!cardItem) return;
+                        openGoogleMapsNavigation({
+                            name: btn.getAttribute('data-nav-name') || cardItem.name,
+                            koreanName: btn.getAttribute('data-nav-korean') || cardItem.koreanName,
+                            address: cardItem.address,
+                            placeId: cardItem.placeId,
+                            lat: cardItem.lat,
+                            lng: cardItem.lng
+                        });
                     });
                 });
             }
 
             function getGoogleMapsApiKey() {
+                if (cachedBackendMapsKey) {
+                    return cachedBackendMapsKey;
+                }
                 try {
                     var stored = localStorage.getItem(USER_GOOGLE_MAPS_KEY);
                     if (stored) {
@@ -3174,6 +3294,122 @@
                     return '';
                 }
                 return key;
+            }
+
+            function isKoreaDestination(city) {
+                return /首爾|首尔|釜山|濟州|济州|大邱|仁川|光州|韓國|韩国|Korea|Seoul|Busan|Jeju|Incheon|Daegu|Gwangju/i.test(String(city || ''));
+            }
+
+            function formatIsoDateLocal(date) {
+                var y = date.getFullYear();
+                var m = String(date.getMonth() + 1).padStart(2, '0');
+                var d = String(date.getDate()).padStart(2, '0');
+                return y + '-' + m + '-' + d;
+            }
+
+            function fillDefaultTripDatesIfEmpty(dayCount) {
+                dayCount = dayCount || 3;
+                syncTripDateState();
+                if (tripDateState.dateStart && tripDateState.dateEnd) return;
+                var start = new Date();
+                start.setDate(start.getDate() + 14);
+                var end = new Date(start);
+                end.setDate(end.getDate() + dayCount - 1);
+                if (dateStartInput) dateStartInput.value = formatIsoDateLocal(start);
+                if (dateEndInput) dateEndInput.value = formatIsoDateLocal(end);
+                syncTripDateState();
+                updateDatePickerDisplays();
+            }
+
+            function findCityPresetKeyForDestination(dest) {
+                var d = String(dest || '').trim();
+                if (CITY_PRESETS[d]) return d;
+                var keys = Object.keys(CITY_PRESETS);
+                for (var i = 0; i < keys.length; i++) {
+                    if (d.indexOf(keys[i]) >= 0 || keys[i].indexOf(d) >= 0) return keys[i];
+                }
+                return '';
+            }
+
+            function ensureFirstTravelStyleSelected() {
+                if (getSelectedTravelStyle()) return;
+                var first = document.querySelector('input[name="travel-style"]');
+                if (first) first.checked = true;
+            }
+
+            function ensureBossDemoFormReady() {
+                if (!isBossMode) return;
+                var dest = destinationInput.value.trim();
+                if (!dest) {
+                    destinationInput.value = '東京';
+                    dest = '東京';
+                }
+                fillDefaultTripDatesIfEmpty(3);
+                ensureFirstTravelStyleSelected();
+                var presetKey = findCityPresetKeyForDestination(dest);
+                if (presetKey) {
+                    var preset = CITY_PRESETS[presetKey];
+                    if (!advancedHotelInput.value.trim()) {
+                        advancedHotelInput.value = pickRandom(preset.hotels);
+                    }
+                    if (!advancedTransportSelect.value) {
+                        advancedTransportSelect.value = pickRandom(preset.transports);
+                    }
+                    applyFlightTimesFromPreset(preset);
+                } else {
+                    if (!advancedHotelInput.value.trim()) {
+                        advancedHotelInput.value = dest + '市中心精品飯店';
+                    }
+                    if (!advancedTransportSelect.value) {
+                        advancedTransportSelect.value = 'public-transit';
+                    }
+                    if (flightDepartureTimeInput && !flightDepartureTimeInput.value) {
+                        flightDepartureTimeInput.value = '14:30';
+                    }
+                    if (flightReturnTimeInput && !flightReturnTimeInput.value) {
+                        flightReturnTimeInput.value = '18:00';
+                    }
+                    updateTimePickerDisplays();
+                }
+            }
+
+            function applyBossModeUi() {
+                if (userApiSettings && (isBossMode || shouldUseBackendProxy())) {
+                    userApiSettings.classList.add('boss-hidden');
+                }
+                if (!isBossMode && !shouldUseBackendProxy()) return;
+                if (!document.getElementById('boss-mode-badge')) {
+                    var badge = document.createElement('div');
+                    badge.id = 'boss-mode-badge';
+                    badge.setAttribute('role', 'status');
+                    badge.textContent = shouldUseBackendProxy()
+                        ? '雲端安全模式 · 後端代理 ✓'
+                        : '親友測試模式 ✓';
+                    document.body.appendChild(badge);
+                }
+                ensureBossDemoFormReady();
+                updateApiKeyStatus();
+            }
+
+            function openNaverMapNavigation(query) {
+                var q = String(query || '').trim();
+                if (!q) {
+                    showModal('尚無可導航的地點名稱，請確認行程已生成。', '🧭');
+                    return;
+                }
+                var nmapUrl = 'nmap://search?query=' + encodeURIComponent(q);
+                var pageHidden = false;
+                var onVis = function () {
+                    if (document.hidden) pageHidden = true;
+                };
+                document.addEventListener('visibilitychange', onVis);
+                window.location.href = nmapUrl;
+                setTimeout(function () {
+                    document.removeEventListener('visibilitychange', onVis);
+                    if (!pageHidden) {
+                        showModal(MSG_NAVER_MAP_HINT, '🌸');
+                    }
+                }, 1500);
             }
 
             function getGoogleMapsBootstrapRegion() {
@@ -3257,6 +3493,9 @@
             }
 
             async function loadGoogleMapsPlacesLibrary() {
+                if (shouldUseBackendProxy()) {
+                    await initBackendMapsKey();
+                }
                 var apiKey = getGoogleMapsApiKey();
                 if (!apiKey) {
                     throw new Error('INVALID_GOOGLE_KEY');
@@ -3541,22 +3780,24 @@
 
             function openGoogleMapsNavigation(item) {
                 var city = resolveCurrentCity() || getCurrentTripRegion();
-                var url;
-                var placeId = normalizePlaceIdForMaps(item.placeId);
-                if (placeId) {
-                    url = 'https://www.google.com/maps/dir/?api=1&destination_place_id=' +
-                        encodeURIComponent(placeId) + '&travelmode=walking';
-                } else if (item.lat != null && item.lng != null) {
-                    url = 'https://www.google.com/maps/dir/?api=1&destination=' +
-                        encodeURIComponent(item.lat + ',' + item.lng) + '&travelmode=walking';
-                } else {
-                    var query = ((item.name || '').trim() + ' ' + (city || '').trim()).trim();
-                    if (!query && item.address) {
-                        query = item.address;
-                    }
-                    url = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(query);
+                var name = String((item && (item.name || item.title)) || '').trim();
+                var koreanName = String((item && item.koreanName) || '').trim();
+
+                if (isKoreaDestination(city)) {
+                    openNaverMapNavigation(koreanName || name);
+                    return;
                 }
-                window.open(url, '_blank');
+
+                var query = (name + ' ' + (city || '').trim()).trim();
+                if (!query && item && item.address) {
+                    query = String(item.address).trim();
+                }
+                if (!query) {
+                    showModal('尚無可導航的地點名稱，請確認行程已生成。', '🧭');
+                    return;
+                }
+                var url = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(query);
+                window.location.href = url;
             }
 
             async function loadFoodAndSpotResultsPanel() {
@@ -4372,6 +4613,8 @@
                 if (!preset) return;
 
                 destinationInput.value = preset.destination;
+                fillDefaultTripDatesIfEmpty(3);
+                ensureFirstTravelStyleSelected();
                 applyFlightTimesFromPreset(preset);
                 advancedHotelInput.value = pickRandom(preset.hotels);
                 advancedTransportSelect.value = pickRandom(preset.transports);
@@ -4480,6 +4723,85 @@
                 return Math.max(1, Math.round((returnDate - departure) / 86400000) + 1);
             }
 
+            function buildGeminiPlannerPersonaBlock(selectedStyle) {
+                return '你現在是一位具備 10 年經驗、精通各大社群數據（Google 商家大數據、小紅書爆款、Threads 實時討論、Instagram 視覺熱點）的全球頂級自由行規劃師。' +
+                    '你為 SOARVIBE 規劃的【' + selectedStyle + '】行程必須極度符合「人類肉體凡胎的客觀生理極限」，嚴格拒絕反人類拉車。' +
+                    '切記：不同旅遊風格必須產出「景點型態、時間分配、美食選型」截然不同的行程——禁止七種風格排成相似的罐頭路線。';
+            }
+
+            function buildGeminiTimingRulesBlock() {
+                return '【全風格通用：防腿斷與客觀時間鐵律——最高優先，違反即不合格】\n' +
+                    '1. 地理鄰近性 (Geographical Continuity)：每一天 A→B→C 必須流暢連續；景點與餐廳之間移動嚴格控制在「當地大眾運輸 15–20 分鐘內」或「步行可達」，嚴禁東西橫跨、反覆拉車。\n' +
+                    '2. 計算路線時間：必須客觀計算上一站到下一站的交通時間，並在 time 欄位中合理扣除；行程不可看起來匆匆忙忙，也不可無意義空等。\n' +
+                    '3. 逗留時間客觀化：不該久留的景點／餐廳／咖啡廳絕對不可拖太久；該深度探索的區域才給足時間——嚴格依【當前風格】的時間規則，禁止一律 2 小時或一律 30 分鐘。\n' +
+                    '4. 行程多元性：同一 day 須混合不同類型體驗（地標＋用餐＋散步／購物等），避免連續 3 站同類型；不同 day 須探索不同區域與主題。\n' +
+                    '5. 禁止重複：禁止在不同 day 或同一 day 重複相同店名／景點（含換時段再訪）。\n';
+            }
+
+            function buildGeminiStyleInstruction(styleKey, currentCity, selectedStyle) {
+                var city = currentCity || '旅遊目的地';
+                var blocks = {
+                    budget: '【💰 小資旅行 (Budget Travel)——當前風格核心指令】\n' +
+                        '- 景點：優先免門票、高 CP 值經典地標或大眾公園（依【' + city + '】實情，如東京淺草寺、上野恩賜公園；首爾清溪川）。\n' +
+                        '- 美食：在地平價排隊美食、百元商店巡禮、平價連鎖居酒屋或 B 級美食（連鎖拉麵、丼飯等）。\n' +
+                        '- 時間節奏：相對緊湊充實，步行可稍高，但移動仍須符合 15–20 分鐘鐵律；一般景點 45–75 分鐘，平價餐 45–60 分鐘。\n' +
+                        '- 與其他風格差異：禁止安排高奢米其林、網美長坐咖啡廳、動漫聖地長時間挖寶。',
+                    sightseeing: '【🗺️ 初次觀光 (First-Time Classic)——當前風格核心指令】\n' +
+                        '- 景點：100% 鎖定【' + city + '】「沒去過等於沒來」的鋼鐵必訪大字號地標（如東京晴空塔、SHIBUYA SKY；巴黎艾菲爾鐵塔、羅浮宮）。\n' +
+                        '- 美食：Google 評論破千、觀光客指名度最高、有中文菜單的代表性名店（如一蘭拉麵、大黑家、明洞餃子——依城市替換）。\n' +
+                        '- 時間節奏：每個經典大景點預留 1.5–2 小時充足觀光拍照；節奏四平八穩，不趕不拖。\n' +
+                        '- 與其他風格差異：禁止只排小眾文青店、禁止動漫挖寶長停、禁止網美咖啡廳超 60 分鐘。',
+                    trendy: '【⚡ 新潮熱門 (Trendy & Hype)——當前風格核心指令】\n' +
+                        '- 景點：鎖定【' + city + '】最新開幕、社群討論度最高、最話題性的新地標或複合式商場（如麻布台之丘、澀谷新地標、The Hyundai Seoul——依城市替換）。\n' +
+                        '- 美食：現在大排長龍的網紅名店、新興跨界概念餐廳、限定快閃店。\n' +
+                        '- 時間節奏：單點停留 1–1.5 小時，著重「話題感」與新穎度；移動仍須 15–20 分鐘內。\n' +
+                        '- 與其他風格差異：禁止只排 20 年前老地標、禁止傳統寺廟一日三廟、禁止動漫中古長停 3 小時。',
+                    foodie: '【🍳 美食吃貨 (Foodie & Gourmet)——當前風格核心指令】\n' +
+                        '- 景點：以「食物商圈」為核心，景點只是陪襯，必須排在著名美食街、海鮮市場、傳統夜市周邊（築地、錦市場、廣藏市場——依【' + city + '】替換）。\n' +
+                        '- 美食：穿插 Tabelog 高分老店、米其林必比登、在地人排隊清晨廚房等高含金量餐廳。\n' +
+                        '- 時間節奏：午餐與晚餐嚴格預留 75–90 分鐘（含排隊與上菜）；點心／下午茶之間留胃部消化步行時間；一般非主打餐廳景點不超 45 分鐘。\n' +
+                        '- 與其他風格差異：美食體驗必須壓倒性高於觀光；禁止排 2 小時純拍照景點、禁止動漫店 3 小時挖寶。',
+                    photospot: '【📸 網美必拍 (Instagrammable & Viral)——當前風格核心指令】\n' +
+                        '- 景點：對齊 IG／小紅書爆款；高視覺張力、極致採光、獨特幾何機位（teamLab、極簡建築、私房日落觀景——依【' + city + '】替換）。\n' +
+                        '- 美食：高顏值下午茶、法式極簡咖啡廳、精緻甜點、露天景觀餐酒館。\n' +
+                        '- 時間節奏（核心限制）：特色咖啡廳／下午茶【嚴格 45–60 分鐘】，絕對禁止乾坐 2 小時！預留 Magic Hour 在拍照點；打卡景點 45–75 分鐘。\n' +
+                        '- 與其他風格差異：節奏偏快、視覺優先；禁止傳統大景點各 2 小時、禁止動漫區 3 小時、禁止正餐各 90 分鐘。',
+                    anime: '【🤖 玩具動漫 (Otaku & Toy Paradise)——當前風格核心指令】\n' +
+                        '- 景點：對齊 Threads 熱議；一番賞旗艦、Pop Mart／Skullpanda、駿河屋／Mandarake 中古、TCG 交易中心、任天堂／寶可夢中心（依【' + city + '】替換）。\n' +
+                        '- 美食：商圈內快捷高熱量排隊美食（秋葉原沾麵、中野百老匯地下街——依城市替換），快速完食繼續尋寶。\n' +
+                        '- 時間節奏（核心限制）：【塊狀縱深探索】單一商圈／聖地 2.5–3 小時；一天最多切換兩個大核心區；禁止在不同動漫商圈頻繁拉車。\n' +
+                        '- 與其他風格差異：完全揚棄無聊歷史景點；禁止網美咖啡 60+ 分鐘、禁止觀光客大景點一日排滿。',
+                    streetwear: '【🔥 潮流玩家 (Streetwear & Vintage)——當前風格核心指令】\n' +
+                        '- 景點：專攻古著 Vintage、設計師品牌、文青銀飾、買手選物店巷弄（原宿裏原宿、下北澤、高圓寺；首爾聖水洞、弘大——依【' + city + '】替換）；可穿插小眾調香體驗。\n' +
+                        '- 美食：工業風極簡咖啡廳（45–60 分鐘）、隱密潮流黑膠餐酒館、地下街特色居酒屋。\n' +
+                        '- 時間節奏：每個古著／買手商圈 2–3 小時漫遊散策；不排死板大眾景點，留足試穿挑選時間。\n' +
+                        '- 與其他風格差異：禁止排傳統寺廟博物館、禁止動漫中古 3 小時、禁止觀光客必訪大字號地標拼盤。'
+                };
+                return blocks[styleKey] || blocks.budget;
+            }
+
+            function buildGeminiKoreaNameBlock(city) {
+                if (!isKoreaDestination(city)) return '';
+                return '【🇰🇷 韓國特規——koreanName 必填】\n' +
+                    '目的地為韓國時，每一個行程 item 必須是 JSON 物件，且務必包含 "koreanName" 欄位（該地點的韓文原文官方名稱，例如 경복궁、명동、성수동）。導航將優先使用韓文原文。\n';
+            }
+
+            function buildGeminiJsonOutputBlock(payload, days) {
+                var city = (payload && payload.destination) || resolveCurrentCity();
+                var isKr = isKoreaDestination(city);
+                var itemShape = isKr
+                    ? '{"time":"09:00 - 10:30","title":"景福宮","koreanName":"경복궁","highlight":"…","note":"…"}'
+                    : '{"time":"09:00 - 10:30","title":"淺草寺","highlight":"…","note":"…"}';
+                return '【📤 輸出格式——僅輸出單一 JSON 物件，禁止 Markdown、前言、後語與程式碼區塊標記】\n' +
+                    buildGeminiKoreaNameBlock(city) +
+                    '結構範例：\n' +
+                    '{"days":[{"day":1,"phases":[{"period":"上午","items":[' + itemShape + ']},{"period":"下午","items":[]},{"period":"晚上","items":[]}]}]}\n' +
+                    '- items 內每個元素必須是 JSON 物件（含 time、title、highlight、note' + (isKr ? '、koreanName' : '') + '）。\n' +
+                    '- days 陣列長度必須恰好等於 ' + days + '（共 ' + days + ' 個 day 物件，day 從 1 到 ' + days + '）。\n' +
+                    '- 禁止只輸出 Day 1；每一天的上午、下午、晚上都至少要有 1 個 item。\n' +
+                    '- JSON 請精簡，但天數不可省略。';
+            }
+
             function buildGeminiStyleBlocks(payload) {
                 var styleKey = (payload && payload.travelStyle) || currentStyle || 'budget';
                 var tripType = TRAVEL_STYLE_LABELS[styleKey] || payload.tripType || '小資旅行';
@@ -4495,22 +4817,8 @@
 「${customWishes}」
 請在排進去的時候，在該景點名稱後面加上 (✨ 您的專屬許願) 數字標籤，讓使用者強烈感受到被客製化的尊榮感！`;
                 }
-                var typeInstruction = '';
-                if (tripType.includes('小資旅行')) {
-                    typeInstruction = '【小資旅行最高指導原則】：鎖定不想花太多錢的小資族，請嚴格提供便宜美味的在地小吃、高 CP 值的平價特色住宿，以及輕鬆好走的市區免費/平價景點。所有高奢、高消費、鋪張浪費的行程一律嚴格禁止。';
-                } else if (tripType.includes('初次觀光')) {
-                    typeInstruction = '【初次觀光最高指導原則】：使用者是第一次到【' + currentCity + '】，請絕對、務必提供該城市最經典、最大眾熱門、旅行團必去的地標景點（依當地實情，例如巴黎即艾菲爾鐵塔、羅浮宮；曼谷即大皇宮、臥佛寺；東京即淺草、晴空塔等）。嚴禁安排極遠、偏僻、冷門的郊區。';
-                } else if (tripType.includes('新潮熱門')) {
-                    typeInstruction = '【新潮熱門最高指導原則】：鎖定現代年輕族群，行程必須全數安排目前在 Instagram (IG)、Threads、小紅書上熱度極高的最新潮流地標、話題店家與新開幕據點。請展現你對【' + currentCity + '】最新流行趨勢的掌握。';
-                } else if (tripType.includes('美食吃貨') || tripType.includes('吃貨')) {
-                    typeInstruction = '【美食吃貨最高指導原則】：這是一趟徹底的味蕾之旅。請大量、高密度地安排【' + currentCity + '】最夯、網路高評價排隊必吃美食、精緻網美下午茶、在地點心，以及當地人才知道的隱藏版名店。行程配比中美食體驗必須壓倒性高於一般觀光景點。';
-                } else if (tripType.includes('網美必拍')) {
-                    typeInstruction = '【網美必拍最高指導原則】：鎖定 IG / 小紅書 / Threads 高熱度打卡點、絕美咖啡廳、高顏值街景與光影場景。每 day 至少安排 2–3 個「必拍」據點，亮點須註明拍照時段、最佳角度或季節限定場景。';
-                } else if (tripType.includes('玩具動漫')) {
-                    typeInstruction = '【玩具動漫最高指導原則】：聚焦【' + currentCity + '】的動漫聖地、一番賞／扭蛋、潮流玩具、公仔模型專賣、ACG 主題咖啡廳與相關商圈（若該城市有）。須寫出可實際朝聖、購買的具體店名、商場與樓層。';
-                } else if (tripType.includes('潮流玩家')) {
-                    typeInstruction = '【潮流玩家最高指導原則】：鎖定【' + currentCity + '】的古著店、選物店、街頭潮牌、文青飾品、二手精品與設計師買手店。動線集中在該城已知潮流區域，避免與時尚無關的傳統觀光拼盤。';
-                }
+                var typeInstruction = buildGeminiStyleInstruction(styleKey, currentCity, selectedStyle);
+                var plannerPersona = buildGeminiPlannerPersonaBlock(selectedStyle);
                 var customerSelectedTransport = payload.customerSelectedTransport
                     || TRANSPORT_LABELS[payload.transport]
                     || payload.transport
@@ -4519,9 +4827,13 @@
                 return {
                     tripType: tripType,
                     selectedStyle: selectedStyle,
+                    styleKey: styleKey,
                     wishesInstruction: wishesInstruction,
                     typeInstruction: typeInstruction,
+                    plannerPersona: plannerPersona,
                     globalCityInstruction: globalCityInstruction,
+                    timingRules: buildGeminiTimingRulesBlock(),
+                    koreaNameBlock: buildGeminiKoreaNameBlock(currentCity),
                     customerSelectedTransport: customerSelectedTransport,
                     currentCity: currentCity,
                     budget: payload.budget || '適中',
@@ -4535,18 +4847,24 @@
                 const ctx = buildGeminiStyleBlocks(payload);
                 const lastDayNum = days;
 
-                return `你現在是 SOARVIBE 專屬的【${ctx.selectedStyle}】專家。請嚴格根據以下使用者選擇的核心維度，為【${ctx.currentCity}】量身打造一份完美的【${ctx.selectedStyle}】風格旅遊行程手冊。
+                return `${ctx.plannerPersona}
 
 ${ctx.wishesInstruction ? ctx.wishesInstruction + '\n\n' : ''}${ctx.globalCityInstruction}
 
 【核心維度規範】
 📍 旅遊目的地（currentCity）：${ctx.currentCity}
-✨ 旅遊風格（selectedStyle）：【${ctx.selectedStyle}】
+✨ 旅遊風格（currentStyle / selectedStyle）：【${ctx.selectedStyle}】
 📅 出發日期：${payload.dateStart}
 📅 回程日期：${payload.dateEnd}
 📅 旅遊總天數：嚴格限定為 ${days} 天，必須從 Day 1 規劃到 Day ${days}，不准多也不准少。
 💰 預算取向：${ctx.budget}
-👥 旅遊型態深度指令：${ctx.typeInstruction}
+
+${ctx.timingRules}
+
+${ctx.typeInstruction}
+
+【🎯 風格差異化鐵律】
+你正在規劃的是【${ctx.selectedStyle}】，不是其他風格。輸出的景點類型、店名風格、每站停留時間必須與【${ctx.selectedStyle}】高度一致，且與「初次觀光／美食吃貨／玩具動漫」等風格有明顯區隔——禁止七種風格都排成淺草+晴空塔+一蘭的相似動線。
 
 【✈️ 航班時間——必填參數（不可忽略）】
 🛫 departureTime（出發航班，含日期+時間）：${ctx.departureTimeText}
@@ -4572,23 +4890,17 @@ ${ctx.wishesInstruction ? ctx.wishesInstruction + '\n\n' : ''}${ctx.globalCityIn
 3. 若 departureTime 或 returnTime 與住宿地點距離機場較遠，必須在行程中寫明【${ctx.customerSelectedTransport}】下的交通方式與預估車程。
 4. 每日起訖點以住宿區域為圓心，符合【${ctx.customerSelectedTransport}】，嚴禁繞路。
 
-【🗺️ 交通與地理邏輯死命令——嚴禁繞路（防腿斷原則）】
+【🗺️ 交通與地理邏輯——嚴禁繞路】
 1. 請發揮你對【${ctx.currentCity}】當地地理結構的精準認知，景點之間的安排「時間與路線一定都要順，絕對不准繞路」！
 2. 每一天的行程景點，必須像是經過 Google Maps 精密計算過一樣，順向、鄰近、流暢；移動時間須符合【${ctx.customerSelectedTransport}】下的合理地鐵／步行／車程範圍，嚴禁早上在東邊、下午跑西邊、晚上又回東邊的瘋狂拉車行為。
 
 【📋 商業級行程格式——每一站都必須專業、可執行，嚴禁流水帳】
 1. 請完全使用繁體中文（台灣習慣用語）。
 2. 每日以 Day 1 到 Day ${days} 規劃，每個時段為「上午」「下午」「晚上」。
-3. 每一站活動必須包含：預估時間 (HH:MM - HH:MM)、景點名稱、亮點（為什麼值得去）、導航/備註（符合【${ctx.customerSelectedTransport}】的具體移動方式）。
-4. 禁止只寫景點名；禁止長篇日記式敘述。
+3. 每一站活動必須包含：time（HH:MM - HH:MM，須合理扣除移動時間）、title（景點／店名）、highlight（為什麼值得去＋符合【${ctx.selectedStyle}】的停留理由）、note（從上一站出發的【${ctx.customerSelectedTransport}】路線／站名／步行或車程分鐘）。
+4. 禁止只寫景點名；禁止長篇日記式敘述；禁止所有風格都用相同店名與相同時間模板。
 
-【📤 輸出格式——僅輸出單一 JSON 物件，禁止 Markdown、前言、後語與程式碼區塊標記】
-結構範例：
-{"days":[{"day":1,"phases":[{"period":"上午","items":["09:00 - 10:30｜淺草寺｜亮點：江戶文化地標｜備註：步行 8 分鐘"]},{"period":"下午","items":[]},{"period":"晚上","items":[]}]}]}
-- items 陣列內每個字串格式：「時間｜景點｜亮點：…｜備註：…」
-- days 陣列長度必須恰好等於 ${days}（共 ${days} 個 day 物件，day 從 1 到 ${days}）。
-- 禁止只輸出 Day 1；每一天的上午、下午、晚上都至少要有 1 個 item。
-- JSON 請精簡，但天數不可省略。`;
+${buildGeminiJsonOutputBlock(payload, days)}`;
             }
 
             function buildGeminiSingleDayRequestText(payload, dayNum, totalDays, priorSummary) {
@@ -4607,7 +4919,9 @@ ${ctx.wishesInstruction ? ctx.wishesInstruction + '\n\n' : ''}${ctx.globalCityIn
                     ? '\n【已規劃日子——請勿重複相同景點／餐廳，並從住宿區延續順向動線】\n' + priorSummary + '\n'
                     : '';
 
-                return `你現在是 SOARVIBE 專屬的【${ctx.selectedStyle}】專家。請只為【${ctx.currentCity}】規劃【${dayLabel}】（日期 ${dateLabel}）這一天的行程。
+                return `${ctx.plannerPersona}
+
+請只為【${ctx.currentCity}】規劃【${dayLabel}】（日期 ${dateLabel}）這一天，風格鎖定【${ctx.selectedStyle}】。
 
 ${ctx.wishesInstruction ? ctx.wishesInstruction + '\n\n' : ''}${ctx.globalCityInstruction}
 
@@ -4616,19 +4930,24 @@ ${ctx.wishesInstruction ? ctx.wishesInstruction + '\n\n' : ''}${ctx.globalCityIn
 🏨 住宿：${payload.accommodation}
 🚇 交通方式（100% 遵守）：【${ctx.customerSelectedTransport}】
 🛫 出發航班：${ctx.departureTimeText}｜🛬 回程航班：${ctx.returnTimeText}
-👥 型態指令：${ctx.typeInstruction}
+
+${ctx.timingRules}
+
+${ctx.typeInstruction}
 ${continuityBlock}
 ${dayRules}
 
 【硬性規則】
+- 嚴格遵守上方【${ctx.selectedStyle}】風格的時間與選點規則；不該久留的站點不可拖時間。
 - 餐廳、超商、咖啡廳必須寫真實店名（含分店），禁止「附近超商」「在地早餐」等模糊字眼。
-- 備註須符合【${ctx.customerSelectedTransport}】並寫明路線／站名／步行或車程分鐘；景點間移動須符合防腿斷原則（鄰近、順路）。
-- 繁體中文（台灣用語）；每站格式：「HH:MM - HH:MM｜景點｜亮點：…｜備註：…」
+- 備註須寫明從上一站出發的【${ctx.customerSelectedTransport}】路線／站名／步行或車程分鐘。
+- 繁體中文（台灣用語）；每站為 JSON 物件：time、title、highlight、note${isKoreaDestination(ctx.currentCity) ? '、koreanName（韓文原文）' : ''}。
 - 本日須有「上午」「下午」「晚上」三個時段，每段至少 1 個 item（中間日建議每段 2 個以上）。
+- 禁止與【已規劃日子】重複相同景點／餐廳；本日動線須與【${ctx.selectedStyle}】一致，不可像其他風格。
 
 【輸出——僅輸出 JSON，禁止 Markdown 與前言後語】
 只輸出 1 天的物件，結構：
-{"days":[{"day":${dayNum},"phases":[{"period":"上午","items":["…"]},{"period":"下午","items":["…"]},{"period":"晚上","items":["…"]}]}]}`;
+{"days":[{"day":${dayNum},"phases":[{"period":"上午","items":[{"time":"…","title":"…","highlight":"…","note":"…"}]},{"period":"下午","items":[]},{"period":"晚上","items":[]}]}]}`;
             }
 
             function buildGeminiMultiDayRequestText(payload, startDay, endDay, totalDays, priorSummary) {
@@ -4653,7 +4972,9 @@ ${dayRules}
                     edgeRules += '【本批為中間日】每 day 的上午、下午、晚上各至少 2 個具體景點或餐廳。\n';
                 }
 
-                return `你現在是 SOARVIBE 專屬的【${ctx.selectedStyle}】專家。請為【${ctx.currentCity}】一次規劃以下 ${dayCount} 天行程：
+                return `${ctx.plannerPersona}
+
+請為【${ctx.currentCity}】一次規劃以下 ${dayCount} 天【${ctx.selectedStyle}】風格行程：
 ${dayLabels.join('\n')}
 
 ${ctx.wishesInstruction ? ctx.wishesInstruction + '\n\n' : ''}${ctx.globalCityInstruction}
@@ -4663,15 +4984,19 @@ ${ctx.wishesInstruction ? ctx.wishesInstruction + '\n\n' : ''}${ctx.globalCityIn
 🏨 住宿：${payload.accommodation}
 🚇 交通方式（100% 遵守）：【${ctx.customerSelectedTransport}】
 🛫 出發：${ctx.departureTimeText}｜🛬 回程：${ctx.returnTimeText}
-👥 型態：${ctx.typeInstruction}
+
+${ctx.timingRules}
+
+${ctx.typeInstruction}
 ${continuityBlock}
 ${edgeRules}
-【硬性規則】餐廳、超商、咖啡廳須寫真實店名；備註符合【${ctx.customerSelectedTransport}】；景點間移動須防腿斷（鄰近順路）；繁體中文（台灣用語）。
-每站格式：「HH:MM - HH:MM｜景點｜亮點：…｜備註：…」
+【硬性規則】嚴格遵守【${ctx.selectedStyle}】風格選點與停留時間；不該久留的不可拖太久。餐廳、超商、咖啡廳須寫真實店名；note 須寫從上一站出發的【${ctx.customerSelectedTransport}】動線與分鐘數。
+每站為 JSON 物件：time、title、highlight、note${isKoreaDestination(ctx.currentCity) ? '、koreanName（韓文原文）' : ''}。
+禁止與【已規劃日子】重複；禁止排成與其他旅遊風格相似的罐頭行程。
 
 【輸出——僅 JSON，禁止 Markdown】
 days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${endDay}：
-{"days":[{"day":${startDay},"phases":[{"period":"上午","items":["…"]},{"period":"下午","items":["…"]},{"period":"晚上","items":["…"]}]}, …]}`;
+{"days":[{"day":${startDay},"phases":[{"period":"上午","items":[{"time":"…","title":"…","highlight":"…","note":"…"}]},{"period":"下午","items":[]},{"period":"晚上","items":[]}]}]}`;
             }
 
             function parseMultiDaysFromResponse(text, startDay, endDay) {
@@ -4703,11 +5028,11 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     var spots = [];
                     (day.phases || []).forEach(function (phase) {
                         (phase.items || []).forEach(function (item) {
-                            var parts = String(item).split('｜');
-                            if (parts[1]) spots.push(parts[1].trim());
+                            var title = getActivityTitleFromItem(item);
+                            if (title) spots.push(title);
                         });
                     });
-                    return 'Day ' + (day.day || '?') + '：' + (spots.slice(0, 6).join('、') || '（已排程）');
+                    return 'Day ' + (day.day || day.dayNum || '?') + '【已使用·禁止重複】：' + (spots.slice(0, 8).join('、') || '（已排程）');
                 }).join('\n');
             }
 
@@ -5024,6 +5349,23 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 return parts.join('｜');
             }
 
+            function normalizeActivityItem(act) {
+                if (typeof act === 'string') {
+                    return parseStructuredActivity(act);
+                }
+                if (!act || typeof act !== 'object') {
+                    return parseStructuredActivity('');
+                }
+                return {
+                    time: String(act.time || act.timeRange || '').trim(),
+                    title: cleanPlaceName(act.title || act.name || act.place || ''),
+                    koreanName: String(act.koreanName || act.korean_name || '').trim(),
+                    highlight: String(act.highlight || act.why || '').replace(/^亮點[：:]\s*/i, ''),
+                    note: String(act.note || act.navigation || act.remark || '').replace(/^備註[：:]\s*/i, ''),
+                    raw: activityToBulletLine(act)
+                };
+            }
+
             function buildHiddenFromJson(data, meta) {
                 var destination = (meta && meta.destination) || '';
                 var daysRaw = data.days || data.itinerary || data.tripDays || [];
@@ -5041,8 +5383,8 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                             var acts = phase.items || phase.activities || phase.stops || [];
                             if (Array.isArray(acts)) {
                                 acts.forEach(function (a) {
-                                    var line = activityToBulletLine(a);
-                                    if (line) items.push(line);
+                                    var normalized = normalizeActivityItem(a);
+                                    if (normalized.title || normalized.raw) items.push(normalized);
                                 });
                             }
                             return {
@@ -5343,6 +5685,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     return {
                         time: String(text.time || text.timeRange || '').trim(),
                         title: cleanPlaceName(text.title || text.name || text.place || text.raw || ''),
+                        koreanName: String(text.koreanName || text.korean_name || '').trim(),
                         highlight: String(text.highlight || text.why || '').replace(/^亮點[：:]\s*/i, ''),
                         note: String(text.note || text.navigation || text.remark || '').replace(/^備註[：:]\s*/i, ''),
                         raw: t || cleanPlaceName(text.title || text.name || '')
@@ -5378,13 +5721,15 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     }
                 });
                 if (!title) title = t;
-                return { time: time, title: title, highlight: highlight, note: note, raw: t };
+                return { time: time, title: title, koreanName: '', highlight: highlight, note: note, raw: t };
             }
 
             function formatActivityItemHtml(text) {
                 var p;
                 try {
-                    p = parseStructuredActivity(text);
+                    p = typeof text === 'object' && text !== null && (text.title || text.raw)
+                        ? text
+                        : parseStructuredActivity(text);
                 } catch (e) {
                     return '<li class="activity-item">' + escapeHtml(String(text || '')) + '</li>';
                 }
@@ -5396,11 +5741,17 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     html += '<span class="activity-time">' + escapeHtml(p.time) + '</span>';
                 }
                 html += '<span class="activity-title">' + escapeHtml(p.title) + '</span>';
+                if (p.koreanName) {
+                    html += '<div class="activity-note">🇰🇷 ' + escapeHtml(p.koreanName) + '</div>';
+                }
                 if (p.highlight) {
                     html += '<div class="activity-highlight">✨ ' + escapeHtml(p.highlight) + '</div>';
                 }
                 if (p.note) {
                     html += '<div class="activity-note">📍 ' + escapeHtml(p.note) + '</div>';
+                }
+                if (!isSkippableItineraryTitle(p.title)) {
+                    html += '<button type="button" class="activity-nav-btn" data-nav-title="' + escapeHtml(p.title) + '" data-nav-korean="' + escapeHtml(p.koreanName || '') + '">🧭 帶路導航</button>';
                 }
                 html += '</li>';
                 return html;
@@ -6181,14 +6532,15 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
             function buildBookletPrintCss() {
                 return '@page{size:A4 portrait;margin:10mm}' +
+                    '@page :first{margin:0;size:A4 portrait}' +
                     '*{box-sizing:border-box}' +
                     'html,body{margin:0;padding:0;width:100%}' +
                     'body{font-family:"Noto Sans TC",sans-serif;color:#37474F;background:#fff;font-size:11pt;line-height:1.55}' +
                     '.bk-page{break-after:page;page-break-after:always;padding:0;position:relative}' +
                     '.bk-page:last-child{break-after:auto;page-break-after:auto}' +
                     buildBookletWatermarkCss() +
-                    '.bk-cover-page{padding:0;margin:0;break-after:page;page-break-after:always;width:100%;height:277mm;max-height:277mm;overflow:hidden;position:relative}' +
-                    '.bk-book-cover{position:relative;width:100%;height:277mm;overflow:hidden}' +
+                    '.bk-cover-page{padding:0;margin:0;break-after:page;page-break-after:always;width:100%;height:297mm;max-height:297mm;overflow:hidden;position:relative;break-inside:avoid-page;page-break-inside:avoid}' +
+                    '.bk-book-cover{position:relative;width:100%;height:297mm;overflow:hidden;break-inside:avoid-page;page-break-inside:avoid}' +
                     '.bk-cover-bg{position:absolute;inset:0;background-size:cover;background-position:center;background-repeat:no-repeat;background-color:#1e293b}' +
                     '.bk-cover-bg-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}' +
                     '.bk-cover-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,23,42,.5) 0%,rgba(15,23,42,.2) 35%,rgba(15,23,42,.88) 100%);z-index:1}' +
@@ -6264,11 +6616,12 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     '.bk-food-tag{font-size:8.5pt;color:#78909C;margin-top:2mm}' +
                     '.bk-muted{font-size:10.5pt;color:#78909C;font-style:italic}' +
                     '.bk-notes-start{break-before:page;page-break-before:always}' +
-                    '.bk-note-page{display:flex;flex-direction:column;break-after:page;page-break-after:always;break-inside:avoid-page;page-break-inside:avoid;height:277mm;max-height:277mm;overflow:hidden;padding:0 2mm}' +
+                    '.bk-note-page{display:flex;flex-direction:column;break-after:page;page-break-after:always;break-inside:avoid-page;page-break-inside:avoid;height:297mm;max-height:297mm;overflow:hidden;padding:0 2mm}' +
+                    '.bk-note-keeper{display:flex;flex-direction:column;flex:1;min-height:0;break-inside:avoid-page;page-break-inside:avoid;overflow:hidden}' +
                     '.bk-note-hint{font-size:9.5pt;color:#78909C;margin:0 0 3mm;flex-shrink:0}' +
                     '.bk-note-body{display:flex;flex-direction:column;flex:1;min-height:0;break-inside:avoid-page;page-break-inside:avoid;overflow:hidden}' +
-                    '.bk-lines-area{flex:0 0 auto;height:205mm;max-height:205mm;margin-bottom:3mm;background-image:repeating-linear-gradient(transparent,transparent 6.5mm,#CFD8DC 6.5mm,#CFD8DC 7mm);background-size:100% 7mm;break-inside:avoid;page-break-inside:avoid}' +
-                    '.bk-stamp-zone{height:48mm;min-height:48mm;max-height:48mm;flex-shrink:0;border:2px dashed #90A4AE;border-radius:10px;position:relative;background:rgba(250,250,250,.6);break-inside:avoid;page-break-inside:avoid;break-before:avoid-page;page-break-before:avoid}' +
+                    '.bk-lines-area{flex:1 1 auto;min-height:0;margin-bottom:3mm;background-image:repeating-linear-gradient(transparent,transparent 6.5mm,#CFD8DC 6.5mm,#CFD8DC 7mm);background-size:100% 7mm;break-inside:avoid;page-break-inside:avoid}' +
+                    '.bk-stamp-zone{height:52mm;min-height:52mm;max-height:52mm;flex-shrink:0;border:2px dashed #90A4AE;border-radius:10px;position:relative;background:rgba(250,250,250,.6);break-inside:avoid;page-break-inside:avoid;break-before:avoid-page;page-break-before:avoid}' +
                     '.bk-stamp-zone-label{position:absolute;top:4mm;left:5mm;font-size:10pt;color:#78909C;font-weight:900;letter-spacing:.1em}' +
                     '.bk-footer{margin-top:6mm;text-align:center;font-size:8pt;color:#B0BEC5}' +
                     '@media print{body,.bk-watermark,.bk-watermark img,.bk-cover-bg,.bk-cover-bg-img,.bk-cover-overlay,.bk-cover-spine,.bk-fact-pill,.bk-culture-card,.bk-tips-box,.bk-checklist-extra,.bk-check-final,.bk-stamp-zone{-webkit-print-color-adjust:exact;print-color-adjust:exact}}';
@@ -6326,7 +6679,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     notePages += '<div class="' + noteCls + '">' + wm +
                         '<div class="bk-page-head"><span class="bk-brand">SOARVIBE</span><span>旅行筆記 · 第 ' + ni + ' 頁</span></div>' +
                         '<p class="bk-note-hint">空白橫線供現場筆記、貼票根與靈感隨寫</p>' +
-                        '<div class="bk-note-body">' +
+                        '<div class="bk-note-keeper">' +
                         '<div class="bk-lines-area" aria-hidden="true"></div>' +
                         '<div class="bk-stamp-zone" aria-label="紀念章專區">' +
                         '<span class="bk-stamp-zone-label">紀念章專區</span></div>' +
@@ -6653,6 +7006,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
             function isValidGeminiApiKey(key) {
                 var k = String(key || '').trim();
+                if (k === SOARVIBE_BACKEND_KEY_SENTINEL) return true;
                 return /^AIza[0-9A-Za-z_-]{30,}$/.test(k) || /^AQ\.[0-9A-Za-z_-]{20,}$/.test(k);
             }
 
@@ -6665,22 +7019,26 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
             function loadStoredGeminiKeys() {
                 var keys = [];
-                try {
-                    var savedList = localStorage.getItem(USER_GEMINI_KEYS_KEY);
-                    if (savedList) {
-                        var parsed = JSON.parse(savedList);
-                        if (Array.isArray(parsed)) {
-                            parsed.forEach(function (k) {
-                                keys.push(String(k || '').trim());
-                            });
+                if (shouldUseBackendProxy()) {
+                    keys.push(SOARVIBE_BACKEND_KEY_SENTINEL);
+                } else {
+                    try {
+                        var savedList = localStorage.getItem(USER_GEMINI_KEYS_KEY);
+                        if (savedList) {
+                            var parsed = JSON.parse(savedList);
+                            if (Array.isArray(parsed)) {
+                                parsed.forEach(function (k) {
+                                    keys.push(String(k || '').trim());
+                                });
+                            }
                         }
-                    }
-                    var saved = localStorage.getItem(USER_GEMINI_KEY_KEY);
-                    if (saved) keys.push(String(saved).trim());
-                } catch (e) { /* silent */ }
-                GEMINI_API_KEYS.forEach(function (k) {
-                    keys.push(String(k || '').trim());
-                });
+                        var saved = localStorage.getItem(USER_GEMINI_KEY_KEY);
+                        if (saved) keys.push(String(saved).trim());
+                    } catch (e) { /* silent */ }
+                    GEMINI_API_KEYS.forEach(function (k) {
+                        keys.push(String(k || '').trim());
+                    });
+                }
                 var seen = {};
                 return keys.filter(function (k) {
                     if (!k || !isValidGeminiApiKey(k) || seen[k]) return false;
@@ -6691,6 +7049,16 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
             function updateApiKeyStatus() {
                 if (!userApiStatus) return;
+                if (shouldUseBackendProxy()) {
+                    userApiStatus.textContent = '雲端安全模式：Gemini 多金鑰輪替 + Maps 後端代理 ✓';
+                    userApiStatus.classList.add('is-ready');
+                    return;
+                }
+                if (isBossMode) {
+                    userApiStatus.textContent = '本機測試模式：請設定 SOARVIBE_API_BASE 或自行填金鑰';
+                    userApiStatus.classList.remove('is-ready');
+                    return;
+                }
                 var geminiCount = loadStoredGeminiKeys().length;
                 var mapsReady = !!getGoogleMapsApiKey();
                 var parts = [];
@@ -6773,10 +7141,11 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             function logGeminiKeySetupHint() {
+                if (shouldUseBackendProxy()) return;
                 var valid = getActiveGeminiApiKeys();
                 if (valid.length) return;
                 console.warn(
-                    '[SOARVIBE] 未偵測到有效 Gemini 金鑰。請至「旅行個人中心 → API 金鑰設定」填入金鑰。'
+                    '[SOARVIBE] 未偵測到有效 Gemini 金鑰。請部署 worker 並設定 SOARVIBE_API_BASE，或至「旅行個人中心 → API 金鑰設定」填入金鑰。'
                 );
             }
 
@@ -6784,6 +7153,24 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 console.warn('[SOARVIBE] 建議用本地伺服器開啟（例如 npx serve），直接雙擊 file:// 可能影響部分 API 請求。');
             }
             logGeminiKeySetupHint();
+            applyBossModeUi();
+            if (shouldUseBackendProxy()) {
+                initBackendMapsKey().then(function () {
+                    updateApiKeyStatus();
+                });
+            }
+
+            if (aiContent) {
+                aiContent.addEventListener('click', function (e) {
+                    var btn = e.target.closest('.activity-nav-btn');
+                    if (!btn) return;
+                    e.preventDefault();
+                    openGoogleMapsNavigation({
+                        name: btn.getAttribute('data-nav-title') || '',
+                        koreanName: btn.getAttribute('data-nav-korean') || ''
+                    });
+                });
+            }
 
             function isGeminiBillingDepleted(err) {
                 var msg = String((err && err.message) || '');
@@ -6847,6 +7234,109 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 }
             }
 
+            async function requestGeminiViaBackend(promptText, modelId) {
+                var response;
+                try {
+                    response = await fetch(getSoarvibeApiBase() + '/api/gemini', {
+                        method: 'POST',
+                        headers: getBackendAuthHeaders(),
+                        body: JSON.stringify({
+                            prompt: String(promptText || ''),
+                            model: modelId
+                        })
+                    });
+                } catch (networkErr) {
+                    var netErr = new Error('network');
+                    netErr.cause = networkErr;
+                    throw netErr;
+                }
+
+                var result = {};
+                try {
+                    result = await response.json();
+                } catch (parseErr) {
+                    var invalidErr = new Error('invalid_response');
+                    invalidErr.cause = parseErr;
+                    throw invalidErr;
+                }
+
+                if (!response.ok) {
+                    console.error('SOARVIBE backend Gemini HTTP ' + response.status, result);
+                    if (result.error === 'all_keys_exhausted' || response.status === 429) {
+                        var details429 = result.details || result;
+                        var rateErr = new Error('rate_limit: ' + (result.message || ((details429.error && details429.error.message) || response.status)));
+                        rateErr.status = 429;
+                        rateErr.responseBody = details429;
+                        throw rateErr;
+                    }
+                    var details = result.details || result;
+                    var apiErr = new Error((details.error && details.error.message) ? details.error.message : (result.message || 'api_error'));
+                    apiErr.status = response.status;
+                    apiErr.responseBody = details;
+                    throw apiErr;
+                }
+
+                var text = String(result.text || '').trim();
+                if (!text) {
+                    throw new Error('empty_response');
+                }
+                return {
+                    text: text,
+                    keySlot: result.keySlot,
+                    keyTotal: result.keyTotal
+                };
+            }
+
+            async function callGeminiContentViaBackend(promptText, options) {
+                options = options || {};
+                var maxRetries = options.maxRetries != null ? options.maxRetries : 2;
+                var lastError = null;
+
+                for (var modelIdx = 0; modelIdx < GEMINI_MODEL_IDS.length; modelIdx++) {
+                    var modelId = GEMINI_MODEL_IDS[modelIdx];
+                    for (var retry = 0; retry <= maxRetries; retry++) {
+                        try {
+                            if (retry > 0) {
+                                await sleep(options.fastMode ? 600 * retry : 1200 * Math.pow(2, retry - 1));
+                            }
+                            console.log('[SOARVIBE] Backend Gemini → model', modelId, retry ? '(retry ' + retry + ')' : '');
+                            var backendResult = await requestGeminiViaBackend(promptText, modelId);
+                            console.log('[SOARVIBE] Backend Gemini OK → model', modelId,
+                                backendResult.keySlot ? ('| key ' + backendResult.keySlot + '/' + backendResult.keyTotal) : '',
+                                '| chars:', backendResult.text.length);
+                            return backendResult.text;
+                        } catch (err) {
+                            lastError = err;
+                            console.warn('[SOARVIBE] Backend Gemini failed model', modelId + ':', err && err.message ? err.message : err);
+                            var status = err && err.status;
+                            if (isGeminiAuthError(status)) {
+                                throw err;
+                            }
+                            if (status === 429) {
+                                if (isGeminiRpmThrottle(err)) {
+                                    break;
+                                }
+                                if (isGeminiModelOnlyQuota(err, modelId)) {
+                                    break;
+                                }
+                                if (isGeminiKeyLevelQuota(err) || isGeminiBillingDepleted(err)) {
+                                    throw err;
+                                }
+                                break;
+                            }
+                            if (isGeminiModelNotFound(status, err)) {
+                                break;
+                            }
+                            if (isGeminiRetryableStatus(status) && retry < maxRetries) {
+                                continue;
+                            }
+                            break;
+                        }
+                    }
+                }
+                throw lastError || new Error('backend_exhausted');
+            }
+
             async function requestGeminiWithKey(promptText, apiKey, modelId) {
                 var url = buildGeminiModelUrl(modelId);
                 var response;
@@ -6904,6 +7394,10 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
             async function callGeminiContent(promptText, options) {
                 options = options || {};
+                if (shouldUseBackendProxy()) {
+                    return callGeminiContentViaBackend(promptText, options);
+                }
+
                 var maxRetries = options.maxRetries != null ? options.maxRetries : 2;
 
                 var validKeys = getActiveGeminiApiKeys();
@@ -7417,6 +7911,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             });
 
             generateBtn.addEventListener('click', function () {
+                ensureBossDemoFormReady();
                 var destination = destinationInput.value.trim();
 
                 if (!destination) {
@@ -7530,7 +8025,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', function () {
-                    navigator.serviceWorker.register('./service-worker.js?v=6').catch(function (err) {
+                    navigator.serviceWorker.register('./service-worker.js?v=7').catch(function (err) {
                         console.warn('[SOARVIBE] Service worker registration failed:', err);
                     });
                 });

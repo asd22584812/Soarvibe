@@ -1,0 +1,27 @@
+# SOARVIBE 免費後端代理（Cloudflare Workers）
+#
+# === 部署步驟（CMD）===
+#   cd worker
+#   wrangler login
+#
+#   【Gemini — 4 把免費金鑰輪替，一行貼上，逗號分隔】
+#   wrangler secret put GEMINI_API_KEYS
+#   例：AIzaSyAAA,AIzaSyBBB,AIzaSyCCC,AIzaSyDDD
+#   ※ 已綁付費、不想扣款的金鑰「不要放進來」
+#
+#   【Google Maps — 必填（若要用 Places / 地圖）】
+#   wrangler secret put GOOGLE_MAPS_API_KEY
+#
+#   wrangler deploy
+#   → 把 workers.dev 網址填到 index.html 的 SOARVIBE_API_BASE
+#
+#   驗證：curl https://你的worker.dev/api/health
+#   應看到 geminiKeyCount: 4, maps: true
+
+name = "soarvibe-api"
+main = "src/index.js"
+compatibility_date = "2024-12-01"
+workers_dev = true
+
+[vars]
+ALLOWED_ORIGINS = "https://asd22584812.github.io,http://localhost:8787,http://127.0.0.1:8787,http://localhost:3000,http://127.0.0.1:3000"
