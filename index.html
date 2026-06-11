@@ -2,8 +2,24 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#37474F">
+    <meta name="description" content="SOARVIBE — AI 旅遊規劃，提升你的旅程，翱翔你的風格">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SOARVIBE">
+    <link rel="manifest" href="./manifest.json">
+    <link rel="apple-touch-icon" href="./soarvibe-logo.png">
     <title>SOARVIBE</title>
+    <script>
+        (function () {
+            var standalone = window.matchMedia('(display-mode: standalone)').matches
+                || window.matchMedia('(display-mode: fullscreen)').matches
+                || window.navigator.standalone === true;
+            if (standalone) document.documentElement.classList.add('pwa-standalone');
+        })();
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;900&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
@@ -1318,6 +1334,65 @@
         #nav-favorite.nav-active {
             color: #F06292;
         }
+        html.pwa-standalone body,
+        @media (display-mode: standalone), (display-mode: fullscreen) {
+            body {
+                padding: 0;
+                background: #263238;
+            }
+            body > .app-shell {
+                width: 100%;
+                max-width: none;
+                height: 100dvh;
+                max-height: 100dvh;
+                border-radius: 0;
+                box-shadow: none;
+            }
+            body > .app-shell .glass-nav {
+                border-radius: 0;
+                padding-bottom: max(0.625rem, env(safe-area-inset-bottom));
+            }
+            body > .app-shell #soarvibe-alert {
+                border-radius: 0;
+            }
+            body > .app-shell header.pt-7 {
+                padding-top: max(1.75rem, env(safe-area-inset-top));
+            }
+        }
+        .user-api-hint {
+            font-size: 0.6875rem;
+            color: #78909C;
+            line-height: 1.5;
+            margin: -0.25rem 0 0.75rem;
+        }
+        .user-api-status {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #546E7A;
+            margin: 0.5rem 0 0.75rem;
+        }
+        .user-api-status.is-ready {
+            color: #00796B;
+        }
+        .user-api-save-btn {
+            width: 100%;
+            border: none;
+            border-radius: 9999px;
+            padding: 0.625rem 1rem;
+            font-size: 0.8125rem;
+            font-weight: 900;
+            color: #fff;
+            background: linear-gradient(90deg, #80CBC4, #4DB6AC);
+            box-shadow: 0 4px 12px rgba(77, 182, 172, 0.35);
+            cursor: pointer;
+        }
+        .user-api-save-btn:active {
+            transform: scale(0.98);
+        }
+        .user-api-key-field {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 0.75rem;
+        }
     </style>
 </head>
 <body class="min-h-screen overflow-hidden bg-gray-950 flex items-center justify-center p-4">
@@ -1679,6 +1754,21 @@
                         <label for="user-note-spots" class="user-note-label">想去的備用景點</label>
                         <textarea id="user-note-spots" class="user-note-textarea" rows="3" placeholder="例如：藍瓶咖啡、秋葉原"></textarea>
                     </div>
+                </section>
+
+                <section class="user-tool-card user-glass-card" aria-labelledby="user-api-title">
+                    <h3 id="user-api-title" class="user-tool-title">API 金鑰設定</h3>
+                    <p class="user-api-hint">金鑰只儲存在這台裝置的瀏覽器，不會上傳到 GitHub 或任何伺服器。</p>
+                    <div class="user-note-block">
+                        <label for="user-api-gemini" class="user-note-label">Gemini AI 金鑰</label>
+                        <textarea id="user-api-gemini" class="user-note-textarea user-api-key-field" rows="3" placeholder="每行一把金鑰（AIzaSy… 或 AQ.…）" autocomplete="off" spellcheck="false"></textarea>
+                    </div>
+                    <div class="user-note-block">
+                        <label for="user-api-maps" class="user-note-label">Google Maps 金鑰</label>
+                        <input type="password" id="user-api-maps" class="user-nickname-input user-api-key-field" placeholder="AIzaSy…（地圖／Places 功能）" autocomplete="off" spellcheck="false" />
+                    </div>
+                    <p id="user-api-status" class="user-api-status">尚未設定金鑰</p>
+                    <button type="button" id="user-api-save" class="user-api-save-btn">儲存金鑰</button>
                 </section>
             </div>
         </div>
@@ -2185,8 +2275,15 @@
             const userNoteShopping = document.getElementById('user-note-shopping');
             const userNoteFood = document.getElementById('user-note-food');
             const userNoteSpots = document.getElementById('user-note-spots');
+            const userApiGemini = document.getElementById('user-api-gemini');
+            const userApiMaps = document.getElementById('user-api-maps');
+            const userApiStatus = document.getElementById('user-api-status');
+            const userApiSave = document.getElementById('user-api-save');
             const userChecklist = document.getElementById('user-checklist');
             const USER_NICKNAME_KEY = 'soarvibe_user_nickname';
+            const USER_GEMINI_KEYS_KEY = 'SOARVIBE_GEMINI_API_KEYS';
+            const USER_GEMINI_KEY_KEY = 'SOARVIBE_GEMINI_API_KEY';
+            const USER_GOOGLE_MAPS_KEY = 'SOARVIBE_GOOGLE_MAPS_API_KEY';
             const USER_CHECKLIST_KEY = 'soarvibe_user_checklist';
             const USER_NOTES_KEY = 'soarvibe_user_notes';
             const USER_AVATAR_KEY = 'soarvibe_user_avatar';
@@ -2905,6 +3002,13 @@
             }
 
             function getGoogleMapsApiKey() {
+                try {
+                    var stored = localStorage.getItem(USER_GOOGLE_MAPS_KEY);
+                    if (stored) {
+                        var trimmed = String(stored).trim();
+                        if (trimmed.indexOf('AIzaSy') === 0) return trimmed;
+                    }
+                } catch (e) { /* silent */ }
                 var key = String(GOOGLE_MAPS_API_KEY || GOOGLE_PLACES_API_KEY || '').trim();
                 if (!key || key.indexOf('AIzaSy') !== 0) {
                     return '';
@@ -3627,6 +3731,7 @@
                 }
                 userWall.classList.remove('hidden');
                 if (navProfile) navProfile.classList.add('nav-active');
+                loadApiKeyForm();
                 var scroll = document.getElementById('user-wall-scroll');
                 if (scroll) scroll.scrollTop = 0;
             }
@@ -6300,10 +6405,26 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 return /^AIza[0-9A-Za-z_-]{30,}$/.test(k) || /^AQ\.[0-9A-Za-z_-]{20,}$/.test(k);
             }
 
-            function getActiveGeminiApiKeys() {
+            function parseGeminiKeysFromText(text) {
+                return String(text || '')
+                    .split(/[\n,]+/)
+                    .map(function (k) { return k.trim(); })
+                    .filter(function (k) { return k && isValidGeminiApiKey(k); });
+            }
+
+            function loadStoredGeminiKeys() {
                 var keys = [];
                 try {
-                    var saved = localStorage.getItem('SOARVIBE_GEMINI_API_KEY');
+                    var savedList = localStorage.getItem(USER_GEMINI_KEYS_KEY);
+                    if (savedList) {
+                        var parsed = JSON.parse(savedList);
+                        if (Array.isArray(parsed)) {
+                            parsed.forEach(function (k) {
+                                keys.push(String(k || '').trim());
+                            });
+                        }
+                    }
+                    var saved = localStorage.getItem(USER_GEMINI_KEY_KEY);
                     if (saved) keys.push(String(saved).trim());
                 } catch (e) { /* silent */ }
                 GEMINI_API_KEYS.forEach(function (k) {
@@ -6315,6 +6436,73 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     seen[k] = true;
                     return true;
                 });
+            }
+
+            function updateApiKeyStatus() {
+                if (!userApiStatus) return;
+                var geminiCount = loadStoredGeminiKeys().length;
+                var mapsReady = !!getGoogleMapsApiKey();
+                var parts = [];
+                if (geminiCount) parts.push('Gemini ' + geminiCount + ' 把');
+                if (mapsReady) parts.push('Maps 已設定');
+                if (!parts.length) {
+                    userApiStatus.textContent = '尚未設定金鑰（仍可使用備援行程）';
+                    userApiStatus.classList.remove('is-ready');
+                    return;
+                }
+                userApiStatus.textContent = '已設定：' + parts.join('、');
+                userApiStatus.classList.add('is-ready');
+            }
+
+            function loadApiKeyForm() {
+                if (!userApiGemini && !userApiMaps) return;
+                var keys = loadStoredGeminiKeys();
+                if (userApiGemini) {
+                    userApiGemini.value = keys.join('\n');
+                }
+                if (userApiMaps) {
+                    try {
+                        userApiMaps.value = localStorage.getItem(USER_GOOGLE_MAPS_KEY) || '';
+                    } catch (e) {
+                        userApiMaps.value = '';
+                    }
+                }
+                updateApiKeyStatus();
+            }
+
+            function saveApiKeysFromForm() {
+                var geminiKeys = userApiGemini ? parseGeminiKeysFromText(userApiGemini.value) : [];
+                var mapsKey = userApiMaps ? String(userApiMaps.value || '').trim() : '';
+                try {
+                    if (geminiKeys.length) {
+                        localStorage.setItem(USER_GEMINI_KEYS_KEY, JSON.stringify(geminiKeys));
+                        localStorage.setItem(USER_GEMINI_KEY_KEY, geminiKeys[0]);
+                    } else {
+                        localStorage.removeItem(USER_GEMINI_KEYS_KEY);
+                        localStorage.removeItem(USER_GEMINI_KEY_KEY);
+                    }
+                    if (mapsKey) {
+                        localStorage.setItem(USER_GOOGLE_MAPS_KEY, mapsKey);
+                    } else {
+                        localStorage.removeItem(USER_GOOGLE_MAPS_KEY);
+                    }
+                } catch (e) {
+                    showModal('無法儲存金鑰，瀏覽器儲存空間可能已滿。', '⚠️');
+                    return;
+                }
+                googleMapsBootstrapInstalled = false;
+                googleMapsPlacesLoadPromise = null;
+                resetGeminiKeySession();
+                currentKeyIndex = 0;
+                if (userApiGemini) {
+                    userApiGemini.value = geminiKeys.join('\n');
+                }
+                updateApiKeyStatus();
+                showModal('API 金鑰已儲存到這台裝置。', '🔐');
+            }
+
+            function getActiveGeminiApiKeys() {
+                return loadStoredGeminiKeys();
             }
 
             function buildGeminiModelUrl(modelId) {
@@ -6337,8 +6525,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 var valid = getActiveGeminiApiKeys();
                 if (valid.length) return;
                 console.warn(
-                    '[SOARVIBE] 未偵測到有效 Gemini 金鑰。請在 GEMINI_API_KEYS 填入 AQ. 或 AIzaSy 金鑰，' +
-                    '或 Console：localStorage.setItem("SOARVIBE_GEMINI_API_KEY","您的金鑰")'
+                    '[SOARVIBE] 未偵測到有效 Gemini 金鑰。請至「旅行個人中心 → API 金鑰設定」填入金鑰。'
                 );
             }
 
@@ -7078,6 +7265,18 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 el.addEventListener('input', saveUserNotes);
                 el.addEventListener('blur', saveUserNotes);
             });
+            if (userApiSave) {
+                userApiSave.addEventListener('click', saveApiKeysFromForm);
+            }
+            updateApiKeyStatus();
+
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function () {
+                    navigator.serviceWorker.register('./service-worker.js').catch(function (err) {
+                        console.warn('[SOARVIBE] Service worker registration failed:', err);
+                    });
+                });
+            }
 
             if (navHome) {
                 navHome.addEventListener('click', goToHome);

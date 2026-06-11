@@ -1,0 +1,26 @@
+{
+  "name": "SOARVIBE",
+  "short_name": "SOARVIBE",
+  "description": "提升你的旅程，翱翔你的風格 — AI 旅遊規劃",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#263238",
+  "theme_color": "#37474F",
+  "lang": "zh-TW",
+  "icons": [
+    {
+      "src": "./soarvibe-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./soarvibe-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
