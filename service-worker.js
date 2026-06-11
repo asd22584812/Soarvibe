@@ -1,7 +1,5 @@
-const CACHE_NAME = 'soarvibe-v2';
+const CACHE_NAME = 'soarvibe-v3';
 const STATIC_ASSETS = [
-  './',
-  './index.html',
   './manifest.json',
   './bg.png',
   './soarvibe-logo.png',
@@ -32,6 +30,12 @@ self.addEventListener('activate', function (event) {
   );
 });
 
+function isHtmlRequest(request, url) {
+  if (request.mode === 'navigate') return true;
+  var path = url.pathname;
+  return path.endsWith('/') || path.endsWith('/index.html') || path.endsWith('/Soarvibe') || path.endsWith('/Soarvibe/');
+}
+
 self.addEventListener('fetch', function (event) {
   var request = event.request;
   if (request.method !== 'GET') return;
@@ -41,9 +45,21 @@ self.addEventListener('fetch', function (event) {
     return;
   }
 
+  if (isHtmlRequest(request, url)) {
+    event.respondWith(
+      fetch(request).then(function (response) {
+        return response;
+      }).catch(function () {
+        return caches.match('./index.html');
+      })
+    );
+    return;
+  }
+
   event.respondWith(
-    fetch(request)
-      .then(function (response) {
+    caches.match(request).then(function (cached) {
+      if (cached) return cached;
+      return fetch(request).then(function (response) {
         if (response && response.status === 200 && response.type === 'basic') {
           var copy = response.clone();
           caches.open(CACHE_NAME).then(function (cache) {
@@ -51,14 +67,7 @@ self.addEventListener('fetch', function (event) {
           });
         }
         return response;
-      })
-      .catch(function () {
-        return caches.match(request).then(function (cached) {
-          if (cached) return cached;
-          if (request.mode === 'navigate') {
-            return caches.match('./index.html');
-          }
-        });
-      })
+      });
+    })
   );
 });

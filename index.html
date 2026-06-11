@@ -14,17 +14,14 @@
     <title>SOARVIBE</title>
     <script>
         (function () {
-            function applyMobileShell() {
+            function applyStandaloneClass() {
                 var standalone = window.matchMedia('(display-mode: standalone)').matches
                     || window.matchMedia('(display-mode: fullscreen)').matches
                     || window.navigator.standalone === true;
-                var mobile = window.matchMedia('(max-width: 768px)').matches;
                 document.documentElement.classList.toggle('pwa-standalone', standalone);
-                document.documentElement.classList.toggle('mobile-fullscreen', mobile || standalone);
             }
-            applyMobileShell();
-            window.addEventListener('resize', applyMobileShell);
-            window.addEventListener('orientationchange', applyMobileShell);
+            applyStandaloneClass();
+            window.matchMedia('(display-mode: standalone)').addEventListener('change', applyStandaloneClass);
         })();
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -1341,71 +1338,37 @@
         #nav-favorite.nav-active {
             color: #F06292;
         }
-        html.pwa-standalone body,
-        html.mobile-fullscreen body {
-            display: block !important;
-            padding: 0 !important;
-            min-height: 100dvh;
-            height: 100dvh;
-            overflow: hidden;
-            background: #1a2327;
-        }
-        html.pwa-standalone body > .app-shell,
-        html.mobile-fullscreen body > .app-shell {
-            width: 100% !important;
-            max-width: none !important;
-            height: 100dvh !important;
-            min-height: 100dvh !important;
-            max-height: 100dvh !important;
-            margin: 0 !important;
-            border-radius: 0 !important;
-            box-shadow: none !important;
-            padding-top: env(safe-area-inset-top, 0px);
-            padding-bottom: env(safe-area-inset-bottom, 0px);
-            box-sizing: border-box;
-        }
-        html.pwa-standalone body > .app-shell .glass-nav,
-        html.mobile-fullscreen body > .app-shell .glass-nav {
-            border-radius: 0 !important;
-            padding-bottom: max(0.625rem, env(safe-area-inset-bottom, 0px));
-        }
-        html.pwa-standalone body > .app-shell #soarvibe-alert,
-        html.pwa-standalone body > .app-shell #soarvibe-generating,
-        html.mobile-fullscreen body > .app-shell #soarvibe-alert,
-        html.mobile-fullscreen body > .app-shell #soarvibe-generating {
-            border-radius: 0 !important;
-        }
-        html.pwa-standalone body > .app-shell header.pt-7,
-        html.mobile-fullscreen body > .app-shell header.pt-7 {
-            padding-top: 1rem;
-        }
-        html.mobile-fullscreen .date-field,
-        html.mobile-fullscreen .flight-times-row .date-field {
-            font-size: 16px;
-            height: 2.75rem;
-            min-height: 0;
-            max-height: 2.75rem;
-            line-height: 1.2;
-            padding: 0 0.5rem;
-        }
-        html.mobile-fullscreen .date-field::-webkit-calendar-picker-indicator {
-            width: 1.25rem;
-            height: 1.25rem;
-            opacity: 0.55;
-        }
-        @media (display-mode: standalone), (display-mode: fullscreen) {
+        /* 手機：等比縮放 393×852 原稿，維持圖二圓角手機框與玻璃卡片比例 */
+        @media (max-width: 768px) {
+            html, body {
+                height: 100%;
+                overflow: hidden;
+            }
             body {
-                display: block !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
                 padding: 0 !important;
-                background: #1a2327;
+                min-height: 100dvh;
+                height: 100dvh;
+                background: #030712;
             }
             body > .app-shell {
-                width: 100% !important;
-                max-width: none !important;
-                height: 100dvh !important;
-                border-radius: 0 !important;
-                box-shadow: none !important;
+                width: 393px !important;
+                height: 852px !important;
+                max-width: 393px !important;
+                max-height: 852px !important;
+                flex-shrink: 0;
+                margin: 0 !important;
+                transform: scale(min(calc(100vw / 393), calc(100dvh / 852)));
+                transform-origin: center center;
+                border-radius: 48px !important;
+                box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.9) !important;
             }
+        }
+        html.pwa-standalone body {
+            padding: 0 !important;
+            background: #030712;
         }
         .user-api-hint {
             font-size: 0.6875rem;
