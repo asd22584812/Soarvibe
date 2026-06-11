@@ -359,28 +359,6 @@
         #advanced-settings.is-open #advanced-chevron {
             transform: rotate(90deg);
         }
-        #user-api-settings .user-api-panel {
-            display: grid;
-            grid-template-rows: 0fr;
-            transition: grid-template-rows 0.35s ease;
-        }
-        #user-api-settings.is-open .user-api-panel {
-            grid-template-rows: 1fr;
-        }
-        #user-api-settings .user-api-panel-inner {
-            min-height: 0;
-            overflow: hidden;
-        }
-        #user-api-chevron {
-            transition: transform 0.35s ease;
-            flex-shrink: 0;
-        }
-        #user-api-settings.is-open #user-api-chevron {
-            transform: rotate(90deg);
-        }
-        #user-api-settings {
-            margin-top: 0.75rem;
-        }
         .city-card {
             cursor: pointer;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -651,9 +629,6 @@
             display: flex;
             justify-content: flex-end;
             margin-top: 0.35rem;
-        }
-        #user-api-settings.boss-hidden {
-            display: none !important;
         }
         #boss-mode-badge {
             position: fixed;
@@ -1527,43 +1502,6 @@
             #user-wall-scroll {
                 padding-bottom: 2.5rem;
             }
-            #user-api-settings {
-                margin-top: 3rem;
-            }
-        }
-        .user-api-hint {
-            font-size: 0.6875rem;
-            color: #78909C;
-            line-height: 1.5;
-            margin: -0.25rem 0 0.75rem;
-        }
-        .user-api-status {
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: #546E7A;
-            margin: 0.5rem 0 0.75rem;
-        }
-        .user-api-status.is-ready {
-            color: #00796B;
-        }
-        .user-api-save-btn {
-            width: 100%;
-            border: none;
-            border-radius: 9999px;
-            padding: 0.625rem 1rem;
-            font-size: 0.8125rem;
-            font-weight: 900;
-            color: #fff;
-            background: linear-gradient(90deg, #80CBC4, #4DB6AC);
-            box-shadow: 0 4px 12px rgba(77, 182, 172, 0.35);
-            cursor: pointer;
-        }
-        .user-api-save-btn:active {
-            transform: scale(0.98);
-        }
-        .user-api-key-field {
-            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-            font-size: 0.75rem;
         }
     </style>
 </head>
@@ -1941,31 +1879,6 @@
                     <div class="user-note-block">
                         <label for="user-note-spots" class="user-note-label">想去的備用景點</label>
                         <textarea id="user-note-spots" class="user-note-textarea" rows="3" placeholder="例如：藍瓶咖啡、秋葉原"></textarea>
-                    </div>
-                </section>
-
-                <section id="user-api-settings" class="user-tool-card user-glass-card" aria-labelledby="user-api-title">
-                    <button type="button" id="user-api-toggle" class="w-full flex items-center justify-between gap-2 text-left cursor-pointer" aria-expanded="false" aria-controls="user-api-panel">
-                        <span id="user-api-title" class="user-tool-title mb-0">🔐 開發者 API 金鑰（選填）</span>
-                        <span id="user-api-chevron" class="text-[#78909C] text-lg leading-none" aria-hidden="true">❯</span>
-                    </button>
-                    <p class="user-api-hint mt-2 mb-0">往下滑動展開；一般使用者可略過，不影響備援行程。</p>
-                    <div id="user-api-panel" class="user-api-panel">
-                        <div class="user-api-panel-inner">
-                            <div class="pt-3 mt-2 border-t border-white/45">
-                                <p class="user-api-hint">金鑰只儲存在這台裝置的瀏覽器，不會上傳到 GitHub 或任何伺服器。</p>
-                                <div class="user-note-block">
-                                    <label for="user-api-gemini" class="user-note-label">Gemini AI 金鑰</label>
-                                    <textarea id="user-api-gemini" class="user-note-textarea user-api-key-field" rows="3" placeholder="每行一把金鑰（AIzaSy… 或 AQ.…）" autocomplete="off" spellcheck="false"></textarea>
-                                </div>
-                                <div class="user-note-block">
-                                    <label for="user-api-maps" class="user-note-label">Google Maps 金鑰</label>
-                                    <input type="password" id="user-api-maps" class="user-nickname-input user-api-key-field" placeholder="AIzaSy…（地圖／Places 功能）" autocomplete="off" spellcheck="false" />
-                                </div>
-                                <p id="user-api-status" class="user-api-status">尚未設定金鑰</p>
-                                <button type="button" id="user-api-save" class="user-api-save-btn">儲存金鑰</button>
-                            </div>
-                        </div>
                     </div>
                 </section>
             </div>
@@ -2473,12 +2386,6 @@
             const userNoteShopping = document.getElementById('user-note-shopping');
             const userNoteFood = document.getElementById('user-note-food');
             const userNoteSpots = document.getElementById('user-note-spots');
-            const userApiGemini = document.getElementById('user-api-gemini');
-            const userApiMaps = document.getElementById('user-api-maps');
-            const userApiStatus = document.getElementById('user-api-status');
-            const userApiSave = document.getElementById('user-api-save');
-            const userApiToggle = document.getElementById('user-api-toggle');
-            const userApiSettings = document.getElementById('user-api-settings');
             const userChecklist = document.getElementById('user-checklist');
             const USER_NICKNAME_KEY = 'soarvibe_user_nickname';
             const USER_GEMINI_KEYS_KEY = 'SOARVIBE_GEMINI_API_KEYS';
@@ -3374,9 +3281,6 @@
             }
 
             function applyBossModeUi() {
-                if (userApiSettings && (isBossMode || shouldUseBackendProxy())) {
-                    userApiSettings.classList.add('boss-hidden');
-                }
                 if (!isBossMode && !shouldUseBackendProxy()) return;
                 if (!document.getElementById('boss-mode-badge')) {
                     var badge = document.createElement('div');
@@ -3388,7 +3292,6 @@
                     document.body.appendChild(badge);
                 }
                 ensureBossDemoFormReady();
-                updateApiKeyStatus();
             }
 
             function openNaverMapNavigation(query) {
@@ -4132,7 +4035,6 @@
                 }
                 userWall.classList.remove('hidden');
                 if (navProfile) navProfile.classList.add('nav-active');
-                loadApiKeyForm();
                 var scroll = document.getElementById('user-wall-scroll');
                 if (scroll) scroll.scrollTop = 0;
             }
@@ -7047,79 +6949,6 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 });
             }
 
-            function updateApiKeyStatus() {
-                if (!userApiStatus) return;
-                if (shouldUseBackendProxy()) {
-                    userApiStatus.textContent = '雲端安全模式：Gemini 多金鑰輪替 + Maps 後端代理 ✓';
-                    userApiStatus.classList.add('is-ready');
-                    return;
-                }
-                if (isBossMode) {
-                    userApiStatus.textContent = '本機測試模式：請設定 SOARVIBE_API_BASE 或自行填金鑰';
-                    userApiStatus.classList.remove('is-ready');
-                    return;
-                }
-                var geminiCount = loadStoredGeminiKeys().length;
-                var mapsReady = !!getGoogleMapsApiKey();
-                var parts = [];
-                if (geminiCount) parts.push('Gemini ' + geminiCount + ' 把');
-                if (mapsReady) parts.push('Maps 已設定');
-                if (!parts.length) {
-                    userApiStatus.textContent = '尚未設定金鑰（仍可使用備援行程）';
-                    userApiStatus.classList.remove('is-ready');
-                    return;
-                }
-                userApiStatus.textContent = '已設定：' + parts.join('、');
-                userApiStatus.classList.add('is-ready');
-            }
-
-            function loadApiKeyForm() {
-                if (!userApiGemini && !userApiMaps) return;
-                var keys = loadStoredGeminiKeys();
-                if (userApiGemini) {
-                    userApiGemini.value = keys.join('\n');
-                }
-                if (userApiMaps) {
-                    try {
-                        userApiMaps.value = localStorage.getItem(USER_GOOGLE_MAPS_KEY) || '';
-                    } catch (e) {
-                        userApiMaps.value = '';
-                    }
-                }
-                updateApiKeyStatus();
-            }
-
-            function saveApiKeysFromForm() {
-                var geminiKeys = userApiGemini ? parseGeminiKeysFromText(userApiGemini.value) : [];
-                var mapsKey = userApiMaps ? String(userApiMaps.value || '').trim() : '';
-                try {
-                    if (geminiKeys.length) {
-                        localStorage.setItem(USER_GEMINI_KEYS_KEY, JSON.stringify(geminiKeys));
-                        localStorage.setItem(USER_GEMINI_KEY_KEY, geminiKeys[0]);
-                    } else {
-                        localStorage.removeItem(USER_GEMINI_KEYS_KEY);
-                        localStorage.removeItem(USER_GEMINI_KEY_KEY);
-                    }
-                    if (mapsKey) {
-                        localStorage.setItem(USER_GOOGLE_MAPS_KEY, mapsKey);
-                    } else {
-                        localStorage.removeItem(USER_GOOGLE_MAPS_KEY);
-                    }
-                } catch (e) {
-                    showModal('無法儲存金鑰，瀏覽器儲存空間可能已滿。', '⚠️');
-                    return;
-                }
-                googleMapsBootstrapInstalled = false;
-                googleMapsPlacesLoadPromise = null;
-                resetGeminiKeySession();
-                currentKeyIndex = 0;
-                if (userApiGemini) {
-                    userApiGemini.value = geminiKeys.join('\n');
-                }
-                updateApiKeyStatus();
-                showModal('API 金鑰已儲存到這台裝置。', '🔐');
-            }
-
             function getActiveGeminiApiKeys() {
                 return loadStoredGeminiKeys();
             }
@@ -7145,7 +6974,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 var valid = getActiveGeminiApiKeys();
                 if (valid.length) return;
                 console.warn(
-                    '[SOARVIBE] 未偵測到有效 Gemini 金鑰。請部署 worker 並設定 SOARVIBE_API_BASE，或至「旅行個人中心 → API 金鑰設定」填入金鑰。'
+                    '[SOARVIBE] 未偵測到有效 Gemini 金鑰。請確認 Cloudflare Worker 後端已部署並設定 SOARVIBE_API_BASE。'
                 );
             }
 
@@ -7155,9 +6984,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             logGeminiKeySetupHint();
             applyBossModeUi();
             if (shouldUseBackendProxy()) {
-                initBackendMapsKey().then(function () {
-                    updateApiKeyStatus();
-                });
+                initBackendMapsKey();
             }
 
             if (aiContent) {
@@ -8012,16 +7839,6 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 el.addEventListener('input', saveUserNotes);
                 el.addEventListener('blur', saveUserNotes);
             });
-            if (userApiSave) {
-                userApiSave.addEventListener('click', saveApiKeysFromForm);
-            }
-            if (userApiToggle && userApiSettings) {
-                userApiToggle.addEventListener('click', function () {
-                    var isOpen = userApiSettings.classList.toggle('is-open');
-                    userApiToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-                });
-            }
-            updateApiKeyStatus();
 
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', function () {
