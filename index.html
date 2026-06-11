@@ -474,17 +474,26 @@
             font-weight: 800;
             color: #80CBC4;
         }
-        .generating-status {
+        .generating-status-wrap {
             margin: 0 0 1rem;
             min-height: 2.6rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .generating-status {
+            margin: 0;
+            width: 100%;
             font-size: 0.75rem;
             font-weight: 700;
             line-height: 1.55;
             color: #546E7A;
-            transition: opacity 0.35s ease;
+            opacity: 1;
+            transition: opacity 0.48s ease;
+            will-change: opacity;
         }
         .generating-status.is-fading {
-            opacity: 0.35;
+            opacity: 0;
         }
         .generating-progress {
             height: 0.35rem;
@@ -1962,7 +1971,9 @@
                 </div>
                 <h2 id="generating-title" class="generating-title">SOARVIBE 航程規劃中</h2>
                 <p id="generating-dest" class="generating-dest">東京</p>
-                <p id="generating-status" class="generating-status">正在為您掃描目的地…</p>
+                <div class="generating-status-wrap" aria-live="polite">
+                    <p id="generating-status" class="generating-status">正在為您掃描目的地…</p>
+                </div>
                 <div class="generating-progress" aria-hidden="true">
                     <div class="generating-progress-bar"></div>
                 </div>
@@ -2021,6 +2032,7 @@
             const generatingStatusEl = document.getElementById('generating-status');
             const generatingDestEl = document.getElementById('generating-dest');
             var generatingStatusTimer = null;
+            var generatingStatusRunId = 0;
             var generatingRotationDest = '';
             var generatingMsgIdx = 0;
             const GENERATING_STATUS_MESSAGES = [
@@ -2033,7 +2045,9 @@
                 '塔台調整航線中，降落的是驚喜不是雷點 🛬',
                 '小本本油墨還沒乾，再幾秒就送到 📖'
             ];
-            const GENERATING_STATUS_ROTATE_MS = 2200;
+            const GENERATING_STATUS_HOLD_MS = 3600;
+            const GENERATING_STATUS_FADE_MS = 480;
+            const GENERATING_STATUS_GAP_MS = 160;
             const alertClose = document.getElementById('alert-close');
             const alertTitle = document.getElementById('alert-title');
             const alertIcon = document.getElementById('alert-icon');
@@ -5073,8 +5087,16 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 return day;
             }
 
+            function getGeneratingStatusMessage(idx) {
+                return GENERATING_STATUS_MESSAGES[idx % GENERATING_STATUS_MESSAGES.length]
+                    .replace(/\{dest\}/g, generatingRotationDest);
+            }
+
             function startGeneratingStatusRotation(dest, resetIndex) {
                 if (!generatingStatusEl) return;
+                stopGeneratingStatusRotation();
+                generatingStatusRunId++;
+                var runId = generatingStatusRunId;
                 if (dest) {
                     generatingRotationDest = dest;
                 }
@@ -5084,24 +5106,36 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 if (resetIndex) {
                     generatingMsgIdx = 0;
                 }
-                clearInterval(generatingStatusTimer);
-                function rotateStatus() {
-                    if (!generatingStatusEl) return;
-                    generatingStatusEl.classList.add('is-fading');
-                    setTimeout(function () {
-                        if (!generatingStatusEl) return;
-                        generatingStatusEl.textContent = GENERATING_STATUS_MESSAGES[generatingMsgIdx % GENERATING_STATUS_MESSAGES.length]
-                            .replace(/\{dest\}/g, generatingRotationDest);
-                        generatingStatusEl.classList.remove('is-fading');
-                        generatingMsgIdx++;
-                    }, 180);
+                generatingStatusEl.classList.remove('is-fading');
+                generatingStatusEl.textContent = getGeneratingStatusMessage(generatingMsgIdx);
+                generatingMsgIdx++;
+
+                function scheduleNextStatusRotation() {
+                    generatingStatusTimer = setTimeout(function () {
+                        if (runId !== generatingStatusRunId || !generatingStatusEl) return;
+                        generatingStatusEl.classList.add('is-fading');
+                        generatingStatusTimer = setTimeout(function () {
+                            if (runId !== generatingStatusRunId || !generatingStatusEl) return;
+                            generatingStatusEl.textContent = getGeneratingStatusMessage(generatingMsgIdx);
+                            generatingMsgIdx++;
+                            generatingStatusTimer = setTimeout(function () {
+                                if (runId !== generatingStatusRunId || !generatingStatusEl) return;
+                                generatingStatusEl.classList.remove('is-fading');
+                                generatingStatusTimer = setTimeout(function () {
+                                    if (runId !== generatingStatusRunId) return;
+                                    scheduleNextStatusRotation();
+                                }, GENERATING_STATUS_HOLD_MS + GENERATING_STATUS_FADE_MS);
+                            }, GENERATING_STATUS_GAP_MS);
+                        }, GENERATING_STATUS_FADE_MS);
+                    }, GENERATING_STATUS_HOLD_MS);
                 }
-                rotateStatus();
-                generatingStatusTimer = setInterval(rotateStatus, GENERATING_STATUS_ROTATE_MS);
+
+                scheduleNextStatusRotation();
             }
 
             function stopGeneratingStatusRotation() {
-                clearInterval(generatingStatusTimer);
+                generatingStatusRunId++;
+                clearTimeout(generatingStatusTimer);
                 generatingStatusTimer = null;
             }
 
