@@ -1,9 +1,18 @@
-const CACHE_NAME = 'soarvibe-v16';
+const CACHE_NAME = 'soarvibe-v17';
 const STATIC_ASSETS = [
   './manifest.json',
   './bg.png',
   './soarvibe-logo.png',
-  './assets/logo.png'
+  './assets/logo.png',
+  './cover-photos/tokyo.jpg',
+  './cover-photos/osaka.jpg',
+  './cover-photos/kyoto.jpg',
+  './cover-photos/seoul.jpg',
+  './cover-photos/bangkok.jpg',
+  './cover-photos/okinawa.jpg',
+  './cover-photos/hokkaido.jpg',
+  './cover-photos/london.jpg',
+  './cover-photos/paris.jpg'
 ];
 
 self.addEventListener('install', function (event) {

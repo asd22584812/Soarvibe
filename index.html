@@ -2376,6 +2376,19 @@
             const BOOKLET_WATERMARK_OPACITY = 0.13;
             const BOOKLET_COVER_LOGO_MAX_HEIGHT = '22mm';
 
+            const BOOKLET_LOCAL_COVERS = {
+                '東京': './cover-photos/tokyo.jpg',
+                '大阪': './cover-photos/osaka.jpg',
+                '京都': './cover-photos/kyoto.jpg',
+                '首爾': './cover-photos/seoul.jpg',
+                '曼谷': './cover-photos/bangkok.jpg',
+                '新加坡': './cover-photos/tokyo.jpg',
+                '沖繩': './cover-photos/okinawa.jpg',
+                '北海道': './cover-photos/hokkaido.jpg',
+                '倫敦': './cover-photos/london.jpg',
+                '巴黎': './cover-photos/paris.jpg'
+            };
+
             const BOOKLET_DESTINATION_COVERS = {
                 '東京': 'https://images.unsplash.com/photo-1648301184879-28c6ed4964d7?auto=format&fit=crop&w=1600&q=85',
                 '京都': 'https://images.unsplash.com/photo-1573047330192-4e6bb1594325?auto=format&fit=crop&w=1600&q=85',
@@ -6449,13 +6462,19 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
             function resolveBookletCoverUrl(destination) {
                 var key = resolveEpithetCityKey(destination);
+                if (key && BOOKLET_LOCAL_COVERS[key]) {
+                    return BOOKLET_LOCAL_COVERS[key];
+                }
                 if (key && BOOKLET_DESTINATION_COVERS[key]) {
                     return BOOKLET_DESTINATION_COVERS[key];
+                }
+                if (destination && BOOKLET_LOCAL_COVERS[destination]) {
+                    return BOOKLET_LOCAL_COVERS[destination];
                 }
                 if (destination && BOOKLET_DESTINATION_COVERS[destination]) {
                     return BOOKLET_DESTINATION_COVERS[destination];
                 }
-                return BOOKLET_DESTINATION_COVERS['東京'];
+                return BOOKLET_LOCAL_COVERS['東京'] || BOOKLET_DESTINATION_COVERS['東京'];
             }
 
             function calcTripDayNight(meta) {
@@ -6630,25 +6649,28 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             function buildBookletIntroHtml(destination, dest, dayCount) {
                 var profile = resolveBookletProfile(destination);
                 var html = '<div class="bk-intro-content">';
-                html += '<div class="bk-intro-top">';
-                html += '<p class="bk-intro-region">' + (profile.coverEmoji || '🌏') + ' ' + escapeHtml(profile.region) + '</p>';
+                html += '<div class="bk-intro-block bk-intro-top">';
+                html += '<p class="bk-intro-region">' + (profile.coverEmoji || '🌏') + ' 認識 ' + escapeHtml(dest) + '　<span class="bk-intro-region-sub">' + escapeHtml(profile.region) + '</span></p>';
                 if (profile.lead) {
                     html += '<p class="bk-intro-lead">' + escapeHtml(profile.lead) + '</p>';
                 }
+                html += '</div>';
+                html += '<div class="bk-intro-block bk-intro-facts">';
+                html += '<div class="bk-intro-rich-list">';
                 if (profile.whereToGo) {
-                    html += '<p class="bk-intro-rich"><strong>🗺️ 大家都去哪玩</strong>　' + escapeHtml(profile.whereToGo) + '</p>';
+                    html += '<div class="bk-intro-rich-item"><span class="bk-intro-rich-label">🗺️ 大家都去哪玩</span><p>' + escapeHtml(profile.whereToGo) + '</p></div>';
                 }
                 if (profile.foodGuide) {
-                    html += '<p class="bk-intro-rich"><strong>🍜 必吃什麼</strong>　' + escapeHtml(profile.foodGuide) + '</p>';
+                    html += '<div class="bk-intro-rich-item"><span class="bk-intro-rich-label">🍜 必吃什麼</span><p>' + escapeHtml(profile.foodGuide) + '</p></div>';
                 }
                 if (profile.weather) {
-                    html += '<p class="bk-intro-rich"><strong>🌡️ 當地氣溫</strong>　' + escapeHtml(profile.weather) + '</p>';
+                    html += '<div class="bk-intro-rich-item"><span class="bk-intro-rich-label">🌡️ 當地氣溫</span><p>' + escapeHtml(profile.weather) + '</p></div>';
                 }
                 if (profile.souvenirs) {
-                    html += '<p class="bk-intro-rich"><strong>🎁 必買伴手禮</strong>　' + escapeHtml(profile.souvenirs) + '</p>';
+                    html += '<div class="bk-intro-rich-item"><span class="bk-intro-rich-label">🎁 必買伴手禮</span><p>' + escapeHtml(profile.souvenirs) + '</p></div>';
                 }
-                html += '</div>';
-                html += '<div class="bk-intro-mid">';
+                html += '</div></div>';
+                html += '<div class="bk-intro-block bk-intro-mid">';
                 if (profile.cultureSections && profile.cultureSections.length) {
                     html += '<div class="bk-culture-grid">';
                     profile.cultureSections.slice(0, 4).forEach(function (sec) {
@@ -6659,6 +6681,8 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     });
                     html += '</div>';
                 }
+                html += '</div>';
+                html += '<div class="bk-intro-block bk-intro-highlights">';
                 if (profile.highlights && profile.highlights.length) {
                     html += '<div class="bk-highlights-wrap"><h3 class="bk-highlights-title">📍 必訪亮點</h3><div class="bk-highlights-grid">';
                     profile.highlights.forEach(function (spot, idx) {
@@ -6669,7 +6693,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 }
                 html += '</div>';
                 if (profile.tips && profile.tips.length) {
-                    html += '<div class="bk-intro-bottom"><div class="bk-tips-box bk-tips-compact"><h3 class="bk-tips-title">💡 在地小提醒</h3><ul class="bk-tips-list">';
+                    html += '<div class="bk-intro-block bk-intro-bottom"><div class="bk-tips-box bk-tips-compact"><h3 class="bk-tips-title">💡 在地小提醒</h3><ul class="bk-tips-list">';
                     profile.tips.slice(0, 4).forEach(function (tip) {
                         html += '<li>' + escapeHtml(tip) + '</li>';
                     });
@@ -6744,40 +6768,78 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 }).join('');
             }
 
+            function getDayPhaseItems(phase) {
+                var items = (phase && phase.items) ? phase.items.slice() : [];
+                if (!items.length && phase && phase.body) {
+                    items = extractActivityBullets(phase.body);
+                }
+                if (!items.length && phase && phase.detail) {
+                    items = extractActivityBullets(phase.detail);
+                }
+                return items;
+            }
+
+            function countDayActivities(day) {
+                var total = 0;
+                (day.phases || []).forEach(function (phase) {
+                    total += getDayPhaseItems(phase).length;
+                });
+                if (!total && day.rawLines && day.rawLines.length) {
+                    total = extractActivityBullets(day.rawLines.join('\n')).length;
+                }
+                return total;
+            }
+
             function buildBookletItineraryHtml(hidden, dest, wm) {
                 var days = (hidden && hidden.days) || [];
-                if (!days.length) {
-                    return '<div class="bk-page bk-day-page bk-itinerary-start">' + wm +
+                var contentDays = days.filter(function (day) {
+                    return countDayActivities(day) > 0;
+                });
+                if (!contentDays.length) {
+                    return '<div class="bk-page bk-day-page">' + wm +
                         buildBookletPageHead('專屬行程表') +
                         '<p class="bk-muted">行程內容載入中或格式異常，請回 App 重新生成行程後再匯出小本本。</p></div>';
                 }
                 var html = '';
-                days.forEach(function (day, idx) {
-                    var pageCls = 'bk-page bk-day-page' + (idx === 0 ? ' bk-itinerary-start' : ' bk-day-new');
-                    html += '<div class="' + pageCls + '">';
-                    html += wm;
-                    if (idx === 0) {
-                        html += '<div class="bk-itinerary-head">';
-                        html += buildBookletPageHead('專屬行程表');
-                        html += '<h2 class="bk-section-title bk-section-title-compact">🗺️ ' + escapeHtml(dest) + ' · 每日動線</h2>';
-                        html += '</div>';
-                    } else {
-                        html += buildBookletPageHead('Day ' + escapeHtml(day.dayNum || String(idx + 1)));
-                    }
-                    html += '<section class="bk-day">';
-                    html += '<h3 class="bk-day-title">📅 ' + escapeHtml(day.dateLabel || '') + ' · Day ' + escapeHtml(day.dayNum || String(idx + 1)) + '</h3>';
+                var rendered = 0;
+                contentDays.forEach(function (day, idx) {
+                    var dayNum = day.dayNum || String(idx + 1);
+                    var dayBody = '';
+                    var dayHasContent = false;
                     (day.phases || []).forEach(function (phase) {
                         var phaseLabel = phase.label || phase.period || '';
-                        if (!phaseLabel && !(phase.items && phase.items.length)) return;
+                        var items = getDayPhaseItems(phase);
+                        if (!items.length && !phaseLabel) return;
+                        dayHasContent = true;
                         var label = phaseLabel ? phaseLabel + '：' : '行程重點：';
-                        html += '<h4 class="bk-phase">' + escapeHtml((phase.emoji || getPhaseEmoji(phaseLabel)) + ' ' + label) + '</h4>';
-                        (phase.items || []).forEach(function (item) {
-                            html += buildBookletActivityHtml(item);
-                        });
+                        dayBody += '<h4 class="bk-phase">' + escapeHtml((phase.emoji || getPhaseEmoji(phaseLabel)) + ' ' + label) + '</h4>';
+                        if (items.length) {
+                            items.forEach(function (item) {
+                                dayBody += buildBookletActivityHtml(item);
+                            });
+                        } else {
+                            dayBody += '<div class="bk-act"><p class="bk-act-note">依 App 行程表安排</p></div>';
+                        }
                     });
-                    html += '</section>';
-                    html += '<div class="bk-footer">SOARVIBE 為您編排的專屬動線</div>';
+                    if (!dayHasContent && day.rawLines && day.rawLines.length) {
+                        var rawItems = extractActivityBullets(day.rawLines.join('\n'));
+                        if (rawItems.length) {
+                            dayHasContent = true;
+                            dayBody += '<h4 class="bk-phase">🗓️ 行程重點：</h4>';
+                            rawItems.forEach(function (item) {
+                                dayBody += buildBookletActivityHtml(item);
+                            });
+                        }
+                    }
+                    if (!dayHasContent) return;
+                    var pageCls = 'bk-page bk-day-page';
+                    if (rendered === 0) pageCls += ' bk-itinerary-start';
+                    html += '<div class="' + pageCls + '">' + wm;
+                    html += buildBookletPageHead('Day ' + dayNum);
+                    html += '<h2 class="bk-day-title">📅 ' + escapeHtml(day.dateLabel || '') + ' · Day ' + escapeHtml(dayNum) + '</h2>';
+                    html += dayBody;
                     html += '</div>';
+                    rendered++;
                 });
                 return html;
             }
@@ -6842,7 +6904,17 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             function isValidCoverDataUrl(dataUrl) {
-                return !!(dataUrl && /^data:image\//i.test(dataUrl) && dataUrl.length > 4000);
+                if (!dataUrl || !/^data:image\//i.test(dataUrl)) return false;
+                if (/^data:image\/svg/i.test(dataUrl)) return false;
+                return dataUrl.length > 4000;
+            }
+
+            function resolveBookletAssetUrl(relativePath) {
+                try {
+                    return new URL(relativePath, window.location.href).href;
+                } catch (urlErr) {
+                    return relativePath;
+                }
             }
 
             async function normalizeCoverDataUrl(dataUrl) {
@@ -6874,7 +6946,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
             async function resolveBookletCoverDataUrl(destination) {
                 var cityKey = resolveEpithetCityKey(destination) || destination || '東京';
-                var cacheKey = 'SOARVIBE_BOOKLET_COVER_V5_' + cityKey;
+                var cacheKey = 'SOARVIBE_BOOKLET_COVER_V6_' + cityKey;
                 try {
                     var cached = localStorage.getItem(cacheKey);
                     if (isValidCoverDataUrl(cached)) {
@@ -6885,7 +6957,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 var i;
                 for (i = 0; i < urls.length; i++) {
                     try {
-                        var resp = await fetch(urls[i], { mode: 'cors', cache: 'no-cache' });
+                        var resp = await fetch(urls[i], { cache: 'no-cache' });
                         if (resp.ok) {
                             var blob = await resp.blob();
                             if (blob && blob.size > 4000) {
@@ -6917,12 +6989,18 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             function getBookletCoverFetchUrls(destination) {
                 var rawUrl = resolveBookletCoverUrl(destination);
                 var list = [];
+                var absLocal = /^\.\//.test(rawUrl) ? resolveBookletAssetUrl(rawUrl) : rawUrl;
+                if (/^\.\/cover-photos\//.test(rawUrl)) {
+                    list.push(absLocal);
+                }
                 var apiBase = getSoarvibeApiBase();
-                if (apiBase) {
+                if (apiBase && !/^\.\//.test(rawUrl)) {
                     list.push(apiBase + '/api/cover-image?url=' + encodeURIComponent(rawUrl));
                 }
-                list.push(getBookletCoverProxyUrl(rawUrl));
-                list.push(rawUrl);
+                if (!/^\.\//.test(rawUrl)) {
+                    list.push(getBookletCoverProxyUrl(rawUrl));
+                    list.push(rawUrl);
+                }
                 return list;
             }
 
@@ -6975,6 +7053,44 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
             var bookletPreviewBlobUrl = '';
 
+            function writeBookletPreviewFrame(frame, printHtml) {
+                return new Promise(function (resolve) {
+                    if (!frame) {
+                        resolve(false);
+                        return;
+                    }
+                    function inject() {
+                        try {
+                            var doc = frame.contentDocument || (frame.contentWindow && frame.contentWindow.document);
+                            if (!doc) {
+                                resolve(false);
+                                return;
+                            }
+                            doc.open();
+                            doc.write(printHtml);
+                            doc.close();
+                            resolve(true);
+                        } catch (writeErr) {
+                            console.warn('[SOARVIBE] writeBookletPreviewFrame:', writeErr);
+                            resolve(false);
+                        }
+                    }
+                    if (frame.contentDocument && frame.contentDocument.readyState === 'complete' && frame.src !== 'about:blank') {
+                        frame.src = 'about:blank';
+                        frame.onload = function () {
+                            frame.onload = null;
+                            inject();
+                        };
+                        return;
+                    }
+                    frame.onload = function () {
+                        frame.onload = null;
+                        inject();
+                    };
+                    frame.src = 'about:blank';
+                });
+            }
+
             function closeBookletInAppPreview() {
                 var sheet = document.getElementById('booklet-preview-sheet');
                 var frame = document.getElementById('booklet-preview-frame');
@@ -6992,31 +7108,32 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 }
             }
 
-            function openBookletInAppPreview(printHtml) {
+            function openBookletInAppPreview(printHtml, options) {
                 var sheet = document.getElementById('booklet-preview-sheet');
                 var frame = document.getElementById('booklet-preview-frame');
                 if (!sheet || !frame) return Promise.resolve(false);
+                options = options || {};
                 if (bookletPreviewBlobUrl) {
                     URL.revokeObjectURL(bookletPreviewBlobUrl);
                     bookletPreviewBlobUrl = '';
                 }
-                var blob = new Blob([printHtml], { type: 'text/html;charset=utf-8' });
-                bookletPreviewBlobUrl = URL.createObjectURL(blob);
-                return new Promise(function (resolve) {
-                    var settled = false;
-                    function done(ok) {
-                        if (settled) return;
-                        settled = true;
-                        resolve(ok);
+                return writeBookletPreviewFrame(frame, printHtml).then(function (ok) {
+                    if (!ok) return false;
+                    if (!options.deferShow) {
+                        sheet.classList.remove('hidden');
+                        sheet.setAttribute('aria-hidden', 'false');
+                        document.documentElement.classList.add('booklet-preview-open');
                     }
-                    frame.onload = function () { done(true); };
-                    frame.onerror = function () { done(false); };
-                    frame.src = bookletPreviewBlobUrl;
-                    sheet.classList.remove('hidden');
-                    sheet.setAttribute('aria-hidden', 'false');
-                    document.documentElement.classList.add('booklet-preview-open');
-                    setTimeout(function () { done(true); }, 8000);
+                    return true;
                 });
+            }
+
+            function revealBookletInAppPreview() {
+                var sheet = document.getElementById('booklet-preview-sheet');
+                if (!sheet) return;
+                sheet.classList.remove('hidden');
+                sheet.setAttribute('aria-hidden', 'false');
+                document.documentElement.classList.add('booklet-preview-open');
             }
 
             async function printBookletFromInAppPreview() {
@@ -7073,18 +7190,24 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 return loadBookletLogoViaImage(BOOKLET_WATERMARK_LOGO);
             }
 
-            function buildBookletWatermarkHtml(watermarkDataUrl) {
+            function buildBookletWatermarkHtml(watermarkDataUrl, placement) {
                 if (!watermarkDataUrl) return '';
-                return '<div class="bk-watermark" aria-hidden="true"><img src="' +
+                var mode = placement === 'center' ? 'center' : 'footer';
+                return '<div class="bk-watermark bk-watermark-' + mode + '" aria-hidden="true"><img src="' +
                     watermarkDataUrl + '" alt=""></div>';
             }
 
+            function buildBookletCoverFooterLogo(watermarkDataUrl) {
+                if (!watermarkDataUrl) return '';
+                return '<div class="bk-cover-brand-foot" aria-hidden="true"><img src="' + watermarkDataUrl + '" alt="SOARVIBE"></div>';
+            }
+
             function buildBookletWatermarkCss() {
-                return '.bk-page,.bk-note-page,.bk-day-page{position:relative;overflow:visible}' +
-                    '.bk-page:not(.bk-cover-page){padding:0 2mm 4mm}' +
-                    '.bk-watermark{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);' +
-                    'width:72%;max-width:115mm;pointer-events:none;z-index:0;text-align:center}' +
-                    '.bk-watermark img{width:100%;height:auto;display:block;opacity:' + BOOKLET_WATERMARK_OPACITY + '}' +
+                return '.bk-page,.bk-note-page,.bk-day-page{position:relative;overflow:visible;padding-bottom:14mm}' +
+                    '.bk-watermark{position:absolute;pointer-events:none;z-index:0;text-align:center}' +
+                    '.bk-watermark-footer{left:50%;bottom:3mm;top:auto;transform:translateX(-50%);width:18mm;max-width:18mm;opacity:0.55}' +
+                    '.bk-watermark-center{left:50%;top:50%;bottom:auto;transform:translate(-50%,-50%);width:68%;max-width:105mm;opacity:' + BOOKLET_WATERMARK_OPACITY + '}' +
+                    '.bk-watermark img{width:100%;height:auto;display:block}' +
                     '.bk-page>*:not(.bk-watermark),.bk-note-page>*:not(.bk-watermark),' +
                     '.bk-day-page>*:not(.bk-watermark){position:relative;z-index:1}' +
                     '.bk-logo-img{display:block;max-height:' + BOOKLET_COVER_LOGO_MAX_HEIGHT +
@@ -7100,17 +7223,21 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     '.bk-page{break-after:page;page-break-after:always;padding:6mm 8mm;position:relative}' +
                     '.bk-page:last-child{break-after:auto;page-break-after:auto}' +
                     buildBookletWatermarkCss() +
-                    '.bk-cover-page{position:relative;display:block;width:210mm;height:294mm;max-width:210mm;max-height:294mm;min-height:294mm;margin:0;padding:0;overflow:hidden;break-after:page;page-break-after:always;break-inside:avoid;page-break-inside:avoid;background-color:#1e293b;background-size:cover;background-position:center center;background-repeat:no-repeat}' +
+                    '.bk-cover-page{position:relative;display:block;width:210mm;height:297mm;max-width:210mm;max-height:297mm;min-height:297mm;margin:0;padding:0;overflow:hidden;break-after:page;page-break-after:always;break-inside:avoid;page-break-inside:avoid;background-color:#B0BEC5;background-size:cover;background-position:center center;background-repeat:no-repeat}' +
                     '.bk-cover-bg-img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:0;display:block;margin:0;padding:0}' +
-                    '.bk-cover-fallback-bg{position:absolute;inset:0;z-index:0;background:linear-gradient(165deg,#1a237e 0%,#37474F 42%,#00838f 100%)}' +
-                    '.bk-cover-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,23,42,.38) 0%,rgba(15,23,42,.12) 42%,rgba(15,23,42,.9) 100%);z-index:1;pointer-events:none}' +
-                    '.bk-cover-spine{position:absolute;left:0;top:0;bottom:0;width:7mm;background:linear-gradient(90deg,rgba(240,98,146,.92),rgba(128,203,196,.55));z-index:2}' +
-                    '.bk-cover-top{position:absolute;top:10mm;left:12mm;right:10mm;z-index:4;display:flex;align-items:center;justify-content:flex-end}' +
-                    '.bk-cover-duration{font-size:12.5pt;font-weight:900;color:#fff;background:rgba(255,255,255,.24);padding:2.5mm 5.5mm;border-radius:999px;letter-spacing:.06em}' +
-                    '.bk-cover-content{position:absolute;left:0;right:0;bottom:0;z-index:3;display:flex;flex-direction:column;justify-content:flex-end;padding:10mm 12mm 18mm 14mm;color:#fff;box-sizing:border-box}' +
-                    '.bk-cover-series{font-size:11pt;font-weight:700;letter-spacing:.22em;text-transform:uppercase;opacity:.92;margin:0 0 3mm}' +
-                    '.bk-cover-dest{font-size:34pt;font-weight:900;line-height:1.1;margin:0 0 3mm;text-shadow:0 4px 20px rgba(0,0,0,.65);word-break:break-word}' +
-                    '.bk-cover-style{font-size:12.5pt;font-weight:700;margin:0;opacity:.96}' +
+                    '.bk-cover-shade{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(0,0,0,.15) 0%,rgba(0,0,0,.05) 45%,rgba(0,0,0,.72) 100%);pointer-events:none}' +
+                    '.bk-cover-top{position:absolute;top:10mm;left:0;right:10mm;z-index:4;display:flex;align-items:center;justify-content:flex-end}' +
+                    '.bk-cover-duration{font-size:11pt;font-weight:900;color:#fff;background:rgba(255,255,255,.22);padding:2mm 5mm;border-radius:999px;letter-spacing:.08em;backdrop-filter:blur(4px)}' +
+                    '.bk-cover-layout{position:absolute;left:0;right:0;bottom:0;z-index:3;padding:0 12mm 16mm 12mm;display:flex;justify-content:center}' +
+                    '.bk-cover-panel{width:100%;max-width:186mm;padding:8mm 9mm 7mm;border-radius:14px;background:rgba(15,23,42,.58);border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(6px);color:#fff;box-sizing:border-box;text-align:center}' +
+                    '.bk-cover-brand-mark{display:block;font-size:10pt;font-weight:900;letter-spacing:.32em;color:#80CBC4;margin:0 0 1.5mm}' +
+                    '.bk-cover-book-label{display:block;font-size:9pt;font-weight:700;letter-spacing:.28em;opacity:.88;margin:0 0 4mm}' +
+                    '.bk-cover-name{font-size:28pt;font-weight:900;line-height:1.15;margin:0 0 2mm;text-shadow:0 2px 12px rgba(0,0,0,.45)}' +
+                    '.bk-cover-dest-line{font-size:18pt;font-weight:900;line-height:1.2;margin:0 0 3.5mm;color:#F8BBD0}' +
+                    '.bk-cover-divider{height:1px;background:linear-gradient(90deg,transparent,rgba(128,203,196,.85),rgba(240,98,146,.85),transparent);margin:0 0 3.5mm}' +
+                    '.bk-cover-style{font-size:11pt;font-weight:700;margin:0;opacity:.92;letter-spacing:.04em}' +
+                    '.bk-cover-brand-foot{position:absolute;left:50%;bottom:4mm;transform:translateX(-50%);z-index:4;width:14mm;opacity:.75}' +
+                    '.bk-cover-brand-foot img{width:100%;height:auto;display:block;filter:brightness(0) invert(1)}' +
                     '.bk-cover-meta{margin:0 0 5mm;padding:4mm 5mm;background:linear-gradient(135deg,#FFF8F0,#E8F5F3);border:1.5px solid rgba(128,203,196,.45);border-radius:12px;break-inside:avoid;page-break-inside:avoid}' +
                     '.bk-cover-dates{font-size:11pt;margin:0 0 2mm;color:#37474F;font-weight:700}' +
                     '.bk-cover-personal{display:inline-block;font-size:12pt;font-weight:900;letter-spacing:.06em;padding:2.5mm 5mm;margin:0 0 2mm;background:rgba(255,255,255,.75);border:1px solid rgba(128,203,196,.45);border-radius:8px;color:#37474F}' +
@@ -7131,33 +7258,34 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     '.bk-tips-title{font-size:11.5pt;font-weight:900;color:#37474F;margin:0 0 2.5mm}' +
                     '.bk-tips-list{margin:0;padding:0 0 0 5mm;font-size:10.5pt;line-height:1.65;color:#455A64}' +
                     '.bk-tips-list li{margin-bottom:1.5mm}' +
-                    '.bk-intro-page{padding:5mm 8mm 6mm;height:281mm;max-height:281mm;overflow:hidden;break-inside:avoid-page;page-break-inside:avoid;display:flex;flex-direction:column;box-sizing:border-box}' +
-                    '.bk-intro-page .bk-page-head{margin-bottom:3mm;padding-bottom:2.5mm;flex-shrink:0}' +
-                    '.bk-intro-page .bk-section-title-compact{margin:0 0 3mm;flex-shrink:0;font-size:14pt}' +
-                    '.bk-intro-content{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;justify-content:space-between;gap:3.5mm;overflow:hidden}' +
-                    '.bk-intro-top{flex-shrink:0}' +
-                    '.bk-intro-mid{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:3mm}' +
-                    '.bk-intro-bottom{flex-shrink:0}' +
-                    '.bk-intro-region{font-size:13pt;font-weight:900;color:#F06292;letter-spacing:.06em;margin:0 0 2.5mm}' +
-                    '.bk-intro-lead{font-size:11.5pt;line-height:1.68;color:#37474F;margin:0 0 2.5mm;text-align:justify;font-weight:700}' +
-                    '.bk-intro-rich{font-size:10.5pt;line-height:1.62;color:#455A64;margin:0 0 2.2mm;text-align:justify}' +
-                    '.bk-intro-rich strong{color:#37474F;font-weight:900;display:inline-block;min-width:7.5em}' +
-                    '.bk-culture-grid{display:grid;grid-template-columns:1fr 1fr;gap:2.5mm;margin:0}' +
-                    '.bk-culture-card{background:#FAFAFA;border:1px solid #E0E0E0;border-left:3px solid #80CBC4;border-radius:0 8px 8px 0;padding:3mm 3.5mm;break-inside:avoid;page-break-inside:avoid;min-height:22mm}' +
-                    '.bk-culture-title{font-size:10pt;font-weight:900;color:#37474F;margin:0 0 1.5mm;line-height:1.3}' +
-                    '.bk-culture-text{font-size:9.25pt;line-height:1.52;color:#546E7A;margin:0;text-align:justify}' +
+                    '.bk-intro-page{padding:5mm 8mm 10mm;height:281mm;max-height:281mm;overflow:hidden;break-inside:avoid-page;page-break-inside:avoid;display:flex;flex-direction:column;box-sizing:border-box}' +
+                    '.bk-intro-page .bk-page-head{margin-bottom:3mm;padding-bottom:2mm;flex-shrink:0}' +
+                    '.bk-intro-content{flex:1 1 auto;min-height:0;display:grid;grid-template-rows:auto auto 1fr auto auto;gap:3.5mm;align-content:space-between;overflow:hidden}' +
+                    '.bk-intro-block{min-height:0}' +
+                    '.bk-intro-region{font-size:14pt;font-weight:900;color:#37474F;letter-spacing:.04em;margin:0;line-height:1.35}' +
+                    '.bk-intro-region-sub{font-size:11.5pt;font-weight:800;color:#F06292;margin-left:2mm}' +
+                    '.bk-intro-lead{font-size:12pt;line-height:1.65;color:#37474F;margin:0;text-align:justify;font-weight:700}' +
+                    '.bk-intro-rich-list{display:grid;grid-template-columns:1fr 1fr;gap:2.5mm;margin:0}' +
+                    '.bk-intro-rich-item{padding:2.5mm 3mm;background:#F5F9FA;border:1px solid #E0E0E0;border-left:3px solid #80CBC4;border-radius:0 8px 8px 0;height:100%;display:flex;flex-direction:column;justify-content:flex-start}' +
+                    '.bk-intro-rich-label{display:block;font-size:10.5pt;font-weight:900;color:#1565c0;margin:0 0 1mm}' +
+                    '.bk-intro-rich-item p{font-size:10.25pt;line-height:1.55;color:#455A64;margin:0;text-align:justify;flex:1}' +
+                    '.bk-culture-grid{display:grid;grid-template-columns:1fr 1fr;gap:2.5mm;margin:0;height:100%;align-content:stretch}' +
+                    '.bk-culture-card{background:#FAFAFA;border:1px solid #E0E0E0;border-left:3px solid #80CBC4;border-radius:0 8px 8px 0;padding:3mm 3.5mm;break-inside:avoid;page-break-inside:avoid;min-height:26mm;display:flex;flex-direction:column;justify-content:center}' +
+                    '.bk-culture-title{font-size:10.5pt;font-weight:900;color:#37474F;margin:0 0 1.5mm;line-height:1.3}' +
+                    '.bk-culture-text{font-size:9.5pt;line-height:1.52;color:#546E7A;margin:0;text-align:justify}' +
                     '.bk-highlights-wrap{margin:0;padding:3mm 3.5mm;background:linear-gradient(135deg,#FFF8F0,#E8F5F3);border:1px solid rgba(128,203,196,.4);border-radius:10px;break-inside:avoid;page-break-inside:avoid}' +
-                    '.bk-highlights-title{font-size:10pt;font-weight:900;color:#37474F;margin:0 0 2mm}' +
-                    '.bk-highlights-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.75mm}' +
-                    '.bk-highlight-pill{font-size:9pt;font-weight:800;color:#455A64;padding:1.75mm 2.25mm;background:rgba(255,255,255,.75);border-radius:6px;border:1px solid rgba(128,203,196,.3)}' +
+                    '.bk-highlights-title{font-size:10.5pt;font-weight:900;color:#37474F;margin:0 0 2mm}' +
+                    '.bk-highlights-grid{display:grid;grid-template-columns:1fr 1fr;gap:2mm}' +
+                    '.bk-highlight-pill{font-size:9.5pt;font-weight:800;color:#455A64;padding:2mm 2.5mm;background:rgba(255,255,255,.82);border-radius:6px;border:1px solid rgba(128,203,196,.35);text-align:center}' +
                     '.bk-tips-compact{padding:3mm 3.5mm;margin:0}' +
-                    '.bk-tips-compact .bk-tips-title{font-size:10pt;margin:0 0 1.5mm}' +
-                    '.bk-tips-compact .bk-tips-list{font-size:9.25pt;line-height:1.48}' +
+                    '.bk-tips-compact .bk-tips-title{font-size:10.5pt;margin:0 0 1.5mm}' +
+                    '.bk-tips-compact .bk-tips-list{font-size:9.5pt;line-height:1.52}' +
                     '.bk-tips-compact .bk-tips-list li{margin-bottom:0.75mm}' +
-                    '.bk-itinerary-head{margin-bottom:4mm}' +
+                    '.bk-day-page{break-after:page;page-break-after:always;min-height:0}' +
+                    '.bk-day-page:last-of-type{break-after:auto;page-break-after:auto}' +
                     '.bk-itinerary-start{break-before:page;page-break-before:always}' +
-                    '.bk-day-new{break-before:page;page-break-before:always}' +
-                    '.bk-section-title-compact{font-size:13pt;margin-bottom:4mm}' +
+                    '.bk-day-title{font-size:14pt;font-weight:900;color:#F06292;margin:0 0 4mm;line-height:1.25}' +
+                    '.bk-phase{font-size:11pt;font-weight:900;color:#546E7A;margin:3mm 0 2mm}' +
                     '.bk-page-head{display:flex;justify-content:space-between;align-items:center;border-bottom:2.5px solid #80CBC4;padding-bottom:3.5mm;margin-bottom:5mm}' +
                     '.bk-brand{font-weight:900;color:#F06292;letter-spacing:.08em;font-size:11pt}' +
                     '.bk-page-label{font-size:13pt;color:#37474F;font-weight:900;letter-spacing:.06em}' +
@@ -7177,9 +7305,6 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     '.bk-check-final-title{font-size:12pt;font-weight:900;color:#37474F;margin:0 0 3mm}' +
                     '.bk-check-final-list{margin:0;padding:0 0 0 5mm;font-size:11pt;line-height:1.7;color:#455A64}' +
                     '.bk-check-final-list li{margin-bottom:1.5mm}' +
-                    '.bk-day{margin-bottom:0;break-inside:avoid-page;page-break-inside:avoid}' +
-                    '.bk-day-title{font-size:13pt;font-weight:900;color:#F06292;margin:0 0 3mm}' +
-                    '.bk-phase{font-size:11pt;font-weight:900;color:#546E7A;margin:3mm 0 2mm}' +
                     '.bk-act{background:#FAFAFA;border-left:3px solid #80CBC4;border-radius:0 8px 8px 0;padding:3mm 4mm;margin-bottom:2.5mm;break-inside:avoid;page-break-inside:avoid}' +
                     '.bk-act-time{font-size:9.5pt;font-weight:900;color:#1565c0}' +
                     '.bk-act-title{font-size:11pt;font-weight:900;margin:1mm 0}' +
@@ -7200,7 +7325,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     '.bk-stamp-zone-label{position:absolute;top:4mm;left:5mm;font-size:10pt;color:#78909C;font-weight:900;letter-spacing:.1em}' +
                     '.bk-footer{margin-top:6mm;text-align:center;font-size:8pt;color:#B0BEC5}' +
                     '@media screen{html,body{width:100%;height:100%;background:#111}.bk-cover-page{width:100vw;height:100vh;min-height:100vh;max-width:none;max-height:none}}' +
-                    '@media print{html,body{margin:0;padding:0;width:210mm}@page{size:210mm 297mm;margin:8mm 6mm}@page :first{margin:0;size:210mm 297mm}.bk-cover-page{width:210mm;height:294mm;max-height:294mm;min-height:294mm;margin:0;padding:0}.bk-page:not(.bk-cover-page){padding:6mm 8mm}body,.bk-watermark,.bk-watermark img,.bk-cover-bg-img,.bk-cover-fallback-bg,.bk-cover-overlay,.bk-cover-spine,.bk-fact-pill,.bk-culture-card,.bk-tips-box,.bk-checklist-extra,.bk-check-final,.bk-stamp-zone{-webkit-print-color-adjust:exact;print-color-adjust:exact}}';
+                    '@media print{html,body{margin:0;padding:0;width:210mm}@page{size:210mm 297mm;margin:8mm 6mm}@page :first{margin:0;size:210mm 297mm}.bk-cover-page{width:210mm;height:297mm;max-height:297mm;min-height:297mm;margin:0;padding:0}.bk-page:not(.bk-cover-page),.bk-day-page{padding:6mm 8mm 14mm}body,.bk-watermark,.bk-watermark img,.bk-cover-bg-img,.bk-cover-shade,.bk-cover-panel,.bk-fact-pill,.bk-culture-card,.bk-tips-box,.bk-checklist-extra,.bk-check-final,.bk-stamp-zone{-webkit-print-color-adjust:exact;print-color-adjust:exact}}';
             }
 
             function buildTravelBookletPrintHtml(meta, hidden, foodSpots, watermarkDataUrl, coverDataUrl) {
@@ -7238,24 +7363,30 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 }
                 var notePages = '';
                 var ni;
-                var wm = buildBookletWatermarkHtml(watermarkDataUrl);
+                var wmFooter = buildBookletWatermarkHtml(watermarkDataUrl, 'footer');
+                var wmCenter = buildBookletWatermarkHtml(watermarkDataUrl, 'center');
                 var profile = resolveBookletProfile(dest);
                 var tripNight = calcTripDayNight(meta);
                 var userName = resolveBookletUserName();
                 var coverTop = buildBookletCoverTopHtml(meta);
                 var coverPersonal = buildBookletCoverPersonalHtml(userName, profile);
-                var coverTitle = (userName || '旅人') + ' · ' + dest + ' 專屬小本本';
+                var coverTitleName = escapeHtml(userName || '旅人');
+                var coverTitleDest = escapeHtml(dest) + ' 專屬小本本';
                 var coverStyleAttr = '';
                 var coverBgHtml = '';
                 if (isValidCoverDataUrl(coverDataUrl)) {
                     coverStyleAttr = ' style="background-image:url(' + coverDataUrl + ')"';
                     coverBgHtml = '<img class="bk-cover-bg-img" src="' + coverDataUrl + '" alt="">';
                 } else {
-                    coverBgHtml = '<div class="bk-cover-fallback-bg" aria-hidden="true"></div>';
+                    var absCoverUrl = resolveBookletAssetUrl(resolveBookletCoverUrl(dest));
+                    coverStyleAttr = ' style="background-image:url(\'' + absCoverUrl + '\')"';
+                    coverBgHtml = '<img class="bk-cover-bg-img" src="' + escapeHtml(absCoverUrl) + '" alt="">';
                 }
+                var printBaseHref = resolveBookletAssetUrl('./');
+                var coverBrandFoot = buildBookletCoverFooterLogo(watermarkDataUrl);
                 for (ni = 1; ni <= 3; ni++) {
                     var noteCls = 'bk-page bk-note-page' + (ni === 1 ? ' bk-notes-start' : '');
-                    notePages += '<div class="' + noteCls + '">' + wm +
+                    notePages += '<div class="' + noteCls + '">' + wmCenter +
                         buildBookletPageHead('旅行筆記 · 第 ' + ni + ' 頁') +
                         '<p class="bk-note-hint">空白橫線供現場筆記、貼票根與靈感隨寫</p>' +
                         '<div class="bk-note-keeper">' +
@@ -7267,25 +7398,30 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
                 var coverLogoHtml = '';
 
-                var itineraryHtml = buildBookletItineraryHtml(hidden, dest, wm);
+                var itineraryHtml = buildBookletItineraryHtml(hidden, dest, wmFooter);
 
                 return '<!DOCTYPE html><html lang="zh-TW"><head><meta charset="UTF-8">' +
+                    '<base href="' + escapeHtml(printBaseHref) + '">' +
                     '<title> </title>' +
                     '<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">' +
                     '<style>' + buildBookletPrintCss() + '</style></head><body>' +
 
                     '<div class="bk-cover-page"' + coverStyleAttr + '>' +
                     coverBgHtml +
-                    '<div class="bk-cover-overlay"></div>' +
-                    '<div class="bk-cover-spine"></div>' +
+                    '<div class="bk-cover-shade"></div>' +
                     coverTop +
-                    '<div class="bk-cover-content">' +
-                    '<p class="bk-cover-series">SOARVIBE TRAVEL BOOK</p>' +
-                    '<h1 class="bk-cover-dest">' + escapeHtml(coverTitle) + '</h1>' +
+                    '<div class="bk-cover-layout"><div class="bk-cover-panel">' +
+                    '<span class="bk-cover-brand-mark">SOARVIBE</span>' +
+                    '<span class="bk-cover-book-label">TRAVEL BOOK</span>' +
+                    '<h1 class="bk-cover-name">' + coverTitleName + '</h1>' +
+                    '<p class="bk-cover-dest-line">' + coverTitleDest + '</p>' +
+                    '<div class="bk-cover-divider"></div>' +
                     '<p class="bk-cover-style">' + escapeHtml(styleLabel) + ' · ' + escapeHtml(dateRange) + '</p>' +
                     '</div></div>' +
+                    coverBrandFoot +
+                    '</div>' +
 
-                    '<div class="bk-page">' + wm +
+                    '<div class="bk-page">' + wmFooter +
                     buildBookletPageHead('行程概要') +
                     '<div class="bk-cover-meta">' +
                     '<p class="bk-cover-dates">📅 ' + escapeHtml(dateRange) + (tripNight.label ? ' · ' + escapeHtml(tripNight.label) : '') + '</p>' +
@@ -7296,13 +7432,12 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     buildBookletTripSummaryPageHtml(dest, meta, styleLabel, dateRange, depText, retText, hotel, transport, profile) +
                     '<div class="bk-footer">Generated by SOARVIBE · ' + escapeHtml(new Date().toLocaleDateString('zh-TW')) + '</div></div>' +
 
-                    '<div class="bk-page bk-intro-page">' + wm +
+                    '<div class="bk-page bk-intro-page">' + wmFooter +
                     buildBookletPageHead('目的地指南') +
-                    '<h2 class="bk-section-title bk-section-title-compact">🌏 認識 ' + escapeHtml(dest) + '</h2>' +
                     buildBookletIntroHtml(dest, dest, tripNight.label) +
                     '</div>' +
 
-                    '<div class="bk-page bk-check-page">' + wm +
+                    '<div class="bk-page bk-check-page">' + wmFooter +
                     buildBookletPageHead('行前必備 CHECK 清單') +
                     '<h2 class="bk-section-title">✅ 出發前請逐項勾選確認</h2>' +
                     buildBookletChecklistPageHtml(checklist, profile, transport) +
@@ -7312,7 +7447,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
                     notePages +
 
-                    '<div class="bk-page">' + wm +
+                    '<div class="bk-page">' + wmFooter +
                     '<div class="bk-page-head"><span class="bk-brand">SOARVIBE</span><span class="bk-page-label">景點＆美食</span></div>' +
                     '<h2 class="bk-section-title">🍱 Google 景點＆美食推薦</h2>' +
                     '<div class="bk-food-grid">' + foodHtml + '</div>' +
@@ -7339,8 +7474,17 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                         hidden = buildTripHiddenData(currentItineraryMarkdown, meta);
                     }
                     var foodSpots = collectBookletFoodSpots(hidden, window.soarvibeFoodSpotCache || []);
+                    btnExportBooklet.textContent = '📖 封面照片載入中…';
                     var watermarkDataUrl = await resolveBookletWatermarkDataUrl();
                     var coverDataUrl = await resolveBookletCoverDataUrl(meta.destination);
+                    if (!isValidCoverDataUrl(coverDataUrl)) {
+                        var localCoverPath = resolveBookletCoverUrl(meta.destination);
+                        if (/^\.\/cover-photos\//.test(localCoverPath)) {
+                            coverDataUrl = await normalizeCoverDataUrl(
+                                await loadImageAsDataUrl(resolveBookletAssetUrl(localCoverPath), '')
+                            );
+                        }
+                    }
                     if (!isValidCoverDataUrl(coverDataUrl)) {
                         var proxyCover = getBookletCoverProxyUrl(resolveBookletCoverUrl(meta.destination));
                         coverDataUrl = await normalizeCoverDataUrl(await loadImageAsDataUrl(proxyCover, ''));
@@ -7358,21 +7502,24 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     if (isValidCoverDataUrl(coverDataUrl)) {
                         console.log('[SOARVIBE] 封面圖已嵌入列印');
                     } else {
-                        console.warn('[SOARVIBE] 封面圖載入失敗 → 將使用漸層備援封面');
+                        console.warn('[SOARVIBE] 封面圖載入失敗 → 封面將無背景照片（請確認 cover-photos 資料夾已部署）');
                     }
                     var printHtml = buildTravelBookletPrintHtml(meta, hidden, foodSpots, watermarkDataUrl, coverDataUrl);
                     var useInAppPreview = shouldUseBookletInAppPreview();
 
                     if (useInAppPreview) {
-                        var previewReady = await openBookletInAppPreview(printHtml);
+                        btnExportBooklet.textContent = '📖 預覽準備中…';
+                        var previewFrame = document.getElementById('booklet-preview-frame');
+                        var previewReady = await openBookletInAppPreview(printHtml, { deferShow: true });
                         if (!previewReady) {
                             showModal('小本本預覽載入失敗，請稍後再試 📖', '📖');
                             return;
                         }
                         await waitForPrintDocumentReady(
-                            document.getElementById('booklet-preview-frame').contentDocument,
-                            8000
+                            previewFrame && previewFrame.contentDocument,
+                            12000
                         );
+                        revealBookletInAppPreview();
                         return;
                     }
 
@@ -7393,15 +7540,17 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     }
 
                     if (!printWin) {
-                        var fallbackReady = await openBookletInAppPreview(printHtml);
+                        var fallbackFrame = document.getElementById('booklet-preview-frame');
+                        var fallbackReady = await openBookletInAppPreview(printHtml, { deferShow: true });
                         if (!fallbackReady) {
                             showModal(MSG_BOOKLET_POPUP_BLOCKED, '📋');
                             return;
                         }
                         await waitForPrintDocumentReady(
-                            document.getElementById('booklet-preview-frame').contentDocument,
-                            8000
+                            fallbackFrame && fallbackFrame.contentDocument,
+                            12000
                         );
+                        revealBookletInAppPreview();
                         return;
                     }
 
