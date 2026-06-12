@@ -167,6 +167,15 @@
             letter-spacing: 0.22em;
             margin-right: -0.22em;
         }
+        .app-header-brand {
+            padding-top: calc(env(safe-area-inset-top, 0px) + 0.25rem);
+        }
+        .generate-btn-main {
+            font-size: 1.0625rem;
+            padding-top: 0.85rem;
+            padding-bottom: 0.85rem;
+            letter-spacing: 0.04em;
+        }
         .brand-tagline {
             font-family: 'Noto Sans TC', sans-serif;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -724,8 +733,9 @@
             width: 10.5rem;
             height: 10.5rem;
             object-fit: contain;
+            opacity: 1;
             animation: splash-logo-in 1.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-            filter: brightness(0) invert(1) drop-shadow(0 12px 32px rgba(0, 0, 0, 0.45));
+            filter: invert(1) brightness(1.05) drop-shadow(0 12px 32px rgba(0, 0, 0, 0.45));
         }
         .soarvibe-splash-ring {
             position: absolute;
@@ -788,8 +798,8 @@
             100% { width: 100%; }
         }
         @keyframes splash-logo-in {
-            0% { opacity: 0; transform: scale(0.35) rotate(-12deg); }
-            100% { opacity: 1; transform: scale(1) rotate(0deg); }
+            0% { transform: scale(0.55) rotate(-8deg); }
+            100% { transform: scale(1) rotate(0deg); }
         }
         @keyframes splash-ring-pulse {
             0%, 100% { transform: scale(0.92); opacity: 0.35; }
@@ -1633,8 +1643,14 @@
                 border-radius: 0 !important;
             }
             body > .app-shell header.app-header {
-                padding-top: calc(env(safe-area-inset-top, 47px) + 0.5rem);
-                margin-bottom: 0.75rem;
+                padding-top: calc(env(safe-area-inset-top, 47px) + 1.35rem);
+                margin-bottom: 0.5rem;
+            }
+            body > .app-shell header.app-header .brand-title {
+                font-size: 3.35rem;
+            }
+            body > .app-shell .form-stack {
+                margin-top: 0.35rem;
             }
             body > .app-shell main.app-main {
                 padding-bottom: 0.5rem;
@@ -1712,8 +1728,8 @@
 
         <div class="phone-scroll relative z-10 flex-1 min-h-0 w-full overflow-y-auto overflow-x-hidden hide-scrollbar">
 
-        <header class="app-header pt-7 pb-4 mb-6 text-center shrink-0 px-5">
-            <h1 class="brand-title text-5xl font-[900] text-white uppercase leading-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]">SOARVIBE</h1>
+        <header class="app-header app-header-brand pt-8 pb-3 mb-5 text-center shrink-0 px-5">
+            <h1 class="brand-title text-6xl font-[900] text-white uppercase leading-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]">SOARVIBE</h1>
             <p class="brand-tagline mt-2 text-xs text-white font-[900] leading-relaxed tracking-[0.3em]">提升你的旅程，翱翔你的風格</p>
         </header>
 
@@ -1857,8 +1873,8 @@
                     </div>
                 </section>
 
-                <button type="button" id="generate-btn" class="w-full bg-gradient-to-r from-[#FFB74D] to-[#F06292] text-white font-black py-2.5 rounded-full shadow-lg text-sm active:scale-95 transition-transform">
-                    ✨ 一鍵生成懶人行程 ✨
+                <button type="button" id="generate-btn" class="generate-btn-main w-full bg-gradient-to-r from-[#FFB74D] to-[#F06292] text-white font-black rounded-full shadow-lg active:scale-95 transition-transform">
+                    ✨ 一鍵生成旅遊行程 ✨
                 </button>
             </div>
 
@@ -2293,6 +2309,10 @@
             const BOOKLET_DESTINATION_INTRO = {
                 '東京': {
                     region: '日本・關東', coverEmoji: '🗼', tagline: '不夜城與江戶風情，每一天都有新發現',
+                    weather: '春 12–20°C、夏 26–34°C 悶熱、秋 15–24°C 最舒適、冬 4–12°C 偏乾。梅雨季 6 月請備雨具。',
+                    whereToGo: '淺草雷門、晴空塔、澀谷 SKY、上野公園、秋葉原、新宿都廳展望台是初訪必排；迪士尼與 teamLab 需預留半日並提前購票。',
+                    foodGuide: '拉麵、壽司、天婦羅、居酒屋、便利商店飯團各有特色；築地外市場海鮮丼、一蘭或當地人氣拉麵店建議錯峰用餐。',
+                    souvenirs: '東京香蕉蛋糕、白色戀人（機場常見）、江戶切子、日本酒、動漫周邊；百貨地下街與機場免稅店最集中。',
                     quickFacts: [
                         { icon: '💴', label: '貨幣', value: '日圓 JPY' },
                         { icon: '🗣️', label: '語言', value: '日語（觀光區英中標示多）' },
@@ -2309,6 +2329,10 @@
                 },
                 '大阪': {
                     region: '日本・關西', coverEmoji: '🍢', tagline: '天下廚房，霓虹與美食的關西入口',
+                    weather: '春 12–20°C、夏 27–34°C 悶熱、秋 14–24°C、冬 5–12°C。夏季紫外線強，戶外行程備帽子與水分。',
+                    whereToGo: '道頓堀、心齋橋、大阪城、通天閣新世界、USJ 是經典組合；梅田空中庭園夜景適合排入晚餐後時段。',
+                    foodGuide: '章魚燒、大阪燒、串炸、河豚料理、蟹道樂是代表；道頓堀與新世界小吃密集，晚餐尖峰 18–20 點排隊最長。',
+                    souvenirs: '551 蓬萊燒、Rikuro 起司蛋糕、關西限定零食、藥妝與卡通雜貨；心齋橋筋商店街與機場都可採買。',
                     quickFacts: [
                         { icon: '💴', label: '貨幣', value: '日圓 JPY' },
                         { icon: '🗣️', label: '語言', value: '日語（關西腔親切）' },
@@ -2325,6 +2349,10 @@
                 },
                 '京都': {
                     region: '日本・關西', coverEmoji: '⛩️', tagline: '千年古都，鳥居、町家與四季慢旅',
+                    weather: '春 10–18°C、夏 25–32°C 悶熱多雨、秋 12–22°C 紅葉最美、冬 2–10°C 偏乾冷。建議洋蔥式穿衣，夏季備防曬與折疊傘。',
+                    whereToGo: '旅人最常造訪伏見稻荷千本鳥居、清水寺與祇園花見小路、金閣寺、嵐山竹林與渡月橋；初訪可安排東山＋嵐山各半日，慢走細看最過癮。',
+                    foodGuide: '必嚐京懷石、湯豆腐、抹茶甜點與宇治茶；錦市場有串燒、漬物與生魚片小食，祇園一帶可找老鋪料亭。排隊名店建議離峰 14:00 前或 20:00 後前往。',
+                    souvenirs: '經典伴手禮：生八橋、抹茶點心、京漬物、和紙工藝、清水燒；機場與京都車站都有集中購買區，可先試吃再採買。',
                     quickFacts: [
                         { icon: '💴', label: '貨幣', value: '日圓 JPY' },
                         { icon: '🗣️', label: '語言', value: '日語（寺社有英文標示）' },
@@ -2341,6 +2369,10 @@
                 },
                 '北海道': {
                     region: '日本・北海道', coverEmoji: '❄️', tagline: '四季皆美，花田、雪原與海鮮的北國',
+                    weather: '夏 18–26°C、冬 -10–0°C 積雪；即使夏季早晚仍涼，冬季需完整防寒。',
+                    whereToGo: '札幌大通、小樽運河、富良野花田、函館夜景、旭山動物園是經典；跨城市移動車程長，每日不宜排太滿。',
+                    foodGuide: '味噌拉麵、海鮮丼、成吉思汗烤肉、乳製品与哈密瓜必嚐；海鮮市場建議早上最新鮮。',
+                    souvenirs: '白色戀人、六花亭、海鮮乾貨、薰衣草製品；新千歲機場伴手禮最齊全。',
                     quickFacts: [
                         { icon: '💴', label: '貨幣', value: '日圓 JPY' },
                         { icon: '🗣️', label: '語言', value: '日語' },
@@ -2357,6 +2389,10 @@
                 },
                 '沖繩': {
                     region: '日本・沖繩', coverEmoji: '🏝️', tagline: '碧海藍天，琉球文化與慢活島嶼',
+                    weather: '全年 20–32°C 溫暖，紫外線強；5–6 月梅雨季、夏末秋初需留意颱風。',
+                    whereToGo: '那霸國際通、首里城、美麗海水族館、古宇利島、恩納海灘是熱門；北部與離島需租車或參加一日遊。',
+                    foodGuide: '沖繩 soba、海葡萄、阿古豬、塔可飯與海鮮丼是特色；國際通與市場小吃選擇多。',
+                    souvenirs: '琉球玻璃、海塩餅乾、泡盛、黑糖商品；機場與國際通可一次購足。',
                     quickFacts: [
                         { icon: '💴', label: '貨幣', value: '日圓 JPY' },
                         { icon: '🗣️', label: '語言', value: '日語（琉球文化）' },
@@ -2373,6 +2409,10 @@
                 },
                 '首爾': {
                     region: '韓國・首爾', coverEmoji: '🏯', tagline: 'K-Culture 與韓屋並存的首都',
+                    weather: '春 8–18°C、夏 24–32°C 悶熱、秋 10–22°C、冬 -5–5°C 乾冷。四季分明，冬季需厚外套與保濕。',
+                    whereToGo: '景福宮、北村韓屋村、明洞、弘大、聖水洞、N 首爾塔是熱門動線；愛寶樂園或 DMZ 需另排一日。',
+                    foodGuide: '韓式烤肉、炸雞、部隊鍋、拌飯、路邊糖餅與雞蛋糕必嚐；明洞、弘大、廣藏市場小吃最集中。',
+                    souvenirs: '韓國彩妝、人參、海苔、韓服小物、Line Friends 周邊；明洞與機場免稅店選擇最多。',
                     quickFacts: [
                         { icon: '💵', label: '貨幣', value: '韓圜 KRW' },
                         { icon: '🗣️', label: '語言', value: '韓語（觀光區中文多）' },
@@ -2389,6 +2429,10 @@
                 },
                 '曼谷': {
                     region: '泰國・曼谷', coverEmoji: '🛕', tagline: '金碧寺廟與街頭美食的熱帶首都',
+                    weather: '全年 28–36°C 炎熱；11–2 月較涼爽少雨，3–5 月最熱，6–10 月雨季午後雷陣雨。',
+                    whereToGo: '大皇宮、臥佛寺、洽圖洽周末市集、湄南河、暹羅商圈是初訪必排；寺廟與市集建議分日安排。',
+                    foodGuide: 'Pad Thai、冬陰功、芒果糯米、船麵與路邊烤肉必吃；米其林路邊攤與夜市最道地。',
+                    souvenirs: '泰絲、香氛、草藥球、皇家奶片、芒果乾；Big C 與機場免稅店好採買。',
                     quickFacts: [
                         { icon: '💵', label: '貨幣', value: '泰銖 THB' },
                         { icon: '🗣️', label: '語言', value: '泰語（觀光區英文可通）' },
@@ -2405,6 +2449,10 @@
                 },
                 '新加坡': {
                     region: '新加坡', coverEmoji: '🦁', tagline: '花園城市，多元文化與濱海天際線',
+                    weather: '終年 26–32°C 炎熱潮濕；午後雷陣雨頻繁，戶外行程備折疊傘與薄外套（商場冷氣強）。',
+                    whereToGo: '濱海灣金沙、魚尾獅、聖淘沙、牛車水、小印度、濱海灣花園是經典動線。',
+                    foodGuide: '海南雞飯、叻沙、辣椒螃蟹、咖椰吐司必嚐；食閣（Hawker Centre）是平民美食精髓。',
+                    souvenirs: '肉骨茶包、咖椰醬、TWG 茶、虎標藥膏、特色零食；機場與 Orchard 商圈選擇多。',
                     quickFacts: [
                         { icon: '💵', label: '貨幣', value: '新幣 SGD' },
                         { icon: '🗣️', label: '語言', value: '英語為主（華語普遍）' },
@@ -2814,10 +2862,15 @@
                     { title: '京都・奈良一日遊', category: '一日遊', emoji: '🚌', price: 'NT$ 1,680 起', desc: '從大阪出發經典路線', keywords: ['京都', '奈良', '一日'], productUrl: kkdayProductUrl(573379, 'kyoto-nara-day-tour-from-osaka-japan') }
                 ],
                 '京都': [
-                    { title: '清水寺門票', category: '景點門票', emoji: '⛩️', price: 'NT$ 280 起', desc: '世界遺產古寺', keywords: ['清水寺', '清水'], productUrl: 'https://www.kkday.com/zh-tw/product/269284' },
-                    { title: '伏見稻荷大社一日遊', category: '一日遊', emoji: '🚌', price: 'NT$ 890 起', desc: '千本鳥居經典路線', keywords: ['伏見', '稻荷', '鳥居'], productUrl: 'https://www.kkday.com/zh-tw/product/167128' },
-                    { title: '京都巴士一日券', category: '交通票券', emoji: '🚌', price: 'NT$ 280 起', desc: '嵐電＋京都地下鐵一日無限搭乘', keywords: ['巴士', '交通', '地下鐵', '嵐電'], productUrl: kkdayProductUrl(101089) },
-                    { title: '嵐山・金閣寺一日遊', category: '一日遊', emoji: '🍁', price: 'NT$ 1,200 起', desc: '竹林小徑・金閣寺・嵐山', keywords: ['嵐山', '金閣', '竹林'], productUrl: kkdayProductUrl(160045, 'kyoto-kinkakuji-arashiyama-day-tour') },
+                    { title: '清水寺門票', category: '景點門票', emoji: '⛩️', price: 'NT$ 280 起', desc: '世界遺產古寺', keywords: ['清水寺', '清水'], productUrl: 'https://www.kkday.com/zh-tw/product/269284', photoUrl: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=400&q=80' },
+                    { title: '伏見稻荷大社・宇治・奈良一日遊', category: '一日遊', emoji: '🚌', price: 'NT$ 890 起', desc: '千本鳥居經典路線', keywords: ['伏見', '稻荷', '鳥居', '宇治', '奈良'], productUrl: 'https://www.kkday.com/zh-tw/product/167128', photoUrl: 'https://images.unsplash.com/photo-1478436127897-769e1b3f0f36?auto=format&fit=crop&w=400&q=80' },
+                    { title: '京都巴士・地下鐵一日券', category: '交通票券', emoji: '🚌', price: 'NT$ 280 起', desc: '嵐電＋京都地下鐵一日無限搭乘', keywords: ['巴士', '交通', '地下鐵', '嵐電'], productUrl: kkdayProductUrl(101089), photoUrl: 'https://images.unsplash.com/photo-1542640244-7e672d6cef4e?auto=format&fit=crop&w=400&q=80' },
+                    { title: '嵐山・金閣寺・清水寺一日遊', category: '一日遊', emoji: '🍁', price: 'NT$ 1,200 起', desc: '竹林小徑・金閣寺・清水寺', keywords: ['嵐山', '金閣', '竹林', '清水寺'], productUrl: kkdayProductUrl(160045, 'kyoto-kinkakuji-arashiyama-day-tour'), photoUrl: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=400&q=80' },
+                    { title: '京都和服租借・髮型設計', category: '體驗行程', emoji: '👘', price: 'NT$ 680 起', desc: '祇園・清水寺周邊人氣和服店', keywords: ['和服', '髮型', '祇園', '清水寺'], productUrl: kkdayProductUrl(1298, 'kyoto-kimono-rental-japan'), photoUrl: 'https://images.unsplash.com/photo-1528360983277-13d401cdc186?auto=format&fit=crop&w=400&q=80' },
+                    { title: '嵯峨野小火車・保津川遊船', category: '體驗行程', emoji: '🚂', price: 'NT$ 520 起', desc: '嵐山經典觀光列車', keywords: ['嵯峨野', '小火車', '保津川', '嵐山'], productUrl: kkdayProductUrl(18682, 'sagano-romantic-train-ticket-kyoto-japan'), photoUrl: 'https://images.unsplash.com/photo-1524413840807-0c3cbfafa338?auto=format&fit=crop&w=400&q=80' },
+                    { title: '京都・大阪・奈良 10 小時包車一日遊', category: '一日遊', emoji: '🚐', price: 'NT$ 476 起', desc: '彈性包車・自由安排景點', keywords: ['包車', '一日遊', '奈良', '大阪'], productUrl: kkdayProductUrl(573379, 'kyoto-nara-day-tour-from-osaka-japan'), photoUrl: 'https://images.unsplash.com/photo-1573047330192-4e6bb1594325?auto=format&fit=crop&w=400&q=80' },
+                    { title: '二条城門票', category: '景點門票', emoji: '🏯', price: 'NT$ 350 起', desc: '德川幕府世界遺產', keywords: ['二条城', '二条', '城'], productUrl: kkdayProductUrl(269285), photoUrl: 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?auto=format&fit=crop&w=400&q=80' },
+                    { title: '京都・奈良・宇治一日遊', category: '一日遊', emoji: '🦌', price: 'NT$ 1,580 起', desc: '奈良餵鹿・宇治抹茶', keywords: ['奈良', '宇治', '鹿'], productUrl: kkdayProductUrl(160044), photoUrl: 'https://images.unsplash.com/photo-1558862107-d49ef2a021d0?auto=format&fit=crop&w=400&q=80' },
                 ],
                 '首爾': [
                     { title: '樂天世界門票', category: '主題樂園', emoji: '🎢', price: 'NT$ 878 起', desc: '全球最大室內主題樂園', keywords: ['樂天', 'Lotte', '主題樂園', '魔幻島'], productUrl: 'https://www.kkday.com/zh-tw/product/2948-lotte-world-ticket-seoul-korea' },
@@ -3010,6 +3063,18 @@
                 return catalog;
             }
 
+            function isKkdaySingleProductUrl(url) {
+                return /kkday\.com\/[^?#]*\/product\/\d+/i.test(String(url || ''));
+            }
+
+            function resolveKkdayTicketPhotoUrl(ticket) {
+                if (ticket && ticket.photoUrl) return ticket.photoUrl;
+                var cityKey = resolveEpithetCityKey(resolveCurrentCity()) || '東京';
+                var cityCover = BOOKLET_DESTINATION_COVERS[cityKey];
+                if (cityCover) return getBookletCoverProxyUrl(cityCover).replace('w=1600&h=1200', 'w=400&h=400');
+                return '';
+            }
+
             function ticketToResultCard(ticket, idx) {
                 return {
                     id: 'kkday-ticket-' + idx,
@@ -3018,7 +3083,7 @@
                     address: ticket.desc || '',
                     tag: ticket.fromItinerary ? '✨ 行程推薦' : (ticket.category || 'KKday 票券'),
                     emoji: ticket.emoji || kkdayCategoryEmoji(ticket.category),
-                    photoUrl: '',
+                    photoUrl: resolveKkdayTicketPhotoUrl(ticket),
                     url: appendKkdayCid(ticket.productUrl)
                 };
             }
@@ -3990,24 +4055,24 @@
                     for (var i = 0; i < attractions.length; i++) {
                         var anchor = await resolveAttractionAnchor(attractions[i]);
                         var nearby = await placesSearchNearbyFood(anchor, attractions[i]);
-                        pushUnique(nearby.slice(0, 3), attractions[i]);
+                        pushUnique(nearby.slice(0, 6), attractions[i]);
 
-                        if (merged.length < 8) {
+                        if (merged.length < 18) {
                             var textFood = await placesSearchByText('美食 餐廳 ' + attractions[i]);
-                            pushUnique(textFood.slice(0, 2), attractions[i]);
+                            pushUnique(textFood.slice(0, 4), attractions[i]);
                         }
-                        if (merged.length >= 8) break;
+                        if (merged.length >= 18) break;
                     }
 
-                    if (!merged.length) {
-                        var broadFood = await placesSearchByText('人氣美食 餐廳');
-                        pushUnique(broadFood.slice(0, 4), city + ' 精選');
-                        if (merged.length < 4) {
+                    if (merged.length < 12) {
+                        var broadFood = await placesSearchByText('人氣美食 餐廳 ' + city);
+                        pushUnique(broadFood.slice(0, 8), city + ' 精選');
+                        if (merged.length < 12) {
                             var broadNearby = await placesSearchNearbyFood(
                                 { lat: geo.lat, lng: geo.lng },
                                 city + ' 精選'
                             );
-                            pushUnique(broadNearby.slice(0, 4), city + ' 精選');
+                            pushUnique(broadNearby.slice(0, 6), city + ' 精選');
                         }
                     }
 
@@ -4036,30 +4101,25 @@
 
             function loadKkdayTicketsPanel() {
                 var city = resolveCurrentCity();
-                var profile = getCityGeoProfile(city);
                 showExclusiveResultsPanel(city + ' KKday 票券專區');
                 setExclusiveLoading(false);
 
                 var tickets = buildKkdayTicketsForTrip(city);
-                var items = tickets.map(ticketToResultCard);
+                var items = tickets
+                    .filter(function (ticket) {
+                        return ticket.productUrl && isKkdaySingleProductUrl(ticket.productUrl);
+                    })
+                    .map(ticketToResultCard);
 
-                buildKkdayCategoryBrowseLinks(city).forEach(function (browse) {
-                    items.push(browse);
-                });
-
-                items.push({
-                    id: 'kkday-city-page',
-                    name: city + ' KKday 官方票券專區',
-                    rating: profile.country || '',
-                    address: '景點・交通・一日遊完整列表',
-                    tag: '外開 KKday',
-                    emoji: '🎫',
-                    photoUrl: '',
-                    url: getKkdayCityPageUrl(city)
-                });
+                if (!items.length) {
+                    exclusiveResultsList.innerHTML =
+                        '<p class="exclusive-results-loading">「' + escapeHtml(city) +
+                        '」暫無可預訂的 KKday 單品票券，請先一鍵生成行程或稍後再試。</p>';
+                    return;
+                }
 
                 renderExclusiveResultCards(items, function (item) {
-                    openAffiliateUrl(item.url || getKkdayCityPageUrl(city));
+                    openAffiliateUrl(item.url);
                 }, { mode: 'affiliate', actionLabel: '前往 KKday' });
             }
 
@@ -6346,6 +6406,10 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                         region: destination || '目的地',
                         coverEmoji: '🌍',
                         tagline: '您的專屬旅程，從這裡啟程',
+                        weather: '依季節準備薄外套與雨具，出發前一週再查當地天氣預報較準確。',
+                        whereToGo: '依本冊行程表所列景點順路安排，熱門地標建議開園前或閉園前前往，人流較少。',
+                        foodGuide: '在地小吃、市場與商圈餐廳最值得探索；尖峰時段可錯峰用餐或提前預約。',
+                        souvenirs: '機場、車站與主要商圈通常有集中伴手禮區，可先試吃再採買。',
                         quickFacts: [
                             { icon: '💱', label: '貨幣', value: '請依目的地準備' },
                             { icon: '🗣️', label: '語言', value: '建議下載離線翻譯' },
@@ -6494,14 +6558,26 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 if (profile.lead) {
                     html += '<p class="bk-intro-lead">' + escapeHtml(profile.lead) + '</p>';
                 }
+                if (profile.whereToGo) {
+                    html += '<p class="bk-intro-rich"><strong>🗺️ 大家都去哪玩</strong>　' + escapeHtml(profile.whereToGo) + '</p>';
+                }
+                if (profile.foodGuide) {
+                    html += '<p class="bk-intro-rich"><strong>🍜 必吃什麼</strong>　' + escapeHtml(profile.foodGuide) + '</p>';
+                }
+                if (profile.weather) {
+                    html += '<p class="bk-intro-rich"><strong>🌡️ 當地氣溫</strong>　' + escapeHtml(profile.weather) + '</p>';
+                }
+                if (profile.souvenirs) {
+                    html += '<p class="bk-intro-rich"><strong>🎁 必買伴手禮</strong>　' + escapeHtml(profile.souvenirs) + '</p>';
+                }
                 if (profile.paragraphs && profile.paragraphs.length) {
-                    profile.paragraphs.forEach(function (para, idx) {
+                    profile.paragraphs.slice(0, 1).forEach(function (para) {
                         html += '<p class="bk-intro-lead2">' + escapeHtml(para) + '</p>';
                     });
                 }
                 if (profile.cultureSections && profile.cultureSections.length) {
                     html += '<div class="bk-culture-grid">';
-                    profile.cultureSections.forEach(function (sec) {
+                    profile.cultureSections.slice(0, 4).forEach(function (sec) {
                         html += '<div class="bk-culture-card">';
                         html += '<h3 class="bk-culture-title">' + sec.icon + ' ' + escapeHtml(sec.title) + '</h3>';
                         html += '<p class="bk-culture-text">' + escapeHtml(sec.text) + '</p>';
@@ -6518,8 +6594,8 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     html += '</div></div>';
                 }
                 if (profile.tips && profile.tips.length) {
-                    html += '<div class="bk-tips-box bk-tips-compact"><h3 class="bk-tips-title">💡 在地小提醒</h3><ul class="bk-tips-list">';
-                    profile.tips.forEach(function (tip) {
+                    html += '<div class="bk-tips-box bk-tips-compact bk-tips-bottom"><h3 class="bk-tips-title">💡 在地小提醒</h3><ul class="bk-tips-list">';
+                    profile.tips.slice(0, 4).forEach(function (tip) {
                         html += '<li>' + escapeHtml(tip) + '</li>';
                     });
                     html += '</ul></div>';
@@ -6677,11 +6753,25 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 });
             }
 
+            function buildBookletCoverSvgDataUrl(destination) {
+                var cityKey = resolveEpithetCityKey(destination) || destination || '目的地';
+                var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="1754" viewBox="0 0 1240 1754">' +
+                    '<defs><linearGradient id="bg" x1="0" y1="0" x2="0.2" y2="1">' +
+                    '<stop offset="0%" stop-color="#1a237e"/><stop offset="45%" stop-color="#37474F"/><stop offset="100%" stop-color="#00838f"/></linearGradient></defs>' +
+                    '<rect width="1240" height="1754" fill="url(#bg)"/>' +
+                    '<rect x="0" y="0" width="28" height="1754" fill="#F06292"/>' +
+                    '<rect x="28" y="0" width="12" height="1754" fill="#80CBC4"/>' +
+                    '<text x="72" y="1560" fill="#fff" font-family="sans-serif" font-size="28" font-weight="700" opacity="0.88">SOARVIBE TRAVEL BOOK</text>' +
+                    '<text x="72" y="1650" fill="#fff" font-family="sans-serif" font-size="64" font-weight="900">' + cityKey + '</text></svg>';
+                return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+            }
+
             function getBookletCoverFetchUrls(destination) {
                 var rawUrl = resolveBookletCoverUrl(destination);
                 var list = [];
-                if (shouldUseBackendProxy() && SOARVIBE_API_BASE) {
-                    list.push(String(SOARVIBE_API_BASE).replace(/\/$/, '') + '/api/cover-image?url=' + encodeURIComponent(rawUrl));
+                var apiBase = getSoarvibeApiBase();
+                if (apiBase) {
+                    list.push(apiBase + '/api/cover-image?url=' + encodeURIComponent(rawUrl));
                 }
                 list.push(getBookletCoverProxyUrl(rawUrl));
                 list.push(rawUrl);
@@ -6690,7 +6780,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
             async function resolveBookletCoverDataUrl(destination) {
                 var cityKey = resolveEpithetCityKey(destination) || destination || '東京';
-                var cacheKey = 'SOARVIBE_BOOKLET_COVER_V3_' + cityKey;
+                var cacheKey = 'SOARVIBE_BOOKLET_COVER_V4_' + cityKey;
                 try {
                     var cached = localStorage.getItem(cacheKey);
                     if (cached && /^data:image\//i.test(cached)) {
@@ -6823,26 +6913,24 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             function buildBookletPrintCss() {
-                return '@page{size:A4 portrait;margin:10mm}' +
-                    '@page :first{margin:0;size:A4 portrait}' +
+                return '@page{size:210mm 297mm;margin:8mm 6mm}' +
+                    '@page :first{margin:0;size:210mm 297mm}' +
                     '*{box-sizing:border-box}' +
                     'html,body{margin:0;padding:0;width:100%}' +
                     'body{font-family:"Noto Sans TC",sans-serif;color:#37474F;background:#fff;font-size:11pt;line-height:1.55}' +
                     '.bk-page{break-after:page;page-break-after:always;padding:0;position:relative}' +
                     '.bk-page:last-child{break-after:auto;page-break-after:auto}' +
                     buildBookletWatermarkCss() +
-                    '.bk-cover-page{padding:0!important;margin:0!important;break-after:page;page-break-after:always;width:210mm;height:296mm;max-width:210mm;max-height:296mm;overflow:hidden;position:relative;break-inside:avoid-page;page-break-inside:avoid;box-sizing:border-box}' +
-                    '.bk-book-cover{position:relative;width:210mm;height:296mm;max-width:210mm;max-height:296mm;overflow:hidden;break-inside:avoid-page;page-break-inside:avoid;box-sizing:border-box}' +
-                    '.bk-cover-bg{position:absolute;inset:0;background-size:cover;background-position:center;background-repeat:no-repeat;background-color:#1e293b}' +
-                    '.bk-cover-bg-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}' +
-                    '.bk-cover-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,23,42,.5) 0%,rgba(15,23,42,.2) 35%,rgba(15,23,42,.88) 100%);z-index:1}' +
+                    '.bk-cover-page{display:block;width:210mm;height:297mm;max-width:210mm;max-height:297mm;min-height:297mm;margin:0;padding:0;overflow:hidden;position:relative;break-after:page;page-break-after:always;break-inside:avoid;page-break-inside:avoid;box-sizing:border-box}' +
+                    '.bk-cover-bg-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:0;display:block}' +
+                    '.bk-cover-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,23,42,.45) 0%,rgba(15,23,42,.15) 38%,rgba(15,23,42,.92) 100%);z-index:1;pointer-events:none}' +
                     '.bk-cover-spine{position:absolute;left:0;top:0;bottom:0;width:8mm;background:linear-gradient(90deg,rgba(240,98,146,.92),rgba(128,203,196,.55));z-index:2}' +
-                    '.bk-cover-top{position:absolute;top:14mm;left:16mm;right:14mm;z-index:4;display:flex;align-items:center;justify-content:flex-end}' +
-                    '.bk-cover-duration{font-size:11pt;font-weight:900;color:#fff;background:rgba(255,255,255,.18);padding:2mm 5mm;border-radius:999px;letter-spacing:.06em}' +
-                    '.bk-cover-content{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;justify-content:flex-end;padding:10mm 12mm 14mm 16mm;color:#fff;box-sizing:border-box;overflow:hidden}' +
-                    '.bk-cover-series{font-size:9pt;font-weight:700;letter-spacing:.22em;text-transform:uppercase;opacity:.88;margin:0 0 3mm}' +
-                    '.bk-cover-dest{font-size:26pt;font-weight:900;line-height:1.08;margin:0 0 2mm;text-shadow:0 3px 16px rgba(0,0,0,.55)}' +
-                    '.bk-cover-style{font-size:11pt;font-weight:700;margin:0;opacity:.95}' +
+                    '.bk-cover-top{position:absolute;top:12mm;left:14mm;right:12mm;z-index:4;display:flex;align-items:center;justify-content:flex-end}' +
+                    '.bk-cover-duration{font-size:12pt;font-weight:900;color:#fff;background:rgba(255,255,255,.22);padding:2.5mm 5.5mm;border-radius:999px;letter-spacing:.06em}' +
+                    '.bk-cover-content{position:absolute;left:0;right:0;bottom:0;z-index:3;display:flex;flex-direction:column;justify-content:flex-end;padding:8mm 12mm 16mm 16mm;color:#fff;box-sizing:border-box;max-height:72mm}' +
+                    '.bk-cover-series{font-size:10.5pt;font-weight:700;letter-spacing:.22em;text-transform:uppercase;opacity:.9;margin:0 0 2.5mm}' +
+                    '.bk-cover-dest{font-size:32pt;font-weight:900;line-height:1.12;margin:0 0 2mm;text-shadow:0 3px 18px rgba(0,0,0,.6);word-break:break-word}' +
+                    '.bk-cover-style{font-size:12pt;font-weight:700;margin:0;opacity:.95}' +
                     '.bk-cover-meta{margin:0 0 5mm;padding:4mm 5mm;background:linear-gradient(135deg,#FFF8F0,#E8F5F3);border:1.5px solid rgba(128,203,196,.45);border-radius:12px;break-inside:avoid;page-break-inside:avoid}' +
                     '.bk-cover-dates{font-size:11pt;margin:0 0 2mm;color:#37474F;font-weight:700}' +
                     '.bk-cover-personal{display:inline-block;font-size:12pt;font-weight:900;letter-spacing:.06em;padding:2.5mm 5mm;margin:0 0 2mm;background:rgba(255,255,255,.75);border:1px solid rgba(128,203,196,.45);border-radius:8px;color:#37474F}' +
@@ -6863,23 +6951,26 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     '.bk-tips-title{font-size:11.5pt;font-weight:900;color:#37474F;margin:0 0 2.5mm}' +
                     '.bk-tips-list{margin:0;padding:0 0 0 5mm;font-size:10.5pt;line-height:1.65;color:#455A64}' +
                     '.bk-tips-list li{margin-bottom:1.5mm}' +
-                    '.bk-intro-page{padding:0 2mm;max-height:277mm;overflow:hidden;break-inside:avoid-page;page-break-inside:avoid;display:flex;flex-direction:column}' +
-                    '.bk-intro-full{display:flex;flex-direction:column;break-inside:avoid-page;page-break-inside:avoid}' +
-                    '.bk-intro-region{font-size:12.5pt;font-weight:900;color:#F06292;letter-spacing:.06em;margin:0 0 2.5mm}' +
-                    '.bk-intro-lead{font-size:10.5pt;line-height:1.75;color:#37474F;margin:0 0 2.5mm;text-align:justify;font-weight:700}' +
-                    '.bk-intro-lead2{font-size:10pt;line-height:1.68;color:#546E7A;margin:0 0 2.5mm;text-align:justify}' +
-                    '.bk-culture-grid{display:grid;grid-template-columns:1fr 1fr;gap:2.5mm;margin-bottom:2.5mm}' +
-                    '.bk-culture-card{background:#FAFAFA;border:1px solid #E0E0E0;border-left:3px solid #80CBC4;border-radius:0 8px 8px 0;padding:2.5mm 3.5mm;break-inside:avoid;page-break-inside:avoid}' +
-                    '.bk-culture-title{font-size:9.5pt;font-weight:900;color:#37474F;margin:0 0 1.5mm;line-height:1.3}' +
-                    '.bk-culture-text{font-size:8.75pt;line-height:1.55;color:#546E7A;margin:0;text-align:justify}' +
-                    '.bk-highlights-wrap{margin-bottom:2.5mm;padding:2.5mm 3.5mm;background:linear-gradient(135deg,#FFF8F0,#E8F5F3);border:1px solid rgba(128,203,196,.4);border-radius:10px;break-inside:avoid;page-break-inside:avoid}' +
-                    '.bk-highlights-title{font-size:9.5pt;font-weight:900;color:#37474F;margin:0 0 2mm}' +
-                    '.bk-highlights-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5mm}' +
-                    '.bk-highlight-pill{font-size:8.75pt;font-weight:800;color:#455A64;padding:1.5mm 2mm;background:rgba(255,255,255,.75);border-radius:6px;border:1px solid rgba(128,203,196,.3)}' +
-                    '.bk-tips-compact{padding:2.5mm 3.5mm;margin-bottom:0}' +
-                    '.bk-tips-compact .bk-tips-title{font-size:9.5pt;margin:0 0 1.5mm}' +
-                    '.bk-tips-compact .bk-tips-list{font-size:8.75pt;line-height:1.45}' +
-                    '.bk-tips-compact .bk-tips-list li{margin-bottom:0.5mm}' +
+                    '.bk-intro-page{padding:0 2mm;height:277mm;max-height:277mm;overflow:hidden;break-inside:avoid-page;page-break-inside:avoid;display:flex;flex-direction:column;box-sizing:border-box}' +
+                    '.bk-intro-full{display:flex;flex-direction:column;flex:1 1 auto;min-height:0;break-inside:avoid-page;page-break-inside:avoid}' +
+                    '.bk-intro-region{font-size:12pt;font-weight:900;color:#F06292;letter-spacing:.06em;margin:0 0 2mm}' +
+                    '.bk-intro-lead{font-size:10pt;line-height:1.62;color:#37474F;margin:0 0 2mm;text-align:justify;font-weight:700}' +
+                    '.bk-intro-lead2{font-size:9.5pt;line-height:1.55;color:#546E7A;margin:0 0 2mm;text-align:justify}' +
+                    '.bk-intro-rich{font-size:9.25pt;line-height:1.58;color:#455A64;margin:0 0 2mm;text-align:justify}' +
+                    '.bk-intro-rich strong{color:#37474F;font-weight:900}' +
+                    '.bk-culture-grid{display:grid;grid-template-columns:1fr 1fr;gap:2mm;margin-bottom:2mm}' +
+                    '.bk-culture-card{background:#FAFAFA;border:1px solid #E0E0E0;border-left:3px solid #80CBC4;border-radius:0 8px 8px 0;padding:2mm 3mm;break-inside:avoid;page-break-inside:avoid}' +
+                    '.bk-culture-title{font-size:9pt;font-weight:900;color:#37474F;margin:0 0 1mm;line-height:1.25}' +
+                    '.bk-culture-text{font-size:8.25pt;line-height:1.48;color:#546E7A;margin:0;text-align:justify}' +
+                    '.bk-highlights-wrap{margin-bottom:2mm;padding:2mm 3mm;background:linear-gradient(135deg,#FFF8F0,#E8F5F3);border:1px solid rgba(128,203,196,.4);border-radius:10px;break-inside:avoid;page-break-inside:avoid}' +
+                    '.bk-highlights-title{font-size:9pt;font-weight:900;color:#37474F;margin:0 0 1.5mm}' +
+                    '.bk-highlights-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25mm}' +
+                    '.bk-highlight-pill{font-size:8.25pt;font-weight:800;color:#455A64;padding:1.25mm 2mm;background:rgba(255,255,255,.75);border-radius:6px;border:1px solid rgba(128,203,196,.3)}' +
+                    '.bk-tips-compact{padding:2mm 3mm;margin-bottom:0}' +
+                    '.bk-tips-bottom{margin-top:auto;flex-shrink:0}' +
+                    '.bk-tips-compact .bk-tips-title{font-size:9pt;margin:0 0 1.25mm}' +
+                    '.bk-tips-compact .bk-tips-list{font-size:8.25pt;line-height:1.42}' +
+                    '.bk-tips-compact .bk-tips-list li{margin-bottom:0.4mm}' +
                     '.bk-itinerary-head{margin-bottom:4mm}' +
                     '.bk-itinerary-start{break-before:page;page-break-before:always}' +
                     '.bk-day-new{break-before:page;page-break-before:always}' +
@@ -6925,7 +7016,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     '.bk-stamp-zone{height:44mm;min-height:44mm;max-height:44mm;flex-shrink:0;border:2px dashed #90A4AE;border-radius:10px;position:relative;background:rgba(250,250,250,.6);break-inside:avoid;page-break-inside:avoid;break-before:avoid-page;page-break-before:avoid}' +
                     '.bk-stamp-zone-label{position:absolute;top:4mm;left:5mm;font-size:10pt;color:#78909C;font-weight:900;letter-spacing:.1em}' +
                     '.bk-footer{margin-top:6mm;text-align:center;font-size:8pt;color:#B0BEC5}' +
-                    '@media print{html,body{margin:0;padding:0}@page{size:A4 portrait;margin:8mm 6mm}@page :first{margin:0;size:A4 portrait}.bk-cover-page,.bk-book-cover{width:210mm;height:297mm;max-height:297mm;margin:0;padding:0}body,.bk-watermark,.bk-watermark img,.bk-cover-bg,.bk-cover-bg-img,.bk-cover-overlay,.bk-cover-spine,.bk-fact-pill,.bk-culture-card,.bk-tips-box,.bk-checklist-extra,.bk-check-final,.bk-stamp-zone{-webkit-print-color-adjust:exact;print-color-adjust:exact}}';
+                    '@media print{html,body{margin:0;padding:0}@page{size:210mm 297mm;margin:8mm 6mm}@page :first{margin:0;size:210mm 297mm}.bk-cover-page{width:210mm;height:297mm;max-height:297mm;min-height:297mm;margin:0;padding:0}body,.bk-watermark,.bk-watermark img,.bk-cover-bg-img,.bk-cover-overlay,.bk-cover-spine,.bk-fact-pill,.bk-culture-card,.bk-tips-box,.bk-checklist-extra,.bk-check-final,.bk-stamp-zone{-webkit-print-color-adjust:exact;print-color-adjust:exact}}';
             }
 
             function buildTravelBookletPrintHtml(meta, hidden, foodSpots, watermarkDataUrl, coverDataUrl) {
@@ -6969,14 +7060,11 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 var userName = resolveBookletUserName();
                 var coverTop = buildBookletCoverTopHtml(meta);
                 var coverPersonal = buildBookletCoverPersonalHtml(userName, profile);
-                var coverFallbackUrl = resolveBookletCoverUrl(dest);
-                var coverImgSrc = coverDataUrl || getBookletCoverProxyUrl(coverFallbackUrl) || coverFallbackUrl;
+                var coverImgSrc = coverDataUrl || buildBookletCoverSvgDataUrl(dest);
+                var coverTitle = (userName || '旅人') + ' · ' + dest + ' 專屬小本本';
                 var coverBgHtml = coverImgSrc
                     ? '<img class="bk-cover-bg-img" src="' + escapeHtml(coverImgSrc) + '" alt="">'
                     : '';
-                var coverBgStyle = coverImgSrc
-                    ? 'background-image:url("' + coverImgSrc + '");background-size:cover;background-position:center;background-repeat:no-repeat;'
-                    : 'background-color:#1e293b;';
                 for (ni = 1; ni <= 3; ni++) {
                     var noteCls = 'bk-page bk-note-page' + (ni === 1 ? ' bk-notes-start' : '');
                     notePages += '<div class="' + noteCls + '">' + wm +
@@ -6998,18 +7086,16 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     '<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">' +
                     '<style>' + buildBookletPrintCss() + '</style></head><body>' +
 
-                    '<div class="bk-page bk-cover-page">' +
-                    '<div class="bk-book-cover">' +
+                    '<div class="bk-cover-page">' +
                     coverBgHtml +
-                    '<div class="bk-cover-bg" style="' + coverBgStyle + '"></div>' +
                     '<div class="bk-cover-overlay"></div>' +
                     '<div class="bk-cover-spine"></div>' +
                     coverTop +
                     '<div class="bk-cover-content">' +
                     '<p class="bk-cover-series">SOARVIBE TRAVEL BOOK</p>' +
-                    '<h1 class="bk-cover-dest">' + escapeHtml(dest) + '</h1>' +
-                    '<p class="bk-cover-style">' + escapeHtml(styleLabel) + '</p>' +
-                    '</div></div></div>' +
+                    '<h1 class="bk-cover-dest">' + escapeHtml(coverTitle) + '</h1>' +
+                    '<p class="bk-cover-style">' + escapeHtml(styleLabel) + ' · ' + escapeHtml(dateRange) + '</p>' +
+                    '</div></div>' +
 
                     '<div class="bk-page">' + wm +
                     buildBookletPageHead('行程概要') +
@@ -7067,6 +7153,9 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     var foodSpots = collectBookletFoodSpots(hidden, window.soarvibeFoodSpotCache || []);
                     var watermarkDataUrl = await resolveBookletWatermarkDataUrl();
                     var coverDataUrl = await resolveBookletCoverDataUrl(meta.destination);
+                    if (!coverDataUrl) {
+                        coverDataUrl = await loadImageAsDataUrl(getBookletCoverProxyUrl(resolveBookletCoverUrl(meta.destination)), '');
+                    }
                     if (watermarkDataUrl) {
                         console.log('[SOARVIBE] 小本本 LOGO 已嵌入浮水印');
                     } else if (isBookletLocalFile()) {
@@ -7094,7 +7183,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                             try {
                                 printWin.document.title = ' ';
                             } catch (titleErr) { /* silent */ }
-                            await waitForPrintDocumentReady(printWin.document, 5000);
+                            await waitForPrintDocumentReady(printWin.document, 10000);
                         }
                     }
 
@@ -7107,7 +7196,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                         await new Promise(function (resolve) {
                             setTimeout(resolve, 800);
                         });
-                        await waitForPrintDocumentReady(printWin.document, 5000);
+                        await waitForPrintDocumentReady(printWin.document, 10000);
                     }
 
                     printWin.focus();
