@@ -1801,7 +1801,7 @@
             <button type="button" id="booklet-preview-print" class="booklet-preview-btn booklet-preview-btn-primary">列印 / 存 PDF</button>
         </div>
         <iframe id="booklet-preview-frame" title="旅行小本本列印預覽"></iframe>
-        <p class="booklet-preview-hint">iPhone：點「列印 / 存 PDF」→ 分享 → 儲存到檔案。請在列印選項關閉「頁首及頁尾」。</p>
+        <p class="booklet-preview-hint">iPhone：點「列印 / 存 PDF」→ 預覽下方點「…」→ 關閉「頁首及頁尾」→ 比例選「100%」→ 分享 → 儲存到檔案。</p>
     </div>
 
     <div class="app-shell relative flex flex-col overflow-hidden">
@@ -7136,6 +7136,23 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 document.documentElement.classList.add('booklet-preview-open');
             }
 
+            function applyBookletCoverPrintSizing(doc) {
+                if (!doc) return;
+                var win = doc.defaultView || window;
+                var h = (win && win.innerHeight) ? win.innerHeight : 0;
+                if (!h) return;
+                var c = doc.querySelector('.bk-cover-page');
+                var bg = doc.querySelector('.bk-cover-bg-img');
+                if (c) {
+                    c.style.height = h + 'px';
+                    c.style.maxHeight = h + 'px';
+                    c.style.minHeight = h + 'px';
+                }
+                if (bg) {
+                    bg.style.height = h + 'px';
+                }
+            }
+
             async function printBookletFromInAppPreview() {
                 var frame = document.getElementById('booklet-preview-frame');
                 if (!frame || !frame.contentWindow) {
@@ -7143,7 +7160,12 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     return;
                 }
                 try {
-                    await waitForPrintDocumentReady(frame.contentDocument, 8000);
+                    var frameDoc = frame.contentDocument;
+                    await waitForPrintDocumentReady(frameDoc, 8000);
+                    applyBookletCoverPrintSizing(frameDoc);
+                    await new Promise(function (resolve) {
+                        setTimeout(resolve, 120);
+                    });
                     frame.contentWindow.focus();
                     frame.contentWindow.print();
                 } catch (printErr) {
@@ -7215,8 +7237,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             function buildBookletPrintCss() {
-                return '@page{size:210mm 297mm;margin:8mm 6mm}' +
-                    '@page :first{margin:0;size:210mm 297mm}' +
+                return '@page{size:A4 portrait;margin:0}' +
                     '*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
                     'html,body{margin:0;padding:0}' +
                     'body{font-family:"Noto Sans TC",sans-serif;color:#37474F;background:#fff;font-size:11pt;line-height:1.55}' +
@@ -7324,8 +7345,36 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     '.bk-stamp-zone{height:44mm;min-height:44mm;max-height:44mm;flex-shrink:0;border:2px dashed #90A4AE;border-radius:10px;position:relative;background:rgba(250,250,250,.6);break-inside:avoid;page-break-inside:avoid;break-before:avoid-page;page-break-before:avoid}' +
                     '.bk-stamp-zone-label{position:absolute;top:4mm;left:5mm;font-size:10pt;color:#78909C;font-weight:900;letter-spacing:.1em}' +
                     '.bk-footer{margin-top:6mm;text-align:center;font-size:8pt;color:#B0BEC5}' +
-                    '@media screen{html,body{width:100%;height:100%;background:#111}.bk-cover-page{width:100vw;height:100vh;min-height:100vh;max-width:none;max-height:none}}' +
-                    '@media print{html,body{margin:0;padding:0;width:210mm}@page{size:210mm 297mm;margin:8mm 6mm}@page :first{margin:0;size:210mm 297mm}.bk-cover-page{width:210mm;height:297mm;max-height:297mm;min-height:297mm;margin:0;padding:0}.bk-page:not(.bk-cover-page),.bk-day-page{padding:6mm 8mm 14mm}body,.bk-watermark,.bk-watermark img,.bk-cover-bg-img,.bk-cover-shade,.bk-cover-panel,.bk-fact-pill,.bk-culture-card,.bk-tips-box,.bk-checklist-extra,.bk-check-final,.bk-stamp-zone{-webkit-print-color-adjust:exact;print-color-adjust:exact}}';
+                    '@media screen{html,body{width:100%;height:100%;background:#111}.bk-cover-page{width:100vw;height:100vh;min-height:100vh;max-width:none;max-height:none;margin:0}}' +
+                    '@media print{' +
+                    '@page{size:A4 portrait;margin:0}' +
+                    'html,body{margin:0!important;padding:0!important;width:100%!important;height:auto!important;background:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
+                    '.bk-cover-page{' +
+                    'width:100%!important;max-width:100%!important;' +
+                    'height:100vh!important;max-height:100vh!important;min-height:100vh!important;' +
+                    'margin:0!important;padding:0!important;overflow:hidden!important;' +
+                    'break-after:page!important;page-break-after:always!important;' +
+                    'break-inside:avoid!important;page-break-inside:avoid!important;' +
+                    'position:relative!important;box-sizing:border-box!important;background-color:#455A64!important' +
+                    '}' +
+                    '.bk-cover-bg-img{' +
+                    'position:absolute!important;top:0!important;left:0!important;right:0!important;bottom:0!important;' +
+                    'width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;' +
+                    'object-fit:cover!important;object-position:center center!important;' +
+                    'display:block!important;margin:0!important;padding:0!important;z-index:0!important' +
+                    '}' +
+                    '.bk-cover-shade{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;z-index:1!important}' +
+                    '.bk-cover-top{position:absolute!important;top:8mm!important;right:10mm!important;left:auto!important;z-index:4!important}' +
+                    '.bk-cover-layout{position:absolute!important;left:0!important;right:0!important;bottom:0!important;z-index:3!important;padding:0 10mm 8mm!important;width:100%!important;box-sizing:border-box!important}' +
+                    '.bk-cover-panel{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}' +
+                    '.bk-cover-brand-foot{position:absolute!important;left:50%!important;bottom:2mm!important;transform:translateX(-50%)!important;z-index:4!important}' +
+                    '.bk-page:not(.bk-cover-page),.bk-day-page,.bk-note-page{padding:10mm 8mm 12mm!important;box-sizing:border-box!important;width:100%!important}' +
+                    '.bk-intro-page{height:auto!important;max-height:none!important;min-height:0!important;overflow:visible!important}' +
+                    '.bk-note-page{height:auto!important;min-height:100vh!important;max-height:none!important;overflow:visible!important}' +
+                    '.bk-note-keeper{max-height:none!important;overflow:visible!important}' +
+                    '.bk-lines-area{min-height:180mm!important;max-height:none!important}' +
+                    'body,.bk-watermark,.bk-watermark img,.bk-cover-bg-img,.bk-cover-shade,.bk-cover-panel,.bk-fact-pill,.bk-culture-card,.bk-tips-box,.bk-checklist-extra,.bk-check-final,.bk-stamp-zone{-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
+                    '}';
             }
 
             function buildTravelBookletPrintHtml(meta, hidden, foodSpots, watermarkDataUrl, coverDataUrl) {
@@ -7453,7 +7502,14 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     '<div class="bk-food-grid">' + foodHtml + '</div>' +
                     '<div class="bk-footer">資料來源：Google Maps · SOARVIBE 精選</div></div>' +
 
-                    '<script>document.title=" ";window.onbeforeprint=function(){document.title=" ";};<\/script>' +
+                    '<script>document.title=" ";' +
+                    'window.onbeforeprint=function(){document.title=" ";' +
+                    'var c=document.querySelector(".bk-cover-page");' +
+                    'if(c){c.style.height=window.innerHeight+"px";c.style.maxHeight=window.innerHeight+"px";}' +
+                    'var bg=document.querySelector(".bk-cover-bg-img");' +
+                    'if(bg){bg.style.height=window.innerHeight+"px";}' +
+                    '};' +
+                    'window.onafterprint=function(){document.title=" ";};<\/script>' +
                     '</body></html>';
             }
 
