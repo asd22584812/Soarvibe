@@ -288,6 +288,32 @@ async function handleMapsKey(env, auth) {
   return jsonResponse({ key: mapsKey }, 200, auth.origin, env);
 }
 
+async function handleCoverImage(request, env, auth) {
+  var url = new URL(request.url);
+  var imageUrl = String(url.searchParams.get('url') || '').trim();
+  if (!/^https:\/\/images\.unsplash\.com\//i.test(imageUrl)) {
+    return jsonResponse({ error: 'invalid_cover_url' }, 400, auth.origin, env);
+  }
+  try {
+    var upstream = await fetch(imageUrl, {
+      headers: { 'Accept': 'image/jpeg,image/png,image/*' }
+    });
+    if (!upstream.ok) {
+      return jsonResponse({ error: 'cover_fetch_failed', status: upstream.status }, 502, auth.origin, env);
+    }
+    var headers = new Headers(upstream.headers);
+    headers.set('Content-Type', upstream.headers.get('Content-Type') || 'image/jpeg');
+    headers.set('Cache-Control', 'public, max-age=86400');
+    var cors = corsHeaders(auth.origin, env);
+    Object.keys(cors).forEach(function (key) {
+      headers.set(key, cors[key]);
+    });
+    return new Response(upstream.body, { status: 200, headers: headers });
+  } catch (e) {
+    return jsonResponse({ error: 'cover_fetch_error' }, 502, auth.origin, env);
+  }
+}
+
 export default {
   async fetch(request, env) {
     var url = new URL(request.url);
@@ -319,6 +345,10 @@ export default {
 
     if (url.pathname === '/api/maps-key' && request.method === 'GET') {
       return handleMapsKey(env, auth);
+    }
+
+    if (url.pathname === '/api/cover-image' && request.method === 'GET') {
+      return handleCoverImage(request, env, auth);
     }
 
     return jsonResponse({ error: 'not_found' }, 404, auth.origin, env);

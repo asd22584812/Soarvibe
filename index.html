@@ -2,6 +2,8 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
+    <style id="splash-critical">html.splash-pending,html.splash-pending body{background:linear-gradient(165deg,#1a237e 0%,#37474F 42%,#00838f 100%)!important;margin:0;padding:0;overflow:hidden}html.splash-pending #soarvibe-splash{display:flex!important}html.splash-pending body>.app-shell{visibility:hidden}</style>
+    <script>(function(){var s=window.matchMedia('(display-mode: standalone)').matches||window.matchMedia('(display-mode: fullscreen)').matches||window.navigator.standalone===true;if(s){document.documentElement.classList.add('splash-pending','pwa-standalone');}})();</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#1a237e">
     <meta name="description" content="SOARVIBE — AI 旅遊規劃，提升你的旅程，翱翔你的風格">
@@ -38,6 +40,7 @@
         }
         body {
             font-family: 'Noto Sans TC', sans-serif;
+            background: #0f172a;
         }
         #boss-mode-badge {
             display: none !important;
@@ -708,8 +711,9 @@
         }
         .soarvibe-splash-logo-wrap {
             position: relative;
-            width: 9rem;
-            height: 9rem;
+            z-index: 2;
+            width: 12.5rem;
+            height: 12.5rem;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -717,11 +721,11 @@
         .soarvibe-splash-logo {
             position: relative;
             z-index: 2;
-            width: 7.5rem;
-            height: 7.5rem;
+            width: 10.5rem;
+            height: 10.5rem;
             object-fit: contain;
             animation: splash-logo-in 1.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-            filter: drop-shadow(0 10px 28px rgba(0, 0, 0, 0.4));
+            filter: brightness(0) invert(1) drop-shadow(0 12px 32px rgba(0, 0, 0, 0.45));
         }
         .soarvibe-splash-ring {
             position: absolute;
@@ -730,12 +734,12 @@
             animation: splash-ring-pulse 2.4s ease-in-out infinite;
         }
         .soarvibe-splash-ring.outer {
-            width: 11.5rem;
-            height: 11.5rem;
+            width: 14rem;
+            height: 14rem;
         }
         .soarvibe-splash-ring.inner {
-            width: 8.5rem;
-            height: 8.5rem;
+            width: 10.5rem;
+            height: 10.5rem;
             border-color: rgba(240, 98, 146, 0.45);
             animation-direction: reverse;
             animation-duration: 1.9s;
@@ -932,9 +936,9 @@
             box-shadow: 0 8px 32px rgba(107, 94, 84, 0.1);
         }
         #kkdayAffiliateMenu.exclusive-results-mode .kkday-affiliate-panel {
-            height: 40%;
-            max-height: 340px;
-            min-height: 280px;
+            height: 58%;
+            max-height: 480px;
+            min-height: 360px;
             border-radius: 1.35rem 1.35rem 0 0;
             background: rgba(255, 255, 255, 0.75);
             backdrop-filter: blur(12px);
@@ -948,9 +952,9 @@
             max-height: 72%;
         }
         #kkdayAffiliateMenu.foodspot-sheet-mode .kkday-affiliate-panel {
-            height: 40%;
-            max-height: 340px;
-            min-height: 280px;
+            height: 58%;
+            max-height: 480px;
+            min-height: 360px;
             border-radius: 1.35rem 1.35rem 0 0;
             background: rgba(255, 255, 255, 0.75);
             backdrop-filter: blur(12px);
@@ -997,7 +1001,7 @@
             padding-top: 1rem;
         }
         .kkday-affiliate-title {
-            font-size: 0.9375rem;
+            font-size: 1rem;
             font-weight: 900;
             color: #37474F;
             text-align: center;
@@ -1022,9 +1026,9 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 0.4rem;
-            min-height: 6.25rem;
-            padding: 0.85rem 0.5rem;
+            gap: 0.45rem;
+            min-height: 6.75rem;
+            padding: 0.95rem 0.55rem;
             border-radius: 18px;
             border: 1px solid rgba(255, 255, 255, 0.85);
             background: linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(225, 245, 254, 0.92));
@@ -1032,7 +1036,7 @@
                 0 4px 18px rgba(0, 46, 93, 0.12),
                 0 0 20px rgba(128, 203, 196, 0.25),
                 inset 0 1px 0 rgba(255, 255, 255, 0.9);
-            font-size: 0.8125rem;
+            font-size: 0.875rem;
             font-weight: 900;
             color: #37474F;
             cursor: pointer;
@@ -1045,7 +1049,7 @@
                 0 0 14px rgba(128, 203, 196, 0.35);
         }
         .kkday-affiliate-card .kkday-card-emoji {
-            font-size: 1.85rem;
+            font-size: 2rem;
             line-height: 1;
             filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.08));
         }
@@ -1207,13 +1211,13 @@
         }
         .forex-result-amount {
             margin: 0;
-            font-size: 1.25rem;
+            font-size: 1.5rem;
             font-weight: 900;
             color: #37474F;
         }
         .forex-rate-hint {
             margin: 0.35rem 0 0;
-            font-size: 0.625rem;
+            font-size: 0.75rem;
             font-weight: 600;
             color: #78909C;
         }
@@ -1594,7 +1598,7 @@
         /* 手機 / PWA：填滿螢幕 + 等比例放大 UI（不動背景圖） */
         @media (max-width: 768px), (display-mode: standalone) {
             html {
-                font-size: 118.75%;
+                font-size: 124%;
             }
             html, body {
                 height: 100%;
@@ -1629,11 +1633,46 @@
                 border-radius: 0 !important;
             }
             body > .app-shell header.app-header {
-                padding-top: calc(env(safe-area-inset-top, 47px) + 0.625rem);
-                margin-bottom: 1rem;
+                padding-top: calc(env(safe-area-inset-top, 47px) + 0.5rem);
+                margin-bottom: 0.75rem;
             }
             body > .app-shell main.app-main {
-                padding-bottom: 0.75rem;
+                padding-bottom: 0.5rem;
+            }
+            body > .app-shell #kkdayAffiliateMenu {
+                border-radius: 0 !important;
+            }
+            #kkdayAffiliateMenu.exclusive-results-mode .kkday-affiliate-panel,
+            #kkdayAffiliateMenu.foodspot-sheet-mode .kkday-affiliate-panel {
+                height: 62%;
+                max-height: 520px;
+                min-height: 400px;
+            }
+            #kkdayAffiliateMenu:not(.exclusive-results-mode):not(.foodspot-sheet-mode) .kkday-affiliate-panel {
+                max-height: 78%;
+            }
+            .kkday-affiliate-title {
+                font-size: 1.0625rem;
+            }
+            .kkday-affiliate-card {
+                min-height: 7.5rem;
+                font-size: 0.9375rem;
+            }
+            .kkday-affiliate-card .kkday-card-emoji {
+                font-size: 2.25rem;
+            }
+            .forex-panel-label {
+                font-size: 0.9375rem;
+            }
+            .forex-input-row input {
+                font-size: 1.125rem;
+                padding: 0.65rem 0.75rem;
+            }
+            .forex-result-amount {
+                font-size: 1.875rem;
+            }
+            .forex-rate-hint {
+                font-size: 0.8125rem;
             }
             body > .app-shell .hot-recommend {
                 margin-bottom: 0;
@@ -1654,15 +1693,14 @@
         }
     </style>
 </head>
-<body class="min-h-screen overflow-hidden bg-gray-950 flex items-center justify-center p-4">
+<body class="min-h-screen overflow-hidden flex items-center justify-center p-4">
 
     <div id="soarvibe-splash" aria-hidden="true">
         <div class="soarvibe-splash-logo-wrap">
             <div class="soarvibe-splash-ring outer" aria-hidden="true"></div>
             <div class="soarvibe-splash-ring inner" aria-hidden="true"></div>
-            <img src="./soarvibe-logo.png" alt="" class="soarvibe-splash-logo" width="120" height="120">
+            <img src="./soarvibe-logo.png" alt="SOARVIBE" class="soarvibe-splash-logo" width="168" height="168">
         </div>
-        <p class="soarvibe-splash-title">SOARVIBE</p>
         <p class="soarvibe-splash-tagline">提升你的旅程，翱翔你的風格</p>
         <div class="soarvibe-splash-progress" aria-hidden="true"><div class="soarvibe-splash-progress-bar"></div></div>
     </div>
@@ -2214,8 +2252,9 @@
 
             function getBookletReadyMessage(meta) {
                 return '叮！你的 ' + getBookletDestLabel(meta) + ' 小本本已準備好了 🧳\n\n' +
-                    '① 列印時請關閉「頁首及頁尾」（才不會出現網址）\n' +
-                    '② 選「另存為 PDF」即可帶著出發！';
+                    '【重要】列印前請關閉「頁首及頁尾」：\n' +
+                    'iPhone → 分享 → 列印 → 點右上角「選項」→ 關閉頁首及頁尾\n\n' +
+                    '完成後選「儲存到檔案」即可帶著出發！';
             }
 
             function getBookletCoverProxyUrl(rawUrl) {
@@ -6452,9 +6491,13 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 var profile = resolveBookletProfile(destination);
                 var html = '<div class="bk-intro-full">';
                 html += '<p class="bk-intro-region">' + (profile.coverEmoji || '🌏') + ' ' + escapeHtml(profile.region) + '</p>';
-                html += '<p class="bk-intro-lead">' + escapeHtml(profile.lead || (profile.paragraphs && profile.paragraphs[0]) || '') + '</p>';
-                if (profile.paragraphs && profile.paragraphs[1]) {
-                    html += '<p class="bk-intro-lead2">' + escapeHtml(profile.paragraphs[1]) + '</p>';
+                if (profile.lead) {
+                    html += '<p class="bk-intro-lead">' + escapeHtml(profile.lead) + '</p>';
+                }
+                if (profile.paragraphs && profile.paragraphs.length) {
+                    profile.paragraphs.forEach(function (para, idx) {
+                        html += '<p class="bk-intro-lead2">' + escapeHtml(para) + '</p>';
+                    });
                 }
                 if (profile.cultureSections && profile.cultureSections.length) {
                     html += '<div class="bk-culture-grid">';
@@ -6474,10 +6517,13 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     });
                     html += '</div></div>';
                 }
-                if (profile.quickFacts && profile.quickFacts.length) {
-                    html += '<div class="bk-intro-facts">' + buildBookletQuickFactsHtml(profile) + '</div>';
+                if (profile.tips && profile.tips.length) {
+                    html += '<div class="bk-tips-box bk-tips-compact"><h3 class="bk-tips-title">💡 在地小提醒</h3><ul class="bk-tips-list">';
+                    profile.tips.forEach(function (tip) {
+                        html += '<li>' + escapeHtml(tip) + '</li>';
+                    });
+                    html += '</ul></div>';
                 }
-                html += buildBookletTipsHtml(profile);
                 html += '</div>';
                 return html;
             }
@@ -6631,30 +6677,52 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 });
             }
 
+            function getBookletCoverFetchUrls(destination) {
+                var rawUrl = resolveBookletCoverUrl(destination);
+                var list = [];
+                if (shouldUseBackendProxy() && SOARVIBE_API_BASE) {
+                    list.push(String(SOARVIBE_API_BASE).replace(/\/$/, '') + '/api/cover-image?url=' + encodeURIComponent(rawUrl));
+                }
+                list.push(getBookletCoverProxyUrl(rawUrl));
+                list.push(rawUrl);
+                return list;
+            }
+
             async function resolveBookletCoverDataUrl(destination) {
                 var cityKey = resolveEpithetCityKey(destination) || destination || '東京';
-                var cacheKey = 'SOARVIBE_BOOKLET_COVER_V2_' + cityKey;
+                var cacheKey = 'SOARVIBE_BOOKLET_COVER_V3_' + cityKey;
                 try {
                     var cached = localStorage.getItem(cacheKey);
                     if (cached && /^data:image\//i.test(cached)) {
                         return cached;
                     }
                 } catch (e) { /* silent */ }
-                var url = getBookletCoverProxyUrl(resolveBookletCoverUrl(destination));
-                if (!url) return '';
-                try {
-                    var resp = await fetch(url, { mode: 'cors', cache: 'force-cache' });
-                    if (resp.ok) {
-                        var data = await blobToDataUrl(await resp.blob());
-                        if (data) {
-                            try {
-                                localStorage.setItem(cacheKey, data);
-                            } catch (storageErr) { /* silent */ }
-                            return data;
+                var urls = getBookletCoverFetchUrls(destination);
+                var i;
+                for (i = 0; i < urls.length; i++) {
+                    try {
+                        var resp = await fetch(urls[i], { mode: 'cors', cache: 'force-cache' });
+                        if (resp.ok) {
+                            var data = await blobToDataUrl(await resp.blob());
+                            if (data) {
+                                try {
+                                    localStorage.setItem(cacheKey, data);
+                                } catch (storageErr) { /* silent */ }
+                                return data;
+                            }
                         }
-                    }
-                } catch (e) { /* fetch failed */ }
-                return loadImageAsDataUrl(url, cacheKey);
+                    } catch (fetchErr) { /* try next */ }
+                    try {
+                        var viaImg = await loadImageAsDataUrl(urls[i], '');
+                        if (viaImg) {
+                            try {
+                                localStorage.setItem(cacheKey, viaImg);
+                            } catch (storageErr2) { /* silent */ }
+                            return viaImg;
+                        }
+                    } catch (imgErr) { /* try next */ }
+                }
+                return '';
             }
 
             function waitForPrintDocumentReady(doc, timeoutMs) {
@@ -6763,8 +6831,8 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     '.bk-page{break-after:page;page-break-after:always;padding:0;position:relative}' +
                     '.bk-page:last-child{break-after:auto;page-break-after:auto}' +
                     buildBookletWatermarkCss() +
-                    '.bk-cover-page{padding:0;margin:0;break-after:page;page-break-after:always;width:210mm;height:297mm;max-width:210mm;max-height:297mm;overflow:hidden;position:relative;break-inside:avoid-page;page-break-inside:avoid;box-sizing:border-box}' +
-                    '.bk-book-cover{position:relative;width:210mm;height:297mm;max-width:210mm;max-height:297mm;overflow:hidden;break-inside:avoid-page;page-break-inside:avoid;box-sizing:border-box}' +
+                    '.bk-cover-page{padding:0!important;margin:0!important;break-after:page;page-break-after:always;width:210mm;height:296mm;max-width:210mm;max-height:296mm;overflow:hidden;position:relative;break-inside:avoid-page;page-break-inside:avoid;box-sizing:border-box}' +
+                    '.bk-book-cover{position:relative;width:210mm;height:296mm;max-width:210mm;max-height:296mm;overflow:hidden;break-inside:avoid-page;page-break-inside:avoid;box-sizing:border-box}' +
                     '.bk-cover-bg{position:absolute;inset:0;background-size:cover;background-position:center;background-repeat:no-repeat;background-color:#1e293b}' +
                     '.bk-cover-bg-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}' +
                     '.bk-cover-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,23,42,.5) 0%,rgba(15,23,42,.2) 35%,rgba(15,23,42,.88) 100%);z-index:1}' +
@@ -6795,20 +6863,23 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     '.bk-tips-title{font-size:11.5pt;font-weight:900;color:#37474F;margin:0 0 2.5mm}' +
                     '.bk-tips-list{margin:0;padding:0 0 0 5mm;font-size:10.5pt;line-height:1.65;color:#455A64}' +
                     '.bk-tips-list li{margin-bottom:1.5mm}' +
-                    '.bk-intro-page{padding:0 2mm;min-height:277mm;display:flex;flex-direction:column}' +
-                    '.bk-intro-full{display:flex;flex-direction:column;flex:1 1 auto}' +
-                    '.bk-intro-region{font-size:14pt;font-weight:900;color:#F06292;letter-spacing:.06em;margin:0 0 4mm}' +
-                    '.bk-intro-lead{font-size:12pt;line-height:1.85;color:#37474F;margin:0 0 4mm;text-align:justify;font-weight:700}' +
-                    '.bk-intro-lead2{font-size:11pt;line-height:1.8;color:#546E7A;margin:0 0 5mm;text-align:justify}' +
-                    '.bk-culture-grid{display:grid;grid-template-columns:1fr 1fr;gap:4mm;margin-bottom:5mm;flex:1 1 auto}' +
-                    '.bk-culture-card{background:#FAFAFA;border:1px solid #E0E0E0;border-left:3px solid #80CBC4;border-radius:0 10px 10px 0;padding:5mm 5.5mm;break-inside:avoid;page-break-inside:avoid}' +
-                    '.bk-culture-title{font-size:11.5pt;font-weight:900;color:#37474F;margin:0 0 2.5mm;line-height:1.35}' +
-                    '.bk-culture-text{font-size:10.5pt;line-height:1.72;color:#546E7A;margin:0;text-align:justify}' +
-                    '.bk-highlights-wrap{margin-bottom:5mm;padding:4mm 5mm;background:linear-gradient(135deg,#FFF8F0,#E8F5F3);border:1.5px solid rgba(128,203,196,.45);border-radius:12px}' +
-                    '.bk-highlights-title{font-size:11.5pt;font-weight:900;color:#37474F;margin:0 0 3mm}' +
-                    '.bk-highlights-grid{display:grid;grid-template-columns:1fr 1fr;gap:2.5mm}' +
-                    '.bk-highlight-pill{font-size:10.5pt;font-weight:800;color:#455A64;padding:2.5mm 3mm;background:rgba(255,255,255,.75);border-radius:8px;border:1px solid rgba(128,203,196,.35)}' +
-                    '.bk-intro-facts{margin-bottom:4mm}' +
+                    '.bk-intro-page{padding:0 2mm;max-height:277mm;overflow:hidden;break-inside:avoid-page;page-break-inside:avoid;display:flex;flex-direction:column}' +
+                    '.bk-intro-full{display:flex;flex-direction:column;break-inside:avoid-page;page-break-inside:avoid}' +
+                    '.bk-intro-region{font-size:12.5pt;font-weight:900;color:#F06292;letter-spacing:.06em;margin:0 0 2.5mm}' +
+                    '.bk-intro-lead{font-size:10.5pt;line-height:1.75;color:#37474F;margin:0 0 2.5mm;text-align:justify;font-weight:700}' +
+                    '.bk-intro-lead2{font-size:10pt;line-height:1.68;color:#546E7A;margin:0 0 2.5mm;text-align:justify}' +
+                    '.bk-culture-grid{display:grid;grid-template-columns:1fr 1fr;gap:2.5mm;margin-bottom:2.5mm}' +
+                    '.bk-culture-card{background:#FAFAFA;border:1px solid #E0E0E0;border-left:3px solid #80CBC4;border-radius:0 8px 8px 0;padding:2.5mm 3.5mm;break-inside:avoid;page-break-inside:avoid}' +
+                    '.bk-culture-title{font-size:9.5pt;font-weight:900;color:#37474F;margin:0 0 1.5mm;line-height:1.3}' +
+                    '.bk-culture-text{font-size:8.75pt;line-height:1.55;color:#546E7A;margin:0;text-align:justify}' +
+                    '.bk-highlights-wrap{margin-bottom:2.5mm;padding:2.5mm 3.5mm;background:linear-gradient(135deg,#FFF8F0,#E8F5F3);border:1px solid rgba(128,203,196,.4);border-radius:10px;break-inside:avoid;page-break-inside:avoid}' +
+                    '.bk-highlights-title{font-size:9.5pt;font-weight:900;color:#37474F;margin:0 0 2mm}' +
+                    '.bk-highlights-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5mm}' +
+                    '.bk-highlight-pill{font-size:8.75pt;font-weight:800;color:#455A64;padding:1.5mm 2mm;background:rgba(255,255,255,.75);border-radius:6px;border:1px solid rgba(128,203,196,.3)}' +
+                    '.bk-tips-compact{padding:2.5mm 3.5mm;margin-bottom:0}' +
+                    '.bk-tips-compact .bk-tips-title{font-size:9.5pt;margin:0 0 1.5mm}' +
+                    '.bk-tips-compact .bk-tips-list{font-size:8.75pt;line-height:1.45}' +
+                    '.bk-tips-compact .bk-tips-list li{margin-bottom:0.5mm}' +
                     '.bk-itinerary-head{margin-bottom:4mm}' +
                     '.bk-itinerary-start{break-before:page;page-break-before:always}' +
                     '.bk-day-new{break-before:page;page-break-before:always}' +
@@ -6854,7 +6925,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     '.bk-stamp-zone{height:44mm;min-height:44mm;max-height:44mm;flex-shrink:0;border:2px dashed #90A4AE;border-radius:10px;position:relative;background:rgba(250,250,250,.6);break-inside:avoid;page-break-inside:avoid;break-before:avoid-page;page-break-before:avoid}' +
                     '.bk-stamp-zone-label{position:absolute;top:4mm;left:5mm;font-size:10pt;color:#78909C;font-weight:900;letter-spacing:.1em}' +
                     '.bk-footer{margin-top:6mm;text-align:center;font-size:8pt;color:#B0BEC5}' +
-                    '@media print{body,.bk-watermark,.bk-watermark img,.bk-cover-bg,.bk-cover-bg-img,.bk-cover-overlay,.bk-cover-spine,.bk-fact-pill,.bk-culture-card,.bk-tips-box,.bk-checklist-extra,.bk-check-final,.bk-stamp-zone{-webkit-print-color-adjust:exact;print-color-adjust:exact}}';
+                    '@media print{html,body{margin:0;padding:0}@page{size:A4 portrait;margin:8mm 6mm}@page :first{margin:0;size:A4 portrait}.bk-cover-page,.bk-book-cover{width:210mm;height:297mm;max-height:297mm;margin:0;padding:0}body,.bk-watermark,.bk-watermark img,.bk-cover-bg,.bk-cover-bg-img,.bk-cover-overlay,.bk-cover-spine,.bk-fact-pill,.bk-culture-card,.bk-tips-box,.bk-checklist-extra,.bk-check-final,.bk-stamp-zone{-webkit-print-color-adjust:exact;print-color-adjust:exact}}';
             }
 
             function buildTravelBookletPrintHtml(meta, hidden, foodSpots, watermarkDataUrl, coverDataUrl) {
@@ -6898,13 +6969,13 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 var userName = resolveBookletUserName();
                 var coverTop = buildBookletCoverTopHtml(meta);
                 var coverPersonal = buildBookletCoverPersonalHtml(userName, profile);
-                var coverFallbackUrl = getBookletCoverProxyUrl(resolveBookletCoverUrl(dest));
-                var coverImgSrc = coverDataUrl || coverFallbackUrl;
+                var coverFallbackUrl = resolveBookletCoverUrl(dest);
+                var coverImgSrc = coverDataUrl || getBookletCoverProxyUrl(coverFallbackUrl) || coverFallbackUrl;
                 var coverBgHtml = coverImgSrc
                     ? '<img class="bk-cover-bg-img" src="' + escapeHtml(coverImgSrc) + '" alt="">'
                     : '';
                 var coverBgStyle = coverImgSrc
-                    ? ''
+                    ? 'background-image:url("' + coverImgSrc + '");background-size:cover;background-position:center;background-repeat:no-repeat;'
                     : 'background-color:#1e293b;';
                 for (ni = 1; ni <= 3; ni++) {
                     var noteCls = 'bk-page bk-note-page' + (ni === 1 ? ' bk-notes-start' : '');
@@ -6953,9 +7024,9 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
                     '<div class="bk-page bk-intro-page">' + wm +
                     buildBookletPageHead('目的地指南') +
-                    '<h2 class="bk-section-title">🌏 認識 ' + escapeHtml(dest) + '</h2>' +
+                    '<h2 class="bk-section-title bk-section-title-compact">🌏 認識 ' + escapeHtml(dest) + '</h2>' +
                     buildBookletIntroHtml(dest, dest, tripNight.label) +
-                    '<div class="bk-footer">出發前先讀一遍，旅程更有感</div></div>' +
+                    '</div>' +
 
                     '<div class="bk-page bk-check-page">' + wm +
                     buildBookletPageHead('行前必備 CHECK 清單') +
