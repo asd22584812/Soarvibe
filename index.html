@@ -1144,8 +1144,81 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
+            font-size: 2rem;
             flex-shrink: 0;
+            background: linear-gradient(145deg, #e1f5fe 0%, #fce4ec 100%);
+        }
+        .exclusive-result-card.is-affiliate .exclusive-result-thumb-placeholder {
+            font-size: 2.25rem;
+        }
+        #booklet-preview-sheet {
+            position: fixed;
+            inset: 0;
+            z-index: 100000;
+            display: flex;
+            flex-direction: column;
+            background: #263238;
+        }
+        #booklet-preview-sheet.hidden {
+            display: none !important;
+        }
+        .booklet-preview-toolbar {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            padding: max(0.65rem, env(safe-area-inset-top, 0px)) 0.75rem 0.65rem;
+            background: rgba(38, 50, 56, 0.96);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        }
+        .booklet-preview-title {
+            flex: 1;
+            text-align: center;
+            font-size: 0.8125rem;
+            font-weight: 900;
+            color: #fff;
+            letter-spacing: 0.06em;
+        }
+        .booklet-preview-btn {
+            border: none;
+            border-radius: 999px;
+            padding: 0.45rem 0.85rem;
+            font-size: 0.75rem;
+            font-weight: 900;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .booklet-preview-btn-ghost {
+            background: rgba(255, 255, 255, 0.14);
+            color: #fff;
+        }
+        .booklet-preview-btn-primary {
+            background: linear-gradient(90deg, #FFB74D, #F06292);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(240, 98, 146, 0.35);
+        }
+        #booklet-preview-frame {
+            flex: 1 1 auto;
+            width: 100%;
+            min-height: 0;
+            border: 0;
+            background: #fff;
+        }
+        .booklet-preview-hint {
+            flex-shrink: 0;
+            margin: 0;
+            padding: 0.55rem 0.85rem max(0.65rem, env(safe-area-inset-bottom, 0px));
+            font-size: 0.625rem;
+            font-weight: 700;
+            line-height: 1.5;
+            color: rgba(255, 255, 255, 0.82);
+            text-align: center;
+            background: rgba(38, 50, 56, 0.96);
+        }
+        html.booklet-preview-open,
+        html.booklet-preview-open body {
+            overflow: hidden !important;
         }
         .exclusive-result-body {
             flex: 1;
@@ -1719,6 +1792,16 @@
         </div>
         <p class="soarvibe-splash-tagline">提升你的旅程，翱翔你的風格</p>
         <div class="soarvibe-splash-progress" aria-hidden="true"><div class="soarvibe-splash-progress-bar"></div></div>
+    </div>
+
+    <div id="booklet-preview-sheet" class="hidden" aria-hidden="true" role="dialog" aria-modal="true" aria-label="旅行小本本預覽">
+        <div class="booklet-preview-toolbar">
+            <button type="button" id="booklet-preview-close" class="booklet-preview-btn booklet-preview-btn-ghost">關閉</button>
+            <span class="booklet-preview-title">📖 旅行小本本預覽</span>
+            <button type="button" id="booklet-preview-print" class="booklet-preview-btn booklet-preview-btn-primary">列印 / 存 PDF</button>
+        </div>
+        <iframe id="booklet-preview-frame" title="旅行小本本列印預覽"></iframe>
+        <p class="booklet-preview-hint">iPhone：點「列印 / 存 PDF」→ 分享 → 儲存到檔案。請在列印選項關閉「頁首及頁尾」。</p>
     </div>
 
     <div class="app-shell relative flex flex-col overflow-hidden">
@@ -3067,14 +3150,6 @@
                 return /kkday\.com\/[^?#]*\/product\/\d+/i.test(String(url || ''));
             }
 
-            function resolveKkdayTicketPhotoUrl(ticket) {
-                if (ticket && ticket.photoUrl) return ticket.photoUrl;
-                var cityKey = resolveEpithetCityKey(resolveCurrentCity()) || '東京';
-                var cityCover = BOOKLET_DESTINATION_COVERS[cityKey];
-                if (cityCover) return getBookletCoverProxyUrl(cityCover).replace('w=1600&h=1200', 'w=400&h=400');
-                return '';
-            }
-
             function ticketToResultCard(ticket, idx) {
                 return {
                     id: 'kkday-ticket-' + idx,
@@ -3083,7 +3158,7 @@
                     address: ticket.desc || '',
                     tag: ticket.fromItinerary ? '✨ 行程推薦' : (ticket.category || 'KKday 票券'),
                     emoji: ticket.emoji || kkdayCategoryEmoji(ticket.category),
-                    photoUrl: resolveKkdayTicketPhotoUrl(ticket),
+                    photoUrl: '',
                     url: appendKkdayCid(ticket.productUrl)
                 };
             }
@@ -3432,8 +3507,9 @@
                     return;
                 }
                 exclusiveResultsList.innerHTML = items.map(function (item) {
-                    var thumb = item.photoUrl
-                        ? '<img class="exclusive-result-thumb" src="' + escapeHtml(item.photoUrl) + '" alt="">'
+                    var useEmojiThumb = mode === 'affiliate' || options.useEmojiThumb;
+                    var thumb = (!useEmojiThumb && item.photoUrl)
+                        ? '<img class="exclusive-result-thumb" src="' + escapeHtml(item.photoUrl) + '" alt="" loading="lazy">'
                         : '<div class="exclusive-result-thumb exclusive-result-thumb-placeholder" aria-hidden="true">' +
                             escapeHtml(item.emoji || '📍') + '</div>';
                     var actionHtml = mode === 'nav'
@@ -6862,6 +6938,74 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 return printWin;
             }
 
+            var bookletPreviewBlobUrl = '';
+
+            function closeBookletInAppPreview() {
+                var sheet = document.getElementById('booklet-preview-sheet');
+                var frame = document.getElementById('booklet-preview-frame');
+                if (sheet) {
+                    sheet.classList.add('hidden');
+                    sheet.setAttribute('aria-hidden', 'true');
+                }
+                document.documentElement.classList.remove('booklet-preview-open');
+                if (frame) {
+                    frame.src = 'about:blank';
+                }
+                if (bookletPreviewBlobUrl) {
+                    URL.revokeObjectURL(bookletPreviewBlobUrl);
+                    bookletPreviewBlobUrl = '';
+                }
+            }
+
+            function openBookletInAppPreview(printHtml) {
+                var sheet = document.getElementById('booklet-preview-sheet');
+                var frame = document.getElementById('booklet-preview-frame');
+                if (!sheet || !frame) return Promise.resolve(false);
+                if (bookletPreviewBlobUrl) {
+                    URL.revokeObjectURL(bookletPreviewBlobUrl);
+                    bookletPreviewBlobUrl = '';
+                }
+                var blob = new Blob([printHtml], { type: 'text/html;charset=utf-8' });
+                bookletPreviewBlobUrl = URL.createObjectURL(blob);
+                return new Promise(function (resolve) {
+                    var settled = false;
+                    function done(ok) {
+                        if (settled) return;
+                        settled = true;
+                        resolve(ok);
+                    }
+                    frame.onload = function () { done(true); };
+                    frame.onerror = function () { done(false); };
+                    frame.src = bookletPreviewBlobUrl;
+                    sheet.classList.remove('hidden');
+                    sheet.setAttribute('aria-hidden', 'false');
+                    document.documentElement.classList.add('booklet-preview-open');
+                    setTimeout(function () { done(true); }, 8000);
+                });
+            }
+
+            async function printBookletFromInAppPreview() {
+                var frame = document.getElementById('booklet-preview-frame');
+                if (!frame || !frame.contentWindow) {
+                    showModal('預覽尚未準備好，請稍候再試 📖', '📖');
+                    return;
+                }
+                try {
+                    await waitForPrintDocumentReady(frame.contentDocument, 8000);
+                    frame.contentWindow.focus();
+                    frame.contentWindow.print();
+                } catch (printErr) {
+                    console.warn('[SOARVIBE] printBookletFromInAppPreview:', printErr);
+                    showModal('無法開啟列印視窗，請再試一次 📖', '📖');
+                }
+            }
+
+            function shouldUseBookletInAppPreview() {
+                return /iPhone|iPad|iPod|Android|Mobile|CriOS|FxiOS/i.test(navigator.userAgent)
+                    || window.matchMedia('(display-mode: standalone)').matches
+                    || (navigator.maxTouchPoints && navigator.maxTouchPoints > 1);
+            }
+
             async function resolveBookletWatermarkDataUrl() {
                 try {
                     var cached = localStorage.getItem('SOARVIBE_BOOKLET_LOGO_DATA');
@@ -7169,9 +7313,22 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                         console.warn('[SOARVIBE] 封面圖載入失敗 → 將使用純色封面');
                     }
                     var printHtml = buildTravelBookletPrintHtml(meta, hidden, foodSpots, watermarkDataUrl, coverDataUrl);
-                    var printWin = null;
-                    var blobUrl = '';
+                    var useInAppPreview = shouldUseBookletInAppPreview();
 
+                    if (useInAppPreview) {
+                        var previewReady = await openBookletInAppPreview(printHtml);
+                        if (!previewReady) {
+                            showModal('小本本預覽載入失敗，請稍後再試 📖', '📖');
+                            return;
+                        }
+                        await waitForPrintDocumentReady(
+                            document.getElementById('booklet-preview-frame').contentDocument,
+                            8000
+                        );
+                        return;
+                    }
+
+                    var printWin = null;
                     if (isBookletLocalFile()) {
                         printWin = openBookletPrintPreview(printHtml);
                     } else {
@@ -7188,7 +7345,15 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     }
 
                     if (!printWin) {
-                        showModal(MSG_BOOKLET_POPUP_BLOCKED, '📋');
+                        var fallbackReady = await openBookletInAppPreview(printHtml);
+                        if (!fallbackReady) {
+                            showModal(MSG_BOOKLET_POPUP_BLOCKED, '📋');
+                            return;
+                        }
+                        await waitForPrintDocumentReady(
+                            document.getElementById('booklet-preview-frame').contentDocument,
+                            8000
+                        );
                         return;
                     }
 
@@ -7201,12 +7366,6 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
                     printWin.focus();
                     printWin.print();
-
-                    if (blobUrl) {
-                        setTimeout(function () {
-                            URL.revokeObjectURL(blobUrl);
-                        }, 60000);
-                    }
 
                     setTimeout(function () {
                         showModal(getBookletReadyMessage(meta), '📖');
@@ -8378,6 +8537,14 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             btnSaveTrip.addEventListener('click', saveCurrentTrip);
             if (btnExportBooklet) {
                 btnExportBooklet.addEventListener('click', exportTravelBooklet);
+            }
+            var bookletPreviewClose = document.getElementById('booklet-preview-close');
+            var bookletPreviewPrint = document.getElementById('booklet-preview-print');
+            if (bookletPreviewClose) {
+                bookletPreviewClose.addEventListener('click', closeBookletInAppPreview);
+            }
+            if (bookletPreviewPrint) {
+                bookletPreviewPrint.addEventListener('click', printBookletFromInAppPreview);
             }
 
             navFavorite.addEventListener('click', function () {
