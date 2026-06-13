@@ -1216,6 +1216,10 @@
             text-align: center;
             background: rgba(38, 50, 56, 0.96);
         }
+        #booklet-preview-sheet.booklet-pdf-busy #booklet-preview-frame {
+            visibility: hidden;
+            pointer-events: none;
+        }
         html.booklet-preview-open,
         html.booklet-preview-open body {
             overflow: hidden !important;
@@ -7052,6 +7056,49 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             var bookletPreviewBlobUrl = '';
+            var lastBookletPrintHtml = '';
+
+            function resetParentViewportZoom() {
+                document.documentElement.classList.remove('bk-pdf-export-mode');
+                document.documentElement.style.removeProperty('zoom');
+                document.documentElement.style.removeProperty('transform');
+                document.body.style.removeProperty('zoom');
+                document.body.style.removeProperty('transform');
+                var vp = document.querySelector('meta[name="viewport"]');
+                if (vp) {
+                    vp.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover');
+                }
+                window.scrollTo(0, 0);
+            }
+
+            function removeHiddenCaptureFrame(frame) {
+                if (!frame) return;
+                try {
+                    if (frame.contentDocument) {
+                        setBookletPdfExportMode(frame.contentDocument, false);
+                    }
+                } catch (ignoreErr) { /* cross-origin */ }
+                try {
+                    frame.src = 'about:blank';
+                } catch (blankErr) { /* silent */ }
+                if (frame.parentNode) {
+                    frame.parentNode.removeChild(frame);
+                }
+            }
+
+            async function createHiddenBookletCaptureDoc(printHtml) {
+                var frame = document.createElement('iframe');
+                frame.setAttribute('title', 'booklet-pdf-capture');
+                frame.setAttribute('aria-hidden', 'true');
+                frame.style.cssText = 'position:fixed;left:-10000px;top:0;width:794px;height:1123px;opacity:0;visibility:hidden;pointer-events:none;border:0;z-index:-1';
+                document.body.appendChild(frame);
+                var ok = await writeBookletPreviewFrame(frame, printHtml);
+                if (!ok || !frame.contentDocument) {
+                    removeHiddenCaptureFrame(frame);
+                    throw new Error('hidden capture frame failed');
+                }
+                return { frame: frame, doc: frame.contentDocument };
+            }
 
             function writeBookletPreviewFrame(frame, printHtml) {
                 return new Promise(function (resolve) {
@@ -7096,16 +7143,20 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 var frame = document.getElementById('booklet-preview-frame');
                 if (sheet) {
                     sheet.classList.add('hidden');
+                    sheet.classList.remove('booklet-pdf-busy');
                     sheet.setAttribute('aria-hidden', 'true');
                 }
                 document.documentElement.classList.remove('booklet-preview-open');
                 if (frame) {
+                    frame.style.visibility = '';
                     frame.src = 'about:blank';
                 }
                 if (bookletPreviewBlobUrl) {
                     URL.revokeObjectURL(bookletPreviewBlobUrl);
                     bookletPreviewBlobUrl = '';
                 }
+                lastBookletPrintHtml = '';
+                resetParentViewportZoom();
             }
 
             function openBookletInAppPreview(printHtml, options) {
@@ -7238,29 +7289,31 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 });
             }
 
-            async function generateBookletPdfBlob(frameDoc, meta, onProgress) {
+            async function generateBookletPdfBlob(printHtml, meta, onProgress) {
                 await loadBookletPdfLibs();
-                if (!frameDoc || !window.jspdf || !window.jspdf.jsPDF || !window.html2canvas) {
+                if (!printHtml || !window.jspdf || !window.jspdf.jsPDF || !window.html2canvas) {
                     throw new Error('PDF libs unavailable');
                 }
-                setBookletPdfExportMode(frameDoc, true);
-                await waitForPrintDocumentReady(frameDoc, 10000);
-                await new Promise(function (resolve) { setTimeout(resolve, 180); });
-
-                var pages = getBookletPdfPageElements(frameDoc);
-                if (!pages.length) {
-                    setBookletPdfExportMode(frameDoc, false);
-                    throw new Error('no booklet pages');
-                }
-
-                var scale = shouldUseBookletInAppPreview() ? 1.5 : 2;
-                var jsPDF = window.jspdf.jsPDF;
-                var pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4', compress: true });
-                var pageW = 210;
-                var pageH = 297;
-                var i;
-
+                var capture = null;
                 try {
+                    capture = await createHiddenBookletCaptureDoc(printHtml);
+                    var frameDoc = capture.doc;
+                    setBookletPdfExportMode(frameDoc, true);
+                    await waitForPrintDocumentReady(frameDoc, 10000);
+                    await new Promise(function (resolve) { setTimeout(resolve, 200); });
+
+                    var pages = getBookletPdfPageElements(frameDoc);
+                    if (!pages.length) {
+                        throw new Error('no booklet pages');
+                    }
+
+                    var scale = shouldUseBookletInAppPreview() ? 1.5 : 2;
+                    var jsPDF = window.jspdf.jsPDF;
+                    var pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4', compress: true });
+                    var pageW = 210;
+                    var pageH = 297;
+                    var i;
+
                     for (i = 0; i < pages.length; i++) {
                         if (onProgress) onProgress(i + 1, pages.length);
                         if (i > 0) pdf.addPage();
@@ -7270,11 +7323,14 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                         canvas.width = 0;
                         canvas.height = 0;
                     }
+                    return pdf.output('blob');
                 } finally {
-                    setBookletPdfExportMode(frameDoc, false);
+                    if (capture) {
+                        setBookletPdfExportMode(capture.doc, false);
+                        removeHiddenCaptureFrame(capture.frame);
+                    }
+                    resetParentViewportZoom();
                 }
-
-                return pdf.output('blob');
             }
 
             async function saveOrShareBookletPdf(blob, filename) {
@@ -7307,9 +7363,9 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             async function saveBookletPdfFromInAppPreview() {
-                var frame = document.getElementById('booklet-preview-frame');
+                var sheet = document.getElementById('booklet-preview-sheet');
                 var btn = document.getElementById('booklet-preview-print');
-                if (!frame || !frame.contentDocument) {
+                if (!lastBookletPrintHtml) {
                     showModal('預覽尚未準備好，請稍候再試 📖', '📖');
                     return;
                 }
@@ -7318,10 +7374,11 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     btn.disabled = true;
                     btn.textContent = '📄 PDF 準備中…';
                 }
+                if (sheet) sheet.classList.add('booklet-pdf-busy');
                 try {
                     var meta = currentItineraryMeta || collectTripPayload();
                     var filename = buildBookletPdfFilename(meta);
-                    var blob = await generateBookletPdfBlob(frame.contentDocument, meta, function (cur, total) {
+                    var blob = await generateBookletPdfBlob(lastBookletPrintHtml, meta, function (cur, total) {
                         if (btn) btn.textContent = '📄 生成 PDF ' + cur + '/' + total + '…';
                     });
                     if (btn) btn.textContent = '📤 開啟分享…';
@@ -7336,6 +7393,8 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     console.error('[SOARVIBE] saveBookletPdfFromInAppPreview:', pdfErr);
                     showModal('PDF 生成失敗，請稍後再試 📖', '📖');
                 } finally {
+                    if (sheet) sheet.classList.remove('booklet-pdf-busy');
+                    resetParentViewportZoom();
                     if (btn) {
                         btn.disabled = false;
                         btn.textContent = prevText || '📥 儲存 PDF';
@@ -7774,6 +7833,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                         console.warn('[SOARVIBE] 封面圖載入失敗 → 封面將無背景照片（請確認 cover-photos 資料夾已部署）');
                     }
                     var printHtml = buildTravelBookletPrintHtml(meta, hidden, foodSpots, watermarkDataUrl, coverDataUrl);
+                    lastBookletPrintHtml = printHtml;
                     var useInAppPreview = shouldUseBookletInAppPreview();
 
                     if (useInAppPreview) {
