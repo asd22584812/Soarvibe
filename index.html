@@ -1246,16 +1246,16 @@
             overflow: hidden;
         }
         #booklet-pdf-progress #booklet-pdf-capture-host {
-            position: absolute;
-            left: 0;
+            position: fixed;
+            left: -10000px;
             top: 0;
-            width: 100%;
-            height: 100%;
+            width: 794px;
+            height: 1123px;
             overflow: hidden;
             opacity: 1;
             visibility: visible;
             pointer-events: none;
-            z-index: 0;
+            z-index: -1;
         }
         #booklet-pdf-progress #booklet-pdf-capture-host iframe {
             position: absolute;
@@ -1290,6 +1290,13 @@
         html.booklet-preview-open,
         html.booklet-preview-open body {
             overflow: hidden !important;
+        }
+        html.pdf-capture-busy,
+        html.pdf-capture-busy body {
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 0 !important;
+            overflow-x: hidden !important;
         }
         .exclusive-result-body {
             flex: 1;
@@ -4430,6 +4437,8 @@
                 closeKkdayAffiliateMenu();
                 closeSavedTripsMenu();
                 closeUserWall();
+                closeBookletInAppPreview();
+                resetParentViewportZoom();
                 if (phoneScroll) {
                     phoneScroll.scrollTo({ top: 0, behavior: 'smooth' });
                 }
@@ -7336,12 +7345,19 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             function cleanupBookletPdfArtifacts() {
                 var host = document.getElementById('booklet-pdf-capture-host');
                 if (host) host.textContent = '';
-                document.querySelectorAll('body > iframe[title="booklet-pdf-capture"]').forEach(function (node) {
+                document.querySelectorAll('iframe[title="booklet-pdf-capture"]').forEach(function (node) {
                     if (node.parentNode) node.parentNode.removeChild(node);
                 });
-                document.querySelectorAll('body > .html2canvas-container, body > div.html2canvas-container').forEach(function (node) {
+                document.querySelectorAll('.html2canvas-container, div.html2canvas-container').forEach(function (node) {
                     if (node.parentNode) node.parentNode.removeChild(node);
                 });
+                var previewFrame = document.getElementById('booklet-preview-frame');
+                if (previewFrame && previewFrame.contentDocument && previewFrame.contentDocument.body) {
+                    previewFrame.contentDocument.querySelectorAll('.html2canvas-container, div.html2canvas-container').forEach(function (node) {
+                        if (node.parentNode) node.parentNode.removeChild(node);
+                    });
+                }
+                document.documentElement.classList.remove('pdf-capture-busy');
             }
 
             function setBookletPdfProgressVisible(visible, mainText, subText) {
@@ -7380,17 +7396,53 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             async function resolveBookletCaptureDoc(printHtml) {
-                var previewFrame = document.getElementById('booklet-preview-frame');
-                if (previewFrame && previewFrame.contentDocument && previewFrame.contentDocument.body) {
-                    var previewDoc = previewFrame.contentDocument;
-                    var previewPages = getBookletPdfPageElements(previewDoc);
-                    if (previewPages.length) {
-                        return { frame: previewFrame, doc: previewDoc, reusePreview: true };
-                    }
-                }
                 var capture = await createHiddenBookletCaptureDoc(printHtml);
                 capture.reusePreview = false;
                 return capture;
+            }
+
+            function injectScriptIntoDoc(doc, src) {
+                return new Promise(function (resolve, reject) {
+                    if (!doc || !doc.head) {
+                        reject(new Error('no capture doc head'));
+                        return;
+                    }
+                    var existing = doc.querySelector('script[data-booklet-src="' + src + '"]');
+                    if (existing) {
+                        if (existing.getAttribute('data-loaded') === '1') resolve();
+                        else existing.addEventListener('load', resolve, { once: true });
+                        return;
+                    }
+                    var script = doc.createElement('script');
+                    script.src = src;
+                    script.async = true;
+                    script.setAttribute('data-booklet-src', src);
+                    script.onload = function () {
+                        script.setAttribute('data-loaded', '1');
+                        resolve();
+                    };
+                    script.onerror = function () {
+                        reject(new Error('iframe script load failed: ' + src));
+                    };
+                    doc.head.appendChild(script);
+                });
+            }
+
+            var BOOKLET_H2C_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+
+            async function ensureBookletCaptureLibs(captureDoc) {
+                await loadBookletPdfLibs();
+                var frameWin = captureDoc && captureDoc.defaultView;
+                if (!frameWin) {
+                    throw new Error('no capture frame window');
+                }
+                if (!frameWin.html2canvas) {
+                    await injectScriptIntoDoc(captureDoc, BOOKLET_H2C_SRC);
+                }
+                if (!frameWin.html2canvas && !window.html2canvas) {
+                    throw new Error('PDF libs unavailable');
+                }
+                return frameWin;
             }
 
             function removeHiddenCaptureFrame(frame) {
@@ -7602,10 +7654,16 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 doc.documentElement.classList.toggle('bk-pdf-export-mode', !!enabled);
             }
 
-            async function captureBookletPageCanvas(el, scale) {
+            async function captureBookletPageCanvas(el, scale, frameWin) {
                 var ownerDoc = el && el.ownerDocument;
-                var canvas = await window.html2canvas(el, {
+                frameWin = frameWin || (ownerDoc && ownerDoc.defaultView) || window;
+                var h2c = frameWin.html2canvas || window.html2canvas;
+                if (!h2c) {
+                    throw new Error('html2canvas unavailable');
+                }
+                var canvas = await h2c(el, {
                     scale: scale,
+                    window: frameWin,
                     useCORS: true,
                     allowTaint: true,
                     backgroundColor: '#ffffff',
@@ -7628,18 +7686,20 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     }
                 });
                 if (ownerDoc && ownerDoc.body) {
-                    ownerDoc.querySelectorAll('.html2canvas-container').forEach(function (node) {
+                    ownerDoc.querySelectorAll('.html2canvas-container, div.html2canvas-container').forEach(function (node) {
                         if (node.parentNode) node.parentNode.removeChild(node);
                     });
                 }
-                cleanupBookletPdfArtifacts();
+                document.querySelectorAll('body > .html2canvas-container, body > div.html2canvas-container').forEach(function (node) {
+                    if (node.parentNode) node.parentNode.removeChild(node);
+                });
                 if (!canvas || !canvas.width || !canvas.height) {
                     throw new Error('empty canvas');
                 }
                 return canvas;
             }
 
-            async function captureBookletPageCanvasWithRetry(el) {
+            async function captureBookletPageCanvasWithRetry(el, frameWin) {
                 var scales = shouldUseBookletInAppPreview()
                     ? [1, 0.85, 1.25, 0.65, 0.5]
                     : [1.5, 1, 2];
@@ -7647,10 +7707,11 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 var i;
                 for (i = 0; i < scales.length; i++) {
                     try {
-                        return await captureBookletPageCanvas(el, scales[i]);
+                        return await captureBookletPageCanvas(el, scales[i], frameWin);
                     } catch (capErr) {
                         lastErr = capErr;
                         console.warn('[SOARVIBE] booklet canvas capture failed scale=' + scales[i], capErr);
+                        cleanupBookletPdfArtifacts();
                     }
                 }
                 throw lastErr || new Error('canvas capture failed');
@@ -7658,16 +7719,19 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
             async function generateBookletPdfBlob(printHtml, meta, onProgress) {
                 await loadBookletPdfLibs();
-                if (!printHtml || !window.jspdf || !window.jspdf.jsPDF || !window.html2canvas) {
+                if (!printHtml || !window.jspdf || !window.jspdf.jsPDF) {
                     throw new Error('PDF libs unavailable');
                 }
+                document.documentElement.classList.add('pdf-capture-busy');
                 var capture = null;
+                var frameWin = null;
                 try {
                     capture = await resolveBookletCaptureDoc(printHtml);
                     var frameDoc = capture.doc;
+                    frameWin = await ensureBookletCaptureLibs(frameDoc);
                     setBookletPdfExportMode(frameDoc, true);
                     await waitForPrintDocumentReady(frameDoc, 12000);
-                    await new Promise(function (resolve) { setTimeout(resolve, 350); });
+                    await new Promise(function (resolve) { setTimeout(resolve, 400); });
 
                     var pages = getBookletPdfPageElements(frameDoc);
                     if (!pages.length) {
@@ -7683,7 +7747,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     for (i = 0; i < pages.length; i++) {
                         if (onProgress) onProgress(i + 1, pages.length);
                         if (i > 0) pdf.addPage();
-                        var canvas = await captureBookletPageCanvasWithRetry(pages[i]);
+                        var canvas = await captureBookletPageCanvasWithRetry(pages[i], frameWin);
                         var imgData = canvas.toDataURL('image/jpeg', 0.88);
                         if (!imgData || imgData.length < 1000) {
                             throw new Error('empty page image ' + (i + 1));
@@ -7697,9 +7761,10 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     if (capture && capture.doc) {
                         setBookletPdfExportMode(capture.doc, false);
                     }
-                    if (capture && !capture.reusePreview) {
+                    if (capture && capture.frame) {
                         removeHiddenCaptureFrame(capture.frame);
                     }
+                    cleanupBookletPdfArtifacts();
                     resetParentViewportZoom();
                 }
             }
@@ -7745,6 +7810,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     btn.textContent = '📄 PDF 準備中…';
                 }
                 hideBookletPreviewForPdfCapture();
+                document.documentElement.classList.add('pdf-capture-busy');
                 setBookletPdfProgressVisible(true, 'PDF 準備中…', '請稍候，正在為您排版每一頁');
                 await new Promise(function (resolve) { setTimeout(resolve, 80); });
                 try {
@@ -7774,7 +7840,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     showModal(pdfHint, '📖');
                 } finally {
                     setBookletPdfProgressVisible(false);
-                    restoreBookletPreviewAfterPdfCapture();
+                    closeBookletInAppPreview();
                     if (btn) {
                         btn.disabled = false;
                         btn.textContent = prevText || '📥 儲存 PDF';
@@ -9346,6 +9412,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
             if (navProfile) {
                 navProfile.addEventListener('click', function () {
+                    closeBookletInAppPreview();
                     if (userWall && !userWall.classList.contains('hidden')) {
                         closeUserWall();
                     } else {
@@ -9407,7 +9474,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', function () {
-                    navigator.serviceWorker.register('./service-worker.js?v=8').catch(function (err) {
+                    navigator.serviceWorker.register('./service-worker.js?v=26').catch(function (err) {
                         console.warn('[SOARVIBE] Service worker registration failed:', err);
                     });
                 });
@@ -9419,6 +9486,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
             if (navSearch) {
                 navSearch.addEventListener('click', function () {
+                    closeBookletInAppPreview();
                     if (kkdayAffiliateMenu && !kkdayAffiliateMenu.classList.contains('hidden')) {
                         closeKkdayAffiliateMenu();
                     } else {
@@ -9465,6 +9533,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             navFavorite.addEventListener('click', function () {
+                closeBookletInAppPreview();
                 if (savedTripsMenu.classList.contains('hidden')) {
                     openSavedTripsMenu();
                 } else {
