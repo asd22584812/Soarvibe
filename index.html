@@ -1231,15 +1231,68 @@
             inset: 0;
             z-index: 100001;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 0.75rem;
             padding: 1.5rem;
-            background: rgba(26, 35, 126, 0.94);
-            color: #fff;
-            text-align: center;
             overflow: hidden;
+            pointer-events: auto;
+        }
+        .bk-pdf-progress-bg {
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(145deg, rgba(15, 23, 42, 0.88) 0%, rgba(38, 50, 56, 0.92) 45%, rgba(0, 131, 143, 0.85) 100%);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .bk-pdf-progress-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 20% 20%, rgba(240, 98, 146, 0.25), transparent 45%),
+                radial-gradient(circle at 80% 80%, rgba(128, 203, 196, 0.22), transparent 40%);
+            pointer-events: none;
+        }
+        .bk-pdf-progress-card {
+            position: relative;
+            z-index: 1;
+            width: min(18rem, 88vw);
+            padding: 1.75rem 1.35rem 1.5rem;
+            border-radius: 1.35rem;
+            text-align: center;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            box-shadow: 0 18px 48px rgba(0, 0, 0, 0.28);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+        .bk-pdf-progress-brand {
+            margin: 0 0 0.35rem;
+            font-size: 0.625rem;
+            font-weight: 900;
+            letter-spacing: 0.42em;
+            text-indent: 0.42em;
+            color: rgba(128, 203, 196, 0.95);
+        }
+        .bk-pdf-progress-icon {
+            font-size: 2rem;
+            line-height: 1;
+            margin-bottom: 0.65rem;
+            filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.25));
+        }
+        .bk-pdf-progress-spinner {
+            width: 2.5rem;
+            height: 2.5rem;
+            margin: 0 auto 1rem;
+            border-radius: 50%;
+            border: 3px solid rgba(255, 255, 255, 0.22);
+            border-top-color: #F06292;
+            border-right-color: #80CBC4;
+            animation: bk-pdf-spin 0.85s linear infinite;
+        }
+        @keyframes bk-pdf-spin {
+            to { transform: rotate(360deg); }
         }
         #booklet-pdf-progress #booklet-pdf-capture-host {
             display: none !important;
@@ -1247,27 +1300,24 @@
         #booklet-pdf-progress #booklet-pdf-capture-host iframe {
             display: none !important;
         }
-        #booklet-pdf-progress-text,
-        #booklet-pdf-progress-sub {
-            position: relative;
-            z-index: 1;
-        }
-        #booklet-pdf-progress.hidden {
-            display: none !important;
-        }
         #booklet-pdf-progress-text {
             margin: 0;
             font-size: 0.9375rem;
             font-weight: 900;
-            letter-spacing: 0.06em;
+            letter-spacing: 0.04em;
             line-height: 1.5;
+            color: #fff;
         }
         #booklet-pdf-progress-sub {
-            margin: 0;
+            margin: 0.45rem 0 0;
             font-size: 0.6875rem;
             font-weight: 700;
-            opacity: 0.82;
-            line-height: 1.5;
+            opacity: 0.88;
+            line-height: 1.55;
+            color: rgba(255, 255, 255, 0.92);
+        }
+        #booklet-pdf-progress.hidden {
+            display: none !important;
         }
         html.booklet-preview-open,
         html.booklet-preview-open body {
@@ -1865,9 +1915,15 @@
     </div>
 
     <div id="booklet-pdf-progress" class="hidden" aria-live="polite" role="status" aria-hidden="true">
+        <div class="bk-pdf-progress-bg" aria-hidden="true"></div>
+        <div class="bk-pdf-progress-card">
+            <p class="bk-pdf-progress-brand">SOARVIBE</p>
+            <div class="bk-pdf-progress-icon" aria-hidden="true">📖</div>
+            <div class="bk-pdf-progress-spinner" aria-hidden="true"></div>
+            <p id="booklet-pdf-progress-text">PDF 生成中…</p>
+            <p id="booklet-pdf-progress-sub">請稍候，正在為您排版每一頁</p>
+        </div>
         <div id="booklet-pdf-capture-host" aria-hidden="true"></div>
-        <p id="booklet-pdf-progress-text">PDF 生成中…</p>
-        <p id="booklet-pdf-progress-sub">請稍候，正在為您排版每一頁</p>
     </div>
 
     <div class="app-shell relative flex flex-col overflow-hidden">
@@ -5183,6 +5239,7 @@
                     '- items 內每個元素必須是 JSON 物件（含 time、title、highlight、note' + (isKr ? '、koreanName' : '') + '）。\n' +
                     '- days 陣列長度必須恰好等於 ' + days + '（共 ' + days + ' 個 day 物件，day 從 1 到 ' + days + '）。\n' +
                     '- 禁止只輸出 Day 1；每一天的上午、下午、晚上都至少要有 1 個 item。\n' +
+                    '- 最終日：上午、下午仍須各有具體行程；「晚上」才安排前往機場／送機，禁止下午空白直接跳機場。\n' +
                     '- JSON 請精簡，但天數不可省略。';
             }
 
@@ -5270,7 +5327,7 @@ ${ctx.typeInstruction}
 
 【⏱️ 首日與最終日接送邏輯——最高優先，必須嚴格遵守 departureTime / returnTime】
 1. Day 1：以 departureTime 為基準，安排「抵達機場 → 入境／提取行李 → 前往住宿 → Check-in」；Check-in 完成前禁止安排一般觀光。
-2. Day ${lastDayNum}（最終日）：以 returnTime 倒推，預留至少 3 小時 Buffer（退房、前往機場、報到、安檢、候機），並明確寫出送機出發時間；送機後禁止再排行程。
+2. Day ${lastDayNum}（最終日）：以 returnTime 倒推，預留至少 3 小時 Buffer（退房、前往機場、報到、安檢、候機），並明確寫出送機出發時間；上午、下午仍須各有 1–2 個具體行程（採買、午餐、最後打卡），「晚上」時段才安排前往機場，禁止下午空白直接跳機場。
 3. 若 departureTime 或 returnTime 與住宿地點距離機場較遠，必須在行程中寫明【${ctx.customerSelectedTransport}】下的交通方式與預估車程。
 4. 每日起訖點以住宿區域為圓心，符合【${ctx.customerSelectedTransport}】，嚴禁繞路。
 
@@ -5295,7 +5352,7 @@ ${buildGeminiJsonOutputBlock(payload, days)}`;
                 if (dayNum === 1) {
                     dayRules = '【本日為 Day 1——抵達日】以 departureTime 為基準：抵達機場 → 入境／提取行李 → 前往住宿 → Check-in；Check-in 完成前禁止安排一般觀光。Check-in 後可安排輕量晚餐或附近散步。';
                 } else if (dayNum === totalDays) {
-                    dayRules = '【本日為最終日——送機日】以 returnTime 倒推，預留至少 3 小時 Buffer（退房、前往機場、報到、安檢、候機），明確寫出送機出發時間；送機前可安排 1–2 個距離住宿或機場動線順路的輕量活動。';
+                    dayRules = '【本日為最終日——送機日】上午、下午仍須各有 1–2 個具體行程（採買、午餐、最後打卡）；「晚上」時段才安排前往機場（依 returnTime 倒推，預留至少 3 小時 Buffer）。禁止下午空白直接跳機場。';
                 } else {
                     dayRules = '【本日為中間日】以住宿區域為圓心，安排充實的上午、下午、晚上各 2–3 個具體景點或餐廳，動線順向不繞路。';
                 }
@@ -5942,6 +5999,14 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                             '可依體力與天氣調整'
                         )];
                     }
+                    if (isLast && afternoon && !getDayPhaseItems(afternoon).length) {
+                        afternoon.items = [makePlaceholderActivity(
+                            '12:00 - 15:00',
+                            '最後採買或輕食午餐',
+                            '車站／商圈伴手禮',
+                            '預留時間回飯店取行李'
+                        )];
+                    }
                     if (evening && !getDayPhaseItems(evening).length) {
                         if (isLast) {
                             evening.items = [makePlaceholderActivity(
@@ -6536,11 +6601,12 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     html += '<section class="ui-day-block" data-day="' + escapeHtml(day.dayNum) + '">';
                     html += '<h3 class="ui-day-title">📅 ' + escapeHtml(day.dateLabel) + ' · Day ' + escapeHtml(day.dayNum) + '</h3>';
                     day.phases.forEach(function (phase) {
-                        if (!phase.label && !(phase.items && phase.items.length)) return;
+                        var phaseItems = getDayPhaseItems(phase);
+                        if (!phaseItems.length) return;
                         var label = phase.label ? phase.label + '：' : '行程重點：';
                         html += '<h4 class="ui-phase-title">' + (phase.emoji || getPhaseEmoji(phase.label)) + escapeHtml(label) + '</h4>';
                         html += '<ul class="activity-list">';
-                        (phase.items || []).forEach(function (item) {
+                        phaseItems.forEach(function (item) {
                             html += formatActivityItemHtml(item);
                         });
                         html += '</ul>';
@@ -6987,13 +7053,6 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     html += '</div></div>';
                 }
                 html += '</div>';
-                if (profile.tips && profile.tips.length) {
-                    html += '<div class="bk-intro-block bk-intro-bottom"><div class="bk-tips-box bk-tips-compact"><h3 class="bk-tips-title">💡 在地小提醒</h3><ul class="bk-tips-list">';
-                    profile.tips.slice(0, 4).forEach(function (tip) {
-                        html += '<li>' + escapeHtml(tip) + '</li>';
-                    });
-                    html += '</ul></div></div>';
-                }
                 html += '</div>';
                 return html;
             }
@@ -7373,10 +7432,18 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     vp.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
                 }
                 window.scrollTo(0, 0);
+                if (phoneScroll) {
+                    phoneScroll.scrollLeft = 0;
+                    phoneScroll.scrollTop = 0;
+                }
                 requestAnimationFrame(function () {
                     requestAnimationFrame(function () {
                         if (vp) vp.setAttribute('content', normal);
                         window.scrollTo(0, 0);
+                        if (phoneScroll) {
+                            phoneScroll.scrollLeft = 0;
+                            phoneScroll.scrollTop = 0;
+                        }
                     });
                 });
             }
@@ -7488,6 +7555,25 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             var BOOKLET_H2C_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
             var BOOKLET_JSPDF_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
 
+            function preparePreviewFrameForPdfCapture(previewFrame) {
+                if (!previewFrame) return;
+                previewFrame.dataset.soarPdfPrevStyle = previewFrame.getAttribute('style') || '';
+                previewFrame.style.cssText = 'position:fixed!important;left:-12000px!important;top:0!important;width:' +
+                    BOOKLET_PDF_PAGE_W + 'px!important;height:100vh!important;border:0!important;' +
+                    'visibility:visible!important;opacity:1!important;z-index:-1!important;pointer-events:none!important;';
+            }
+
+            function restorePreviewFrameAfterPdfCapture(previewFrame) {
+                if (!previewFrame) return;
+                var prev = previewFrame.dataset.soarPdfPrevStyle;
+                if (prev !== undefined) {
+                    previewFrame.setAttribute('style', prev);
+                    delete previewFrame.dataset.soarPdfPrevStyle;
+                } else {
+                    previewFrame.removeAttribute('style');
+                }
+            }
+
             function buildBookletIframePdfRunnerScript() {
                 return '(function(){' +
                     'var PAGE_W=' + BOOKLET_PDF_PAGE_W + ',PAGE_H=' + BOOKLET_PDF_PAGE_H + ';' +
@@ -7497,12 +7583,12 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     'function reportProgress(cur,total){var cfg=window.parent&&window.parent.__SOARVIBE_PDF_RUN;if(cfg&&cfg.progress)cfg.progress(cur,total);}' +
                     'function reportDone(blob){var cfg=window.parent&&window.parent.__SOARVIBE_PDF_RUN;if(cfg&&cfg.done)cfg.done(blob);}' +
                     'function reportFail(msg){var cfg=window.parent&&window.parent.__SOARVIBE_PDF_RUN;if(cfg&&cfg.fail)cfg.fail(msg);}' +
-                    'async function capturePage(el,scale,h2c){return h2c(el,{scale:scale,window:window,useCORS:true,allowTaint:true,backgroundColor:"#ffffff",logging:false,scrollX:0,scrollY:0,foreignObjectRendering:false,onclone:function(clonedDoc){ensureNoteLines(clonedDoc);}});}' +
+                    'async function capturePage(el,scale,h2c){return h2c(el,{scale:scale,window:window,useCORS:true,allowTaint:true,backgroundColor:"#ffffff",logging:false,width:PAGE_W,height:PAGE_H,windowWidth:PAGE_W,windowHeight:PAGE_H,scrollX:0,scrollY:0,x:0,y:0,foreignObjectRendering:false,onclone:function(clonedDoc,clonedEl){clonedDoc.documentElement.classList.add("bk-pdf-export-mode");ensureNoteLines(clonedDoc);if(clonedEl&&clonedEl.style){clonedEl.style.width=PAGE_W+"px";clonedEl.style.height=PAGE_H+"px";clonedEl.style.boxSizing="border-box";}}});}' +
                     'async function run(){try{' +
-                    'document.documentElement.classList.remove("bk-pdf-export-mode");' +
+                    'document.documentElement.classList.add("bk-pdf-export-mode");' +
                     'await loadScript("' + BOOKLET_H2C_SRC + '");' +
                     'await loadScript("' + BOOKLET_JSPDF_SRC + '");' +
-                    'await new Promise(function(r){setTimeout(r,400);});' +
+                    'await new Promise(function(r){setTimeout(r,650);});' +
                     'var pages=getPages();if(!pages.length)throw new Error("no booklet pages");' +
                     'var jsPDF=window.jspdf.jsPDF;var pdf=new jsPDF({orientation:"portrait",unit:"mm",format:"a4",compress:true});' +
                     'var scales=[1,0.92,1.08];' +
@@ -7512,14 +7598,15 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     'var canvas=null,lastErr=null,si;' +
                     'for(si=0;si<scales.length;si++){try{canvas=await capturePage(pages[i],scales[si],window.html2canvas);break;}catch(e){lastErr=e;}}' +
                     'if(!canvas)throw lastErr||new Error("canvas capture failed");' +
-                    'var img=canvas.toDataURL("image/jpeg",0.9);' +
+                    'var img=canvas.toDataURL("image/jpeg",0.92);' +
                     'if(!img||img.length<1000)throw new Error("empty page image "+(i+1));' +
                     'pdf.addImage(img,"JPEG",0,0,210,297,undefined,"FAST");' +
                     'canvas.width=0;canvas.height=0;' +
                     'document.querySelectorAll(".html2canvas-container").forEach(function(n){if(n.parentNode)n.parentNode.removeChild(n);});' +
                     '}' +
+                    'document.documentElement.classList.remove("bk-pdf-export-mode");' +
                     'reportDone(pdf.output("blob"));' +
-                    '}catch(err){reportFail(String(err&&err.message||err));}}' +
+                    '}catch(err){document.documentElement.classList.remove("bk-pdf-export-mode");reportFail(String(err&&err.message||err));}}' +
                     'run();})();';
             }
 
@@ -7660,6 +7747,10 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 }
                 document.documentElement.classList.remove('booklet-preview-open');
                 if (frame) {
+                    restorePreviewFrameAfterPdfCapture(frame);
+                    if (frame.contentDocument) {
+                        cleanupPreviewPdfRunnerScripts(frame.contentDocument);
+                    }
                     frame.style.visibility = '';
                     frame.src = 'about:blank';
                 }
@@ -7851,18 +7942,23 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     throw new Error('PDF libs unavailable');
                 }
                 var capture = null;
+                var previewFrame = null;
                 try {
                     capture = await resolveBookletCaptureDoc();
+                    previewFrame = capture.frame;
+                    preparePreviewFrameForPdfCapture(previewFrame);
+                    await new Promise(function (resolve) { setTimeout(resolve, 450); });
                     var frameDoc = capture.doc;
                     setBookletPdfExportMode(frameDoc, false);
                     await waitForPrintDocumentReady(frameDoc, 12000);
-                    return await runBookletPdfInsideIframe(capture.frame, frameDoc, onProgress);
+                    return await runBookletPdfInsideIframe(previewFrame, frameDoc, onProgress);
                 } finally {
+                    restorePreviewFrameAfterPdfCapture(previewFrame);
                     if (capture && capture.doc) {
                         cleanupPreviewPdfRunnerScripts(capture.doc);
                     }
-                    if (capture && capture.frame) {
-                        removeHiddenCaptureFrame(capture.frame, !!capture.fromPreview);
+                    if (capture && capture.frame && !capture.fromPreview) {
+                        removeHiddenCaptureFrame(capture.frame, false);
                     }
                     cleanupBookletPdfArtifacts();
                     resetParentViewportZoom();
@@ -7940,9 +8036,10 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 } finally {
                     setBookletPdfProgressVisible(false);
                     resetParentViewportZoom();
-                    var previewFrame = document.getElementById('booklet-preview-frame');
-                    if (previewFrame && previewFrame.contentDocument) {
-                        cleanupPreviewPdfRunnerScripts(previewFrame.contentDocument);
+                    var previewFrameEl = document.getElementById('booklet-preview-frame');
+                    restorePreviewFrameAfterPdfCapture(previewFrameEl);
+                    if (previewFrameEl && previewFrameEl.contentDocument) {
+                        cleanupPreviewPdfRunnerScripts(previewFrameEl.contentDocument);
                     }
                     restoreBookletPreviewAfterPdfCapture();
                     if (btn) {
@@ -8362,6 +8459,11 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     var hidden = resolveBookletHiddenForExport(meta);
                     currentTripHiddenData = hidden;
                     window.soarvibeTripHiddenData = hidden;
+                    if (aiContent && !aiContent.classList.contains('hidden')) {
+                        try {
+                            aiContent.innerHTML = buildMinimalItineraryHtml(currentItineraryMarkdown, meta, hidden);
+                        } catch (refreshErr) { /* silent */ }
+                    }
                     var foodSpots = collectBookletFoodSpots(hidden, window.soarvibeFoodSpotCache || []);
                     btnExportBooklet.textContent = '📖 封面照片載入中…';
                     var watermarkDataUrl = await resolveBookletWatermarkDataUrl();
@@ -9588,7 +9690,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', function () {
-                    navigator.serviceWorker.register('./service-worker.js?v=28').catch(function (err) {
+                    navigator.serviceWorker.register('./service-worker.js?v=30').catch(function (err) {
                         console.warn('[SOARVIBE] Service worker registration failed:', err);
                     });
                 });
