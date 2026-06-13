@@ -1244,6 +1244,31 @@
             background: rgba(26, 35, 126, 0.94);
             color: #fff;
             text-align: center;
+            overflow: hidden;
+        }
+        #booklet-pdf-progress #booklet-pdf-capture-host {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+        #booklet-pdf-progress #booklet-pdf-capture-host iframe {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 794px;
+            height: 1123px;
+            border: 0;
+        }
+        #booklet-pdf-progress-text,
+        #booklet-pdf-progress-sub {
+            position: relative;
+            z-index: 1;
         }
         #booklet-pdf-progress.hidden {
             display: none !important;
@@ -1847,11 +1872,11 @@
             <button type="button" id="booklet-preview-print" class="booklet-preview-btn booklet-preview-btn-primary">📥 儲存 PDF</button>
         </div>
         <iframe id="booklet-preview-frame" title="旅行小本本列印預覽"></iframe>
-        <div id="booklet-pdf-capture-host" aria-hidden="true"></div>
         <p class="booklet-preview-hint">一鍵儲存 PDF，無需設定列印。點「儲存 PDF」→ 分享 →「儲存到檔案」即可。</p>
     </div>
 
     <div id="booklet-pdf-progress" class="hidden" aria-live="polite" role="status" aria-hidden="true">
+        <div id="booklet-pdf-capture-host" aria-hidden="true"></div>
         <p id="booklet-pdf-progress-text">PDF 生成中…</p>
         <p id="booklet-pdf-progress-sub">請稍候，正在為您排版每一頁</p>
     </div>
@@ -5802,9 +5827,95 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 });
                 return {
                     meta: meta || {},
-                    days: days,
+                    days: enrichHiddenDaysFromMeta(days.map(ensureStandardPhasesPerDay), meta),
                     checklist: PRE_TRIP_CHECKLIST.slice()
                 };
+            }
+
+            function ensureStandardPhasesPerDay(day) {
+                var labels = ['上午', '下午', '晚上'];
+                var existing = {};
+                (day.phases || []).forEach(function (phase) {
+                    var key = String(phase.label || phase.period || '').replace(/[：:]\s*$/, '').trim();
+                    if (key) existing[key] = phase;
+                });
+                day.phases = labels.map(function (label) {
+                    if (existing[label]) {
+                        if (!existing[label].label) existing[label].label = label;
+                        if (!existing[label].emoji) existing[label].emoji = getPhaseEmoji(label);
+                        return existing[label];
+                    }
+                    return { label: label, emoji: getPhaseEmoji(label), items: [], detail: '' };
+                });
+                return day;
+            }
+
+            function enrichHiddenDaysFromMeta(days, meta) {
+                if (!days.length) return days;
+                var day1 = days[0];
+                if (String(day1.dayNum) !== '1') return days;
+                var total = countDayActivities(day1);
+                if (total > 2) return days;
+                var hotel = (meta && meta.accommodation) || '住宿';
+                var afternoon = (day1.phases || []).find(function (p) {
+                    return (p.label || p.period) === '下午';
+                });
+                var evening = (day1.phases || []).find(function (p) {
+                    return (p.label || p.period) === '晚上';
+                });
+                if (afternoon && !getDayPhaseItems(afternoon).length) {
+                    afternoon.items = [{
+                        time: '',
+                        title: '前往 ' + hotel + ' Check-in',
+                        highlight: '辦理入住、放置行李',
+                        note: '依航班抵達時間彈性安排',
+                        raw: '前往 ' + hotel + ' Check-in｜亮點：辦理入住｜備註：依抵達時間'
+                    }];
+                }
+                if (evening && !getDayPhaseItems(evening).length) {
+                    evening.items = [{
+                        time: '',
+                        title: '住宿周邊晚餐或休息',
+                        highlight: '抵達日安排輕鬆收尾',
+                        note: '可依體力調整',
+                        raw: '住宿周邊晚餐或休息｜亮點：抵達日放松'
+                    }];
+                }
+                return days;
+            }
+
+            function resolveBookletHiddenForExport(meta) {
+                var fromJson = currentTripHiddenData || window.soarvibeTripHiddenData;
+                var fromMd = null;
+                try {
+                    fromMd = buildTripHiddenData(currentItineraryMarkdown || '', meta);
+                } catch (mdErr) {
+                    fromMd = null;
+                }
+                if (!fromJson || !fromJson.days || !fromJson.days.length) {
+                    return {
+                        meta: meta || {},
+                        days: enrichHiddenDaysFromMeta((fromMd && fromMd.days) || [], meta),
+                        checklist: (fromMd && fromMd.checklist) || PRE_TRIP_CHECKLIST.slice()
+                    };
+                }
+                var merged = JSON.parse(JSON.stringify(fromJson));
+                merged.days = merged.days.map(ensureStandardPhasesPerDay);
+                if (fromMd && fromMd.days && fromMd.days.length) {
+                    fromMd.days.forEach(function (mdDay, idx) {
+                        var jsonDay = merged.days.find(function (d) {
+                            return String(d.dayNum) === String(mdDay.dayNum);
+                        }) || merged.days[idx];
+                        if (!jsonDay) return;
+                        if (countDayActivities(mdDay) > countDayActivities(jsonDay)) {
+                            jsonDay.phases = mdDay.phases;
+                            jsonDay.rawLines = mdDay.rawLines;
+                        }
+                    });
+                }
+                merged.days = enrichHiddenDaysFromMeta(merged.days, meta);
+                merged.meta = meta || merged.meta || {};
+                return merged;
             }
 
             function hiddenToMarkdown(hidden) {
@@ -6269,7 +6380,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 });
                 return {
                     meta: meta || {},
-                    days: days,
+                    days: enrichHiddenDaysFromMeta(days.map(ensureStandardPhasesPerDay), meta),
                     checklist: PRE_TRIP_CHECKLIST.slice()
                 };
             }
@@ -6828,7 +6939,15 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 if (!items.length && phase && phase.detail) {
                     items = extractActivityBullets(phase.detail);
                 }
-                return items;
+                return items.map(function (item) {
+                    if (typeof item === 'string') return item;
+                    if (item && typeof item === 'object') {
+                        return activityToBulletLine(item) || item.raw || item.title || '';
+                    }
+                    return String(item || '');
+                }).filter(function (line) {
+                    return line && String(line).trim().length > 1;
+                });
             }
 
             function countDayActivities(day) {
@@ -7190,24 +7309,14 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             async function createHiddenBookletCaptureDoc(printHtml) {
-                var sheet = document.getElementById('booklet-preview-sheet');
-                if (!sheet) throw new Error('no preview sheet');
-                sheet.classList.add('hidden');
-                sheet.setAttribute('aria-hidden', 'true');
-
+                var progress = document.getElementById('booklet-pdf-progress');
                 var host = document.getElementById('booklet-pdf-capture-host');
-                if (!host) {
-                    host = document.createElement('div');
-                    host.id = 'booklet-pdf-capture-host';
-                    host.setAttribute('aria-hidden', 'true');
-                    sheet.appendChild(host);
-                }
+                if (!progress || !host) throw new Error('no pdf capture host');
                 host.textContent = '';
 
                 var frame = document.createElement('iframe');
                 frame.setAttribute('title', 'booklet-pdf-capture');
                 frame.setAttribute('aria-hidden', 'true');
-                frame.style.cssText = 'position:absolute;left:0;top:0;width:1px;height:1px;border:0;opacity:0;';
                 host.appendChild(frame);
 
                 var ok = await writeBookletPreviewFrame(frame, printHtml);
@@ -7392,7 +7501,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
             async function captureBookletPageCanvas(el, scale) {
                 var ownerDoc = el && el.ownerDocument;
-                return window.html2canvas(el, {
+                var canvas = await window.html2canvas(el, {
                     scale: scale,
                     useCORS: true,
                     allowTaint: true,
@@ -7414,14 +7523,32 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                             clonedEl.style.height = BOOKLET_PDF_PAGE_H + 'px';
                         }
                     }
-                }).finally(function () {
-                    if (ownerDoc && ownerDoc.body) {
-                        ownerDoc.querySelectorAll('.html2canvas-container').forEach(function (node) {
-                            if (node.parentNode) node.parentNode.removeChild(node);
-                        });
-                    }
-                    cleanupBookletPdfArtifacts();
                 });
+                if (ownerDoc && ownerDoc.body) {
+                    ownerDoc.querySelectorAll('.html2canvas-container').forEach(function (node) {
+                        if (node.parentNode) node.parentNode.removeChild(node);
+                    });
+                }
+                cleanupBookletPdfArtifacts();
+                if (!canvas || !canvas.width || !canvas.height) {
+                    throw new Error('empty canvas');
+                }
+                return canvas;
+            }
+
+            async function captureBookletPageCanvasWithRetry(el) {
+                var scales = shouldUseBookletInAppPreview() ? [1, 0.85, 1.25] : [1.5, 1, 2];
+                var lastErr = null;
+                var i;
+                for (i = 0; i < scales.length; i++) {
+                    try {
+                        return await captureBookletPageCanvas(el, scales[i]);
+                    } catch (capErr) {
+                        lastErr = capErr;
+                        console.warn('[SOARVIBE] booklet canvas capture failed scale=' + scales[i], capErr);
+                    }
+                }
+                throw lastErr || new Error('canvas capture failed');
             }
 
             async function generateBookletPdfBlob(printHtml, meta, onProgress) {
@@ -7434,15 +7561,14 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     capture = await createHiddenBookletCaptureDoc(printHtml);
                     var frameDoc = capture.doc;
                     setBookletPdfExportMode(frameDoc, true);
-                    await waitForPrintDocumentReady(frameDoc, 10000);
-                    await new Promise(function (resolve) { setTimeout(resolve, 200); });
+                    await waitForPrintDocumentReady(frameDoc, 12000);
+                    await new Promise(function (resolve) { setTimeout(resolve, 350); });
 
                     var pages = getBookletPdfPageElements(frameDoc);
                     if (!pages.length) {
                         throw new Error('no booklet pages');
                     }
 
-                    var scale = shouldUseBookletInAppPreview() ? 1.5 : 2;
                     var jsPDF = window.jspdf.jsPDF;
                     var pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4', compress: true });
                     var pageW = 210;
@@ -7452,8 +7578,11 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     for (i = 0; i < pages.length; i++) {
                         if (onProgress) onProgress(i + 1, pages.length);
                         if (i > 0) pdf.addPage();
-                        var canvas = await captureBookletPageCanvas(pages[i], scale);
-                        var imgData = canvas.toDataURL('image/jpeg', 0.9);
+                        var canvas = await captureBookletPageCanvasWithRetry(pages[i]);
+                        var imgData = canvas.toDataURL('image/jpeg', 0.88);
+                        if (!imgData || imgData.length < 1000) {
+                            throw new Error('empty page image ' + (i + 1));
+                        }
                         pdf.addImage(imgData, 'JPEG', 0, 0, pageW, pageH, undefined, 'FAST');
                         canvas.width = 0;
                         canvas.height = 0;
@@ -7510,6 +7639,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 }
                 hideBookletPreviewForPdfCapture();
                 setBookletPdfProgressVisible(true, 'PDF 準備中…', '請稍候，正在為您排版每一頁');
+                await new Promise(function (resolve) { setTimeout(resolve, 80); });
                 try {
                     var meta = currentItineraryMeta || collectTripPayload();
                     var filename = buildBookletPdfFilename(meta);
@@ -7934,10 +8064,9 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
                 try {
                     var meta = currentItineraryMeta || collectTripPayload();
-                    var hidden = currentTripHiddenData || window.soarvibeTripHiddenData;
-                    if (!hidden || !hidden.days || !hidden.days.length) {
-                        hidden = buildTripHiddenData(currentItineraryMarkdown, meta);
-                    }
+                    var hidden = resolveBookletHiddenForExport(meta);
+                    currentTripHiddenData = hidden;
+                    window.soarvibeTripHiddenData = hidden;
                     var foodSpots = collectBookletFoodSpots(hidden, window.soarvibeFoodSpotCache || []);
                     btnExportBooklet.textContent = '📖 封面照片載入中…';
                     var watermarkDataUrl = await resolveBookletWatermarkDataUrl();
@@ -8094,8 +8223,8 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
                 lines.forEach(function (line) {
                     var trimmed = line.trim();
-                    var dayMatch = trimmed.match(/^#{0,3}\s*Day\s*(\d+)/i) || trimmed.match(/^Day\s*(\d+)/i);
-                    if (dayMatch) {
+                    var dayMatch = trimmed.match(/Day\s*(\d+)/i);
+                    if (dayMatch && trimmed.length < 48 && (/^#{0,3}\s/.test(trimmed) || /^Day\s*\d+/i.test(trimmed) || /第\s*\d+\s*天/.test(trimmed))) {
                         if (current) days.push(current);
                         current = { dayNum: dayMatch[1], rawLines: [] };
                     } else if (current) {
@@ -8125,12 +8254,19 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     }
 
                     d.rawLines.forEach(function (ln) {
-                        var phaseMatch = ln.match(/(上午|下午|晚上)[：:]/);
+                        var stripped = ln.replace(/^#{1,3}\s*/g, '').trim();
+                        var phaseMatch = stripped.match(/^(上午|下午|晚上)\s*[：:]\s*(.*)$/);
                         if (phaseMatch) {
                             flushPhase();
                             phaseLabel = phaseMatch[1];
-                        } else {
-                            buffer.push(ln.replace(/^#{1,3}\s*/g, '').trim());
+                            if (phaseMatch[2] && phaseMatch[2].trim()) {
+                                buffer.push(phaseMatch[2].trim());
+                            }
+                        } else if (/^(上午|下午|晚上)\s*[：:]?\s*$/.test(stripped)) {
+                            flushPhase();
+                            phaseLabel = stripped.replace(/[：:]\s*$/, '');
+                        } else if (stripped) {
+                            buffer.push(stripped);
                         }
                     });
                     flushPhase();
