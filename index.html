@@ -1217,7 +1217,6 @@
             background: rgba(38, 50, 56, 0.96);
         }
         #booklet-preview-sheet.booklet-pdf-busy #booklet-preview-frame {
-            visibility: hidden;
             pointer-events: none;
         }
         #booklet-pdf-capture-host {
@@ -1253,7 +1252,8 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            opacity: 0;
+            opacity: 1;
+            visibility: visible;
             pointer-events: none;
             z-index: 0;
         }
@@ -5769,6 +5769,10 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 if (!act || typeof act !== 'object') {
                     return parseStructuredActivity('');
                 }
+                if (!act.title && !act.time && !act.timeRange && !act.name && !act.place &&
+                    act.raw && typeof act.raw === 'object') {
+                    return normalizeActivityItem(act.raw);
+                }
                 return {
                     time: String(act.time || act.timeRange || '').trim(),
                     title: cleanPlaceName(act.title || act.name || act.place || ''),
@@ -5777,6 +5781,36 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     note: String(act.note || act.navigation || act.remark || '').replace(/^備註[：:]\s*/i, ''),
                     raw: activityToBulletLine(act)
                 };
+            }
+
+            function coerceActivityLine(item) {
+                if (typeof item === 'string') return item.trim();
+                if (!item || typeof item !== 'object') return String(item || '').trim();
+                var line = activityToBulletLine(item);
+                if (line) return line;
+                if (typeof item.raw === 'string') return item.raw.trim();
+                if (item.raw && typeof item.raw === 'object') {
+                    line = activityToBulletLine(normalizeActivityItem(item.raw));
+                    if (line) return line;
+                }
+                return activityToBulletLine(normalizeActivityItem(item));
+            }
+
+            function getPhaseDisplayItems(phase) {
+                var items = (phase && phase.items) ? phase.items.slice() : [];
+                if (!items.length && phase && phase.body) {
+                    items = extractActivityBullets(phase.body);
+                }
+                if (!items.length && phase && phase.detail) {
+                    items = extractActivityBullets(phase.detail);
+                }
+                return items.map(function (item) {
+                    if (typeof item === 'string') return normalizeActivityItem(item);
+                    if (item && typeof item === 'object') return normalizeActivityItem(item);
+                    return normalizeActivityItem(String(item || ''));
+                }).filter(function (p) {
+                    return p && (p.title || p.raw);
+                });
             }
 
             function buildHiddenFromJson(data, meta) {
@@ -6181,17 +6215,22 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             function parseStructuredActivity(text) {
-                var t = String(text || '').replace(/^[-*•]\s+/, '').trim();
                 if (typeof text === 'object' && text !== null) {
+                    if (!text.title && !text.time && !text.timeRange && !text.name && !text.place &&
+                        text.raw && typeof text.raw === 'object') {
+                        return parseStructuredActivity(text.raw);
+                    }
+                    var rawStr = typeof text.raw === 'string' ? text.raw : '';
                     return {
                         time: String(text.time || text.timeRange || '').trim(),
-                        title: cleanPlaceName(text.title || text.name || text.place || text.raw || ''),
+                        title: cleanPlaceName(text.title || text.name || text.place || rawStr),
                         koreanName: String(text.koreanName || text.korean_name || '').trim(),
                         highlight: String(text.highlight || text.why || '').replace(/^亮點[：:]\s*/i, ''),
                         note: String(text.note || text.navigation || text.remark || '').replace(/^備註[：:]\s*/i, ''),
-                        raw: t || cleanPlaceName(text.title || text.name || '')
+                        raw: rawStr || cleanPlaceName(text.title || text.name || '')
                     };
                 }
+                var t = String(text || '').replace(/^[-*•]\s+/, '').trim();
                 var parts = t.split('｜').map(function (p) { return p.trim(); }).filter(Boolean);
                 var time = '';
                 var title = '';
@@ -6229,13 +6268,14 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 var p;
                 try {
                     p = typeof text === 'object' && text !== null && (text.title || text.raw)
-                        ? text
+                        ? normalizeActivityItem(text)
                         : parseStructuredActivity(text);
                 } catch (e) {
                     return '<li class="activity-item">' + escapeHtml(String(text || '')) + '</li>';
                 }
                 if (!p || !p.title) {
-                    return '<li class="activity-item">' + escapeHtml(String((p && p.raw) || text || '')) + '</li>';
+                    var fallback = (p && p.raw) || coerceActivityLine(text) || String(text || '');
+                    return '<li class="activity-item">' + escapeHtml(String(fallback)) + '</li>';
                 }
                 var html = '<li class="activity-item">';
                 if (p.time) {
@@ -6406,7 +6446,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     html += '<section class="ui-day-block" data-day="' + escapeHtml(day.dayNum) + '">';
                     html += '<h3 class="ui-day-title">📅 ' + escapeHtml(day.dateLabel) + ' · Day ' + escapeHtml(day.dayNum) + '</h3>';
                     day.phases.forEach(function (phase) {
-                        var phaseItems = getDayPhaseItems(phase);
+                        var phaseItems = getPhaseDisplayItems(phase);
                         if (!phase.label && !phaseItems.length) return;
                         var label = phase.label ? phase.label + '：' : '行程重點：';
                         html += '<h4 class="ui-phase-title">' + (phase.emoji || getPhaseEmoji(phase.label)) + escapeHtml(label) + '</h4>';
@@ -6942,13 +6982,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 if (!items.length && phase && phase.detail) {
                     items = extractActivityBullets(phase.detail);
                 }
-                return items.map(function (item) {
-                    if (typeof item === 'string') return item;
-                    if (item && typeof item === 'object') {
-                        return activityToBulletLine(item) || item.raw || item.title || '';
-                    }
-                    return String(item || '');
-                }).filter(function (line) {
+                return items.map(coerceActivityLine).filter(function (line) {
                     return line && String(line).trim().length > 1;
                 });
             }
@@ -7284,14 +7318,35 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
             function hideBookletPreviewForPdfCapture() {
                 var sheet = document.getElementById('booklet-preview-sheet');
-                var previewFrame = document.getElementById('booklet-preview-frame');
-                if (previewFrame) previewFrame.src = 'about:blank';
                 if (sheet) {
-                    sheet.classList.add('hidden');
-                    sheet.classList.remove('booklet-pdf-busy');
+                    sheet.classList.add('booklet-pdf-busy');
                     sheet.setAttribute('aria-hidden', 'true');
                 }
                 document.documentElement.classList.remove('booklet-preview-open');
+            }
+
+            function restoreBookletPreviewAfterPdfCapture() {
+                var sheet = document.getElementById('booklet-preview-sheet');
+                if (sheet) {
+                    sheet.classList.remove('booklet-pdf-busy');
+                    sheet.classList.remove('hidden');
+                    sheet.setAttribute('aria-hidden', 'false');
+                }
+                document.documentElement.classList.add('booklet-preview-open');
+            }
+
+            async function resolveBookletCaptureDoc(printHtml) {
+                var previewFrame = document.getElementById('booklet-preview-frame');
+                if (previewFrame && previewFrame.contentDocument && previewFrame.contentDocument.body) {
+                    var previewDoc = previewFrame.contentDocument;
+                    var previewPages = getBookletPdfPageElements(previewDoc);
+                    if (previewPages.length) {
+                        return { frame: previewFrame, doc: previewDoc, reusePreview: true };
+                    }
+                }
+                var capture = await createHiddenBookletCaptureDoc(printHtml);
+                capture.reusePreview = false;
+                return capture;
             }
 
             function removeHiddenCaptureFrame(frame) {
@@ -7564,7 +7619,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 }
                 var capture = null;
                 try {
-                    capture = await createHiddenBookletCaptureDoc(printHtml);
+                    capture = await resolveBookletCaptureDoc(printHtml);
                     var frameDoc = capture.doc;
                     setBookletPdfExportMode(frameDoc, true);
                     await waitForPrintDocumentReady(frameDoc, 12000);
@@ -7595,8 +7650,10 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     }
                     return pdf.output('blob');
                 } finally {
-                    if (capture) {
+                    if (capture && capture.doc) {
                         setBookletPdfExportMode(capture.doc, false);
+                    }
+                    if (capture && !capture.reusePreview) {
                         removeHiddenCaptureFrame(capture.frame);
                     }
                     resetParentViewportZoom();
@@ -7673,6 +7730,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     showModal(pdfHint, '📖');
                 } finally {
                     setBookletPdfProgressVisible(false);
+                    restoreBookletPreviewAfterPdfCapture();
                     if (btn) {
                         btn.disabled = false;
                         btn.textContent = prevText || '📥 儲存 PDF';
