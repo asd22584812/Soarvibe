@@ -5884,8 +5884,10 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 return days;
             }
 
-            function resolveBookletHiddenForExport(meta) {
-                var fromJson = currentTripHiddenData || window.soarvibeTripHiddenData;
+            function resolveBookletHiddenForExport(meta, hiddenOverride) {
+                var fromJson = hiddenOverride !== undefined
+                    ? hiddenOverride
+                    : (currentTripHiddenData || window.soarvibeTripHiddenData);
                 var fromMd = null;
                 try {
                     fromMd = buildTripHiddenData(currentItineraryMarkdown || '', meta);
@@ -6389,7 +6391,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 var hidden;
                 try {
                     if (hiddenOptional && hiddenOptional.days && hiddenOptional.days.length) {
-                        hidden = hiddenOptional;
+                        hidden = resolveBookletHiddenForExport(meta, hiddenOptional);
                     } else {
                         hidden = buildTripHiddenData(markdownText || '', meta);
                     }
@@ -6404,11 +6406,12 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     html += '<section class="ui-day-block" data-day="' + escapeHtml(day.dayNum) + '">';
                     html += '<h3 class="ui-day-title">📅 ' + escapeHtml(day.dateLabel) + ' · Day ' + escapeHtml(day.dayNum) + '</h3>';
                     day.phases.forEach(function (phase) {
-                        if (!phase.label && !phase.items.length) return;
+                        var phaseItems = getDayPhaseItems(phase);
+                        if (!phase.label && !phaseItems.length) return;
                         var label = phase.label ? phase.label + '：' : '行程重點：';
                         html += '<h4 class="ui-phase-title">' + (phase.emoji || getPhaseEmoji(phase.label)) + escapeHtml(label) + '</h4>';
                         html += '<ul class="activity-list">';
-                        phase.items.forEach(function (item) {
+                        phaseItems.forEach(function (item) {
                             html += formatActivityItemHtml(item);
                         });
                         html += '</ul>';
@@ -7324,6 +7327,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     removeHiddenCaptureFrame(frame);
                     throw new Error('hidden capture frame failed');
                 }
+                await new Promise(function (resolve) { setTimeout(resolve, 120); });
                 return { frame: frame, doc: frame.contentDocument };
             }
 
@@ -7537,7 +7541,9 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             async function captureBookletPageCanvasWithRetry(el) {
-                var scales = shouldUseBookletInAppPreview() ? [1, 0.85, 1.25] : [1.5, 1, 2];
+                var scales = shouldUseBookletInAppPreview()
+                    ? [1, 0.85, 1.25, 0.65, 0.5]
+                    : [1.5, 1, 2];
                 var lastErr = null;
                 var i;
                 for (i = 0; i < scales.length; i++) {
@@ -7658,7 +7664,13 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     }
                 } catch (pdfErr) {
                     console.error('[SOARVIBE] saveBookletPdfFromInAppPreview:', pdfErr);
-                    showModal('PDF 生成失敗，請稍後再試 📖', '📖');
+                    var pdfHint = 'PDF 生成失敗，請稍後再試 📖';
+                    if (pdfErr && pdfErr.message === 'PDF libs unavailable') {
+                        pdfHint = 'PDF 元件載入失敗，請確認網路連線後再試 📖';
+                    } else if (pdfErr && /canvas|empty page/i.test(String(pdfErr.message || pdfErr))) {
+                        pdfHint = 'PDF 排版失敗，請關閉預覽後重新製作小本本 📖';
+                    }
+                    showModal(pdfHint, '📖');
                 } finally {
                     setBookletPdfProgressVisible(false);
                     if (btn) {
