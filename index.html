@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <style id="splash-critical">html.splash-pending,html.splash-pending body{background:linear-gradient(165deg,#1a237e 0%,#37474F 42%,#00838f 100%)!important;margin:0;padding:0;overflow:hidden}html.splash-pending #soarvibe-splash{display:flex!important}html.splash-pending body>.app-shell{visibility:hidden}</style>
-    <script>(function(){var skip=false;try{skip=sessionStorage.getItem('soarvibe_splash_done')==='1';}catch(e){}var s=window.matchMedia('(display-mode: standalone)').matches||window.matchMedia('(display-mode: fullscreen)').matches||window.navigator.standalone===true;if(s){document.documentElement.classList.add('pwa-standalone');if(!skip){document.documentElement.classList.add('splash-pending');}}})();</script>
+    <script>(function(){var skip=false;try{skip=localStorage.getItem('soarvibe_splash_done')==='1'||sessionStorage.getItem('soarvibe_splash_done')==='1';}catch(e){}var s=window.matchMedia('(display-mode: standalone)').matches||window.matchMedia('(display-mode: fullscreen)').matches||window.navigator.standalone===true;if(s){document.documentElement.classList.add('pwa-standalone');if(!skip){document.documentElement.classList.add('splash-pending');}}})();</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#1a237e">
     <meta name="description" content="SOARVIBE — AI 旅遊規劃，提升你的旅程，翱翔你的風格">
@@ -24,7 +24,8 @@
                 if (standalone) {
                     var skipSplash = false;
                     try {
-                        skipSplash = sessionStorage.getItem('soarvibe_splash_done') === '1';
+                        skipSplash = localStorage.getItem('soarvibe_splash_done') === '1'
+                            || sessionStorage.getItem('soarvibe_splash_done') === '1';
                     } catch (splashStoreErr) { /* silent */ }
                     if (!skipSplash) {
                         document.documentElement.classList.add('splash-pending');
@@ -3809,8 +3810,17 @@
                 }
             }
 
+            function hasSplashBeenSeen() {
+                try {
+                    if (localStorage.getItem('soarvibe_splash_done') === '1') return true;
+                    if (sessionStorage.getItem('soarvibe_splash_done') === '1') return true;
+                } catch (splashSeenErr) { /* silent */ }
+                return false;
+            }
+
             function markSplashSeen() {
                 try {
+                    localStorage.setItem('soarvibe_splash_done', '1');
                     sessionStorage.setItem('soarvibe_splash_done', '1');
                 } catch (splashMarkErr) { /* silent */ }
                 document.documentElement.classList.remove('splash-pending');
@@ -3820,7 +3830,13 @@
                 }
                 document.body.classList.remove('splash-active');
                 var appShellEarly = document.querySelector('.app-shell');
-                if (appShellEarly) appShellEarly.style.visibility = '';
+                if (appShellEarly) {
+                    appShellEarly.style.visibility = '';
+                    appShellEarly.style.removeProperty('width');
+                    appShellEarly.style.removeProperty('min-width');
+                    appShellEarly.style.removeProperty('max-width');
+                    appShellEarly.style.removeProperty('transform');
+                }
             }
 
             function initSplashScreen() {
@@ -3832,11 +3848,7 @@
                     document.documentElement.classList.remove('splash-pending');
                     return;
                 }
-                var skipSplash = false;
-                try {
-                    skipSplash = sessionStorage.getItem('soarvibe_splash_done') === '1';
-                } catch (splashSkipErr) { /* silent */ }
-                if (skipSplash) {
+                if (hasSplashBeenSeen()) {
                     markSplashSeen();
                     return;
                 }
@@ -7585,6 +7597,39 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
             var bookletPreviewBlobUrl = '';
             var lastBookletPrintHtml = '';
+            var pdfExportInProgress = false;
+
+            function restoreAppLayoutAfterPdf() {
+                document.documentElement.classList.remove(
+                    'bk-pdf-export-mode', 'booklet-preview-open', 'pdf-capture-busy', 'splash-pending'
+                );
+                document.documentElement.style.removeProperty('zoom');
+                document.documentElement.style.removeProperty('transform');
+                document.documentElement.style.removeProperty('width');
+                document.documentElement.style.removeProperty('min-width');
+                document.documentElement.style.removeProperty('max-width');
+                document.body.style.removeProperty('zoom');
+                document.body.style.removeProperty('transform');
+                document.body.style.removeProperty('width');
+                document.body.style.removeProperty('min-width');
+                document.body.style.removeProperty('max-width');
+                var shell = document.querySelector('.app-shell');
+                if (shell) {
+                    shell.style.removeProperty('width');
+                    shell.style.removeProperty('min-width');
+                    shell.style.removeProperty('max-width');
+                    shell.style.removeProperty('transform');
+                    shell.style.visibility = '';
+                }
+                if (phoneScroll) {
+                    phoneScroll.style.removeProperty('width');
+                    phoneScroll.style.removeProperty('min-width');
+                    phoneScroll.style.removeProperty('max-width');
+                }
+                if (hasSplashBeenSeen()) {
+                    markSplashSeen();
+                }
+            }
 
             function resetParentViewportZoom(hardReset) {
                 document.documentElement.classList.remove('bk-pdf-export-mode', 'booklet-preview-open', 'pdf-capture-busy');
@@ -7627,6 +7672,8 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             function cleanupBookletPdfArtifacts() {
+                var sandbox = document.getElementById('soarvibe-pdf-sandbox');
+                if (sandbox) sandbox.textContent = '';
                 var host = document.getElementById('booklet-pdf-capture-host');
                 if (host) host.textContent = '';
                 document.querySelectorAll('iframe[title="booklet-pdf-capture"]').forEach(function (node) {
@@ -7642,6 +7689,19 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     });
                 }
                 document.documentElement.classList.remove('pdf-capture-busy');
+            }
+
+            function getPdfCaptureSandbox() {
+                var box = document.getElementById('soarvibe-pdf-sandbox');
+                if (!box) {
+                    box = document.createElement('div');
+                    box.id = 'soarvibe-pdf-sandbox';
+                    box.setAttribute('aria-hidden', 'true');
+                    box.style.cssText = 'position:fixed!important;left:0!important;top:0!important;width:0!important;height:0!important;overflow:hidden!important;opacity:0!important;pointer-events:none!important;contain:strict!important;isolation:isolate!important;z-index:-9999!important;';
+                    document.body.appendChild(box);
+                }
+                box.textContent = '';
+                return box;
             }
 
             function setBookletPdfProgressVisible(visible, mainText, subText) {
@@ -7856,13 +7916,13 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             async function createHiddenBookletCaptureDoc(printHtml) {
+                var sandbox = getPdfCaptureSandbox();
                 var frame = document.createElement('iframe');
                 frame.setAttribute('title', 'booklet-pdf-capture');
                 frame.setAttribute('aria-hidden', 'true');
-                frame.style.cssText = 'position:fixed!important;left:-12000px!important;top:0!important;width:' +
-                    BOOKLET_PDF_PAGE_W + 'px!important;height:' + BOOKLET_PDF_PAGE_H + 'px!important;border:0!important;' +
-                    'opacity:0!important;visibility:visible!important;pointer-events:none!important;z-index:-1!important;';
-                document.body.appendChild(frame);
+                frame.style.cssText = 'width:' + BOOKLET_PDF_PAGE_W + 'px;height:' + BOOKLET_PDF_PAGE_H +
+                    'px;border:0;margin:0;padding:0;display:block;';
+                sandbox.appendChild(frame);
 
                 var ok = await writeBookletPreviewFrame(frame, printHtml);
                 if (!ok || !frame.contentDocument) {
@@ -8145,11 +8205,13 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                         removeHiddenCaptureFrame(capture.frame, false);
                     }
                     cleanupBookletPdfArtifacts();
+                    restoreAppLayoutAfterPdf();
                 }
             }
 
             async function saveOrShareBookletPdf(blob, filename) {
                 markSplashSeen();
+                restoreAppLayoutAfterPdf();
                 var file = new File([blob], filename, { type: 'application/pdf' });
                 if (navigator.canShare) {
                     try {
@@ -8184,6 +8246,8 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     showModal('預覽尚未準備好，請稍候再試 📖', '📖');
                     return;
                 }
+                markSplashSeen();
+                pdfExportInProgress = true;
                 var prevText = btn ? btn.textContent : '';
                 if (btn) {
                     btn.disabled = true;
@@ -8200,6 +8264,8 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                         if (btn) btn.textContent = label;
                         setBookletPdfProgressVisible(true, label, '完成後會自動開啟分享');
                     });
+                    cleanupBookletPdfArtifacts();
+                    restoreAppLayoutAfterPdf();
                     setBookletPdfProgressVisible(true, '📤 開啟分享…', '請選「儲存到檔案」');
                     var result = await saveOrShareBookletPdf(blob, filename);
                     if (result === 'cancel') return;
@@ -8213,8 +8279,11 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     }
                     showModal(pdfHint, '📖');
                 } finally {
+                    pdfExportInProgress = false;
                     setBookletPdfProgressVisible(false);
+                    cleanupBookletPdfArtifacts();
                     closeBookletInAppPreview();
+                    restoreAppLayoutAfterPdf();
                     if (btn) {
                         btn.disabled = false;
                         btn.textContent = prevText || '📥 儲存 PDF';
@@ -8991,11 +9060,22 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             purgeLegacyBossBadge();
             applyBossModeUi();
             window.addEventListener('pageshow', function () {
-                try {
-                    if (sessionStorage.getItem('soarvibe_splash_done') === '1') {
-                        markSplashSeen();
-                    }
-                } catch (pageShowErr) { /* silent */ }
+                if (hasSplashBeenSeen()) {
+                    markSplashSeen();
+                }
+                if (pdfExportInProgress) {
+                    restoreAppLayoutAfterPdf();
+                }
+            });
+            document.addEventListener('visibilitychange', function () {
+                if (document.hidden) return;
+                if (hasSplashBeenSeen()) {
+                    markSplashSeen();
+                }
+                if (pdfExportInProgress) {
+                    cleanupBookletPdfArtifacts();
+                    restoreAppLayoutAfterPdf();
+                }
             });
             initSplashScreen();
             if (shouldUseBackendProxy()) {
@@ -9862,7 +9942,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', function () {
-                    navigator.serviceWorker.register('./service-worker.js?v=33').catch(function (err) {
+                    navigator.serviceWorker.register('./service-worker.js?v=34').catch(function (err) {
                         console.warn('[SOARVIBE] Service worker registration failed:', err);
                     });
                 });
