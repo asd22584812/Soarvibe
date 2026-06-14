@@ -4475,8 +4475,7 @@
                 closeKkdayAffiliateMenu();
                 closeSavedTripsMenu();
                 closeUserWall();
-                var hadPreview = isBookletPreviewOpen();
-                closeBookletInAppPreview({ hardReset: hadPreview });
+                closeBookletInAppPreview();
                 if (phoneScroll) {
                     phoneScroll.scrollTop = 0;
                 }
@@ -7146,11 +7145,14 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 return total;
             }
 
-            var BK_PAGE_PAD_PX = 52;
-            var BK_PAGE_HEAD_PX = 74;
-            var BK_DAY_TITLE_PX = 50;
-            var BK_DAY_CONT_PX = 34;
-            var BK_PHASE_HEAD_PX = 38;
+            var BK_PAGE_TOP_PAD_PX = 26;
+            var BK_PAGE_BOTTOM_PAD_PX = 26;
+            var BK_WATERMARK_ZONE_PX = 92;
+            var BK_PAGE_HEAD_PX = 78;
+            var BK_DAY_TITLE_PX = 52;
+            var BK_DAY_CONT_PX = 36;
+            var BK_PHASE_HEAD_PX = 40;
+            var BK_PAGINATE_SAFETY = 1.18;
 
             function estimateBookletActHeightPx(item) {
                 var p = parseStructuredActivity(item);
@@ -7158,15 +7160,15 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     var plain = String(item || '');
                     return 52 + Math.min(48, Math.ceil(plain.length / 28) * 16);
                 }
-                var h = 58;
-                if (p.time) h += 4;
+                var h = 64;
+                if (p.time) h += 6;
                 if (p.highlight) {
-                    h += 18 + Math.min(72, Math.ceil(String(p.highlight).length / 24) * 16);
+                    h += 22 + Math.min(80, Math.ceil(String(p.highlight).length / 22) * 17);
                 }
                 if (p.note) {
-                    h += 18 + Math.min(56, Math.ceil(String(p.note).length / 24) * 16);
+                    h += 22 + Math.min(64, Math.ceil(String(p.note).length / 22) * 17);
                 }
-                return h + 10;
+                return h + 12;
             }
 
             function collectBookletDayBlocks(day) {
@@ -7225,7 +7227,8 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 var isFirstPage = true;
 
                 function pageBudget(firstPage) {
-                    var overhead = BK_PAGE_PAD_PX + BK_PAGE_HEAD_PX + (firstPage ? BK_DAY_TITLE_PX : BK_DAY_CONT_PX);
+                    var overhead = BK_PAGE_TOP_PAD_PX + BK_PAGE_BOTTOM_PAD_PX + BK_WATERMARK_ZONE_PX +
+                        BK_PAGE_HEAD_PX + (firstPage ? BK_DAY_TITLE_PX : BK_DAY_CONT_PX);
                     return pageH - overhead;
                 }
 
@@ -7241,7 +7244,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     } else {
                         html += '<p class="bk-day-cont">📅 ' + escapeHtml(day.dateLabel || '') + ' · Day ' + escapeHtml(dayNum) + '（續）</p>';
                     }
-                    html += chunk.join('');
+                    html += '<div class="bk-day-body">' + chunk.join('') + '</div>';
                     html += '</div>';
                     pageCount += 1;
                     chunk = [];
@@ -7251,11 +7254,13 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
                 blocks.forEach(function (block) {
                     var budget = pageBudget(isFirstPage);
-                    if (used + block.height > budget && chunk.length) {
+                    var blockH = Math.round(block.height * BK_PAGINATE_SAFETY);
+                    if (used + blockH > budget && chunk.length) {
                         flushPage();
+                        budget = pageBudget(isFirstPage);
                     }
                     chunk.push(block.html);
-                    used += block.height;
+                    used += blockH;
                 });
                 flushPage();
                 return { html: html, pageCount: pageCount };
@@ -7290,7 +7295,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 var pageIndex = 0;
                 while (idx < foodSpots.length) {
                     var isFirst = pageIndex === 0;
-                    var take = isFirst ? 8 : 10;
+                    var take = isFirst ? 6 : 8;
                     var chunk = foodSpots.slice(idx, idx + take);
                     var pageCls = 'bk-page bk-food-page' + (pageIndex > 0 ? ' bk-food-continued' : '');
                     html += '<div class="' + pageCls + '">' + wm;
@@ -7300,11 +7305,11 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     } else {
                         html += '<p class="bk-food-cont">🍱 景點＆美食推薦（續）</p>';
                     }
-                    html += '<div class="bk-food-grid">';
+                    html += '<div class="bk-food-body"><div class="bk-food-grid">';
                     chunk.forEach(function (spot) {
                         html += buildBookletFoodCardHtml(spot);
                     });
-                    html += '</div><div class="bk-footer">資料來源：Google Maps · SOARVIBE 精選</div></div>';
+                    html += '</div></div><div class="bk-footer">資料來源：Google Maps · SOARVIBE 精選</div></div>';
                     idx += chunk.length;
                     pageIndex += 1;
                 }
@@ -8109,7 +8114,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                         removeHiddenCaptureFrame(capture.frame, false);
                     }
                     cleanupBookletPdfArtifacts();
-                    resetParentViewportZoom(true);
+                    resetParentViewportZoom(false);
                 }
             }
 
@@ -8167,11 +8172,6 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     setBookletPdfProgressVisible(true, '📤 開啟分享…', '請選「儲存到檔案」');
                     var result = await saveOrShareBookletPdf(blob, filename);
                     if (result === 'cancel') return;
-                    if (result === 'share') {
-                        showModal('已開啟分享！請選「儲存到檔案」存入手機 📖', '📖');
-                    } else {
-                        showModal('PDF 已下載完成 📖', '📖');
-                    }
                 } catch (pdfErr) {
                     console.error('[SOARVIBE] saveBookletPdfFromInAppPreview:', pdfErr);
                     var pdfHint = 'PDF 生成失敗，請稍後再試 📖';
@@ -8188,7 +8188,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     if (previewFrameEl && previewFrameEl.contentDocument) {
                         cleanupPreviewPdfRunnerScripts(previewFrameEl.contentDocument);
                     }
-                    closeBookletInAppPreview({ hardReset: true });
+                    closeBookletInAppPreview();
                     if (btn) {
                         btn.disabled = false;
                         btn.textContent = prevText || '📥 儲存 PDF';
@@ -8276,13 +8276,14 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             function buildBookletWatermarkCss() {
-                return '.bk-page,.bk-note-page,.bk-day-page{position:relative;overflow:visible;padding-bottom:14mm}' +
-                    '.bk-watermark{position:absolute;pointer-events:none;z-index:0;text-align:center}' +
-                    '.bk-watermark-footer{left:50%;bottom:3mm;top:auto;transform:translateX(-50%);width:18mm;max-width:18mm;opacity:0.55}' +
+                return '.bk-page,.bk-note-page,.bk-day-page,.bk-food-page{position:relative;overflow:visible;padding-bottom:18mm}' +
+                    '.bk-watermark{position:absolute;pointer-events:none;z-index:3;text-align:center}' +
+                    '.bk-watermark-footer{left:50%;bottom:4mm;top:auto;transform:translateX(-50%);width:18mm;max-width:18mm;opacity:0.55}' +
                     '.bk-watermark-center{left:50%;top:50%;bottom:auto;transform:translate(-50%,-50%);width:68%;max-width:105mm;opacity:' + BOOKLET_WATERMARK_OPACITY + '}' +
                     '.bk-watermark img{width:100%;height:auto;display:block}' +
                     '.bk-page>*:not(.bk-watermark),.bk-note-page>*:not(.bk-watermark),' +
-                    '.bk-day-page>*:not(.bk-watermark){position:relative;z-index:1}' +
+                    '.bk-day-page>*:not(.bk-watermark),.bk-food-page>*:not(.bk-watermark){position:relative;z-index:1}' +
+                    '.bk-day-body,.bk-food-body{position:relative;z-index:1}' +
                     '.bk-logo-img{display:block;max-height:' + BOOKLET_COVER_LOGO_MAX_HEIGHT +
                     ';width:auto;margin:0 auto 6mm;object-fit:contain;border-radius:8px}';
             }
@@ -8413,6 +8414,9 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     '.bk-pdf-export-mode .bk-intro-page{height:1123px!important;max-height:1123px!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;padding:24px 32px!important}' +
                     '.bk-pdf-export-mode .bk-check-page{height:1123px!important;min-height:1123px!important;max-height:1123px!important;overflow:hidden!important;display:flex!important;flex-direction:column!important}' +
                     '.bk-pdf-export-mode .bk-note-page{height:1123px!important;min-height:1123px!important;max-height:1123px!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;padding:16px!important}' +
+                    '.bk-pdf-export-mode .bk-day-page,.bk-pdf-export-mode .bk-food-page{display:flex!important;flex-direction:column!important;padding:24px 32px 22mm!important}' +
+                    '.bk-pdf-export-mode .bk-day-body,.bk-pdf-export-mode .bk-food-body{flex:1 1 auto;min-height:0;overflow:hidden!important;max-height:calc(1123px - 150px - 22mm)!important}' +
+                    '.bk-pdf-export-mode .bk-watermark-footer{bottom:5mm!important;opacity:0.55!important}' +
                     '.bk-pdf-export-mode .bk-note-keeper{max-height:none!important;flex:1!important;overflow:hidden!important}' +
                     '.bk-pdf-export-mode .bk-lines-area{min-height:640px!important;max-height:680px!important;flex:1!important}' +
                     '@media screen{html,body{width:100%;height:100%;background:#111}.bk-cover-page{width:100vw;height:100vh;min-height:100vh;max-width:none;max-height:none;margin:0}}' +
@@ -9818,7 +9822,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', function () {
-                    navigator.serviceWorker.register('./service-worker.js?v=31').catch(function (err) {
+                    navigator.serviceWorker.register('./service-worker.js?v=32').catch(function (err) {
                         console.warn('[SOARVIBE] Service worker registration failed:', err);
                     });
                 });
