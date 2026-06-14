@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <style id="splash-critical">html.splash-pending,html.splash-pending body{background:linear-gradient(165deg,#1a237e 0%,#37474F 42%,#00838f 100%)!important;margin:0;padding:0;overflow:hidden}html.splash-pending #soarvibe-splash{display:flex!important}html.splash-pending body>.app-shell{visibility:hidden}</style>
-    <script>(function(){var s=window.matchMedia('(display-mode: standalone)').matches||window.matchMedia('(display-mode: fullscreen)').matches||window.navigator.standalone===true;if(s){document.documentElement.classList.add('splash-pending','pwa-standalone');}})();</script>
+    <script>(function(){var skip=false;try{skip=sessionStorage.getItem('soarvibe_splash_done')==='1';}catch(e){}var s=window.matchMedia('(display-mode: standalone)').matches||window.matchMedia('(display-mode: fullscreen)').matches||window.navigator.standalone===true;if(s){document.documentElement.classList.add('pwa-standalone');if(!skip){document.documentElement.classList.add('splash-pending');}}})();</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#1a237e">
     <meta name="description" content="SOARVIBE — AI 旅遊規劃，提升你的旅程，翱翔你的風格">
@@ -22,7 +22,15 @@
                     || window.navigator.standalone === true;
                 document.documentElement.classList.toggle('pwa-standalone', standalone);
                 if (standalone) {
-                    document.documentElement.classList.add('splash-pending');
+                    var skipSplash = false;
+                    try {
+                        skipSplash = sessionStorage.getItem('soarvibe_splash_done') === '1';
+                    } catch (splashStoreErr) { /* silent */ }
+                    if (!skipSplash) {
+                        document.documentElement.classList.add('splash-pending');
+                    } else {
+                        document.documentElement.classList.remove('splash-pending');
+                    }
                 }
             }
             applyStandaloneClass();
@@ -3801,6 +3809,20 @@
                 }
             }
 
+            function markSplashSeen() {
+                try {
+                    sessionStorage.setItem('soarvibe_splash_done', '1');
+                } catch (splashMarkErr) { /* silent */ }
+                document.documentElement.classList.remove('splash-pending');
+                var splashEl = document.getElementById('soarvibe-splash');
+                if (splashEl && splashEl.parentNode) {
+                    splashEl.parentNode.removeChild(splashEl);
+                }
+                document.body.classList.remove('splash-active');
+                var appShellEarly = document.querySelector('.app-shell');
+                if (appShellEarly) appShellEarly.style.visibility = '';
+            }
+
             function initSplashScreen() {
                 var splash = document.getElementById('soarvibe-splash');
                 if (!splash) return;
@@ -3810,15 +3832,20 @@
                     document.documentElement.classList.remove('splash-pending');
                     return;
                 }
+                var skipSplash = false;
+                try {
+                    skipSplash = sessionStorage.getItem('soarvibe_splash_done') === '1';
+                } catch (splashSkipErr) { /* silent */ }
+                if (skipSplash) {
+                    markSplashSeen();
+                    return;
+                }
                 splash.setAttribute('aria-hidden', 'false');
                 document.body.classList.add('splash-active');
                 window.setTimeout(function () {
+                    markSplashSeen();
                     splash.classList.add('is-hidden');
                     splash.setAttribute('aria-hidden', 'true');
-                    document.body.classList.remove('splash-active');
-                    document.documentElement.classList.remove('splash-pending');
-                    var appShell = document.querySelector('.app-shell');
-                    if (appShell) appShell.style.visibility = '';
                     window.setTimeout(function () {
                         if (splash.parentNode) splash.parentNode.removeChild(splash);
                     }, 750);
@@ -7145,30 +7172,30 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 return total;
             }
 
-            var BK_PAGE_TOP_PAD_PX = 26;
-            var BK_PAGE_BOTTOM_PAD_PX = 26;
-            var BK_WATERMARK_ZONE_PX = 92;
-            var BK_PAGE_HEAD_PX = 78;
-            var BK_DAY_TITLE_PX = 52;
-            var BK_DAY_CONT_PX = 36;
-            var BK_PHASE_HEAD_PX = 40;
-            var BK_PAGINATE_SAFETY = 1.18;
+            var BK_PAGE_TOP_PAD_PX = 22;
+            var BK_PAGE_BOTTOM_PAD_PX = 22;
+            var BK_WATERMARK_ZONE_PX = 44;
+            var BK_PAGE_HEAD_PX = 68;
+            var BK_DAY_TITLE_PX = 40;
+            var BK_DAY_CONT_PX = 28;
+            var BK_PHASE_HEAD_PX = 28;
+            var BK_PAGINATE_SAFETY = 1.04;
 
             function estimateBookletActHeightPx(item) {
                 var p = parseStructuredActivity(item);
                 if (!p || !p.title) {
                     var plain = String(item || '');
-                    return 52 + Math.min(48, Math.ceil(plain.length / 28) * 16);
+                    return 38 + Math.min(36, Math.ceil(plain.length / 32) * 13);
                 }
-                var h = 64;
-                if (p.time) h += 6;
+                var h = 42;
+                if (p.time) h += 2;
                 if (p.highlight) {
-                    h += 22 + Math.min(80, Math.ceil(String(p.highlight).length / 22) * 17);
+                    h += 14 + Math.min(56, Math.ceil(String(p.highlight).length / 28) * 13);
                 }
                 if (p.note) {
-                    h += 22 + Math.min(64, Math.ceil(String(p.note).length / 22) * 17);
+                    h += 14 + Math.min(42, Math.ceil(String(p.note).length / 28) * 13);
                 }
-                return h + 12;
+                return h + 6;
             }
 
             function collectBookletDayBlocks(day) {
@@ -7222,9 +7249,6 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 var pageH = BOOKLET_PDF_PAGE_H || 1123;
                 var html = '';
                 var pageCount = 0;
-                var chunk = [];
-                var used = 0;
-                var isFirstPage = true;
 
                 function pageBudget(firstPage) {
                     var overhead = BK_PAGE_TOP_PAD_PX + BK_PAGE_BOTTOM_PAD_PX + BK_WATERMARK_ZONE_PX +
@@ -7232,21 +7256,36 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     return pageH - overhead;
                 }
 
-                function flushPage() {
-                    if (!chunk.length) return;
+                function renderDayPage(blockHtmlList, isFirstPage, isContinued) {
                     var pageCls = 'bk-page bk-day-page';
                     if (itineraryStart && pageCount === 0) pageCls += ' bk-itinerary-start';
-                    if (!isFirstPage) pageCls += ' bk-day-continued';
-                    html += '<div class="' + pageCls + '">' + wm;
-                    html += buildBookletPageHead('Day ' + dayNum);
+                    if (isContinued) pageCls += ' bk-day-continued';
+                    var pageHtml = '<div class="' + pageCls + '">' + wm;
+                    pageHtml += buildBookletPageHead('Day ' + dayNum);
                     if (isFirstPage) {
-                        html += '<h2 class="bk-day-title">📅 ' + escapeHtml(day.dateLabel || '') + ' · Day ' + escapeHtml(dayNum) + '</h2>';
+                        pageHtml += '<h2 class="bk-day-title">📅 ' + escapeHtml(day.dateLabel || '') + ' · Day ' + escapeHtml(dayNum) + '</h2>';
                     } else {
-                        html += '<p class="bk-day-cont">📅 ' + escapeHtml(day.dateLabel || '') + ' · Day ' + escapeHtml(dayNum) + '（續）</p>';
+                        pageHtml += '<p class="bk-day-cont">📅 ' + escapeHtml(day.dateLabel || '') + ' · Day ' + escapeHtml(dayNum) + '（續）</p>';
                     }
-                    html += '<div class="bk-day-body">' + chunk.join('') + '</div>';
-                    html += '</div>';
+                    pageHtml += '<div class="bk-day-body">' + blockHtmlList.join('') + '</div></div>';
                     pageCount += 1;
+                    return pageHtml;
+                }
+
+                var totalHeight = blocks.reduce(function (sum, block) {
+                    return sum + block.height;
+                }, 0);
+                if (totalHeight <= pageBudget(true)) {
+                    html += renderDayPage(blocks.map(function (b) { return b.html; }), true, false);
+                    return { html: html, pageCount: pageCount };
+                }
+
+                var chunk = [];
+                var used = 0;
+                var isFirstPage = true;
+                function flushPage() {
+                    if (!chunk.length) return;
+                    html += renderDayPage(chunk.slice(), isFirstPage, !isFirstPage);
                     chunk = [];
                     used = 0;
                     isFirstPage = false;
@@ -7257,7 +7296,6 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     var blockH = Math.round(block.height * BK_PAGINATE_SAFETY);
                     if (used + blockH > budget && chunk.length) {
                         flushPage();
-                        budget = pageBudget(isFirstPage);
                     }
                     chunk.push(block.html);
                     used += blockH;
@@ -7295,7 +7333,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 var pageIndex = 0;
                 while (idx < foodSpots.length) {
                     var isFirst = pageIndex === 0;
-                    var take = isFirst ? 6 : 8;
+                    var take = isFirst ? 10 : 12;
                     var chunk = foodSpots.slice(idx, idx + take);
                     var pageCls = 'bk-page bk-food-page' + (pageIndex > 0 ? ' bk-food-continued' : '');
                     html += '<div class="' + pageCls + '">' + wm;
@@ -7818,23 +7856,21 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             async function createHiddenBookletCaptureDoc(printHtml) {
-                var progress = document.getElementById('booklet-pdf-progress');
-                var host = document.getElementById('booklet-pdf-capture-host');
-                if (!progress || !host) throw new Error('no pdf capture host');
-                host.textContent = '';
-
                 var frame = document.createElement('iframe');
                 frame.setAttribute('title', 'booklet-pdf-capture');
                 frame.setAttribute('aria-hidden', 'true');
-                host.appendChild(frame);
+                frame.style.cssText = 'position:fixed!important;left:-12000px!important;top:0!important;width:' +
+                    BOOKLET_PDF_PAGE_W + 'px!important;height:' + BOOKLET_PDF_PAGE_H + 'px!important;border:0!important;' +
+                    'opacity:0!important;visibility:visible!important;pointer-events:none!important;z-index:-1!important;';
+                document.body.appendChild(frame);
 
                 var ok = await writeBookletPreviewFrame(frame, printHtml);
                 if (!ok || !frame.contentDocument) {
-                    removeHiddenCaptureFrame(frame);
+                    removeHiddenCaptureFrame(frame, false);
                     throw new Error('hidden capture frame failed');
                 }
-                await new Promise(function (resolve) { setTimeout(resolve, 120); });
-                return { frame: frame, doc: frame.contentDocument };
+                await new Promise(function (resolve) { setTimeout(resolve, 200); });
+                return { frame: frame, doc: frame.contentDocument, fromPreview: false };
             }
 
             function writeBookletPreviewFrame(frame, printHtml) {
@@ -8095,30 +8131,25 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     throw new Error('PDF libs unavailable');
                 }
                 var capture = null;
-                var previewFrame = null;
                 try {
-                    capture = await resolveBookletCaptureDoc();
-                    previewFrame = capture.frame;
-                    preparePreviewFrameForPdfCapture(previewFrame);
-                    await new Promise(function (resolve) { setTimeout(resolve, 450); });
+                    capture = await createHiddenBookletCaptureDoc(printHtml);
                     var frameDoc = capture.doc;
                     setBookletPdfExportMode(frameDoc, false);
                     await waitForPrintDocumentReady(frameDoc, 12000);
-                    return await runBookletPdfInsideIframe(previewFrame, frameDoc, onProgress);
+                    return await runBookletPdfInsideIframe(capture.frame, frameDoc, onProgress);
                 } finally {
-                    restorePreviewFrameAfterPdfCapture(previewFrame);
                     if (capture && capture.doc) {
                         cleanupPreviewPdfRunnerScripts(capture.doc);
                     }
-                    if (capture && capture.frame && !capture.fromPreview) {
+                    if (capture && capture.frame) {
                         removeHiddenCaptureFrame(capture.frame, false);
                     }
                     cleanupBookletPdfArtifacts();
-                    resetParentViewportZoom(false);
                 }
             }
 
             async function saveOrShareBookletPdf(blob, filename) {
+                markSplashSeen();
                 var file = new File([blob], filename, { type: 'application/pdf' });
                 if (navigator.canShare) {
                     try {
@@ -8183,11 +8214,6 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     showModal(pdfHint, '📖');
                 } finally {
                     setBookletPdfProgressVisible(false);
-                    var previewFrameEl = document.getElementById('booklet-preview-frame');
-                    restorePreviewFrameAfterPdfCapture(previewFrameEl);
-                    if (previewFrameEl && previewFrameEl.contentDocument) {
-                        cleanupPreviewPdfRunnerScripts(previewFrameEl.contentDocument);
-                    }
                     closeBookletInAppPreview();
                     if (btn) {
                         btn.disabled = false;
@@ -8414,9 +8440,16 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     '.bk-pdf-export-mode .bk-intro-page{height:1123px!important;max-height:1123px!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;padding:24px 32px!important}' +
                     '.bk-pdf-export-mode .bk-check-page{height:1123px!important;min-height:1123px!important;max-height:1123px!important;overflow:hidden!important;display:flex!important;flex-direction:column!important}' +
                     '.bk-pdf-export-mode .bk-note-page{height:1123px!important;min-height:1123px!important;max-height:1123px!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;padding:16px!important}' +
-                    '.bk-pdf-export-mode .bk-day-page,.bk-pdf-export-mode .bk-food-page{display:flex!important;flex-direction:column!important;padding:24px 32px 22mm!important}' +
-                    '.bk-pdf-export-mode .bk-day-body,.bk-pdf-export-mode .bk-food-body{flex:1 1 auto;min-height:0;overflow:hidden!important;max-height:calc(1123px - 150px - 22mm)!important}' +
-                    '.bk-pdf-export-mode .bk-watermark-footer{bottom:5mm!important;opacity:0.55!important}' +
+                    '.bk-pdf-export-mode .bk-day-page,.bk-pdf-export-mode .bk-food-page{display:flex!important;flex-direction:column!important;padding:20px 28px 18mm!important}' +
+                    '.bk-pdf-export-mode .bk-day-body,.bk-pdf-export-mode .bk-food-body{flex:1 1 auto;min-height:0;position:relative;z-index:1}' +
+                    '.bk-pdf-export-mode .bk-day-title{font-size:12pt!important;margin:0 0 2mm!important}' +
+                    '.bk-pdf-export-mode .bk-day-cont{font-size:10.5pt!important;margin:0 0 2mm!important}' +
+                    '.bk-pdf-export-mode .bk-phase{font-size:9.5pt!important;margin:2mm 0 1mm!important}' +
+                    '.bk-pdf-export-mode .bk-act{padding:2mm 3mm!important;margin-bottom:1.5mm!important}' +
+                    '.bk-pdf-export-mode .bk-act-time{font-size:8.5pt!important}' +
+                    '.bk-pdf-export-mode .bk-act-title{font-size:9.5pt!important;margin:0.5mm 0!important;line-height:1.3!important}' +
+                    '.bk-pdf-export-mode .bk-act-hl,.bk-pdf-export-mode .bk-act-note{font-size:8.5pt!important;line-height:1.35!important;margin-top:0.5mm!important}' +
+                    '.bk-pdf-export-mode .bk-watermark-footer{bottom:4mm!important;opacity:0.55!important}' +
                     '.bk-pdf-export-mode .bk-note-keeper{max-height:none!important;flex:1!important;overflow:hidden!important}' +
                     '.bk-pdf-export-mode .bk-lines-area{min-height:640px!important;max-height:680px!important;flex:1!important}' +
                     '@media screen{html,body{width:100%;height:100%;background:#111}.bk-cover-page{width:100vw;height:100vh;min-height:100vh;max-width:none;max-height:none;margin:0}}' +
@@ -8957,6 +8990,13 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             logGeminiKeySetupHint();
             purgeLegacyBossBadge();
             applyBossModeUi();
+            window.addEventListener('pageshow', function () {
+                try {
+                    if (sessionStorage.getItem('soarvibe_splash_done') === '1') {
+                        markSplashSeen();
+                    }
+                } catch (pageShowErr) { /* silent */ }
+            });
             initSplashScreen();
             if (shouldUseBackendProxy()) {
                 initBackendMapsKey();
@@ -9822,7 +9862,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', function () {
-                    navigator.serviceWorker.register('./service-worker.js?v=32').catch(function (err) {
+                    navigator.serviceWorker.register('./service-worker.js?v=33').catch(function (err) {
                         console.warn('[SOARVIBE] Service worker registration failed:', err);
                     });
                 });
