@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <style id="splash-critical">html.splash-pending,html.splash-pending body{background:linear-gradient(165deg,#1a237e 0%,#37474F 42%,#00838f 100%)!important;margin:0;padding:0;overflow:hidden}html.splash-pending #soarvibe-splash{display:flex!important}html.splash-pending body>.app-shell{visibility:hidden}</style>
     <script>(function(){var skip=false;try{skip=localStorage.getItem('soarvibe_splash_done')==='1'||sessionStorage.getItem('soarvibe_splash_done')==='1';}catch(e){}var s=window.matchMedia('(display-mode: standalone)').matches||window.matchMedia('(display-mode: fullscreen)').matches||window.navigator.standalone===true;if(s){document.documentElement.classList.add('pwa-standalone');if(!skip){document.documentElement.classList.add('splash-pending');}}})();</script>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=overlays-content">
     <meta name="theme-color" content="#1a237e">
     <meta name="description" content="SOARVIBE — AI 旅遊規劃，提升你的旅程，翱翔你的風格">
     <meta name="mobile-web-app-capable" content="yes">
@@ -1899,6 +1899,10 @@
             .picker-display {
                 font-size: 0.875rem;
             }
+            html.soarvibe-keyboard-open body > .app-shell {
+                height: var(--soarvibe-vh, 100dvh) !important;
+                min-height: var(--soarvibe-vh, 100dvh) !important;
+            }
             #destination-input {
                 font-size: 16px !important;
             }
@@ -3149,7 +3153,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
-            const SOARVIBE_APP_BUILD = 'v40';
+            const SOARVIBE_APP_BUILD = 'v41';
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
@@ -8649,14 +8653,88 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             var bookletPreviewBlobUrl = '';
             var lastBookletPrintHtml = '';
             var pdfExportInProgress = false;
+            var soarvibeLockedLayoutHeight = 0;
 
-            function refreshSoarvibeViewportHeight() {
-                var h = Math.round(
-                    (window.visualViewport && window.visualViewport.height) ||
-                    window.innerHeight ||
-                    document.documentElement.clientHeight ||
-                    0
-                );
+            function isSoarvibeTextEntry(el) {
+                if (!el || !el.tagName) return false;
+                var tag = el.tagName.toLowerCase();
+                if (tag === 'textarea') return true;
+                if (tag !== 'input') return false;
+                var type = (el.type || 'text').toLowerCase();
+                return type === 'text' || type === 'search' || type === 'email' ||
+                    type === 'tel' || type === 'url' || type === 'number' || type === 'password';
+            }
+
+            function isSoarvibeKeyboardLikelyOpen() {
+                if (document.documentElement.classList.contains('soarvibe-keyboard-open')) return true;
+                if (!window.visualViewport) return false;
+                var innerH = window.innerHeight || 0;
+                var visualH = window.visualViewport.height || 0;
+                return innerH > 0 && visualH > 0 && (innerH - visualH) > 120;
+            }
+
+            function lockSoarvibeLayoutHeight() {
+                var current = parseInt(String(getComputedStyle(document.documentElement).getPropertyValue('--soarvibe-vh') || '').replace('px', ''), 10);
+                if (!isNaN(current) && current > 0) {
+                    soarvibeLockedLayoutHeight = current;
+                } else {
+                    soarvibeLockedLayoutHeight = Math.round(window.innerHeight || document.documentElement.clientHeight || 0);
+                }
+                if (soarvibeLockedLayoutHeight > 0) {
+                    document.documentElement.style.setProperty('--soarvibe-vh', soarvibeLockedLayoutHeight + 'px');
+                }
+                document.documentElement.classList.add('soarvibe-keyboard-open');
+            }
+
+            function unlockSoarvibeLayoutHeight() {
+                document.documentElement.classList.remove('soarvibe-keyboard-open');
+                soarvibeLockedLayoutHeight = 0;
+                refreshSoarvibeViewportHeight({ force: true });
+            }
+
+            function scrollFieldIntoFormView(el) {
+                if (!el || !phoneScroll) return;
+                requestAnimationFrame(function () {
+                    var scrollRect = phoneScroll.getBoundingClientRect();
+                    var elRect = el.getBoundingClientRect();
+                    var topGap = elRect.top - scrollRect.top - 20;
+                    if (topGap < 0) {
+                        phoneScroll.scrollTop += topGap;
+                        return;
+                    }
+                    var bottomGap = elRect.bottom - scrollRect.bottom + 96;
+                    if (bottomGap > 0) {
+                        phoneScroll.scrollTop += bottomGap;
+                    }
+                });
+            }
+
+            function installSoarvibeKeyboardGuard() {
+                var shell = document.querySelector('.app-shell');
+                if (!shell) return;
+                shell.addEventListener('focusin', function (e) {
+                    if (!isSoarvibeTextEntry(e.target)) return;
+                    lockSoarvibeLayoutHeight();
+                    scrollFieldIntoFormView(e.target);
+                });
+                shell.addEventListener('focusout', function () {
+                    setTimeout(function () {
+                        var active = document.activeElement;
+                        if (isSoarvibeTextEntry(active)) return;
+                        if (isSoarvibeKeyboardLikelyOpen()) return;
+                        unlockSoarvibeLayoutHeight();
+                    }, 160);
+                });
+            }
+
+            function refreshSoarvibeViewportHeight(options) {
+                options = options || {};
+                if (!options.force && (document.documentElement.classList.contains('soarvibe-keyboard-open') || isSoarvibeKeyboardLikelyOpen())) {
+                    return;
+                }
+                var innerH = Math.round(window.innerHeight || document.documentElement.clientHeight || 0);
+                var visualH = Math.round((window.visualViewport && window.visualViewport.height) || innerH);
+                var h = options.preferVisual ? Math.max(innerH, visualH) : innerH;
                 if (h <= 0) return;
                 var prevRaw = getComputedStyle(document.documentElement).getPropertyValue('--soarvibe-vh');
                 var prev = parseInt(String(prevRaw || '').replace('px', ''), 10);
@@ -8667,7 +8745,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             function schedulePostShareLayoutRestore() {
                 [0, 120, 350, 700, 1200].forEach(function (ms) {
                     setTimeout(function () {
-                        refreshSoarvibeViewportHeight();
+                        refreshSoarvibeViewportHeight({ force: true, preferVisual: true });
                         restoreAppLayoutAfterPdf({ hard: true });
                     }, ms);
                 });
@@ -8786,9 +8864,9 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
             function forceIosViewportReset() {
                 var vp = document.querySelector('meta[name="viewport"]');
-                var normal = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover';
+                var normal = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=overlays-content';
                 if (vp) {
-                    vp.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+                    vp.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=overlays-content');
                 }
                 window.scrollTo(0, 0);
                 if (phoneScroll) {
@@ -11215,26 +11293,38 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', function () {
                     refreshSoarvibeViewportHeight();
-                    navigator.serviceWorker.register('./service-worker.js?v=40').catch(function (err) {
+                    navigator.serviceWorker.register('./service-worker.js?v=41').catch(function (err) {
                         console.warn('[SOARVIBE] Service worker registration failed:', err);
                     });
                 });
             }
 
             refreshSoarvibeViewportHeight();
+            installSoarvibeKeyboardGuard();
             console.info('[SOARVIBE] build', SOARVIBE_APP_BUILD);
-            window.addEventListener('resize', refreshSoarvibeViewportHeight);
+            window.addEventListener('resize', function () {
+                if (!document.documentElement.classList.contains('soarvibe-keyboard-open')) {
+                    refreshSoarvibeViewportHeight();
+                }
+            });
             window.addEventListener('orientationchange', function () {
-                setTimeout(refreshSoarvibeViewportHeight, 120);
+                document.documentElement.classList.remove('soarvibe-keyboard-open');
+                soarvibeLockedLayoutHeight = 0;
+                setTimeout(function () { refreshSoarvibeViewportHeight({ force: true }); }, 120);
             });
             window.addEventListener('pageshow', function (ev) {
                 if (ev.persisted) {
-                    refreshSoarvibeViewportHeight();
+                    refreshSoarvibeViewportHeight({ force: true, preferVisual: true });
                     restoreAppLayoutAfterPdf({ hard: true });
                 }
             });
             if (window.visualViewport) {
-                window.visualViewport.addEventListener('resize', refreshSoarvibeViewportHeight);
+                window.visualViewport.addEventListener('resize', function () {
+                    if (document.documentElement.classList.contains('soarvibe-keyboard-open') || isSoarvibeKeyboardLikelyOpen()) {
+                        return;
+                    }
+                    refreshSoarvibeViewportHeight();
+                });
             }
 
             if (navHome) {
