@@ -3153,7 +3153,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
-            const SOARVIBE_APP_BUILD = 'v47';
+            const SOARVIBE_APP_BUILD = 'v48';
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
@@ -8239,9 +8239,9 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             var BK_DAY_TITLE_PX = 32;
             var BK_DAY_CONT_PX = 22;
             var BK_PHASE_HEAD_PX = 22;
-            var BK_PAGINATE_SAFETY = 1.0;
+            var BK_PAGINATE_SAFETY = 0.86;
             var BK_WHOLE_DAY_SAFETY = 1.0;
-            var BK_PDF_BODY_RESERVE_PX = 196;
+            var BK_PDF_BODY_RESERVE_PX = 178;
 
             function isBookletPhaseBlockHtml(html) {
                 return html && html.indexOf('bk-phase') !== -1;
@@ -8335,6 +8335,31 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                         var groupH = scaledHeight(group.height);
 
                         if (chunk.length && used + groupH > budget) {
+                            if (group.isPhaseGroup && group.blocks.length) {
+                                var bi = 0;
+                                var partialUsed = used;
+                                var partialChunk = chunk.slice();
+                                for (bi = 0; bi < group.blocks.length; bi++) {
+                                    var bh = scaledHeight(group.blocks[bi].height);
+                                    if (partialUsed + bh > budget) break;
+                                    partialChunk.push(group.blocks[bi].html);
+                                    partialUsed += bh;
+                                }
+                                if (bi > 0) {
+                                    chunk = partialChunk;
+                                    used = partialUsed;
+                                    if (bi >= group.blocks.length) {
+                                        groupIdx += 1;
+                                    } else {
+                                        groups[groupIdx] = {
+                                            blocks: group.blocks.slice(bi),
+                                            height: sumBookletBlockHeights(group.blocks.slice(bi)),
+                                            isPhaseGroup: isBookletPhaseBlockHtml(group.blocks[bi].html)
+                                        };
+                                    }
+                                    break;
+                                }
+                            }
                             break;
                         }
 
@@ -8948,8 +8973,9 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             function returnHomeAfterPdfViewerClose() {
-                restoreHomeLayoutAfterBooklet();
+                if (!soarvibePdfSessionActive) return;
                 soarvibePdfSessionActive = false;
+                closeBookletInAppPreview();
             }
 
             function installAppResumeLayoutGuard() {
@@ -9234,23 +9260,96 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 return -1;
             }
 
+            function prepareBookletCoverForPdfExport(doc) {
+                if (!doc) return;
+                doc.documentElement.classList.add('bk-pdf-export-mode');
+                var w = BOOKLET_PDF_PAGE_W || 794;
+                var h = BOOKLET_PDF_PAGE_H || 1123;
+                var cover = doc.querySelector('.bk-cover-page');
+                var bg = doc.querySelector('.bk-cover-bg-img');
+                if (cover) {
+                    cover.style.width = w + 'px';
+                    cover.style.height = h + 'px';
+                    cover.style.minHeight = h + 'px';
+                    cover.style.maxHeight = h + 'px';
+                    cover.style.maxWidth = w + 'px';
+                    cover.style.overflow = 'hidden';
+                }
+                if (bg) {
+                    bg.style.position = 'absolute';
+                    bg.style.top = '0';
+                    bg.style.left = '0';
+                    bg.style.width = w + 'px';
+                    bg.style.height = h + 'px';
+                    bg.style.minWidth = w + 'px';
+                    bg.style.minHeight = h + 'px';
+                    bg.style.objectFit = 'cover';
+                    bg.style.objectPosition = 'center center';
+                }
+            }
+
+            function packBookletDayPagesTightInDoc(doc) {
+                if (!doc || !doc.body) return;
+                doc.documentElement.classList.add('bk-pdf-export-mode');
+                var win = doc.defaultView || window;
+                var guard = 0;
+                while (guard < 400) {
+                    guard += 1;
+                    var pages = Array.prototype.slice.call(doc.querySelectorAll('.bk-day-page'));
+                    var moved = false;
+                    var pi;
+                    for (pi = 0; pi < pages.length - 1; pi++) {
+                        var page = pages[pi];
+                        var next = pages[pi + 1];
+                        if (!bookletSameDayPage(page, next)) continue;
+                        var body = page.querySelector('.bk-day-body');
+                        var nextBody = next.querySelector('.bk-day-body');
+                        if (!body || !nextBody || !nextBody.firstElementChild) continue;
+
+                        var pull = [];
+                        while (nextBody.firstElementChild) {
+                            var first = nextBody.firstElementChild;
+                            var batch = [first];
+                            if (first.classList && first.classList.contains('bk-phase') &&
+                                first.nextElementSibling && first.nextElementSibling.classList.contains('bk-act')) {
+                                batch.push(first.nextElementSibling);
+                            }
+                            batch.forEach(function (node) { body.appendChild(node); });
+                            pull = pull.concat(batch);
+
+                            var bad = false;
+                            var ci;
+                            for (ci = 0; ci < body.children.length; ci++) {
+                                if (bookletBlockCrossesWatermark(page, body.children[ci], win)) {
+                                    bad = true;
+                                    break;
+                                }
+                            }
+                            if (bad) {
+                                batch.slice().reverse().forEach(function (node) {
+                                    nextBody.insertBefore(node, nextBody.firstChild);
+                                });
+                                pull = pull.slice(0, pull.length - batch.length);
+                                break;
+                            }
+                            if (!nextBody.firstElementChild) break;
+                        }
+                        if (!pull.length) continue;
+                        if (!nextBody.firstElementChild && next.parentNode) {
+                            next.parentNode.removeChild(next);
+                        }
+                        moved = true;
+                        break;
+                    }
+                    if (!moved) break;
+                }
+            }
+
             function enforceBookletWatermarkClearanceInDoc(doc) {
                 if (!doc || !doc.body) return;
                 doc.documentElement.classList.add('bk-pdf-export-mode');
                 var win = doc.defaultView || window;
-                var bodyMax = (BOOKLET_PDF_PAGE_H || 1123) - 196;
                 var guard = 0;
-
-                function measureBodyHeight(body) {
-                    var prevMax = body.style.maxHeight;
-                    var prevOverflow = body.style.overflow;
-                    body.style.maxHeight = 'none';
-                    body.style.overflow = 'visible';
-                    var h = body.scrollHeight || 0;
-                    body.style.maxHeight = prevMax || '';
-                    body.style.overflow = prevOverflow || '';
-                    return h;
-                }
 
                 while (guard < 600) {
                     guard += 1;
@@ -9264,18 +9363,6 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                         if (!body || !body.children.length) continue;
 
                         var splitIdx = findFirstWatermarkOverflowIndex(page, body, win);
-                        if (splitIdx < 0 && measureBodyHeight(body) > bodyMax + 4) {
-                            splitIdx = body.children.length - 1;
-                            while (splitIdx > 0) {
-                                var saved = collectBlocksToMoveFromIndex(body, splitIdx);
-                                var frag = doc.createDocumentFragment();
-                                saved.forEach(function (n) { frag.appendChild(n); });
-                                var fits = measureBodyHeight(body) <= bodyMax + 4;
-                                while (frag.firstChild) body.appendChild(frag.firstChild);
-                                if (fits) break;
-                                splitIdx -= 1;
-                            }
-                        }
                         if (splitIdx < 0) continue;
 
                         var moveNodes = collectBlocksToMoveFromIndex(body, splitIdx);
@@ -9331,7 +9418,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     'function reportProgress(cur,total){var cfg=window.parent&&window.parent.__SOARVIBE_PDF_RUN;if(cfg&&cfg.progress)cfg.progress(cur,total);}' +
                     'function reportDone(blob){var cfg=window.parent&&window.parent.__SOARVIBE_PDF_RUN;if(cfg&&cfg.done)cfg.done(blob);}' +
                     'function reportFail(msg){var cfg=window.parent&&window.parent.__SOARVIBE_PDF_RUN;if(cfg&&cfg.fail)cfg.fail(msg);}' +
-                    'async function capturePage(el,scale,h2c){return h2c(el,{scale:scale,window:window,useCORS:true,allowTaint:true,backgroundColor:"#ffffff",logging:false,width:PAGE_W,height:PAGE_H,windowWidth:PAGE_W,windowHeight:PAGE_H,scrollX:0,scrollY:0,x:0,y:0,foreignObjectRendering:false,onclone:function(clonedDoc,clonedEl){clonedDoc.documentElement.classList.add("bk-pdf-export-mode");ensureNoteLines(clonedDoc);if(clonedEl&&clonedEl.style){clonedEl.style.width=PAGE_W+"px";clonedEl.style.height=PAGE_H+"px";clonedEl.style.boxSizing="border-box";}}});}' +
+                    'async function capturePage(el,scale,h2c,isCover){return h2c(el,{scale:scale,window:window,useCORS:true,allowTaint:true,backgroundColor:"#ffffff",logging:false,width:PAGE_W,height:PAGE_H,windowWidth:PAGE_W,windowHeight:PAGE_H,scrollX:0,scrollY:0,x:0,y:0,foreignObjectRendering:false,onclone:function(clonedDoc,clonedEl){clonedDoc.documentElement.classList.add("bk-pdf-export-mode");ensureNoteLines(clonedDoc);if(clonedEl&&clonedEl.style){clonedEl.style.width=PAGE_W+"px";clonedEl.style.height=PAGE_H+"px";clonedEl.style.boxSizing="border-box";}if(isCover){var bg=clonedEl&&clonedEl.querySelector?clonedEl.querySelector(".bk-cover-bg-img"):null;if(bg){bg.style.width=PAGE_W+"px";bg.style.height=PAGE_H+"px";bg.style.objectFit="cover";bg.style.objectPosition="center center";}}}});}' +
                     'async function run(){try{' +
                     'document.documentElement.classList.add("bk-pdf-export-mode");' +
                     'await loadScript("' + BOOKLET_H2C_SRC + '");' +
@@ -9339,14 +9426,18 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     'await new Promise(function(r){setTimeout(r,650);});' +
                     'var pages=getPages();if(!pages.length)throw new Error("no booklet pages");' +
                     'var jsPDF=window.jspdf.jsPDF;var pdf=new jsPDF({orientation:"portrait",unit:"mm",format:"a4",compress:true});' +
-                    'var scales=[1,0.92,1.08];' +
+                    'var coverScales=[2,1.75,1.5,1.25];' +
+                    'var dayScales=[1,0.92,1.08];' +
                     'for(var i=0;i<pages.length;i++){' +
                     'reportProgress(i+1,pages.length);' +
                     'if(i>0)pdf.addPage();' +
+                    'var isCover=pages[i].classList.contains("bk-cover-page");' +
+                    'var scales=isCover?coverScales:dayScales;' +
                     'var canvas=null,lastErr=null,si;' +
-                    'for(si=0;si<scales.length;si++){try{canvas=await capturePage(pages[i],scales[si],window.html2canvas);break;}catch(e){lastErr=e;}}' +
+                    'for(si=0;si<scales.length;si++){try{canvas=await capturePage(pages[i],scales[si],window.html2canvas,isCover);break;}catch(e){lastErr=e;}}' +
                     'if(!canvas)throw lastErr||new Error("canvas capture failed");' +
-                    'var img=canvas.toDataURL("image/jpeg",0.92);' +
+                    'var quality=isCover?0.97:0.93;' +
+                    'var img=canvas.toDataURL("image/jpeg",quality);' +
                     'if(!img||img.length<1000)throw new Error("empty page image "+(i+1));' +
                     'pdf.addImage(img,"JPEG",0,0,210,297,undefined,"FAST");' +
                     'canvas.width=0;canvas.height=0;' +
@@ -9431,7 +9522,10 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 var frame = document.createElement('iframe');
                 frame.setAttribute('title', 'booklet-pdf-capture');
                 frame.setAttribute('aria-hidden', 'true');
-                frame.style.cssText = 'position:absolute!important;left:0!important;top:0!important;width:1px!important;height:1px!important;max-width:1px!important;max-height:1px!important;border:0!important;margin:0!important;padding:0!important;opacity:0!important;visibility:hidden!important;overflow:hidden!important;';
+                frame.style.cssText = 'position:fixed!important;left:-12000px!important;top:0!important;width:' +
+                    BOOKLET_PDF_PAGE_W + 'px!important;height:' + BOOKLET_PDF_PAGE_H + 'px!important;' +
+                    'max-width:' + BOOKLET_PDF_PAGE_W + 'px!important;max-height:' + BOOKLET_PDF_PAGE_H + 'px!important;' +
+                    'border:0!important;margin:0!important;padding:0!important;opacity:0!important;visibility:hidden!important;overflow:hidden!important;';
                 sandbox.appendChild(frame);
 
                 var ok = await writeBookletPreviewFrame(frame, printHtml);
@@ -9701,19 +9795,32 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     throw new Error('PDF libs unavailable');
                 }
                 var capture = null;
+                var usedPreview = false;
                 try {
-                    capture = await createHiddenBookletCaptureDoc(printHtml);
+                    var previewFrame = document.getElementById('booklet-preview-frame');
+                    if (previewFrame && previewFrame.contentDocument && previewFrame.contentDocument.body &&
+                        previewFrame.contentDocument.querySelector('.bk-cover-page')) {
+                        preparePreviewFrameForPdfCapture(previewFrame);
+                        capture = { frame: previewFrame, doc: previewFrame.contentDocument };
+                        usedPreview = true;
+                    } else {
+                        capture = await createHiddenBookletCaptureDoc(printHtml);
+                    }
                     var frameDoc = capture.doc;
-                    setBookletPdfExportMode(frameDoc, false);
-                    await waitForPrintDocumentReady(frameDoc, 12000);
+                    setBookletPdfExportMode(frameDoc, true);
+                    await waitForPrintDocumentReady(frameDoc, usedPreview ? 5000 : 12000);
+                    prepareBookletCoverForPdfExport(frameDoc);
+                    packBookletDayPagesTightInDoc(frameDoc);
                     enforceBookletWatermarkClearanceInDoc(frameDoc);
-                    await new Promise(function (resolve) { setTimeout(resolve, 120); });
+                    await new Promise(function (resolve) { setTimeout(resolve, 150); });
                     return await runBookletPdfInsideIframe(capture.frame, frameDoc, onProgress);
                 } finally {
                     if (capture && capture.doc) {
                         cleanupPreviewPdfRunnerScripts(capture.doc);
                     }
-                    if (capture && capture.frame) {
+                    if (usedPreview && capture && capture.frame) {
+                        restorePreviewFrameAfterPdfCapture(capture.frame);
+                    } else if (capture && capture.frame) {
                         removeHiddenCaptureFrame(capture.frame, false);
                     }
                     cleanupBookletPdfArtifacts();
@@ -11578,7 +11685,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', function () {
                     refreshSoarvibeViewportHeight();
-                    navigator.serviceWorker.register('./service-worker.js?v=47').catch(function (err) {
+                    navigator.serviceWorker.register('./service-worker.js?v=48').catch(function (err) {
                         console.warn('[SOARVIBE] Service worker registration failed:', err);
                     });
                 });
