@@ -3152,7 +3152,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
-            const SOARVIBE_APP_BUILD = 'v50';
+            const SOARVIBE_APP_BUILD = 'v51';
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
@@ -8875,18 +8875,19 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             function returnHomeAfterPdfViewerClose() {
+                if (pdfExportInProgress) return;
                 finishBookletPdfExportSession();
             }
 
             function installAppResumeLayoutGuard() {
                 document.addEventListener('visibilitychange', function () {
-                    if (document.hidden || !soarvibePdfSessionActive) return;
+                    if (document.hidden || !soarvibePdfSessionActive || pdfExportInProgress) return;
                     if (document.documentElement.classList.contains('booklet-preview-open')) return;
                     setTimeout(returnHomeAfterPdfViewerClose, 120);
                     setTimeout(returnHomeAfterPdfViewerClose, 600);
                 });
                 window.addEventListener('pageshow', function () {
-                    if (!soarvibePdfSessionActive) return;
+                    if (!soarvibePdfSessionActive || pdfExportInProgress) return;
                     if (document.documentElement.classList.contains('booklet-preview-open')) return;
                     setTimeout(returnHomeAfterPdfViewerClose, 120);
                 });
@@ -9706,7 +9707,6 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             async function saveOrShareBookletPdf(blob, filename) {
-                markSoarvibePdfSession();
                 var file = new File([blob], filename, { type: 'application/pdf' });
                 var result = 'download';
                 if (navigator.canShare) {
@@ -9721,7 +9721,6 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                         }
                     } catch (shareErr) {
                         if (shareErr && shareErr.name === 'AbortError') {
-                            armPostShareLayoutRestore();
                             return 'cancel';
                         }
                         console.warn('[SOARVIBE] share PDF:', shareErr);
@@ -9738,7 +9737,6 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     link.remove();
                     setTimeout(function () { URL.revokeObjectURL(url); }, 8000);
                 }
-                armPostShareLayoutRestore();
                 return result;
             }
 
@@ -9750,7 +9748,6 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 }
                 if (pdfExportInProgress) return;
 
-                markSoarvibePdfSession();
                 snapshotLayoutBaseline();
                 snapshotPrePdfLayoutHeight();
                 pdfExportInProgress = true;
@@ -9792,6 +9789,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     showModal(pdfHint, '📖');
                     finishBookletPdfExportSession();
                 } finally {
+                    pdfExportInProgress = false;
                     if (btn) {
                         btn.disabled = false;
                         btn.textContent = prevText || '📥 儲存 PDF';
@@ -11570,7 +11568,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', function () {
                     refreshSoarvibeViewportHeight();
-                    navigator.serviceWorker.register('./service-worker.js?v=50').catch(function (err) {
+                    navigator.serviceWorker.register('./service-worker.js?v=51').catch(function (err) {
                         console.warn('[SOARVIBE] Service worker registration failed:', err);
                     });
                 });
@@ -11594,7 +11592,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 if (ev.persisted) {
                     refreshSoarvibeViewportHeight({ force: true });
                 }
-                if (soarvibePdfSessionActive && !document.documentElement.classList.contains('booklet-preview-open')) {
+                if (soarvibePdfSessionActive && !pdfExportInProgress && !document.documentElement.classList.contains('booklet-preview-open')) {
                     setTimeout(returnHomeAfterPdfViewerClose, 120);
                 }
             });
