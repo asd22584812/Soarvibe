@@ -3153,7 +3153,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
-            const SOARVIBE_APP_BUILD = 'v46';
+            const SOARVIBE_APP_BUILD = 'v47';
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
@@ -4963,6 +4963,9 @@
                 closeSavedTripsMenu();
                 closeUserWall();
                 closeBookletInAppPreviewIfOpen();
+                if (soarvibePdfSessionActive) {
+                    returnHomeAfterPdfViewerClose();
+                }
                 if (phoneScroll && phoneScroll.scrollTop > 0) {
                     try {
                         phoneScroll.scrollTo({ top: 0, behavior: 'smooth' });
@@ -8861,9 +8864,9 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 }
             }
 
-            function clearMobileShellInlineStyles() {
+            function clearPdfLayoutStylesOnly() {
                 document.documentElement.classList.remove(
-                    'bk-pdf-export-mode', 'booklet-preview-open', 'pdf-capture-busy', 'splash-pending'
+                    'bk-pdf-export-mode', 'booklet-preview-open', 'pdf-capture-busy'
                 );
                 document.body.classList.remove('bk-pdf-export-mode', 'booklet-preview-open', 'pdf-capture-busy');
                 document.documentElement.style.removeProperty('zoom');
@@ -8871,52 +8874,47 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 document.documentElement.style.removeProperty('width');
                 document.documentElement.style.removeProperty('min-width');
                 document.documentElement.style.removeProperty('max-width');
-                document.documentElement.style.removeProperty('height');
-                document.documentElement.style.removeProperty('min-height');
-                document.documentElement.style.removeProperty('font-size');
                 document.body.style.removeProperty('zoom');
                 document.body.style.removeProperty('transform');
                 document.body.style.removeProperty('width');
                 document.body.style.removeProperty('min-width');
                 document.body.style.removeProperty('max-width');
-                document.body.style.removeProperty('height');
-                document.body.style.removeProperty('min-height');
-                document.body.style.removeProperty('overflow');
-                document.body.style.removeProperty('position');
-                document.body.style.removeProperty('padding');
-                document.body.style.removeProperty('display');
                 document.documentElement.classList.remove('soarvibe-keyboard-open');
                 soarvibeLockedLayoutHeight = 0;
                 var shell = document.querySelector('.app-shell');
-                var isMobileShell = window.matchMedia('(max-width: 768px), (display-mode: standalone)').matches;
                 if (shell) {
+                    shell.style.removeProperty('transform');
+                    shell.style.removeProperty('zoom');
                     shell.style.removeProperty('width');
                     shell.style.removeProperty('min-width');
                     shell.style.removeProperty('max-width');
                     shell.style.removeProperty('height');
                     shell.style.removeProperty('min-height');
-                    shell.style.removeProperty('transform');
-                    shell.style.removeProperty('zoom');
-                    shell.style.removeProperty('overflow');
                     shell.style.removeProperty('margin');
                     shell.style.removeProperty('border-radius');
                     shell.style.visibility = '';
-                    if (isMobileShell) {
-                        shell.style.width = '100%';
-                        shell.style.maxWidth = 'none';
-                        shell.style.margin = '0';
-                        shell.style.transform = 'none';
-                        shell.style.borderRadius = '0';
-                        shell.style.overflow = 'hidden';
-                    }
                 }
                 if (phoneScroll) {
+                    phoneScroll.style.removeProperty('transform');
                     phoneScroll.style.removeProperty('width');
-                    phoneScroll.style.removeProperty('min-width');
-                    phoneScroll.style.removeProperty('max-width');
                     phoneScroll.style.removeProperty('height');
                     phoneScroll.style.removeProperty('overflow');
-                    phoneScroll.style.removeProperty('transform');
+                }
+            }
+
+            function clearMobileShellInlineStyles() {
+                clearPdfLayoutStylesOnly();
+                var isMobileShell = window.matchMedia('(max-width: 768px), (display-mode: standalone)').matches;
+                var shell = document.querySelector('.app-shell');
+                if (shell && isMobileShell) {
+                    shell.style.width = '100%';
+                    shell.style.maxWidth = 'none';
+                    shell.style.margin = '0';
+                    shell.style.transform = 'none';
+                    shell.style.borderRadius = '0';
+                    shell.style.overflow = 'hidden';
+                }
+                if (phoneScroll) {
                     phoneScroll.style.flex = '1 1 auto';
                     phoneScroll.style.minHeight = '0';
                     phoneScroll.style.overflowY = 'auto';
@@ -8925,14 +8923,9 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 }
             }
 
-            function restoreHomeLayoutAfterBooklet(options) {
-                options = options || {};
-                var vp = document.querySelector('meta[name="viewport"]');
-                var normalVp = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=overlays-content';
-                if (vp) {
-                    vp.setAttribute('content', normalVp);
-                }
-                clearMobileShellInlineStyles();
+            function restoreHomeLayoutAfterBooklet() {
+                setBookletPdfProgressVisible(false);
+                clearPdfLayoutStylesOnly();
                 cleanupBookletPdfArtifacts();
                 var previewFrame = document.getElementById('booklet-preview-frame');
                 if (previewFrame) {
@@ -8946,103 +8939,39 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     previewSheet.setAttribute('aria-hidden', 'true');
                 }
                 document.documentElement.classList.remove('booklet-preview-open', 'pdf-capture-busy', 'bk-pdf-export-mode');
-                if (hasSplashBeenSeen()) {
-                    markSplashSeen();
-                }
-                document.documentElement.style.removeProperty('--soarvibe-vh');
-                document.documentElement.style.removeProperty('font-size');
-                document.body.style.removeProperty('height');
-                document.body.style.removeProperty('min-height');
-
-                function applyShellHeight() {
-                    var innerH = Math.round(window.innerHeight || document.documentElement.clientHeight || 0);
-                    var h = innerH;
-                    if (soarvibeLayoutBaseline.vh > 0 && innerH > 0 &&
-                        Math.abs(innerH - soarvibeLayoutBaseline.vh) < 96) {
-                        h = soarvibeLayoutBaseline.vh;
-                    }
-                    if (document.documentElement.classList.contains('soarvibe-keyboard-open') && soarvibeLockedLayoutHeight > 0) {
-                        h = soarvibeLockedLayoutHeight;
-                    }
-                    if (h > 0) {
-                        document.documentElement.style.setProperty('--soarvibe-vh', h + 'px');
-                    }
-                    var shell = document.querySelector('.app-shell');
-                    var isMobileShell = window.matchMedia('(max-width: 768px), (display-mode: standalone)').matches;
-                    if (shell && isMobileShell) {
-                        shell.style.width = '100%';
-                        shell.style.maxWidth = '100%';
-                        shell.style.minHeight = h + 'px';
-                        shell.style.height = h + 'px';
-                        shell.style.margin = '0';
-                        shell.style.transform = 'none';
-                        shell.style.borderRadius = '0';
-                    }
-                    document.body.style.display = 'block';
-                    document.body.style.padding = '0';
-                    document.body.style.margin = '0';
-                    document.body.style.width = '100%';
-                    document.body.style.maxWidth = '100%';
-                    document.body.style.overflow = 'hidden';
-                }
-
-                applyShellHeight();
+                refreshSoarvibeViewportHeight({ force: true });
                 window.scrollTo(0, 0);
                 if (phoneScroll) {
                     phoneScroll.scrollLeft = 0;
                     phoneScroll.scrollTop = 0;
                 }
-                if (options.hard) {
-                    forceIosViewportReset();
-                    setTimeout(applyShellHeight, 120);
-                    setTimeout(applyShellHeight, 420);
-                }
-                soarvibePrePdfLayoutHeight = 0;
+            }
+
+            function returnHomeAfterPdfViewerClose() {
+                restoreHomeLayoutAfterBooklet();
+                soarvibePdfSessionActive = false;
             }
 
             function installAppResumeLayoutGuard() {
-                var resumeTimer = null;
-                function scheduleResumeRestore() {
-                    if (resumeTimer) clearTimeout(resumeTimer);
-                    resumeTimer = setTimeout(function () {
-                        resumeTimer = null;
-                        if (document.documentElement.classList.contains('booklet-preview-open')) return;
-                        restoreHomeLayoutAfterBooklet({ hard: soarvibePdfSessionActive });
-                    }, 80);
-                }
                 document.addEventListener('visibilitychange', function () {
-                    if (!document.hidden) {
-                        scheduleResumeRestore();
-                        if (soarvibePdfSessionActive) {
-                            setTimeout(function () {
-                                restoreHomeLayoutAfterBooklet({ hard: true });
-                            }, 160);
-                            setTimeout(function () {
-                                restoreHomeLayoutAfterBooklet({ hard: true });
-                            }, 700);
-                        }
-                    }
+                    if (document.hidden || !soarvibePdfSessionActive) return;
+                    if (document.documentElement.classList.contains('booklet-preview-open')) return;
+                    setTimeout(returnHomeAfterPdfViewerClose, 120);
+                    setTimeout(returnHomeAfterPdfViewerClose, 600);
                 });
                 window.addEventListener('pageshow', function () {
-                    scheduleResumeRestore();
-                });
-                window.addEventListener('focus', function () {
-                    scheduleResumeRestore();
+                    if (!soarvibePdfSessionActive) return;
+                    if (document.documentElement.classList.contains('booklet-preview-open')) return;
+                    setTimeout(returnHomeAfterPdfViewerClose, 120);
                 });
             }
 
             function armPostShareLayoutRestore() {
                 markSoarvibePdfSession();
-                [400, 1200, 2800, 6000, 12000].forEach(function (ms) {
-                    setTimeout(function () {
-                        restoreHomeLayoutAfterBooklet({ hard: ms < 2000 });
-                    }, ms);
-                });
-                setTimeout(function () { soarvibePrePdfLayoutHeight = 0; }, 800);
             }
 
             function restoreAppLayoutAfterPdf() {
-                restoreHomeLayoutAfterBooklet({ hard: true });
+                returnHomeAfterPdfViewerClose();
             }
 
             function resetParentViewportZoom(hardReset) {
@@ -9225,6 +9154,156 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 }
             }
 
+            function bookletSameDayPage(pageA, pageB) {
+                if (!pageA || !pageB) return false;
+                var la = pageA.querySelector('.bk-day-title') || pageA.querySelector('.bk-day-cont');
+                var lb = pageB.querySelector('.bk-day-title') || pageB.querySelector('.bk-day-cont');
+                var da = la && String(la.textContent || '').match(/Day\s*(\d+)/i);
+                var db = lb && String(lb.textContent || '').match(/Day\s*(\d+)/i);
+                return !!(da && db && da[1] === db[1]);
+            }
+
+            function createBookletContinuedDayPage(doc, refPage) {
+                var labelEl = refPage.querySelector('.bk-day-title') || refPage.querySelector('.bk-day-cont');
+                var labelText = labelEl ? String(labelEl.textContent || '') : '';
+                var dayMatch = labelText.match(/Day\s*(\d+)/i);
+                var dayNum = dayMatch ? dayMatch[1] : '?';
+                var datePart = labelText.replace(/（續）/g, '').split('·')[0].trim();
+
+                var page = doc.createElement('div');
+                page.className = 'bk-page bk-day-page bk-day-continued';
+                var wm = refPage.querySelector('.bk-watermark');
+                if (wm) page.appendChild(wm.cloneNode(true));
+
+                var headWrap = doc.createElement('div');
+                headWrap.innerHTML = buildBookletPageHead('Day ' + dayNum);
+                while (headWrap.firstChild) page.appendChild(headWrap.firstChild);
+
+                var cont = doc.createElement('p');
+                cont.className = 'bk-day-cont';
+                cont.textContent = '📅 ' + datePart + ' · Day ' + dayNum + '（續）';
+                page.appendChild(cont);
+
+                var body = doc.createElement('div');
+                body.className = 'bk-day-body';
+                page.appendChild(body);
+
+                var safe = doc.createElement('div');
+                safe.className = 'bk-day-safe-zone';
+                safe.setAttribute('aria-hidden', 'true');
+                page.appendChild(safe);
+                return page;
+            }
+
+            function getBookletWatermarkClearLine(page, win) {
+                var safe = page.querySelector('.bk-day-safe-zone, .bk-page-safe-zone');
+                if (safe) {
+                    return safe.getBoundingClientRect().top;
+                }
+                var pageRect = page.getBoundingClientRect();
+                return pageRect.bottom - Math.round(((win || window).innerHeight ? 91 : 91));
+            }
+
+            function bookletBlockCrossesWatermark(page, block, win) {
+                if (!page || !block) return false;
+                var clearLine = getBookletWatermarkClearLine(page, win);
+                return block.getBoundingClientRect().bottom > clearLine - 4;
+            }
+
+            function collectBlocksToMoveFromIndex(body, startIdx) {
+                var nodes = [];
+                var idx = startIdx;
+                if (idx > 0 && body.children[idx] && body.children[idx].classList.contains('bk-act') &&
+                    body.children[idx - 1].classList.contains('bk-phase')) {
+                    idx -= 1;
+                }
+                while (idx < body.children.length) {
+                    nodes.push(body.children[idx]);
+                    idx += 1;
+                }
+                return nodes;
+            }
+
+            function findFirstWatermarkOverflowIndex(page, body, win) {
+                var ci;
+                for (ci = 0; ci < body.children.length; ci++) {
+                    if (bookletBlockCrossesWatermark(page, body.children[ci], win)) {
+                        return ci;
+                    }
+                }
+                return -1;
+            }
+
+            function enforceBookletWatermarkClearanceInDoc(doc) {
+                if (!doc || !doc.body) return;
+                doc.documentElement.classList.add('bk-pdf-export-mode');
+                var win = doc.defaultView || window;
+                var bodyMax = (BOOKLET_PDF_PAGE_H || 1123) - 196;
+                var guard = 0;
+
+                function measureBodyHeight(body) {
+                    var prevMax = body.style.maxHeight;
+                    var prevOverflow = body.style.overflow;
+                    body.style.maxHeight = 'none';
+                    body.style.overflow = 'visible';
+                    var h = body.scrollHeight || 0;
+                    body.style.maxHeight = prevMax || '';
+                    body.style.overflow = prevOverflow || '';
+                    return h;
+                }
+
+                while (guard < 600) {
+                    guard += 1;
+                    var pages = Array.prototype.slice.call(doc.querySelectorAll('.bk-day-page'));
+                    var moved = false;
+                    var pi;
+
+                    for (pi = 0; pi < pages.length; pi++) {
+                        var page = pages[pi];
+                        var body = page.querySelector('.bk-day-body');
+                        if (!body || !body.children.length) continue;
+
+                        var splitIdx = findFirstWatermarkOverflowIndex(page, body, win);
+                        if (splitIdx < 0 && measureBodyHeight(body) > bodyMax + 4) {
+                            splitIdx = body.children.length - 1;
+                            while (splitIdx > 0) {
+                                var saved = collectBlocksToMoveFromIndex(body, splitIdx);
+                                var frag = doc.createDocumentFragment();
+                                saved.forEach(function (n) { frag.appendChild(n); });
+                                var fits = measureBodyHeight(body) <= bodyMax + 4;
+                                while (frag.firstChild) body.appendChild(frag.firstChild);
+                                if (fits) break;
+                                splitIdx -= 1;
+                            }
+                        }
+                        if (splitIdx < 0) continue;
+
+                        var moveNodes = collectBlocksToMoveFromIndex(body, splitIdx);
+                        if (!moveNodes.length) continue;
+
+                        var next = pages[pi + 1];
+                        if (!bookletSameDayPage(page, next)) {
+                            next = createBookletContinuedDayPage(doc, page);
+                            if (page.nextSibling) {
+                                page.parentNode.insertBefore(next, page.nextSibling);
+                            } else {
+                                page.parentNode.appendChild(next);
+                            }
+                        }
+                        var nextBody = next.querySelector('.bk-day-body');
+                        if (!nextBody) continue;
+
+                        moveNodes.forEach(function (node) {
+                            nextBody.appendChild(node);
+                        });
+                        moved = true;
+                        break;
+                    }
+                    if (!moved) break;
+                }
+                fixOrphanPhaseHeadersInDoc(doc);
+            }
+
             function fixOrphanPhaseHeadersInDoc(doc) {
                 if (!doc || !doc.body) return;
                 var pages = Array.prototype.slice.call(doc.querySelectorAll('.bk-day-page'));
@@ -9241,174 +9320,6 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     if (!nextBody) return;
                     nextBody.insertBefore(body.lastElementChild, nextBody.firstChild);
                 });
-            }
-
-            function tightenBookletDayPagesInDoc(doc) {
-                if (!doc || !doc.body) return;
-                doc.documentElement.classList.add('bk-pdf-export-mode');
-                var pageH = BOOKLET_PDF_PAGE_H || 1123;
-                var guard = 0;
-
-                function sameDay(pageA, pageB) {
-                    if (!pageA || !pageB) return false;
-                    var la = pageA.querySelector('.bk-day-title') || pageA.querySelector('.bk-day-cont');
-                    var lb = pageB.querySelector('.bk-day-title') || pageB.querySelector('.bk-day-cont');
-                    var da = la && String(la.textContent || '').match(/Day\s*(\d+)/i);
-                    var db = lb && String(lb.textContent || '').match(/Day\s*(\d+)/i);
-                    return !!(da && db && da[1] === db[1]);
-                }
-
-                while (guard < 400) {
-                    guard += 1;
-                    var pages = Array.prototype.slice.call(doc.querySelectorAll('.bk-day-page'));
-                    var moved = false;
-                    var pi;
-                    for (pi = 0; pi < pages.length - 1; pi++) {
-                        var page = pages[pi];
-                        var next = pages[pi + 1];
-                        if (!sameDay(page, next)) continue;
-                        var body = page.querySelector('.bk-day-body');
-                        var nextBody = next.querySelector('.bk-day-body');
-                        if (!body || !nextBody || !nextBody.firstElementChild) continue;
-
-                        var node = nextBody.firstElementChild;
-                        var pullPhase = node.classList && node.classList.contains('bk-phase');
-                        var pullAct = pullPhase && node.nextElementSibling && node.nextElementSibling.classList &&
-                            node.nextElementSibling.classList.contains('bk-act') ? node.nextElementSibling : null;
-
-                        if (pullPhase && pullAct) {
-                            body.appendChild(node);
-                            body.appendChild(pullAct);
-                        } else {
-                            body.appendChild(node);
-                        }
-
-                        if ((page.scrollHeight || 0) > pageH + 2) {
-                            if (pullPhase && pullAct) {
-                                body.removeChild(pullAct);
-                                body.removeChild(node);
-                            } else {
-                                body.removeChild(node);
-                            }
-                            continue;
-                        }
-
-                        if (body.lastElementChild && body.lastElementChild.classList &&
-                            body.lastElementChild.classList.contains('bk-phase')) {
-                            var orphan = body.lastElementChild;
-                            body.removeChild(orphan);
-                            nextBody.insertBefore(orphan, nextBody.firstChild);
-                        }
-
-                        if (!nextBody.firstElementChild && next.parentNode) {
-                            next.parentNode.removeChild(next);
-                        }
-                        moved = true;
-                        break;
-                    }
-                    if (!moved) break;
-                }
-                fixOrphanPhaseHeadersInDoc(doc);
-            }
-
-            function splitOverflowBookletDayPagesInDoc(doc) {
-                if (!doc || !doc.body) return;
-                doc.documentElement.classList.add('bk-pdf-export-mode');
-                var pageH = BOOKLET_PDF_PAGE_H || 1123;
-                var guard = 0;
-
-                function pageOverflows(page) {
-                    return (page.scrollHeight || 0) > pageH + 4;
-                }
-
-                function sameDay(pageA, pageB) {
-                    if (!pageA || !pageB) return false;
-                    var la = pageA.querySelector('.bk-day-title') || pageA.querySelector('.bk-day-cont');
-                    var lb = pageB.querySelector('.bk-day-title') || pageB.querySelector('.bk-day-cont');
-                    var da = la && String(la.textContent || '').match(/Day\s*(\d+)/i);
-                    var db = lb && String(lb.textContent || '').match(/Day\s*(\d+)/i);
-                    return !!(da && db && da[1] === db[1]);
-                }
-
-                function createContinuedPage(refPage) {
-                    var labelEl = refPage.querySelector('.bk-day-title') || refPage.querySelector('.bk-day-cont');
-                    var labelText = labelEl ? String(labelEl.textContent || '') : '';
-                    var dayMatch = labelText.match(/Day\s*(\d+)/i);
-                    var dayNum = dayMatch ? dayMatch[1] : '?';
-                    var datePart = labelText.replace(/（續）/g, '').split('·')[0].trim();
-
-                    var page = doc.createElement('div');
-                    page.className = 'bk-page bk-day-page bk-day-continued';
-                    var wm = refPage.querySelector('.bk-watermark');
-                    if (wm) page.appendChild(wm.cloneNode(true));
-
-                    var headWrap = doc.createElement('div');
-                    headWrap.innerHTML = buildBookletPageHead('Day ' + dayNum);
-                    while (headWrap.firstChild) page.appendChild(headWrap.firstChild);
-
-                    var cont = doc.createElement('p');
-                    cont.className = 'bk-day-cont';
-                    cont.textContent = '📅 ' + datePart + ' · Day ' + dayNum + '（續）';
-                    page.appendChild(cont);
-
-                    var body = doc.createElement('div');
-                    body.className = 'bk-day-body';
-                    page.appendChild(body);
-
-                    var safe = doc.createElement('div');
-                    safe.className = 'bk-day-safe-zone';
-                    safe.setAttribute('aria-hidden', 'true');
-                    page.appendChild(safe);
-                    return page;
-                }
-
-                function moveLastBlockToNext(body, nextBody) {
-                    if (!body || !nextBody || !body.lastElementChild) return false;
-                    var last = body.lastElementChild;
-                    if (last.classList && last.classList.contains('bk-act')) {
-                        var prev = last.previousElementSibling;
-                        if (prev && prev.classList && prev.classList.contains('bk-phase')) {
-                            nextBody.insertBefore(last, nextBody.firstChild);
-                            nextBody.insertBefore(prev, nextBody.firstChild);
-                            return true;
-                        }
-                        nextBody.insertBefore(last, nextBody.firstChild);
-                        return true;
-                    }
-                    nextBody.insertBefore(last, nextBody.firstChild);
-                    return true;
-                }
-
-                while (guard < 500) {
-                    guard += 1;
-                    var pages = Array.prototype.slice.call(doc.querySelectorAll('.bk-day-page'));
-                    var didSplit = false;
-                    var pi;
-                    for (pi = 0; pi < pages.length; pi++) {
-                        var page = pages[pi];
-                        if (!pageOverflows(page)) continue;
-                        var body = page.querySelector('.bk-day-body');
-                        if (!body || !body.lastElementChild) continue;
-
-                        var next = pages[pi + 1];
-                        if (!sameDay(page, next)) {
-                            next = createContinuedPage(page);
-                            if (page.nextSibling) {
-                                page.parentNode.insertBefore(next, page.nextSibling);
-                            } else {
-                                page.parentNode.appendChild(next);
-                            }
-                        }
-                        var nextBody = next.querySelector('.bk-day-body');
-                        if (!nextBody) continue;
-                        if (moveLastBlockToNext(body, nextBody)) {
-                            didSplit = true;
-                        }
-                        break;
-                    }
-                    if (!didSplit) break;
-                }
-                fixOrphanPhaseHeadersInDoc(doc);
             }
 
             function buildBookletIframePdfRunnerScript() {
@@ -9607,7 +9518,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 lastBookletPrintHtml = '';
                 cleanupBookletPdfArtifacts();
                 if (!options.skipLayoutRestore) {
-                    restoreHomeLayoutAfterBooklet({ hard: true });
+                    restoreHomeLayoutAfterBooklet();
                 }
             }
 
@@ -9795,10 +9706,8 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     var frameDoc = capture.doc;
                     setBookletPdfExportMode(frameDoc, false);
                     await waitForPrintDocumentReady(frameDoc, 12000);
-                    tightenBookletDayPagesInDoc(frameDoc);
-                    splitOverflowBookletDayPagesInDoc(frameDoc);
-                    fixOrphanPhaseHeadersInDoc(frameDoc);
-                    await new Promise(function (resolve) { setTimeout(resolve, 100); });
+                    enforceBookletWatermarkClearanceInDoc(frameDoc);
+                    await new Promise(function (resolve) { setTimeout(resolve, 120); });
                     return await runBookletPdfInsideIframe(capture.frame, frameDoc, onProgress);
                 } finally {
                     if (capture && capture.doc) {
@@ -9812,7 +9721,6 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             async function saveOrShareBookletPdf(blob, filename) {
-                markSplashSeen();
                 markSoarvibePdfSession();
                 var file = new File([blob], filename, { type: 'application/pdf' });
                 var result = 'download';
@@ -9855,7 +9763,6 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     showModal('預覽尚未準備好，請稍候再試 📖', '📖');
                     return;
                 }
-                markSplashSeen();
                 markSoarvibePdfSession();
                 snapshotLayoutBaseline();
                 snapshotPrePdfLayoutHeight();
@@ -11671,7 +11578,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', function () {
                     refreshSoarvibeViewportHeight();
-                    navigator.serviceWorker.register('./service-worker.js?v=46').catch(function (err) {
+                    navigator.serviceWorker.register('./service-worker.js?v=47').catch(function (err) {
                         console.warn('[SOARVIBE] Service worker registration failed:', err);
                     });
                 });
@@ -11692,18 +11599,16 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 setTimeout(function () { refreshSoarvibeViewportHeight({ force: true }); }, 120);
             });
             window.addEventListener('pageshow', function (ev) {
-                if (ev.persisted || soarvibePdfSessionActive) {
+                if (ev.persisted) {
                     refreshSoarvibeViewportHeight({ force: true });
-                    restoreHomeLayoutAfterBooklet({ hard: soarvibePdfSessionActive });
+                }
+                if (soarvibePdfSessionActive && !document.documentElement.classList.contains('booklet-preview-open')) {
+                    setTimeout(returnHomeAfterPdfViewerClose, 120);
                 }
             });
             if (window.visualViewport) {
                 window.visualViewport.addEventListener('resize', function () {
                     if (document.documentElement.classList.contains('soarvibe-keyboard-open') || isSoarvibeKeyboardLikelyOpen()) {
-                        return;
-                    }
-                    if (soarvibePdfSessionActive) {
-                        restoreHomeLayoutAfterBooklet({ hard: true });
                         return;
                     }
                     refreshSoarvibeViewportHeight();
