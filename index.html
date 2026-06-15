@@ -631,16 +631,23 @@
             border-radius: 10px;
             border-left: 3px solid #80CBC4;
         }
+        #ai-content .activity-head {
+            line-height: 1.45;
+            margin-bottom: 0.15rem;
+        }
         #ai-content .activity-time {
-            display: inline-block;
+            display: inline;
             font-weight: 800;
             color: #1565c0;
             font-size: 0.75rem;
             margin-right: 0.35rem;
+            white-space: nowrap;
         }
         #ai-content .activity-title {
+            display: inline;
             font-weight: 700;
             color: #37474F;
+            font-size: 0.8125rem;
         }
         #ai-content .activity-highlight {
             font-size: 0.75rem;
@@ -1817,8 +1824,8 @@
             }
             body > .app-shell {
                 width: 100% !important;
-                height: 100dvh !important;
-                min-height: 100dvh !important;
+                height: var(--soarvibe-vh, 100dvh) !important;
+                min-height: var(--soarvibe-vh, 100dvh) !important;
                 max-width: none !important;
                 max-height: none !important;
                 margin: 0 !important;
@@ -2123,7 +2130,7 @@
                         </div>
                     </article>
                     <article class="city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" data-city="北海道" aria-label="快速填入北海道隨機行程範本">
-                        <img src="https://images.unsplash.com/photo-1629725593792-727bbe2255b2?auto=format&fit=crop&w=600&q=85" alt="北海道富良野花田" loading="lazy" class="absolute inset-0 w-full h-full object-cover pointer-events-none">
+                        <img src="https://images.unsplash.com/photo-1741225241678-0c7f8fa07917?auto=format&fit=crop&w=600&q=85" alt="北海道札幌雪景" loading="lazy" class="absolute inset-0 w-full h-full object-cover pointer-events-none">
                         <div class="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/75 to-transparent pointer-events-none">
                             <span class="text-white font-bold text-sm">北海道</span>
                         </div>
@@ -2429,6 +2436,8 @@
                 '沖繩': ['海島', '湛藍', '慢活'],
                 '北海道': ['雪國', '北國', '浪漫'],
                 '首爾': ['韓潮', '時尚', '歐膩'],
+                '釜山': ['海港', '韓食', '文青'],
+                '濟州': ['海島', '慢活', '湛藍'],
                 '曼谷': ['熱情', '泰式', '繽紛'],
                 '新加坡': ['獅城', '花園', '多元'],
                 '巴黎': ['浪漫', '時尚', '左岸'],
@@ -2455,6 +2464,11 @@
                 if (/okinawa|沖繩/i.test(raw)) return '沖繩';
                 if (/hokkaido|北海道|sapporo|札幌/i.test(raw)) return '北海道';
                 if (/seoul|首尔|首爾/i.test(raw)) return '首爾';
+                if (/busan|釜山/i.test(raw)) return '釜山';
+                if (/jeju|濟州|济州/i.test(raw)) return '濟州';
+                if (/incheon|仁川/i.test(raw)) return '仁川';
+                if (/daegu|大邱/i.test(raw)) return '大邱';
+                if (/gwangju|光州/i.test(raw)) return '光州';
                 if (/bangkok|曼谷/i.test(raw)) return '曼谷';
                 if (/singapore|新加坡/i.test(raw)) return '新加坡';
                 if (/paris|巴黎/i.test(raw)) return '巴黎';
@@ -2513,9 +2527,8 @@
                 '京都': './cover-photos/kyoto.jpg',
                 '首爾': './cover-photos/seoul.jpg',
                 '曼谷': './cover-photos/bangkok.jpg',
-                '新加坡': './cover-photos/tokyo.jpg',
                 '沖繩': './cover-photos/okinawa.jpg',
-                '北海道': './cover-photos/hokkaido.jpg',
+                '北海道': 'https://images.unsplash.com/photo-1741225241678-0c7f8fa07917?auto=format&fit=crop&w=1600&q=85',
                 '倫敦': './cover-photos/london.jpg',
                 '巴黎': './cover-photos/paris.jpg'
             };
@@ -2524,14 +2537,249 @@
                 '東京': 'https://images.unsplash.com/photo-1648301184879-28c6ed4964d7?auto=format&fit=crop&w=1600&q=85',
                 '京都': 'https://images.unsplash.com/photo-1573047330192-4e6bb1594325?auto=format&fit=crop&w=1600&q=85',
                 '首爾': 'https://images.unsplash.com/photo-1517154421773-0529f29ea451?auto=format&fit=crop&w=1600&q=85',
+                '釜山': 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?auto=format&fit=crop&w=1600&q=85',
+                '濟州': 'https://images.unsplash.com/photo-1586278365265-e3052ba0882b?auto=format&fit=crop&w=1600&q=85',
+                '仁川': 'https://images.unsplash.com/photo-1517154421773-0529f29ea451?auto=format&fit=crop&w=1600&q=85',
+                '大邱': 'https://images.unsplash.com/photo-1517154421773-0529f29ea451?auto=format&fit=crop&w=1600&q=85',
+                '光州': 'https://images.unsplash.com/photo-1517154421773-0529f29ea451?auto=format&fit=crop&w=1600&q=85',
                 '大阪': 'https://images.unsplash.com/photo-1590559899731-a38283956a55?auto=format&fit=crop&w=1600&q=85',
-                '北海道': 'https://images.unsplash.com/photo-1629725593792-727bbe2255b2?auto=format&fit=crop&w=1600&q=85',
+                '北海道': 'https://images.unsplash.com/photo-1741225241678-0c7f8fa07917?auto=format&fit=crop&w=1600&q=85',
                 '曼谷': 'https://images.unsplash.com/photo-1768392810963-017c92313d79?auto=format&fit=crop&w=1600&q=85',
                 '倫敦': 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=1600&q=85',
                 '巴黎': 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1600&q=85',
                 '新加坡': 'https://images.unsplash.com/photo-1525621488850-45826425d4a?auto=format&fit=crop&w=1600&q=85',
-                '沖繩': 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?auto=format&fit=crop&w=1600&q=85'
+                '沖繩': 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?auto=format&fit=crop&w=1600&q=85',
+                '香港': 'https://images.unsplash.com/photo-1536596783564-2d6a2b3979b2?auto=format&fit=crop&w=1600&q=85',
+                '澳門': 'https://images.unsplash.com/photo-1596422846543-75c6fc5f3999?auto=format&fit=crop&w=1600&q=85',
+                '台北': 'https://images.unsplash.com/photo-1470006985019-6c9325004491?auto=format&fit=crop&w=1600&q=85',
+                '台灣': 'https://images.unsplash.com/photo-1470006985019-6c9325004491?auto=format&fit=crop&w=1600&q=85',
+                '峇里島': 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=1600&q=85',
+                '清邁': 'https://images.unsplash.com/photo-1528181304800-259f0d005963?auto=format&fit=crop&w=1600&q=85',
+                '普吉島': 'https://images.unsplash.com/photo-1552465011-b5f7c7c9f991?auto=format&fit=crop&w=1600&q=85',
+                '胡志明': 'https://images.unsplash.com/photo-1583417319070-4a69db38a482?auto=format&fit=crop&w=1600&q=85',
+                '河內': 'https://images.unsplash.com/photo-1583417319070-4a69db38a482?auto=format&fit=crop&w=1600&q=85',
+                '雪梨': 'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=1600&q=85',
+                '墨爾本': 'https://images.unsplash.com/photo-1514395462725-fb8496f2f2f4?auto=format&fit=crop&w=1600&q=85',
+                '紐約': 'https://images.unsplash.com/photo-1496442226666-8d0d0e62e049?auto=format&fit=crop&w=1600&q=85',
+                '洛杉磯': 'https://images.unsplash.com/photo-1503899037854-aa377763e787?auto=format&fit=crop&w=1600&q=85',
+                '舊金山': 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?auto=format&fit=crop&w=1600&q=85',
+                '拉斯維加斯': 'https://images.unsplash.com/photo-1605831897210-1977b711a5e1?auto=format&fit=crop&w=1600&q=85',
+                '夏威夷': 'https://images.unsplash.com/photo-1542259009477-d6250e29ef8f?auto=format&fit=crop&w=1600&q=85',
+                '杜拜': 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1600&q=85',
+                '羅馬': 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=1600&q=85',
+                '米蘭': 'https://images.unsplash.com/photo-151648363826-e23f96bb2717?auto=format&fit=crop&w=1600&q=85',
+                '威尼斯': 'https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?auto=format&fit=crop&w=1600&q=85',
+                '佛羅倫斯': 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&w=1600&q=85',
+                '巴塞隆納': 'https://images.unsplash.com/photo-1583422409516-2895a77efded?auto=format&fit=crop&w=1600&q=85',
+                '馬德里': 'https://images.unsplash.com/photo-1539037116277-4db20889f2d4?auto=format&fit=crop&w=1600&q=85',
+                '阿姆斯特丹': 'https://images.unsplash.com/photo-1534351590666-13e3e96fd519?auto=format&fit=crop&w=1600&q=85',
+                '柏林': 'https://images.unsplash.com/photo-1560930950-5cc20c80c392?auto=format&fit=crop&w=1600&q=85',
+                '慕尼黑': 'https://images.unsplash.com/photo-1595867818082-083864f7e638?auto=format&fit=crop&w=1600&q=85',
+                '蘇黎世': 'https://images.unsplash.com/photo-1527661597135-525596e4a776?auto=format&fit=crop&w=1600&q=85',
+                '布拉格': 'https://images.unsplash.com/photo-1541849548739-2812f3a8a1b5?auto=format&fit=crop&w=1600&q=85',
+                '維也納': 'https://images.unsplash.com/photo-1516550906949-5b6336276af6?auto=format&fit=crop&w=1600&q=85',
+                '伊斯坦堡': 'https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?auto=format&fit=crop&w=1600&q=85',
+                '開羅': 'https://images.unsplash.com/photo-1572252009286-0a235e7e28a0?auto=format&fit=crop&w=1600&q=85',
+                '馬爾地夫': 'https://images.unsplash.com/photo-1514282401047-d79a71a590e8?auto=format&fit=crop&w=1600&q=85',
+                '吉隆坡': 'https://images.unsplash.com/photo-1596422846543-75c6fc5f3999?auto=format&fit=crop&w=1600&q=85',
+                '檳城': 'https://images.unsplash.com/photo-1596422846543-75c6fc5f3999?auto=format&fit=crop&w=1600&q=85',
+                '宿霧': 'https://images.unsplash.com/photo-1528181304800-259f0d005963?auto=format&fit=crop&w=1600&q=85',
+                '馬尼拉': 'https://images.unsplash.com/photo-1528181304800-259f0d005963?auto=format&fit=crop&w=1600&q=85',
+                '冰島': 'https://images.unsplash.com/photo-1504829857797-ddff29c27927?auto=format&fit=crop&w=1600&q=85',
+                '挪威': 'https://images.unsplash.com/photo-1584170468397-2a59dc8948a4?auto=format&fit=crop&w=1600&q=85',
+                '芬蘭': 'https://images.unsplash.com/photo-1586125916870-958d645d407e?auto=format&fit=crop&w=1600&q=85',
+                '瑞士': 'https://images.unsplash.com/photo-1664954628844-a83af173ce74?auto=format&fit=crop&w=1600&q=85',
+                '上海': 'https://images.unsplash.com/photo-1538422847192-9529e8bf3f6a?auto=format&fit=crop&w=1600&q=85',
+                '北京': 'https://images.unsplash.com/photo-1508804185872-d83badb0d6e2?auto=format&fit=crop&w=1600&q=85',
+                '成都': 'https://images.unsplash.com/photo-1584270354949-c26b0d646042?auto=format&fit=crop&w=1600&q=85',
+                '加拿大': 'https://images.unsplash.com/photo-1503614472-8c93d56e92ce?auto=format&fit=crop&w=1600&q=85',
+                '溫哥華': 'https://images.unsplash.com/photo-1559511647-0f0a5c0f8a0e?auto=format&fit=crop&w=1600&q=85',
+                '多倫多': 'https://images.unsplash.com/photo-1517935706615-2717063c2225?auto=format&fit=crop&w=1600&q=85',
+                '札幌': 'https://images.unsplash.com/photo-1741225241678-0c7f8fa07917?auto=format&fit=crop&w=1600&q=85',
+                '長野': 'https://images.unsplash.com/photo-1721370336185-d24b8152fd37?auto=format&fit=crop&w=1600&q=85',
+                '哈爾濱': 'https://images.unsplash.com/photo-1644471407830-6ef0e338e08f?auto=format&fit=crop&w=1600&q=85',
+                '皇后鎮': 'https://images.unsplash.com/photo-1595212665227-e8fdd2fb35c0?auto=format&fit=crop&w=1600&q=85',
+                '因特拉肯': 'https://images.unsplash.com/photo-1664954628844-a83af173ce74?auto=format&fit=crop&w=1600&q=85'
             };
+
+            /** 雪景 PDF 封面：每個 key 對應「可辨識的當地城市／景點」冬季照片，禁止共用通用雪景 */
+            const BOOKLET_SNOW_COVERS = {
+                '北海道': 'https://images.unsplash.com/photo-1741225241678-0c7f8fa07917?auto=format&fit=crop&w=1600&q=85',
+                '札幌': 'https://images.unsplash.com/photo-1741225241678-0c7f8fa07917?auto=format&fit=crop&w=1600&q=85',
+                '小樽': 'https://images.unsplash.com/photo-1629725593792-727bbe2255b2?auto=format&fit=crop&w=1600&q=85',
+                '函館': 'https://images.unsplash.com/photo-1770212646096-c1de6133970f?auto=format&fit=crop&w=1600&q=85',
+                '哈爾濱': 'https://images.unsplash.com/photo-1644471407830-6ef0e338e08f?auto=format&fit=crop&w=1600&q=85',
+                '長野': 'https://images.unsplash.com/photo-1721370336185-d24b8152fd37?auto=format&fit=crop&w=1600&q=85',
+                '挪威': 'https://images.unsplash.com/photo-1584170468397-2a59dc8948a4?auto=format&fit=crop&w=1600&q=85',
+                '羅弗敦': 'https://images.unsplash.com/photo-1615237925003-4afb292cb81f?auto=format&fit=crop&w=1600&q=85',
+                '特羅姆瑟': 'https://images.unsplash.com/photo-1641299868381-42c07960306c?auto=format&fit=crop&w=1600&q=85',
+                '因特拉肯': 'https://images.unsplash.com/photo-1664954628844-a83af173ce74?auto=format&fit=crop&w=1600&q=85',
+                '策馬特': 'https://images.unsplash.com/photo-1769029299006-82d59e37c746?auto=format&fit=crop&w=1600&q=85',
+                '瑞士': 'https://images.unsplash.com/photo-1710891516618-16e03c8ac2ef?auto=format&fit=crop&w=1600&q=85',
+                '芬蘭': 'https://images.unsplash.com/photo-1586125916870-958d645d407e?auto=format&fit=crop&w=1600&q=85',
+                '班夫': 'https://images.unsplash.com/photo-1720733947921-4ecb2e88c797?auto=format&fit=crop&w=1600&q=85',
+                '加拿大雪': 'https://images.unsplash.com/photo-1714278934590-0bad2e0fdec1?auto=format&fit=crop&w=1600&q=85',
+                '美國雪': 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1600&q=85',
+                '韓國雪': 'https://images.unsplash.com/photo-1637073758491-9c0bc254510c?auto=format&fit=crop&w=1600&q=85',
+                '平昌': 'https://images.unsplash.com/photo-1768134465376-17ae04a08b2b?auto=format&fit=crop&w=1600&q=85',
+                '皇后鎮': 'https://images.unsplash.com/photo-1595212665227-e8fdd2fb35c0?auto=format&fit=crop&w=1600&q=85',
+                '冰島': 'https://images.unsplash.com/photo-1504829857797-ddff29c27927?auto=format&fit=crop&w=1600&q=85'
+            };
+
+            /** 知名雪景／滑雪目的地 → 使用 BOOKLET_SNOW_COVERS（優先於一般城市封面；越具體的規則放越前面） */
+            const BOOKLET_SNOW_DESTINATION_PATTERNS = [
+                [/otaru|小樽/i, '小樽'],
+                [/sapporo|札幌/i, '札幌'],
+                [/hakodate|函館/i, '函館'],
+                [/hokkaido|北海道|furano|富良野|niseko|二世谷|旭川|帶廣|登別/i, '北海道'],
+                [/harbin|哈爾濱|哈尔滨|冰雪大世界|冰雕/i, '哈爾濱'],
+                [/nagano|長野|长野|白馬|hakuba|苗場|湯澤|yuzawa|輕井澤|karuizawa/i, '長野'],
+                [/finland|芬蘭|lapland|羅瓦涅米|rovaniemi|helsinki/i, '芬蘭'],
+                [/lofoten|羅弗敦|reine|hamn[oø]y|hamnoy/i, '羅弗敦'],
+                [/troms[oø]|tromso|特羅姆瑟/i, '特羅姆瑟'],
+                [/norway|挪威|oslo|奧斯陸|bergen|卑爾根/i, '挪威'],
+                [/zermatt|策馬特|matterhorn|馬特洪峰/i, '策馬特'],
+                [/interlaken|因特拉肯|grindelwald|lauterbrunnen|jungfrau|少女峰|bernese|伯恩/i, '因特拉肯'],
+                [/switzerland|瑞士|st\.?\s*moritz|geneva|日內瓦|geneve|蘇黎世/i, '瑞士'],
+                [/queenstown|皇后鎮|wanaka|瓦納卡|tekapo|remarkables|紐西蘭.*(雪|ski|滑雪)/i, '皇后鎮'],
+                [/banff|班夫|jasper|賈斯珀/i, '班夫'],
+                [/whistler|惠斯勒|mont-tremblant|魁北克.*冬|vancouver.*雪|加拿大.*(雪|ski|滑雪)/i, '加拿大雪'],
+                [/aspen|aspens|denver|colorado|科罗拉|阿拉斯加|alaska|anchorage|salt\s*lake|park\s*city|美國.*(雪|ski|滑雪)|美国.*(雪|ski|滑雪)/i, '美國雪'],
+                [/pyeongchang|平昌|gangwon|江原道.*(雪|ski|滑雪)/i, '平昌'],
+                [/韓國.*(雪|ski|滑雪)|韩国.*(雪|ski|滑雪)|seoul.*(雪|winter|冬|ski|滑雪)|首爾.*(雪|冬|ski|滑雪)/i, '韓國雪'],
+                [/iceland|冰島/i, '冰島']
+            ];
+
+            function resolveSnowBookletCoverKey(destination) {
+                var raw = String(destination || '').trim();
+                if (!raw) return '';
+                var i;
+                for (i = 0; i < BOOKLET_SNOW_DESTINATION_PATTERNS.length; i++) {
+                    if (BOOKLET_SNOW_DESTINATION_PATTERNS[i][0].test(raw)) {
+                        return BOOKLET_SNOW_DESTINATION_PATTERNS[i][1];
+                    }
+                }
+                return '';
+            }
+
+            const BOOKLET_COVER_CITY_PATTERNS = [
+                [/busan|釜山/i, '釜山'],
+                [/jeju|濟州|济州/i, '濟州'],
+                [/incheon|仁川/i, '仁川'],
+                [/daegu|大邱/i, '大邱'],
+                [/gwangju|光州/i, '光州'],
+                [/seoul|首尔|首爾/i, '首爾'],
+                [/tokyo|東京/i, '東京'],
+                [/osaka|大阪/i, '大阪'],
+                [/kyoto|京都/i, '京都'],
+                [/okinawa|沖繩/i, '沖繩'],
+                [/hokkaido|北海道|sapporo|札幌/i, '北海道'],
+                [/bangkok|曼谷/i, '曼谷'],
+                [/chiang\s*mai|清邁/i, '清邁'],
+                [/phuket|普吉/i, '普吉島'],
+                [/bali|峇里/i, '峇里島'],
+                [/ho\s*chi\s*minh|胡志明|saigon/i, '胡志明'],
+                [/hanoi|河內/i, '河內'],
+                [/singapore|新加坡/i, '新加坡'],
+                [/hong\s*kong|香港/i, '香港'],
+                [/macau|macao|澳門|澳门/i, '澳門'],
+                [/taipei|台北/i, '台北'],
+                [/taiwan|台灣|台湾/i, '台灣'],
+                [/shanghai|上海/i, '上海'],
+                [/beijing|北京/i, '北京'],
+                [/chengdu|成都/i, '成都'],
+                [/paris|巴黎/i, '巴黎'],
+                [/london|倫敦/i, '倫敦'],
+                [/rome|羅馬/i, '羅馬'],
+                [/milan|米蘭/i, '米蘭'],
+                [/venice|威尼斯/i, '威尼斯'],
+                [/florence|佛羅倫斯/i, '佛羅倫斯'],
+                [/barcelona|巴塞隆納/i, '巴塞隆納'],
+                [/madrid|馬德里/i, '馬德里'],
+                [/amsterdam|阿姆斯特丹/i, '阿姆斯特丹'],
+                [/berlin|柏林/i, '柏林'],
+                [/munich|慕尼黑/i, '慕尼黑'],
+                [/zurich|蘇黎世/i, '蘇黎世'],
+                [/prague|布拉格/i, '布拉格'],
+                [/vienna|維也納/i, '維也納'],
+                [/istanbul|伊斯坦堡/i, '伊斯坦堡'],
+                [/cairo|開羅/i, '開羅'],
+                [/maldives|馬爾地夫/i, '馬爾地夫'],
+                [/kuala\s*lumpur|吉隆坡/i, '吉隆坡'],
+                [/penang|檳城/i, '檳城'],
+                [/cebu|宿霧/i, '宿霧'],
+                [/manila|馬尼拉/i, '馬尼拉'],
+                [/sydney|雪梨/i, '雪梨'],
+                [/melbourne|墨爾本/i, '墨爾本'],
+                [/new\s*york|紐約/i, '紐約'],
+                [/los\s*angeles|洛杉磯|LA\b/i, '洛杉磯'],
+                [/san\s*francisco|舊金山/i, '舊金山'],
+                [/las\s*vegas|拉斯維加斯/i, '拉斯維加斯'],
+                [/hawaii|夏威夷/i, '夏威夷'],
+                [/dubai|杜拜/i, '杜拜'],
+                [/iceland|冰島/i, '冰島'],
+                [/norway|挪威/i, '挪威'],
+                [/finland|芬蘭/i, '芬蘭'],
+                [/vancouver|溫哥華/i, '溫哥華'],
+                [/toronto|多倫多/i, '多倫多']
+            ];
+
+            const BOOKLET_COUNTRY_COVER_FALLBACK = [
+                [/韓國|韩国|korea/i, '首爾'],
+                [/日本|japan/i, '東京'],
+                [/泰國|泰国|thailand/i, '曼谷'],
+                [/越南|vietnam/i, '胡志明'],
+                [/印尼|indonesia|bali/i, '峇里島'],
+                [/馬來西亞|马来西亚|malaysia/i, '吉隆坡'],
+                [/菲律賓|菲律宾|philippines/i, '宿霧'],
+                [/新加坡|singapore/i, '新加坡'],
+                [/香港|hong\s*kong/i, '香港'],
+                [/澳門|澳门|macau|macao/i, '澳門'],
+                [/台灣|台湾|taiwan/i, '台灣'],
+                [/英國|英国|uk|britain/i, '倫敦'],
+                [/法國|法国|france/i, '巴黎'],
+                [/德國|德国|germany/i, '柏林'],
+                [/義大利|意大利|italy/i, '羅馬'],
+                [/西班牙|spain/i, '巴塞隆納'],
+                [/荷蘭|荷兰|netherlands/i, '阿姆斯特丹'],
+                [/瑞士|switzerland/i, '蘇黎世'],
+                [/奧地利|奥地利|austria/i, '維也納'],
+                [/捷克|czech|prague/i, '布拉格'],
+                [/土耳其|turkey|istanbul/i, '伊斯坦堡'],
+                [/埃及|egypt/i, '開羅'],
+                [/澳洲|澳大利亚|australia/i, '雪梨'],
+                [/紐西蘭|新西兰|new\s*zealand/i, '雪梨'],
+                [/美國|美国|usa|america/i, '紐約'],
+                [/加拿大|canada/i, '溫哥華'],
+                [/阿聯酋|uae|dubai/i, '杜拜'],
+                [/馬爾地夫|maldives/i, '馬爾地夫'],
+                [/冰島|iceland/i, '冰島'],
+                [/北歐|norway|finland|scandinavia/i, '挪威'],
+                [/杜拜|迪拜|dubai|uae|阿聯酋|阿布扎比/i, '杜拜'],
+                [/馬爾地夫|马尔代夫|maldives/i, '馬爾地夫'],
+                [/中國|中国|china/i, '上海']
+            ];
+
+            function resolveBookletCoverKey(destination) {
+                var raw = String(destination || '').trim();
+                if (!raw) return '';
+                var epithetKey = resolveEpithetCityKey(raw);
+                if (BOOKLET_LOCAL_COVERS[epithetKey] || BOOKLET_DESTINATION_COVERS[epithetKey]) {
+                    return epithetKey;
+                }
+                var i;
+                for (i = 0; i < BOOKLET_COVER_CITY_PATTERNS.length; i++) {
+                    if (BOOKLET_COVER_CITY_PATTERNS[i][0].test(raw)) {
+                        return BOOKLET_COVER_CITY_PATTERNS[i][1];
+                    }
+                }
+                for (i = 0; i < BOOKLET_COUNTRY_COVER_FALLBACK.length; i++) {
+                    if (BOOKLET_COUNTRY_COVER_FALLBACK[i][0].test(raw)) {
+                        return BOOKLET_COUNTRY_COVER_FALLBACK[i][1];
+                    }
+                }
+                return epithetKey;
+            }
 
             const BOOKLET_DESTINATION_INTRO = {
                 '東京': {
@@ -2740,6 +2988,7 @@
             const BOOKLET_CULTURE_SECTIONS = {
                 '東京': {
                     lead: '東京是日本首都，也是世界級大都會。這座城市同時保有江戶時代傳承下來的寺社與下町風情，也引領著全球潮流、科技與設計。無論是第一次造訪或多次重遊，東京總能在傳統與現代之間給旅人新的驚喜。',
+                    leadExtra: '淺草、上野、谷中一帶可感受下町人情；澀谷、原宿、表參道則是潮流與設計重鎮；新宿、銀座、六本木代表夜生活與高端消費。地鐵與 JR 路網密集，Suica／Pasmo 幾乎必備。熱門景點如 teamLab、迪士尼、晴空塔建議提前購票，錯峰用餐能大幅節省排隊時間。',
                     sections: [
                         { icon: '🏙️', title: '城市面貌', text: '東京由多個風格迥異的區域組成：浅草・上野保留江戶韻味，澀谷・原宿是年輕潮流核心，新宿・銀座則代表繁華商業與夜生活。建議以「區域」而非「距離」規劃動線，減少跨區折返。' },
                         { icon: '🍜', title: '飲食文化', text: '從米其林餐廳到便利商店飯團，東京的飲食光譜極其寬廣。拉麵、壽司、天婦羅、居酒屋是經典入門；百貨地下街與車站便當則適合移動中快速補給。熱門名店常需排隊，離峰時段或預約是聰明選擇。' },
@@ -2749,6 +2998,7 @@
                 },
                 '大阪': {
                     lead: '大阪是關西的政治、經濟與文化重鎮，以「天下廚房」聞名。這裡的人們熱情直率，美食種類從街頭章魚燒、串炸到高級壽司應有盡有，夜生活與購物也極其豐富，是感受關西活力的最佳起點。',
+                    leadExtra: '道頓堀、心齋橋、新世界、梅田是四大美食與購物核心；大阪城、通天閣則是歷史地標。若行程包含 USJ，建議預留完整一日並提前購買快速通關。大阪也是延伸京都、奈良、神戸的交通樞紐，ICOCA 卡通用於關西圈，換乘時請預留步行時間。',
                     sections: [
                         { icon: '🍢', title: '飲食與夜生活', text: '道頓堀、新世界、梅田是三大美食重鎮。大阪人愛吃、愛聊、愛熱鬧，居酒屋文化盛行。許多餐廳 20:00 後仍營業，但熱門店晚餐尖峰需排隊，建議提早或改宵夜時段。' },
                         { icon: '🌃', title: '城市個性', text: '相較京都的內斂，大阪更外向活潑。街頭霓虹、商店街叫賣聲、USJ 的歡樂氛圍，共同構成關西獨有的「明るい」文化。' },
@@ -2758,6 +3008,7 @@
                 },
                 '京都': {
                     lead: '京都曾是日本千年首都，保存了全國最完整的傳統文化景觀。這裡有世界遺產寺社、藝伎文化、茶道與和菓子，四季分明更讓春櫻、秋楓成為舉世聞名的風景。在京都旅行，節奏不妨放慢，細細感受「和」之美。',
+                    leadExtra: '伏見稻荷、清水寺、金閣寺、嵐山竹林是初訪必排；祇園、先斗町一帶可體驗茶屋文化。巴士在觀光區比地鐵更實用，一日券搭配步行是慢遊京都的最佳方式。寺社參拜需脫鞋，部分堂內禁止拍照，穿著好走的鞋子並尊重當地居民生活空間，旅程會更順遂。',
                     sections: [
                         { icon: '⛩️', title: '宗教與歷史', text: '京都擁有超過兩千座寺社，許多為世界遺產。參拜時需脫帽、部分堂內禁止拍照。清水寺、金閣寺、伏見稻荷等名所人潮眾多，開園前或閉園前是較清靜時段。' },
                         { icon: '🍵', title: '傳統工藝與飲食', text: '京料理講究季節與擺盤，懷石、湯豆腐是代表。祇園、先斗町一帶可體驗茶屋文化；和菓子、漬物也是經典伴手禮。' },
@@ -2767,6 +3018,7 @@
                 },
                 '北海道': {
                     lead: '北海道是日本最北的大島，幅員遼闊、人口稀疏，自然景觀壓倒性勝過都市感。這裡有世界級雪場、夏季花田、海鮮市場與溫泉，四季各有擁護，是喜歡大自然與美食旅人的天堂。',
+                    leadExtra: '札幌作為北海道門戶，集結購物、美食與交通樞紐；小樽運河、函館夜景、富良野花田、旭山動物園則是延伸經典。跨城市移動車程較長，建議每日排程保留彈性，不要把景點塞太滿。飲食上，味噌拉麵、成吉思汗烤肉、海鮮丼與乳製品是代表；冬季賞雪、夏季避暑、秋季紅葉各有風情，出發前確認 JR PASS 或租車需求，方能充分感受北國魅力。',
                     sections: [
                         { icon: '🌿', title: '自然與季節', text: '春櫻、夏薰衣草、秋楓、冬雪，北海道四季皆美。行程常需跨城市移動，車程較長，建議預留緩衝。' },
                         { icon: '🦀', title: '飲食特色', text: '札幌味噌拉麵、函館海鮮丼、旭川拉麵、乳製品與哈密瓜是代表。海鮮市場建議早上前往，最新鮮。' },
@@ -2776,6 +3028,7 @@
                 },
                 '沖繩': {
                     lead: '沖繩是日本最南端的熱帶群島，曾為獨立琉球王國，文化融合日本、中國與東南亞元素。這裡有湛藍海水、白色沙灘、慢活節奏，與本州截然不同的度假氛圍。',
+                    leadExtra: '那霸國際通適合美食與伴手禮，首里城、美麗海水族館、古宇利島、恩納海灘是經典動線。本島幅員不大但公車班次有限，租車自駕最自由（需國際駕照＋日文譯本）。紫外線強、午後偶有雷陣雨，防曬、泳具與颱風季天氣預報都需留意。',
                     sections: [
                         { icon: '🏝️', title: '海島文化', text: '琉球文化體現在服飾、音樂、建築與飲食。首里城、傳統工藝村是認識歷史的窗口；海灘與離島則適合水上活動。' },
                         { icon: '🐠', title: '海洋與生態', text: '美麗海水族館、潜水、浮潛是熱門選項。請尊重海洋生態，不觸摸珊瑚；防曬與泳具必備。' },
@@ -2785,6 +3038,7 @@
                 },
                 '首爾': {
                     lead: '首爾是韓國首都，K-Pop、K-Drama、K-Beauty 與傳統韓屋在此交會。這座城市節奏明快，地鐵網絡發達，從景福宮的歷史到弘大的潮流，一日之內就能感受強烈對比。',
+                    leadExtra: '景福宮、北村韓屋村代表朝鮮時代；明洞、弘大、聖水洞則是購物與美食重鎮。T-money 或 WOWPASS 幾乎必備，後者還可兼行動支付。韓式烤肉、炸雞、部隊鍋、路邊小吃是日常，乾燥季節請備保濕用品，地鐵換乘步行距離長，預留 10 分鐘緩衝較安心。',
                     sections: [
                         { icon: '🏯', title: '傳統與現代', text: '景福宮、北村韓屋村代表朝鮮時代；江南、聖水洞則是時尚與設計新據點。' },
                         { icon: '🍗', title: '飲食文化', text: '韓式烤肉、炸雞、部隊鍋、路邊小吃是日常。許多餐廳提供小菜無限續，明洞、弘大是美食集中區。' },
@@ -2794,6 +3048,7 @@
                 },
                 '曼谷': {
                     lead: '曼谷是東南亞最繽紛的首都之一，金碧輝煌的寺廟與現代商場並存，街頭小吃與米其林餐廳僅一街之隔。這裡熱情、 chaotic 卻充滿生命力，是認識泰國文化的絕佳入口。',
+                    leadExtra: '大皇宮、臥佛寺、鄭王廟需 2–3 小時參觀，進入寺廟須遮蔽肩膝、脫鞋。洽圖洽周末市集、湄南河遊船、暹羅商圈適合分日安排。BTS、MRT 可避開塞車，計程車請堅持 By Meter；Pad Thai、冬陰功、芒果糯米是必嚐，午間炎熱可安排按摩或商場動線。',
                     sections: [
                         { icon: '🛕', title: '宗教與寺廟', text: '佛教是泰國核心信仰。進入寺廟需遮蔽肩膝、脫鞋。大皇宮、臥佛寺等需 2–3 小時參觀。' },
                         { icon: '🍜', title: '街頭美食', text: 'Pad Thai、冬陰功、芒果糯米是經典。路邊攤與夜市是體驗正統風味的最佳方式，注意冰塊與生鮮衛生。' },
@@ -2803,6 +3058,7 @@
                 },
                 '新加坡': {
                     lead: '新加坡是東南亞的現代化花園城市，多元種族（華人、馬來、印度）融合出獨特文化。這裡以乾淨、安全、高效著稱，是初次東南亞旅行的理想起點。',
+                    leadExtra: '濱海灣金沙、魚尾獅、聖淘沙、牛車水、小印度、濱海灣花園是經典動線。食閣（Hawker Centre）是平民美食精髓，海南雞飯、叻沙、辣椒螃蟹必嚐。MRT 覆蓋主要景點，EZ-Link 或信用卡感應皆可；終年炎熱潮濕，午後陣雨頻繁，商場冷氣強請備薄外套。',
                     sections: [
                         { icon: '🦁', title: '多元文化', text: '牛車水、小印度、甘榜格南各有鲜明特色。英語為官方語言，華語普遍可通。' },
                         { icon: '🍜', title: '飲食', text: '食閣（Hawker Centre）是平民美食精髓，海南雞飯、叻沙、辣椒螃蟹必嚐。' },
@@ -2812,6 +3068,7 @@
                 },
                 '倫敦': {
                     lead: '倫敦是大英帝國遺產與現代創新的交會點，擁有世界級博物館、皇室傳統、西區音樂劇與多元移民文化。這座城市歷史感深厚，卻又持續推動藝術、金融與科技。',
+                    leadExtra: '大英博物館、自然史博物館等多數免費入場；白金漢宮衛兵換崗、倫敦塔橋、泰晤士河畔是經典動線。Oyster 卡或 Contactless 適用於地鐵與巴士，右側通行、過馬路先看右。天氣多變，輕便雨衣比雨傘實用，西區音樂劇建議提前訂票。',
                     sections: [
                         { icon: '🏛️', title: '歷史與博物館', text: '大英博物館、自然史博物館等多數免費入場。白金漢宮衛兵換崗是經典儀式。' },
                         { icon: '🎭', title: '文化娛樂', text: '西區音樂劇、莎士比亞環球劇場、科文特園市集是必體驗。' },
@@ -2821,6 +3078,7 @@
                 },
                 '巴黎': {
                     lead: '巴黎被譽為「光之城」，是藝術、時尚、建築與美食的世界首都。塞納河畔的艾菲爾鐵塔、羅浮宮的蒙娜 Lisa、左岸的咖啡館，構成最經典的法式浪漫想像。',
+                    leadExtra: '羅浮宮、奧賽、龐畢度中心是藝術愛好者聖地，建議預約時段避免排隊。地鐵密集但月台換乘多、樓梯長，注意扒手、背包前背。午餐 12–14 點、晚餐 19:30 後是慣例，週日許多商店休息；河邊野餐、露天咖啡是 local 日常，慢下來品味最巴黎。',
                     sections: [
                         { icon: '🗼', title: '藝術與建築', text: '羅浮宮、奧賽、龐畢度中心是藝術愛好者聖地。建議預約時段避免排隊。' },
                         { icon: '🥐', title: '飲食', text: '可頌、法棍、起司、紅酒是日常。午餐 12–14 點、晚餐 19:30 後是慣例。' },
@@ -2891,6 +3149,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
+            const SOARVIBE_APP_BUILD = 'v39';
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
@@ -3014,6 +3273,8 @@
                 { re: /溫哥華|多伦多|多倫多|加拿大|Canada|Vancouver|Toronto/i, profile: { country: '加拿大', currency: 'CAD', currencyName: '加幣', waysimQuery: '加拿大 eSIM' } },
                 { re: /雪梨|悉尼|墨爾本|墨尔本|澳洲|澳大利亚|Australia|Sydney|Melbourne|Brisbane/i, profile: { country: '澳洲', currency: 'AUD', currencyName: '澳幣', waysimQuery: '澳洲 eSIM' } },
                 { re: /紐西蘭|新西兰|New\s*Zealand|Auckland|Queenstown/i, profile: { country: '紐西蘭', currency: 'NZD', currencyName: '紐西蘭幣', waysimQuery: '紐西蘭 eSIM' } },
+                { re: /杜拜|迪拜|Dubai|Abu\s*Dhabi|阿布扎比|UAE|阿聯酋/i, profile: { country: '阿聯酋', currency: 'AED', currencyName: '阿聯酋迪拉姆', waysimQuery: '阿聯酋 eSIM' } },
+                { re: /馬爾地夫|马尔代夫|Maldives|Male|馬累/i, profile: { country: '馬爾地夫', currency: 'USD', currencyName: '美元', waysimQuery: '馬爾地夫 eSIM' } },
                 { re: CHINA_DESTINATION_RE, profile: { country: '中國', currency: 'CNY', currencyName: '人民幣', waysimQuery: '中國 eSIM' } }
             ];
 
@@ -3024,10 +3285,18 @@
                 '沖繩': { lat: 26.2124, lng: 127.6792, regionCode: 'JP', country: '日本', searchRadiusM: 20000 },
                 '北海道': { lat: 43.0618, lng: 141.3545, regionCode: 'JP', country: '日本', searchRadiusM: 25000 },
                 '首爾': { lat: 37.5665, lng: 126.9780, regionCode: 'KR', country: '韓國', searchRadiusM: 15000 },
+                '釜山': { lat: 35.1796, lng: 129.0756, regionCode: 'KR', country: '韓國', searchRadiusM: 16000 },
+                '濟州': { lat: 33.4996, lng: 126.5312, regionCode: 'KR', country: '韓國', searchRadiusM: 22000 },
+                '仁川': { lat: 37.4563, lng: 126.7052, regionCode: 'KR', country: '韓國', searchRadiusM: 15000 },
+                '大邱': { lat: 35.8714, lng: 128.6014, regionCode: 'KR', country: '韓國', searchRadiusM: 14000 },
+                '光州': { lat: 35.1595, lng: 126.8526, regionCode: 'KR', country: '韓國', searchRadiusM: 14000 },
                 '曼谷': { lat: 13.7563, lng: 100.5018, regionCode: 'TH', country: '泰國', searchRadiusM: 18000 },
                 '新加坡': { lat: 1.3521, lng: 103.8198, regionCode: 'SG', country: '新加坡', searchRadiusM: 12000 },
                 '巴黎': { lat: 48.8566, lng: 2.3522, regionCode: 'FR', country: '法國', searchRadiusM: 15000 },
-                '倫敦': { lat: 51.5074, lng: -0.1278, regionCode: 'GB', country: '英國', searchRadiusM: 15000 }
+                '倫敦': { lat: 51.5074, lng: -0.1278, regionCode: 'GB', country: '英國', searchRadiusM: 15000 },
+                '杜拜': { lat: 25.2048, lng: 55.2708, regionCode: 'AE', country: '阿聯酋', searchRadiusM: 20000 },
+                '上海': { lat: 31.2304, lng: 121.4737, regionCode: 'CN', country: '中國', searchRadiusM: 18000 },
+                '北京': { lat: 39.9042, lng: 116.4074, regionCode: 'CN', country: '中國', searchRadiusM: 18000 }
             };
 
             function kkdayKeywordUrl(keyword) {
@@ -3208,7 +3477,8 @@
                     { title: '全球 eSIM 方案', price: '依地區而定', desc: '威訊 WaySim 官方方案', url: WAYSIM_BASE_URL }
                 ]
             };
-            const ITINERARY_SKIP_RE = /機場|Check-in|Check in|前往|退房|送機|報到|候機|入境|提取行李|集合|轉機|返國|抵達機場|自由活動|伴手禮/;
+            const ITINERARY_SKIP_RE = /機場|Check-in|Check in|前往|退房|送機|報到|候機|入境|提取行李|集合|轉機|返國|抵達機場|伴手禮/;
+            const ITINERARY_LAZY_RE = /自由活動|自由行程|自由時間|彈性安排|彈性時間|彈性自由|可自行安排|待編排|補充行程|自由探索|自由漫遊|自由購物|自由選擇|彈性活動|自由活動或補充行程/;
             const RESTAURANT_RE = /餐廳|咖啡|珈琲|居酒屋|食堂|拉麵|燒肉|早餐|午餐|晚餐|下午茶|章魚燒|大阪燒|海鮮|丼|味噌|涮|鍋|酒吧|Bar|CAFE|串炸|小吃|甜點|名店|小館|燒|炸雞|烤肉|豆腐|料理|珈琲|咖啡廳|燒烤|飲料|酒場|天国|專賣/;
             const ATTRACTION_RE = /公園|寺|神社|神宮|塔|SKY|展望|城|博物館|迪士尼|海遊|環球|USJ|通天閣|市場|原宿|秋葉|銀座|淺草|上野|道頓|心齋|梅田|晴空|teamLab|廣場|水族|樂園|建築|橋|難波|清水|伏見|嵐山|祇園|天空|觀景|纜車|遊船|主題|雷門|迪士尼/;
 
@@ -3423,7 +3693,14 @@
             function getCityGeoProfile(city) {
                 var c = city || resolveCurrentCity();
                 var alias = KKDAY_CITY_CATALOG_ALIAS[c] || c;
-                return CITY_GEO_PROFILE[c] || CITY_GEO_PROFILE[alias] || CITY_GEO_PROFILE['東京'];
+                if (CITY_GEO_PROFILE[c]) return CITY_GEO_PROFILE[c];
+                if (CITY_GEO_PROFILE[alias]) return CITY_GEO_PROFILE[alias];
+                var coverKey = resolveBookletCoverKey(c);
+                if (coverKey && CITY_GEO_PROFILE[coverKey]) return CITY_GEO_PROFILE[coverKey];
+                if (/busan|釜山/i.test(c)) return CITY_GEO_PROFILE['釜山'];
+                if (/jeju|濟州|济州/i.test(c)) return CITY_GEO_PROFILE['濟州'];
+                if (isKoreaDestination(c)) return CITY_GEO_PROFILE['首爾'];
+                return CITY_GEO_PROFILE['東京'];
             }
 
             function composePlacesQuery(baseQuery, city, geo) {
@@ -3523,6 +3800,54 @@
 
             function isSkippableItineraryTitle(title) {
                 return ITINERARY_SKIP_RE.test(title);
+            }
+
+            function isLazyItineraryTitle(title) {
+                return ITINERARY_LAZY_RE.test(String(title || ''));
+            }
+
+            function isLazyItineraryDay(day, dayNum, totalDays) {
+                if (!day || dayNum === 1 || dayNum === totalDays) return false;
+                var lazyCount = 0;
+                var itemCount = 0;
+                (day.phases || []).forEach(function (phase) {
+                    getDayPhaseItems(phase).forEach(function (item) {
+                        itemCount += 1;
+                        var title = getActivityTitleFromItem(item);
+                        if (isLazyItineraryTitle(title)) lazyCount += 1;
+                    });
+                });
+                if (itemCount === 0) return true;
+                if (lazyCount >= Math.max(1, Math.ceil(itemCount / 2))) return true;
+                var afternoon = (day.phases || []).find(function (p) {
+                    return normalizePhaseLabel(p.label || p.period) === '下午';
+                });
+                var evening = (day.phases || []).find(function (p) {
+                    return normalizePhaseLabel(p.label || p.period) === '晚上';
+                });
+                if (afternoon && !getDayPhaseItems(afternoon).length) return true;
+                if (evening && !getDayPhaseItems(evening).length) return true;
+                return false;
+            }
+
+            function fillEmptyPhaseFromBackup(dayNum, phaseLabel, meta) {
+                var payload = {
+                    destination: (meta && meta.destination) || '',
+                    dateStart: meta && meta.dateStart,
+                    dateEnd: meta && meta.dateEnd
+                };
+                var backupDay = getBackupDayForIndex(payload, dayNum - 1);
+                if (!backupDay || !backupDay.phases) return null;
+                var match = null;
+                backupDay.phases.forEach(function (phase) {
+                    if (normalizePhaseLabel(phase.label || phase.period) === phaseLabel) {
+                        match = phase;
+                    }
+                });
+                if (match && getDayPhaseItems(match).length) {
+                    return JSON.parse(JSON.stringify(getDayPhaseItems(match)));
+                }
+                return null;
             }
 
             function isChinaDestination(text) {
@@ -3869,13 +4194,122 @@
                 if (badge && badge.parentNode) badge.parentNode.removeChild(badge);
             }
 
-            function openNaverMapNavigation(query) {
-                var q = String(query || '').trim();
-                if (!q) {
+            function extractHangulPhrase(text) {
+                var parts = String(text || '').match(/[\uAC00-\uD7A3][\uAC00-\uD7A3\s·.0-9A-Za-z-]*/g);
+                if (!parts || !parts.length) return '';
+                parts.sort(function (a, b) { return b.length - a.length; });
+                return parts[0].replace(/\s+/g, ' ').trim();
+            }
+
+            function resolveKoreanCityLabel(city) {
+                var c = String(city || '');
+                if (/釜山|busan/i.test(c)) return '부산';
+                if (/首爾|首尔|seoul/i.test(c)) return '서울';
+                if (/濟州|济州|jeju/i.test(c)) return '제주';
+                if (/仁川|incheon/i.test(c)) return '인천';
+                if (/大邱|daegu/i.test(c)) return '대구';
+                if (/光州|gwangju/i.test(c)) return '광주';
+                if (isKoreaDestination(c)) return '서울';
+                return '';
+            }
+
+            const NAVER_KOREA_PLACE_ALIASES = {
+                '甘川洞文化村': '감천문화마을',
+                '甘川洞': '감천문화마을',
+                '札嘎其市場': '자갈치시장',
+                '札嘎其': '자갈치시장',
+                '國際市場': '국제시장',
+                'BIFF廣場': 'BIFF 광장',
+                'BIFF 廣場': 'BIFF 광장',
+                '龍頭山公園': '용두산공원',
+                '釜山塔': '부산타워',
+                '海雲台': '해운대',
+                '海雲台海水浴場': '해운대해수욕장',
+                '廣安里': '광안리',
+                '廣安里大橋': '광안대교',
+                '冬柏島': '동백섬',
+                'APEC世峰樓': 'APEC 나루기공원',
+                '太宗台': '태종대',
+                '松島天空步道': '송도구름산책로',
+                '螞蟻家': '개미집',
+                '南浦洞': '남포동',
+                '西面': '서면',
+                '景福宮': '경복궁',
+                '北村韓屋村': '북촌한옥마을',
+                '北村': '북촌한옥마을',
+                '明洞': '명동',
+                '弘大': '홍대',
+                '東大門': '동대문',
+                'N首爾塔': 'N서울타워',
+                '南山首爾塔': 'N서울타워',
+                '廣藏市場': '광장시장',
+                '梨泰院': '이태원',
+                '聖水洞': '성수동',
+                '漢江': '한강',
+                '樂天世界': '롯데월드',
+                '愛寶樂園': '에버랜드',
+                '城山日出峰': '성산일출봉',
+                '牛島': '우도',
+                '涉地可支': '섭지코지'
+            };
+
+            function lookupNaverKoreaAlias(name) {
+                var cleaned = cleanPlaceName(String(name || ''));
+                cleaned = cleaned.replace(/^(前往|午餐|晚餐|早餐|早午餐|下午茶|造訪|參觀|漫步|散步|逛街|購物|採買|探訪|打卡|夜遊)[：:]\s*/i, '');
+                cleaned = cleaned.replace(/\([^)]*\)/g, '').trim();
+                if (NAVER_KOREA_PLACE_ALIASES[cleaned]) return NAVER_KOREA_PLACE_ALIASES[cleaned];
+                var keys = Object.keys(NAVER_KOREA_PLACE_ALIASES);
+                var i;
+                for (i = 0; i < keys.length; i++) {
+                    if (cleaned.indexOf(keys[i]) !== -1) return NAVER_KOREA_PLACE_ALIASES[keys[i]];
+                }
+                return '';
+            }
+
+            function buildNaverMapSearchQuery(item, city) {
+                city = city || resolveCurrentCity();
+                var name = cleanPlaceName((item && (item.name || item.title)) || '');
+                name = name.replace(/^(前往|午餐|晚餐|早餐|早午餐|下午茶|造訪|參觀|漫步|散步|逛街|購物|採買|探訪|打卡|夜遊)[：:]\s*/i, '');
+                var korean = String((item && item.koreanName) || '').trim();
+                var cityKr = resolveKoreanCityLabel(city);
+                if (korean) {
+                    if (cityKr && korean.indexOf(cityKr) === -1 && !/^[A-Za-z]/.test(korean)) {
+                        return cityKr + ' ' + korean;
+                    }
+                    return korean;
+                }
+                var aliasKr = lookupNaverKoreaAlias(name);
+                if (aliasKr) {
+                    return cityKr ? cityKr + ' ' + aliasKr : aliasKr;
+                }
+                var fromAddr = extractHangulPhrase(item && item.address);
+                if (fromAddr && fromAddr.length >= 2) return fromAddr;
+                var fromName = extractHangulPhrase(name);
+                if (fromName && fromName.length >= 2) return fromName;
+                if (cityKr && name) {
+                    var shortName = name.split(/[·・｜|]/)[0].trim();
+                    return cityKr + ' ' + shortName;
+                }
+                return name;
+            }
+
+            function openNaverMapNavigation(itemOrQuery) {
+                var item = typeof itemOrQuery === 'object' && itemOrQuery !== null
+                    ? itemOrQuery
+                    : { name: itemOrQuery };
+                var query = buildNaverMapSearchQuery(item, resolveCurrentCity());
+                if (!query) {
                     showModal('尚無可導航的地點名稱，請確認行程已生成。', '🧭');
                     return;
                 }
-                var nmapUrl = 'nmap://search?query=' + encodeURIComponent(q);
+                var nmapUrl;
+                if (item.lat != null && item.lng != null && !isNaN(Number(item.lat)) && !isNaN(Number(item.lng))) {
+                    nmapUrl = 'nmap://place?lat=' + encodeURIComponent(String(item.lat)) +
+                        '&lng=' + encodeURIComponent(String(item.lng)) +
+                        '&name=' + encodeURIComponent(query) + '&appname=soarvibe';
+                } else {
+                    nmapUrl = 'nmap://search?query=' + encodeURIComponent(query);
+                }
                 var pageHidden = false;
                 var onVis = function () {
                     if (document.hidden) pageHidden = true;
@@ -3885,7 +4319,7 @@
                 setTimeout(function () {
                     document.removeEventListener('visibilitychange', onVis);
                     if (!pageHidden) {
-                        showModal(MSG_NAVER_MAP_HINT, '🌸');
+                        showModal(MSG_NAVER_MAP_HINT + '\n\n若仍搜尋不到，請在 NAVER Map 直接搜尋：「' + query + '」', '🌸');
                     }
                 }, 1500);
             }
@@ -4061,6 +4495,7 @@
                 return {
                     id: place.place_id || ('legacy-' + Math.random().toString(36).slice(2)),
                     name: place.name || '景點＆美食',
+                    koreanName: extractHangulPhrase(place.name) || extractHangulPhrase(place.formatted_address || place.vicinity || ''),
                     rating: ratingText,
                     address: place.formatted_address || place.vicinity || '',
                     tag: '景點＆美食 · 近 ' + nearAttraction,
@@ -4132,9 +4567,12 @@
                 }
 
                 var rawPlaceId = place.id || '';
+                var displayName = getPlaceDisplayName(place) || place.name || '景點＆美食';
+                var koreanName = extractHangulPhrase(displayName) || extractHangulPhrase(place.formattedAddress || place.formatted_address || '');
                 return {
                     id: normalizePlaceIdForMaps(rawPlaceId) || ('place-' + Math.random().toString(36).slice(2)),
-                    name: getPlaceDisplayName(place) || place.name || '景點＆美食',
+                    name: displayName,
+                    koreanName: koreanName,
                     rating: ratingText,
                     address: place.formattedAddress || place.formatted_address || place.vicinity || '',
                     tag: '景點＆美食 · 近 ' + nearAttraction,
@@ -4262,7 +4700,13 @@
                 var koreanName = String((item && item.koreanName) || '').trim();
 
                 if (isKoreaDestination(city)) {
-                    openNaverMapNavigation(koreanName || name);
+                    openNaverMapNavigation({
+                        name: name,
+                        koreanName: koreanName,
+                        address: item && item.address,
+                        lat: item && item.lat,
+                        lng: item && item.lng
+                    });
                     return;
                 }
 
@@ -4774,6 +5218,59 @@
                         }
                     ]
                 },
+                '釜山': {
+                    summary: '✨ 【SOARVIBE 精選備援 · 釜山】「{style}」海港城市動線：甘川洞、海雲台、札嘎其、國際市場到廣安里夜景，美食與文青一次收齊。含地鐵／公車動線與排隊時段提醒。',
+                    days: [
+                        {
+                            day: 1,
+                            phases: [
+                                { period: '上午', items: ['10:30 - 12:00｜甘川洞文化村｜亮點：彩色階梯與小王子打卡，文青必訪｜備註：地鐵 1 號線土城站 6 號出口轉接社區巴士 1-1、2-2 至甘川文化村'] },
+                                { period: '下午', items: ['13:30 - 16:00｜札嘎其市場・BIFF 廣場｜亮點：現撈海鮮與釜山電影節地標｜備註：地鐵 1 號線札嘎其站，午餐建議 12:00 前後錯峰'] },
+                                { period: '晚上', items: ['18:00 - 20:30｜南浦洞・國際市場｜亮點：糖餅、魚糕串與夜間商圈｜備註：地鐵 1 號線南浦站，可順逛 BIFF 周邊'] }
+                            ]
+                        },
+                        {
+                            day: 2,
+                            phases: [
+                                { period: '上午', items: ['09:30 - 11:30｜海雲台海水浴場・Blueline Park｜亮點：海濱散步與膠囊列車｜備註：地鐵 2 號線海雲台站 3／5 號出口，週末較擁擠'] },
+                                { period: '下午', items: ['13:00 - 16:00｜冬柏島・APEC 世峰樓｜亮點：海雲台與廣安里間的絕美海岸｜備註：地鐵 2 號線冬柏站，步行約 15 分鐘'] },
+                                { period: '晚上', items: ['17:30 - 20:00｜廣安里大橋・The Bay 101｜亮點：廣安大橋夜景與遊艇碼頭｜備註：地鐵 2 號線金蓮山站，傍晚光線最佳'] }
+                            ]
+                        },
+                        {
+                            day: 3,
+                            phases: [
+                                { period: '上午', items: ['09:00 - 11:30｜太宗台・松島天空步道｜亮點：斷崖海景與透明步道｜備註：地鐵 1 號線南浦站轉公車 66、186 至太宗台'] },
+                                { period: '下午', items: ['13:00 - 15:30｜五六島・Skywalk｜亮點：海上玻璃步道，釜山必拍｜備註：地鐵 2 號線慶星大學站轉公車，風大備外套'] },
+                                { period: '晚上', items: ['18:00 - 20:00｜西面・Seomyeon 商圈｜亮點：釜山最熱鬧購物與豬肉湯飯｜備註：地鐵 1／2 號線西面站，週末人潮多'] }
+                            ]
+                        },
+                        {
+                            day: 4,
+                            phases: [
+                                { period: '上午', items: ['09:30 - 11:30｜龍頭山公園・釜山塔｜亮點：360 度市港全景，經典地標｜備註：地鐵 1 號線南浦站，可搭纜車上山'] },
+                                { period: '下午', items: ['13:00 - 16:00｜影島・白貽貝路・絲路市場｜亮點：韓綜同款階梯與在地小吃｜備註：地鐵 1 號線南浦站轉影島區域公車'] },
+                                { period: '晚上', items: ['18:00 - 20:30｜螞蟻家 南浦店（辣炒章魚蝦仁飯）｜亮點：釜山代表拌飯名店｜備註：南浦洞步行 5 分鐘，熱門時段需候位'] }
+                            ]
+                        },
+                        {
+                            day: 5,
+                            phases: [
+                                { period: '上午', items: ['09:30 - 11:30｜機張竹節蝦・大魚市場｜亮點：現場料理海鮮，釜山近郊美食｜備註：地鐵 2 號線 Centum City 站轉公車至機張'] },
+                                { period: '下午', items: ['13:00 - 16:00｜Centum City・Spaland 汗蒸幕｜亮點：新世界百貨內大型汗蒸，雨天備案｜備註：地鐵 2 號線 Centum City 站直達'] },
+                                { period: '晚上', items: ['18:00 - 20:00｜F1963 複合文化空間｜亮點：舊倉庫改造書店與展覽，質感夜遊｜備註：地鐵 2 號線 Centum City 站步行 10 分鐘'] }
+                            ]
+                        },
+                        {
+                            day: 6,
+                            phases: [
+                                { period: '上午', items: ['09:00 - 11:00｜南浦洞・樂天百貨・伴手禮採買｜亮點：魚糕、海苔與韓式零食集中｜備註：地鐵 1 號線南浦站，可寄放行李'] },
+                                { period: '下午', items: ['12:00 - 14:00｜釜山站 KTX 周邊・最後午餐｜亮點：釜山魚糕湯或豬肉湯飯收尾｜備註：地鐵 1 號線釜山站，預留取行李時間'] },
+                                { period: '晚上', items: ['15:00 - 17:30｜前往金海機場｜亮點：預留報到安檢 Buffer｜備註：輕軌／機場巴士，依回程航班倒推'] }
+                            ]
+                        }
+                    ]
+                },
                 '京都': {
                     summary: '✨ 【SOARVIBE 精選備援 · 京都】「{style}」千年古都慢旅：伏見稻荷、清水寺、祇園、嵐山到錦市場，和風經典一次收齊。動線依區域串連，附寺社禮儀與巴士動線提示。',
                     days: [
@@ -4859,6 +5356,446 @@
                                 { period: '晚上', items: ['16:00 - 18:00｜前往新千歲機場｜亮點：預留報到安檢 Buffer｜備註：JR 快速 Airpor，依航班倒推'] }
                             ]
                         }
+                    ]
+                },
+                '濟州': {
+                    summary: '✨ 【SOARVIBE 精選備援 · 濟州】「{style}」海島慢旅：城山日出峰、牛島、涯月海岸到東門市場，火山地形與海鮮一次收齊。',
+                    days: [
+                        { day: 1, phases: [
+                            { period: '上午', items: ['09:30 - 11:30｜城山日出峰 Seongsan Ilchulbong｜亮點： UNESCO 火山口，海島經典首拍｜備註：包車或市外巴士，建議早到避開人潮'] },
+                            { period: '下午', items: ['13:00 - 16:00｜牛島 Udo｜亮點：環島電動車、花生冰淇淋、海崖公路｜備註：城山港搭船約 15 分鐘，需帶護照或證件'] },
+                            { period: '晚上', items: ['18:00 - 20:00｜涉地可支 Seopjikoji｜亮點：燈塔與海岸斷崖夕陽｜備註：包車順路，風大備外套'] }
+                        ]},
+                        { day: 2, phases: [
+                            { period: '上午', items: ['09:30 - 11:30｜涯月海岸 Aewol Cafe Street｜亮點：火山岩海崖與網美咖啡廳｜備註：包車或計程車，週末車位難找'] },
+                            { period: '下午', items: ['13:00 - 15:30｜山茶花之丘 Camellia Hill｜亮點：四季花田與拍照場景｜備註：中文導覽標示多，雨天備案'] },
+                            { period: '晚上', items: ['17:30 - 20:00｜濟州東門傳統市場｜亮點：黑豬肉、海鮮鍋、橘子伴手禮｜備註：濟州市區，步行＋計程車'] }
+                        ]},
+                        { day: 3, phases: [
+                            { period: '上午', items: ['09:00 - 11:00｜泰迪熊博物館／Hello Kitty 島｜亮點：親子與網美打卡，雨天首選｜備註：中文區近西歸浦，包車最順'] },
+                            { period: '下午', items: ['12:30 - 14:30｜新濟州免稅／伴手禮採買｜亮點：橘子巧克力、海苔、馬骨酒｜備註：預留時間回飯店取行李'] },
+                            { period: '晚上', items: ['15:30 - 17:30｜前往濟州機場｜亮點：預留報到安檢 Buffer｜備註：依回程航班倒推，市區車程約 40–60 分'] }
+                        ]}
+                    ]
+                },
+                '沖繩': {
+                    summary: '✨ 【SOARVIBE 精選備援 · 沖繩】「{style}」海島度假動線：首里城、國際通、美麗海水族館到古宇利島，南國風情與海景一次收齊。',
+                    days: [
+                        { day: 1, phases: [
+                            { period: '上午', items: ['10:00 - 12:00｜首里城公園｜亮點：琉球王國紅瓦王城，世界遺產｜備註：單軌電車首里站，坡道多穿好走鞋'] },
+                            { period: '下午', items: ['13:30 - 16:00｜國際通・牧志公設市場｜亮點：沖繩料理、海葡萄、夜間霓虹｜備註：縣廳前站步行 5 分鐘'] },
+                            { period: '晚上', items: ['18:00 - 20:00｜美國村 American Village｜亮點：海景夕陽、美式風情與雜貨｜備註：計程車或公車，週末較熱鬧'] }
+                        ]},
+                        { day: 2, phases: [
+                            { period: '上午', items: ['09:00 - 12:00｜沖繩美麗海水族館｜亮點：黑潮之海大水槽，親子必訪｜備註：那霸搭高速巴士約 2 小時，建議預約'] },
+                            { period: '下午', items: ['13:30 - 16:00｜古宇利島・心形岩｜亮點：跨海大橋與果凍海，經典自駕路線｜備註：自駕或包車，橋上禁止停車'] },
+                            { period: '晚上', items: ['17:30 - 20:00｜名護市・邊土岬｜亮點：高處俯瞰東海岸，夕陽名所｜備註：自駕較方便，注意末班車'] }
+                        ]},
+                        { day: 3, phases: [
+                            { period: '上午', items: ['09:30 - 11:30｜波上宮｜亮點：海邊神社，那霸市區最近參拜點｜備註：縣廳前站步行 15 分鐘'] },
+                            { period: '下午', items: ['12:30 - 14:30｜那霸機場周邊・Ryubo 伴手禮｜亮點：紅芋塔、海鹽、泡盛一次購足｜備註：單軌電車至機場前站'] },
+                            { period: '晚上', items: ['15:00 - 17:00｜前往那霸機場｜亮點：預留報到安檢 Buffer｜備註：依回程航班倒推'] }
+                        ]}
+                    ]
+                },
+                '新加坡': {
+                    summary: '✨ 【SOARVIBE 精選備援 · 新加坡】「{style}」獅城精華：濱海灣、魚尾獅、牛車水、小印度到克拉碼頭，多元文化與美食一次收齊。',
+                    days: [
+                        { day: 1, phases: [
+                            { period: '上午', items: ['10:00 - 12:00｜魚尾獅公園 Merlion Park｜亮點：新加坡地標，濱海灣全景｜備註：MRT Raffles Place，步行 10 分鐘'] },
+                            { period: '下午', items: ['13:30 - 16:30｜濱海灣花園 Gardens by the Bay｜亮點：擎天樹、雲霧林、花穹｜備註：MRT Bayfront，傍晚可看燈光秀'] },
+                            { period: '晚上', items: ['18:30 - 20:30｜克拉碼頭 Clarke Quay｜亮點：河畔餐廳與夜生活｜備註：MRT Clarke Quay，週末較熱鬧'] }
+                        ]},
+                        { day: 2, phases: [
+                            { period: '上午', items: ['09:30 - 11:30｜牛車水 Chinatown｜亮點：媽廟、佛牙寺、傳統中藥行｜備註：MRT Chinatown，周日部分店休'] },
+                            { period: '下午', items: ['13:00 - 16:00｜小印度 Little India｜亮點：維拉瑪卡里曼曼興都廟、竹腳中心｜備註：MRT Little India，著裝需遮蔽'] },
+                            { period: '晚上', items: ['18:00 - 20:00｜Maxwell 食閣／老巴剎 Lau Pa Sat｜亮點：海南雞飯、沙嗲、叻沙｜備註：尖峰 12–13 點與 18–19 點較滿'] }
+                        ]},
+                        { day: 3, phases: [
+                            { period: '上午', items: ['09:30 - 11:30｜聖淘沙 Sentosa｜亮點：海灘、纜車、S.E.A. 水族館擇一｜備註：MRT HarbourFront 轉 Sentosa Express'] },
+                            { period: '下午', items: ['13:00 - 15:00｜烏節路／機場 Jewel 星耀樟宜｜亮點：購物或瀑布森林，送機前必訪｜備註：Jewel 與 T1 相連'] },
+                            { period: '晚上', items: ['16:00 - 18:00｜前往樟宜機場｜亮點：預留報到安檢 Buffer｜備註：MRT 東西線直達'] }
+                        ]}
+                    ]
+                },
+                '香港': {
+                    summary: '✨ 【SOARVIBE 精選備援 · 香港】「{style}」港式經典：太平山、尖沙咀、中環、旺角到維港夜景，美食與購物並重。',
+                    days: [
+                        { day: 1, phases: [
+                            { period: '上午', items: ['10:00 - 12:00｜太平山頂 Peak Tram｜亮點：360 度港島全景，經典首訪｜備註：中環花園道纜車站，建議預約或早到'] },
+                            { period: '下午', items: ['13:30 - 16:00｜中環 SOHO・PMQ 元創方｜亮點：文創小店、咖啡廳、街拍｜備註：中環站 D2 出口，坡道多'] },
+                            { period: '晚上', items: ['18:30 - 20:30｜蘭桂坊 Lan Kwai Fong｜亮點：異國餐廳與夜生活｜備註：中環站步行 8 分鐘'] }
+                        ]},
+                        { day: 2, phases: [
+                            { period: '上午', items: ['09:30 - 11:30｜尖沙咀・星光大道｜亮點：維港對岸視角，鐘樓打卡｜備註：尖東站步行 5 分鐘'] },
+                            { period: '下午', items: ['13:00 - 16:00｜旺角 Mong Kok｜亮點：女人街、波鞋街、朗豪坊｜備註：旺角站，週末人潮多'] },
+                            { period: '晚上', items: ['18:00 - 20:30｜尖沙咀海濱・幻彩詠香江｜亮點：8 點燈光秀，維港夜景｜備註：尖沙咀天星碼頭旁'] }
+                        ]},
+                        { day: 3, phases: [
+                            { period: '上午', items: ['09:30 - 11:30｜黃大仙祠｜亮點：求籤祈福，本地文化體驗｜備註：黃大仙站 B2 出口'] },
+                            { period: '下午', items: ['13:00 - 15:00｜銅鑼灣・時代廣場伴手禮｜亮點：曲奇、珍妮熊、藥妝集中｜備註：銅鑼灣站'] },
+                            { period: '晚上', items: ['16:00 - 18:00｜前往機場｜亮點：預留報到安檢 Buffer｜備註：機場快線約 24 分鐘'] }
+                        ]}
+                    ]
+                },
+                '澳門': {
+                    summary: '✨ 【SOARVIBE 精選備援 · 澳門】「{style}」中西合璧：大三巴、議事亭、路氹金光大道，葡式蛋撻與夜景一次收齊。',
+                    days: [
+                        { day: 1, phases: [
+                            { period: '上午', items: ['10:00 - 12:00｜大三巴牌坊・戀愛巷｜亮點：世界遺產核心，經典打卡｜備註：巴士至新馬路，步行 uphill'] },
+                            { period: '下午', items: ['13:30 - 16:00｜議事亭前地・玫瑰堂｜亮點：葡式碎石路與殖民建築｜備註：步行動線，週末人潮多'] },
+                            { period: '晚上', items: ['18:00 - 20:00｜新馬路・義順牛奶公司｜亮點：雙皮奶、豬扒包、夜間商圈｜備註：公車或步行'] }
+                        ]},
+                        { day: 2, phases: [
+                            { period: '上午', items: ['09:30 - 11:30｜媽閣廟・海事博物館｜亮點：澳門地名起源，臨海風情｜備註：巴士 1、2 至媽閣'] },
+                            { period: '下午', items: ['13:00 - 16:00｜路氹金光大道・威尼斯人／巴黎人｜亮點：購物、娛樂、人造天空運河｜備註：免費接駁巴士多'] },
+                            { period: '晚上', items: ['18:30 - 20:30｜永利皇宮表演湖｜亮點：音樂噴泉與纜車，免費夜景｜備註：路氹步行或接駁'] }
+                        ]},
+                        { day: 3, phases: [
+                            { period: '上午', items: ['09:30 - 11:30｜官也街・安德魯餅店｜亮點：葡式蛋撻發源地，伴手禮必買｜備註：氹仔官也街，週末排隊'] },
+                            { period: '下午', items: ['13:00 - 15:00｜最後採買・鉅記／咀香園｜亮點：肉乾、杏仁餅集中｜備註：新馬路或氹仔'] },
+                            { period: '晚上', items: ['15:30 - 17:30｜前往澳門機場／關閘｜亮點：預留通關或報到 Buffer｜備註：依回程方式倒推'] }
+                        ]}
+                    ]
+                },
+                '台北': {
+                    summary: '✨ 【SOARVIBE 精選備援 · 台北】「{style}」寶島首都：101、故宮、西門町、象山到饒河夜市，經典與夜食並重。',
+                    days: [
+                        { day: 1, phases: [
+                            { period: '上午', items: ['10:00 - 12:00｜台北 101 觀景台｜亮點：地標全景，購物美食一站｜備註：捷運市政府站，建議預約時段'] },
+                            { period: '下午', items: ['13:30 - 16:30｜國立故宮博物院｜亮點：翠玉白菜、肉形石，文化必訪｜備註：捷運劍潭轉公車，週五周六延長開放'] },
+                            { period: '晚上', items: ['18:00 - 20:30｜饒河夜市｜亮點：胡椒餅、藥燉排骨、芒果冰｜備註：捷運松山站 1 號出口'] }
+                        ]},
+                        { day: 2, phases: [
+                            { period: '上午', items: ['09:30 - 11:30｜中正紀念堂・自由廣場｜亮點：整點衛兵交接，經典地標｜備註：捷運中正紀念堂站'] },
+                            { period: '下午', items: ['13:00 - 16:00｜西門町・紅樓｜亮點：潮流、電影街、阿宗麵線｜備註：捷運西門站，週末人潮多'] },
+                            { period: '晚上', items: ['17:30 - 20:00｜象山步道・台北夜景｜亮點：101 夜景最佳免費點｜備註：捷運象山站，登階約 20 分鐘'] }
+                        ]},
+                        { day: 3, phases: [
+                            { period: '上午', items: ['09:30 - 11:30｜龍山寺・剝皮寮｜亮點：媽祖廟與老街文化｜備註：捷運龍山寺站'] },
+                            { period: '下午', items: ['13:00 - 15:00｜迪化街・伴手禮採買｜亮點：年節貨、茶葉、鳳梨酥｜備註：捷運北門站'] },
+                            { period: '晚上', items: ['16:00 - 18:00｜前往機場／高鐵｜亮點：預留報到或搭車 Buffer｜備註：機場捷運約 35–50 分'] }
+                        ]}
+                    ]
+                },
+                '清邁': {
+                    summary: '✨ 【SOARVIBE 精選備援 · 清邁】「{style}」泰北慢活：古城寺廟、素帖山、寧曼路與週六夜市，蘭納文化與咖啡廳並重。',
+                    days: [
+                        { day: 1, phases: [
+                            { period: '上午', items: ['09:30 - 11:30｜素帖山雙龍寺 Doi Suthep｜亮點：金色佛塔俯瞰清邁，必訪聖地｜備註：包車或雙條車，盤山彎多暈車者注意'] },
+                            { period: '下午', items: ['13:00 - 16:00｜清邁古城・帕辛寺／大佛塔｜亮點：蘭納建築，步行串連多廟｜備註：著裝需遮蔽肩膝'] },
+                            { period: '晚上', items: ['18:00 - 20:30｜週六／週日夜市｜亮點：泰北小吃、手工藝品｜備註：周六 Wualai、周日 Tha Phae Gate'] }
+                        ]},
+                        { day: 2, phases: [
+                            { period: '上午', items: ['09:30 - 11:30｜塔佩門 Tha Phae Gate｜亮點：古城東門，餵鴿拍照｜備註：步行至週日市集起點'] },
+                            { period: '下午', items: ['13:00 - 16:00｜寧曼路 Nimman｜亮點：文青咖啡、選物店、網美打卡｜備註：雙條車或 Grab，午後較涼'] },
+                            { period: '晚上', items: ['18:00 - 20:00｜長康路夜市 Chang Khlan｜亮點：泰式按摩、小吃、酒吧｜備註：近古城東側'] }
+                        ]},
+                        { day: 3, phases: [
+                            { period: '上午', items: ['09:00 - 11:00｜瓦洛洛市場 Warorot｜亮點：在地乾貨、香料、早餐｜備註：7:00 後較熱鬧'] },
+                            { period: '下午', items: ['12:30 - 14:30｜MAYA 百貨／伴手禮｜亮點：泰絲、香氛、零食集中｜備註：寧曼路對面'] },
+                            { period: '晚上', items: ['15:30 - 17:30｜前往清邁機場｜亮點：預留報到 Buffer｜備註：Grab 約 15 分鐘'] }
+                        ]}
+                    ]
+                },
+                '普吉島': {
+                    summary: '✨ 【SOARVIBE 精選備援 · 普吉島】「{style}」安達曼海度假：芭東、大佛、普吉鎮到攀牙灣，海灘與泰式美食並重。',
+                    days: [
+                        { day: 1, phases: [
+                            { period: '上午', items: ['10:00 - 12:00｜山頂大佛 Big Buddha｜亮點：全島制高點，海景壯觀｜備註：包車或租機車，著裝需遮蔽'] },
+                            { period: '下午', items: ['13:30 - 16:30｜芭東海灘 Patong｜亮點：最熱鬧海灘，水上活動多｜備註：計程車或 Grab，防曬必備'] },
+                            { period: '晚上', items: ['18:00 - 20:30｜芭東夜市 Bangla Road｜亮點：海鮮、泰式按摩、夜生活｜備註：步行即可，週末較吵'] }
+                        ]},
+                        { day: 2, phases: [
+                            { period: '上午', items: ['08:30 - 12:30｜皮皮島／皇帝島一日遊｜亮點：跳島浮潛，安達曼海經典｜備註：提前預訂船票，暈船者備藥'] },
+                            { period: '下午', items: ['14:00 - 16:00｜飯店泳池／海灘休息｜亮點：恢復體力，錯峰曬太陽｜備註：依住宿區域安排'] },
+                            { period: '晚上', items: ['18:30 - 20:30｜普吉鎮 Phuket Old Town｜亮點：中葡建築、週末夜市｜備註：Grab 約 30 分鐘，周日 Lok Diew'] }
+                        ]},
+                        { day: 3, phases: [
+                            { period: '上午', items: ['09:30 - 11:30｜查龍寺 Wat Chalong｜亮點：普吉最大廟宇，求平安｜備註：包車順路'] },
+                            { period: '下午', items: ['13:00 - 15:00｜Central Phuket 伴手禮｜亮點：乳膠、香氛、海產乾貨｜備註：兩館相連，冷氣足'] },
+                            { period: '晚上', items: ['16:00 - 18:00｜前往普吉機場｜亮點：預留報到 Buffer｜備註：依航班倒推，車程 45–90 分'] }
+                        ]}
+                    ]
+                },
+                '馬來西亞': {
+                    summary: '✨ 【SOARVIBE 精選備援 · 馬來西亞】「{style}」雙城精華：吉隆坡雙子星、黑風洞、獨立廣場到茨廠街，多元文化與椰漿飯並重。',
+                    days: [
+                        { day: 1, phases: [
+                            { period: '上午', items: ['10:00 - 12:00｜雙子星塔 KLCC｜亮點：國家地標，觀景台與購物｜備註：LRT KLCC，建議預約 Skybridge'] },
+                            { period: '下午', items: ['13:30 - 16:00｜獨立廣場 Merdeka Square｜亮點：殖民建築與國家清真寺｜備註：Grab 或 LRT Masjid Jamek'] },
+                            { period: '晚上', items: ['18:00 - 20:30｜阿羅街 Alor Street｜亮點：燒烤、沙爹、榴槤｜備註：步行近 Bukit Bintang'] }
+                        ]},
+                        { day: 2, phases: [
+                            { period: '上午', items: ['09:30 - 11:30｜黑風洞 Batu Caves｜亮點：彩色階梯與印度教聖地｜備註：KTM 或 Grab，272 階需體力'] },
+                            { period: '下午', items: ['13:00 - 16:00｜茨廠街 Petaling Street｜亮點：華人商圈、點心、仿品｜備註：LRT Pasar Seni，週末人潮多'] },
+                            { period: '晚上', items: ['18:00 - 20:00｜吉隆坡塔 KL Tower｜亮點：夜景與天空盒，情侶熱點｜備註：建議預約傍晚時段'] }
+                        ]},
+                        { day: 3, phases: [
+                            { period: '上午', items: ['09:30 - 11:30｜中央藝術坊 Central Market｜亮點：手工藝品、蠟染、錫器｜備註：LRT Pasar Seni'] },
+                            { period: '下午', items: ['13:00 - 15:00｜Pavilion 伴手禮｜亮點：白咖啡、肉骨茶包、沙巴紅茶｜備註：Bukit Bintang 商圈'] },
+                            { period: '晚上', items: ['16:00 - 18:00｜前往 KLIA 機場｜亮點：預留報到 Buffer｜備註：KLIA Ekspres 約 28 分'] }
+                        ]}
+                    ]
+                },
+                '越南': {
+                    summary: '✨ 【SOARVIBE 精選備援 · 越南】「{style}」越式經典：河內還劍湖、三十六行街，或胡志明紅教堂、濱城市場，法殖風情與河粉並重。',
+                    days: [
+                        { day: 1, phases: [
+                            { period: '上午', items: ['09:30 - 11:30｜還劍湖 Hoan Kiem Lake｜亮點：河內心臟，玉山祠與龜塔｜備註：步行圈，週末本地人多'] },
+                            { period: '下午', items: ['13:00 - 16:00｜三十六行街 Old Quarter｜亮點：窄巷傳統商號，蛋咖啡必喝｜備註：步行，注意機車橫穿'] },
+                            { period: '晚上', items: ['18:00 - 20:30｜升龍水上木偶戲｜亮點：越南國粹，雨天備案｜備註：需提前購票'] }
+                        ]},
+                        { day: 2, phases: [
+                            { period: '上午', items: ['09:00 - 11:30｜胡志明 mausoleum／文廟 Quoc Tu Giam｜亮點：歷史與儒家建築｜備註：著裝需端莊，週一五陵寢開放日不同'] },
+                            { period: '下午', items: ['13:30 - 16:00｜火車街 Train Street｜亮點：網美鐵道咖啡（依現場管制）｜備註：Grab 至，安全優先'] },
+                            { period: '晚上', items: ['18:00 - 20:00｜Ta Hien 啤酒街｜亮點：在地生啤與小吃｜備註：週末最熱鬧'] }
+                        ]},
+                        { day: 3, phases: [
+                            { period: '上午', items: ['09:30 - 11:30｜同春市場 Dong Xuan｜亮點：最大室內市場，乾貨伴手禮｜備註：討價空間大'] },
+                            { period: '下午', items: ['13:00 - 15:00｜伴手禮採買・G7 咖啡／腰果｜亮點：越南咖啡與堅果｜備註：舊城區或機場免稅'] },
+                            { period: '晚上', items: ['16:00 - 18:00｜前往機場｜亮點：預留報到 Buffer｜備註：Grab 約 45 分至 Noi Bai'] }
+                        ]}
+                    ]
+                },
+                '峇里島': {
+                    summary: '✨ 【SOARVIBE 精選備援 · 峇里島】「{style}」海島療癒：烏布梯田、海神庙、庫塔到水明漾，瑜伽與衝浪並重。',
+                    days: [
+                        { day: 1, phases: [
+                            { period: '上午', items: ['09:30 - 11:30｜德格拉朗梯田 Tegallalang｜亮點：層層綠意，網美鞦韆｜備註：包車或租機車，入園費另計'] },
+                            { period: '下午', items: ['13:00 - 16:00｜烏布皇宮 Ubud Palace｜亮點：傳統舞蹈表演，文創市集｜備註：步行至 Ubud Market'] },
+                            { period: '晚上', items: ['18:00 - 20:00｜烏布健康餐／Bebek Bengil 髒鴨餐廳｜亮點：峇里料理代表｜備註：熱門店建議預約'] }
+                        ]},
+                        { day: 2, phases: [
+                            { period: '上午', items: ['09:00 - 11:30｜聖泉寺 Tirta Empul｜亮點：净化儀式，文化體驗｜備註：著裝需圍紗，包車約 1 小時'] },
+                            { period: '下午', items: ['13:30 - 16:30｜海神庙 Tanah Lot｜亮點：海上廟宇夕陽，經典明信片｜備註：傍晚光線最佳，潮位影響'] },
+                            { period: '晚上', items: ['18:30 - 20:30｜水明漾 Seminyak 晚餐｜亮點：精品餐廳與酒吧｜備註：Grab 或包車'] }
+                        ]},
+                        { day: 3, phases: [
+                            { period: '上午', items: ['09:30 - 11:30｜庫塔 Kuta 海灘｜亮點：衝浪初學，日落名所｜備註：防曬必備，注意浪況'] },
+                            { period: '下午', items: ['13:00 - 15:00｜Beachwalk 伴手禮｜亮點：手工皂、銀飾、咖啡｜備註：近機場方向'] },
+                            { period: '晚上', items: ['16:00 - 18:00｜前往峇里機場｜亮點：預留報到 Buffer｜備註：烏布至機場約 1.5–2 小時'] }
+                        ]}
+                    ]
+                },
+                '菲律賓': {
+                    summary: '✨ 【SOARVIBE 精選備援 · 菲律賓】「{style}」熱帶島國：馬尼拉王城、宿霧麥哲倫十字架到薄荷島，西班牙殖民遺跡與海島並重。',
+                    days: [
+                        { day: 1, phases: [
+                            { period: '上午', items: ['10:00 - 12:00｜馬尼拉王城 Intramuros｜亮點：西班牙古城牆，聖地牙哥堡｜備註：Grab 至，午後較熱'] },
+                            { period: '下午', items: ['13:30 - 16:00｜馬尼拉灣日落 Manila Bay｜亮點：世界十大夕陽之一｜備註：MOA 商圈順逛'] },
+                            { period: '晚上', items: ['18:00 - 20:30｜Robinsons Place 菲律賓料理｜亮點：Lechon、Adobo、 Halo-halo｜備註：商場冷氣足'] }
+                        ]},
+                        { day: 2, phases: [
+                            { period: '上午', items: ['09:30 - 11:30｜宿霧麥哲倫十字架 Magellan\'s Cross｜亮點：天主教傳教起點｜備註：若飛宿霧，市區步行圈'] },
+                            { period: '下午', items: ['13:00 - 16:00｜聖嬰教堂 Basilica Minore｜亮點：宿霧最古老教堂｜備註：著裝需端莊'] },
+                            { period: '晚上', items: ['18:00 - 20:00｜IT Park 美食街｜亮點：宿霧夜生活與燒烤｜備註：Grab 或計程車'] }
+                        ]},
+                        { day: 3, phases: [
+                            { period: '上午', items: ['09:30 - 11:30｜SM 商城伴手禮｜亮點：芒果乾、7D 乾、手工餅｜備註：各城市 SM 連鎖'] },
+                            { period: '下午', items: ['13:00 - 15:00｜最後採買或海灘休息｜亮點：依體力彈性安排｜備註：預留取行李時間'] },
+                            { period: '晚上', items: ['16:00 - 18:00｜前往機場｜亮點：預留報到 Buffer｜備註：馬尼拉塞車嚴重，多留 1 小時'] }
+                        ]}
+                    ]
+                },
+                '倫敦': {
+                    summary: '✨ 【SOARVIBE 精選備援 · 倫敦】「{style}」英倫經典：大英博物館、白金漢宮、倫敦眼到博羅市場，皇室傳統與博物館並重。',
+                    days: [
+                        { day: 1, phases: [
+                            { period: '上午', items: ['10:00 - 12:30｜大英博物館 British Museum｜亮點：羅塞塔石碑、埃及館，免費入場｜備註：Tottenham Court Road，週末人潮多'] },
+                            { period: '下午', items: ['14:00 - 16:30｜考文特園 Covent Garden｜亮點：街頭表演、精品、Neal\'s Yard｜備註：Leicester Square 步行 10 分'] },
+                            { period: '晚上', items: ['18:30 - 20:30｜SOHO 中國城晚餐｜亮點：英式酒吧或粵菜，夜生活熱區｜備註：Tottenham Court Road'] }
+                        ]},
+                        { day: 2, phases: [
+                            { period: '上午', items: ['09:30 - 11:30｜白金漢宮衛兵換崗｜亮點：皇室儀式，夏季開放參觀｜備註：St James\'s Park，11:00 週一三五'] },
+                            { period: '下午', items: ['13:00 - 16:00｜倫敦眼 London Eye｜亮點：泰晤士河全景，建議預約｜備註：Waterloo 站，可搭遊船'] },
+                            { period: '晚上', items: ['18:00 - 20:30｜西區音樂劇 West End｜亮點：Leicester Square 劇院區｜備註：需提前購票'] }
+                        ]},
+                        { day: 3, phases: [
+                            { period: '上午', items: ['09:30 - 11:30｜博羅市場 Borough Market｜亮點：英式起司、生蠔、咖啡｜備註：London Bridge，週末最熱鬧'] },
+                            { period: '下午', items: ['13:00 - 15:00｜哈羅德／Selfridges 伴手禮｜亮點：茶葉、餅乾、英國品牌｜備註：Knightsbridge 或 Oxford Street'] },
+                            { period: '晚上', items: ['16:00 - 18:00｜前往希斯洛機場｜亮點：預留報到 Buffer｜備註：Heathrow Express 約 15 分'] }
+                        ]}
+                    ]
+                },
+                '巴黎': {
+                    summary: '✨ 【SOARVIBE 精選備援 · 巴黎】「{style}」法式浪漫：艾菲爾、羅浮宮、瑪黑區到蒙馬特，藝術與可頌並重。',
+                    days: [
+                        { day: 1, phases: [
+                            { period: '上午', items: ['10:00 - 12:00｜艾菲爾鐵塔 Eiffel Tower｜亮點：巴黎地標，登頂需預約｜備註：Metro Bir-Hakeim，週末排隊長'] },
+                            { period: '下午', items: ['13:30 - 16:30｜羅浮宮 Louvre｜亮點：蒙娜 Lisa、勝利女神，必預約時段｜備註：Metro Palais Royal'] },
+                            { period: '晚上', items: ['18:30 - 20:30｜塞納河遊船 Dinner Cruise｜亮點：河畔夜景，浪漫收尾｜備註：需提前訂位'] }
+                        ]},
+                        { day: 2, phases: [
+                            { period: '上午', items: ['09:30 - 11:30｜聖心大教堂 Sacré-Cœur｜亮點：蒙馬特高地，街頭藝人｜備註：Metro Anvers，小心扒手'] },
+                            { period: '下午', items: ['13:00 - 16:00｜瑪黑區 Le Marais｜亮點：猶太區、Place des Vosges、選物店｜備註：Metro Saint-Paul'] },
+                            { period: '晚上', items: ['18:00 - 20:30｜拉丁區 Latin Quarter｜亮點：法式小館、crepe、夜間氛圍｜備註：Metro Cluny-La Sorbonne'] }
+                        ]},
+                        { day: 3, phases: [
+                            { period: '上午', items: ['09:30 - 11:30｜凱旋門 Arc de Triomphe｜亮點：香榭大道起點，登頂俯瞰｜備註：Metro Charles de Gaulle'] },
+                            { period: '下午', items: ['13:00 - 15:00｜老佛爺／春天百貨伴手禮｜亮點：馬卡龍、香水、紅酒｜備註：Haussmann 商圈'] },
+                            { period: '晚上', items: ['16:00 - 18:00｜前往戴高樂機場｜亮點：預留報到 Buffer｜備註：RER B 約 35 分'] }
+                        ]}
+                    ]
+                },
+                '歐洲': {
+                    summary: '✨ 【SOARVIBE 精選備援 · 歐洲】「{style}」歐陸精華：老城廣場、世界遺產教堂、博物館與露天咖啡，步行＋大眾運輸動線。',
+                    days: [
+                        { day: 1, phases: [
+                            { period: '上午', items: ['10:00 - 12:00｜舊城中心廣場 Old Town Square｜亮點：哥德式鐘樓與市政廳，城市縮影｜備註：步行圈，週末市集熱鬧'] },
+                            { period: '下午', items: ['13:30 - 16:30｜國家／城市博物館｜亮點：理解在地歷史，雨天首選｜備註：建議官網預約時段'] },
+                            { period: '晚上', items: ['18:00 - 20:30｜老城區特色餐廳｜亮點：當地燉菜、義大利麵或 tapas｜備註：晚餐 19:30 後最熱門'] }
+                        ]},
+                        { day: 2, phases: [
+                            { period: '上午', items: ['09:30 - 11:30｜世界遺產教堂／城堡｜亮點：建築藝術必訪，拍照經典｜備註：著裝需遮蔽肩膝'] },
+                            { period: '下午', items: ['13:00 - 16:00｜河畔／公園散步區｜亮點：當地人休閒節奏，街頭音樂｜備註：週一部分博物館休館'] },
+                            { period: '晚上', items: ['18:00 - 20:30｜觀景台或河濱夜景｜亮點：金色時刻拍照，浪漫收尾｜備註：預約傍晚時段'] }
+                        ]},
+                        { day: 3, phases: [
+                            { period: '上午', items: ['09:30 - 11:30｜在地市集 Mercato｜亮點：起司、火腿、橄榄，早餐最佳｜備註：清晨最新鮮'] },
+                            { period: '下午', items: ['13:00 - 15:00｜伴手禮採買・百貨或機場免稅｜亮點：巧克力、紅酒、紀念品｜備註：歐盟退稅保留單據'] },
+                            { period: '晚上', items: ['16:00 - 18:00｜前往機場／車站｜亮點：預留報到 Buffer｜備註：歐洲鐵路需提前 30 分'] }
+                        ]}
+                    ]
+                },
+                '美國': {
+                    summary: '✨ 【SOARVIBE 精選備援 · 美國】「{style}」美式都會：地標天際線、博物館區、特色街區到夜景，Uber／地鐵動線。',
+                    days: [
+                        { day: 1, phases: [
+                            { period: '上午', items: ['10:00 - 12:00｜城市地標觀景台 Observation Deck｜亮點：天際線首拍，快速掌握方位｜備註：建議線上購票省排队'] },
+                            { period: '下午', items: ['13:30 - 16:30｜中央公園／濱水步道｜亮點：都市綠洲，街拍與野餐｜備註：步行＋地鐵'] },
+                            { period: '晚上', items: ['18:30 - 20:30｜特色街區晚餐｜亮點：美式漢堡、BBQ 或精緻餐廳｜備註：小費 18–22%'] }
+                        ]},
+                        { day: 2, phases: [
+                            { period: '上午', items: ['09:30 - 11:30｜國家／城市博物館｜亮點：免費或捐贈制博物館多｜備註：週一部分休館'] },
+                            { period: '下午', items: ['13:00 - 16:00｜潮流／藝術街區｜亮點：壁畫、選物店、咖啡廳｜備註：Uber 或地鐵'] },
+                            { period: '晚上', items: ['18:00 - 20:30｜劇院區或河濱夜景｜亮點：Broadway 或 Ferris wheel｜備註：熱門秀需提前訂票'] }
+                        ]},
+                        { day: 3, phases: [
+                            { period: '上午', items: ['09:30 - 11:30｜Outlet 或 Whole Foods 伴手禮｜亮點：保健品、零食、紀念品｜備註：保留退稅單據'] },
+                            { period: '下午', items: ['13:00 - 15:00｜最後打卡點｜亮點：補齊遺珠，行李寄飯店｜備註：預留 TSA 安檢時間'] },
+                            { period: '晚上', items: ['16:00 - 18:00｜前往機場｜亮點：預留 3 小時送機 Buffer｜備註：Uber 或機場快線'] }
+                        ]}
+                    ]
+                },
+                '加拿大': {
+                    summary: '✨ 【SOARVIBE 精選備援 · 加拿大】「{style}」楓情都會：濱水區、老城、市集到夜景，多元移民美食並重。',
+                    days: [
+                        { day: 1, phases: [
+                            { period: '上午', items: ['10:00 - 12:00｜CN Tower／濱水區 Harbourfront｜亮點：城市地標，湖景散步｜備註：地鐵 Union，建議預約登塔'] },
+                            { period: '下午', items: ['13:30 - 16:00｜St Lawrence Market｜亮點：楓糖、Peameal bacon 三明治｜備註：週六最熱鬧，週一休'] },
+                            { period: '晚上', items: ['18:00 - 20:30｜Distillery District｜亮點：紅磚文創區，冬季燈飾｜備註：Uber 或電車'] }
+                        ]},
+                        { day: 2, phases: [
+                            { period: '上午', items: ['09:30 - 11:30｜老城區 Old Town／ Gastown｜亮點：蒸汽鐘、殖民建築｜備註：溫哥華或魁北克老城依城市調整'] },
+                            { period: '下午', items: ['13:00 - 16:00｜Stanley Park／皇家山｜亮點：城市公園，單車或步行｜備註：租 bike 約 1–2 小時'] },
+                            { period: '晚上', items: ['18:00 - 20:00｜Kitsilano 海灘夕陽｜亮點：太平洋或湖景，夏季最佳｜備註：Uber 或公車'] }
+                        ]},
+                        { day: 3, phases: [
+                            { period: '上午', items: ['09:30 - 11:30｜Granville Island 市集｜亮點：手工藝、海鮮、楓葉糖漿｜備註：水上 taxi 或公車'] },
+                            { period: '下午', items: ['13:00 - 15:00｜伴手禮採買｜亮點：Tim Hortons 禮盒、加拿大鹅 outlet｜備註：機場免稅亦可'] },
+                            { period: '晚上', items: ['16:00 - 18:00｜前往機場｜亮點：預留報到 Buffer｜備註：UP Express 或 Uber'] }
+                        ]}
+                    ]
+                },
+                '澳洲': {
+                    summary: '✨ 【SOARVIBE 精選備援 · 澳洲】「{style}」南半球風情：歌劇院、港灣大橋、海灘到動物園，戶外與咖啡文化並重。',
+                    days: [
+                        { day: 1, phases: [
+                            { period: '上午', items: ['10:00 - 12:00｜雪梨歌劇院 Sydney Opera House｜亮點：世界遺產，內部導覽需預約｜備註：Circular Quay 渡輪站'] },
+                            { period: '下午', items: ['13:30 - 16:30｜港灣大橋 Bridge Climb 或 The Rocks｜亮點：殖民石屋與週末市集｜備註：Climb 需提前預約'] },
+                            { period: '晚上', items: ['18:00 - 20:30｜Darling Harbour 晚餐｜亮點：海鮮、亞洲融合料理｜備註：Light Rail 或步行'] }
+                        ]},
+                        { day: 2, phases: [
+                            { period: '上午', items: ['09:30 - 11:30｜邦迪海灘 Bondi Beach｜亮點：衝浪、Coastal Walk 起點｜備註：Bus 333，防曬必備'] },
+                            { period: '下午', items: ['13:00 - 16:00｜塔龍加動物園 Taronga Zoo｜亮點：無尾熊、袋鼠，港灣視角｜備註：Circular Quay 搭渡輪'] },
+                            { period: '晚上', items: ['18:00 - 20:00｜Newtown 文青區｜亮點：塗鴉、二手店、精釀啤酒｜備註：Train 至 Newtown'] }
+                        ]},
+                        { day: 3, phases: [
+                            { period: '上午', items: ['09:30 - 11:30｜Queen Victoria Building｜亮點：維多利亞建築購物，伴手禮｜備註：Town Hall 站'] },
+                            { period: '下午', items: ['13:00 - 15:00｜伴手禮・Tim Tam、UGG、羊毛｜備註：機場免稅亦可'] },
+                            { period: '晚上', items: ['16:00 - 18:00｜前往機場｜亮點：預留報到 Buffer｜備註：機場快線約 13 分'] }
+                        ]}
+                    ]
+                },
+                '紐西蘭': {
+                    summary: '✨ 【SOARVIBE 精選備援 · 紐西蘭】「{style}」紐式自然：港灣、火山、牧場到極限運動，自駕或一日遊動線。',
+                    days: [
+                        { day: 1, phases: [
+                            { period: '上午', items: ['10:00 - 12:00｜奧克蘭天空塔 Sky Tower｜亮點：360 度港灣，極限跳台｜備註：Queen Street 步行圈'] },
+                            { period: '下午', items: ['13:30 - 16:00｜Waiheke 懷希基島葡萄酒莊｜亮點：渡輪＋品酒一日遊｜備註：Fullers 渡輪需預約'] },
+                            { period: '晚上', items: ['18:00 - 20:30｜Viaduct Harbour 海鮮｜亮點：青口、羊排、精釀啤酒｜備註：步行即可'] }
+                        ]},
+                        { day: 2, phases: [
+                            { period: '上午', items: ['08:00 - 12:00｜霍比特村 Hobbiton 一日遊｜亮點：魔戒場景，網美必訪｜備註：若在南島改排皇后鎮 Skyline'] },
+                            { period: '下午', items: ['13:30 - 16:00｜Rotorua 地熱公園｜亮點：間歇泉、泥浆浴｜備註：硫磺味正常，自駕或跟團'] },
+                            { period: '晚上', items: ['18:00 - 20:00｜毛利文化表演 Mitai｜亮點：傳統 Haka 與 Hangi 晚餐｜備註：需提前預約'] }
+                        ]},
+                        { day: 3, phases: [
+                            { period: '上午', items: ['09:30 - 11:30｜Parnell 古董街／博物館｜亮點：紐西蘭歷史，雨天備案｜備註：Auckland Domain'] },
+                            { period: '下午', items: ['13:00 - 15:00｜Manuka 蜂蜜／羊毛伴手禮｜亮點：機場免稅集中｜備註：保留退稅單據'] },
+                            { period: '晚上', items: ['16:00 - 18:00｜前往機場｜亮點：預留報到 Buffer｜備註：國內轉機需多留時間'] }
+                        ]}
+                    ]
+                },
+                '中國': {
+                    summary: '✨ 【SOARVIBE 精選備援 · 中國】「{style}」大陸經典：老城區、世界遺產、步行街到夜市，地鐵＋步行動線。',
+                    days: [
+                        { day: 1, phases: [
+                            { period: '上午', items: ['10:00 - 12:00｜外灘／故宮／天安門（依城市）｜亮點：城市名片，歷史首站｜備註：故宮需提前 7 天預約'] },
+                            { period: '下午', items: ['13:30 - 16:30｜歷史街區／胡同／夫子廟｜亮點：傳統建築與小吃｜備註：地鐵＋步行，週末人潮多'] },
+                            { period: '晚上', items: ['18:00 - 20:30｜步行街夜市｜亮點：小籠包、烤串、地方特色｜備註：支付寶／微信必備'] }
+                        ]},
+                        { day: 2, phases: [
+                            { period: '上午', items: ['09:30 - 11:30｜世界遺產／園林／寺廟｜亮點：文化深度，拍照經典｜備註：著裝端莊'] },
+                            { period: '下午', items: ['13:00 - 16:00｜潮流商圈／文創園區｜亮點：購物與網美打卡｜備註：地鐵直達'] },
+                            { period: '晚上', items: ['18:00 - 20:30｜江景／塔景夜景｜亮點：浦江遊船或珠江夜遊｜備註：提前購票'] }
+                        ]},
+                        { day: 3, phases: [
+                            { period: '上午', items: ['09:30 - 11:30｜在地市集／茶葉街｜亮點：伴手禮採買，討價技巧｜備註：保留發票'] },
+                            { period: '下午', items: ['13:00 - 15:00｜高鐵站／機場商圈最後採買｜亮點：省時動線｜備註：高鐵需提前 30 分'] },
+                            { period: '晚上', items: ['16:00 - 18:00｜前往機場／車站｜亮點：預留報到 Buffer｜備註：大城市塞車多留 1 小時'] }
+                        ]}
+                    ]
+                },
+                '杜拜': {
+                    summary: '✨ 【SOARVIBE 精選備援 · 杜拜】「{style}」沙漠奢華：哈里發塔、黃金市集、棕榈島到沙漠衝沙，現代與傳統並重。',
+                    days: [
+                        { day: 1, phases: [
+                            { period: '上午', items: ['10:00 - 12:00｜哈里發塔 Burj Khalifa At The Top｜亮點：世界最高，360 度沙漠與海｜備註：Dubai Mall Metro，需預約時段'] },
+                            { period: '下午', items: ['13:30 - 16:00｜迪拜 Mall 水族館／Dubai Fountain｜亮點：音樂噴泉每 30 分｜備註：傍晚 18:00 後最佳'] },
+                            { period: '晚上', items: ['18:30 - 20:30｜Old Dubai 黃金市集 Gold Souk｜亮點：傳統 abra 渡船，香料與黃金｜備註：Al Ghubaiba 站'] }
+                        ]},
+                        { day: 2, phases: [
+                            { period: '上午', items: ['09:00 - 12:00｜沙漠衝沙 Desert Safari｜亮點：滑沙、駱駝、貝都因營地｜備註：下午團含 sunset，需預約'] },
+                            { period: '下午', items: ['14:00 - 16:30｜棕榈岛 The Pointe／Atlantis｜亮點：奢華海濱，單軌電車｜備註：Monorail 至亚特兰蒂斯'] },
+                            { period: '晚上', items: ['18:00 - 20:30｜JBR Walk 海濱晚餐｜亮點：阿拉伯烤肉、海鮮｜備註：Tram 至 JBR'] }
+                        ]},
+                        { day: 3, phases: [
+                            { period: '上午', items: ['09:30 - 11:30｜朱美拉清真寺 Jumeirah Mosque｜亮點：開放非穆斯林導覽｜備註：需預約，著裝端莊'] },
+                            { period: '下午', items: ['13:00 - 15:00｜Dubai Mall 伴手禮｜亮點：椰棗、阿拉伯香水、巧克力｜備註：機場免稅亦可'] },
+                            { period: '晚上', items: ['16:00 - 18:00｜前往 DXB 機場｜亮點：預留報到 Buffer｜備註：Metro 紅線直達'] }
+                        ]}
+                    ]
+                },
+                '馬爾地夫': {
+                    summary: '✨ 【SOARVIBE 精選備援 · 馬爾地夫】「{style}」一島一飯店：浮潛、沙灘、水上屋到夕陽巡航，海島度假動線。',
+                    days: [
+                        { day: 1, phases: [
+                            { period: '上午', items: ['10:00 - 12:00｜水飛機／快艇上島 Check-in｜亮點：俯瞰環礁，度假開始｜備註：依度假村接駁時間'] },
+                            { period: '下午', items: ['13:30 - 16:30｜環島浮潛 House Reef Snorkeling｜亮點：珊瑚與熱帶魚，裝備飯店提供｜備註：防曬與救生員注意'] },
+                            { period: '晚上', items: ['18:30 - 20:30｜沙灘 BBQ 晚餐｜亮點：龍蝦、鮪魚、Maldivian curry｜備註：需向飯店預約'] }
+                        ]},
+                        { day: 2, phases: [
+                            { period: '上午', items: ['09:30 - 11:30｜海豚巡航 Dolphin Cruise｜亮點：野生海豚，攝影經典｜備註：暈船者備藥，早班較穩'] },
+                            { period: '下午', items: ['13:00 - 16:00｜無動力水上活動 Kayak／SUP｜亮點：果凍海，玻璃海質感｜備註：正午紫外線強'] },
+                            { period: '晚上', items: ['18:00 - 20:00｜夕陽巡航 Sunset Cruise｜亮點：香檳與環礁剪影｜備註：飯店安排，需預約'] }
+                        ]},
+                        { day: 3, phases: [
+                            { period: '上午', items: ['09:30 - 11:30｜SPA 或沙灘漫步｜亮點：度假收尾，放鬆優先｜備註：退房前可寄行李'] },
+                            { period: '下午', items: ['12:30 - 14:30｜馬累市區快速採買（若時間允許）｜亮點：魚市場、紀念品｜備註：僅適合晚班機'] },
+                            { period: '晚上', items: ['15:00 - 17:00｜快艇／水飛回機場｜亮點：預留國際航班 Buffer｜備註：度假村通常提前 3 小時送機'] }
+                        ]}
                     ]
                 },
                 default: {
@@ -5278,6 +6215,7 @@
                     '- days 陣列長度必須恰好等於 ' + days + '（共 ' + days + ' 個 day 物件，day 從 1 到 ' + days + '）。\n' +
                     '- 禁止只輸出 Day 1；每一天的上午、下午、晚上都至少要有 1 個 item。\n' +
                     '- 最終日：上午、下午仍須各有具體行程；「晚上」才安排前往機場／送機，禁止下午空白直接跳機場。\n' +
+                    '- 中間日（Day 2 至倒數第 2 天）禁止以「自由活動／自由行程／彈性安排／可自行安排」充數；每一天上午、下午、晚上都須有 2 個以上具體景點或餐廳。\n' +
                     '- JSON 請精簡，但天數不可省略。';
             }
 
@@ -5392,7 +6330,7 @@ ${buildGeminiJsonOutputBlock(payload, days)}`;
                 } else if (dayNum === totalDays) {
                     dayRules = '【本日為最終日——送機日】上午、下午仍須各有 1–2 個具體行程（採買、午餐、最後打卡）；「晚上」時段才安排前往機場（依 returnTime 倒推，預留至少 3 小時 Buffer）。禁止下午空白直接跳機場。';
                 } else {
-                    dayRules = '【本日為中間日】以住宿區域為圓心，安排充實的上午、下午、晚上各 2–3 個具體景點或餐廳，動線順向不繞路。';
+                    dayRules = '【本日為中間日】以住宿區域為圓心，安排充實的上午、下午、晚上各 2–3 個具體景點或餐廳，動線順向不繞路。嚴禁「自由活動／自由行程／彈性安排／可自行安排」等模糊字眼。';
                 }
                 var continuityBlock = priorSummary
                     ? '\n【已規劃日子——請勿重複相同景點／餐廳，並從住宿區延續順向動線】\n' + priorSummary + '\n'
@@ -5423,6 +6361,7 @@ ${dayRules}
 - 繁體中文（台灣用語）；每站為 JSON 物件：time、title、highlight、note${isKoreaDestination(ctx.currentCity) ? '、koreanName（韓文原文）' : ''}。
 - 本日須有「上午」「下午」「晚上」三個時段，每段至少 1 個 item（中間日建議每段 2 個以上）。
 - 禁止與【已規劃日子】重複相同景點／餐廳；本日動線須與【${ctx.selectedStyle}】一致，不可像其他風格。
+- 嚴禁以「自由活動／自由行程／彈性安排」充數；每一站須為具體景點或真實店名。
 
 【輸出——僅輸出 JSON，禁止 Markdown 與前言後語】
 只輸出 1 天的物件，結構：
@@ -5532,13 +6471,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             function getBackupDayForIndex(payload, zeroIndex) {
-                var key = pickBackupItineraryKey(payload && payload.destination);
-                var pack = fitBackupDaysToTrip(
-                    (window.backupItinerary && window.backupItinerary[key])
-                        || window.backupItinerary.default
-                        || { days: [] },
-                    payload
-                );
+                var pack = getBackupItineraryPack(payload);
                 var src = pack.days[zeroIndex] || pack.days[zeroIndex % Math.max(1, pack.days.length)];
                 if (!src) return null;
                 var day = JSON.parse(JSON.stringify(src));
@@ -6030,12 +6963,17 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                         )];
                     }
                     if (!isFirst && !isLast && afternoon && !getDayPhaseItems(afternoon).length) {
-                        afternoon.items = [makePlaceholderActivity(
-                            '13:00 - 16:00',
-                            '自由活動或補充行程',
-                            '彈性安排',
-                            '可依體力與天氣調整'
-                        )];
+                        var backupAfternoon = fillEmptyPhaseFromBackup(dayNum, '下午', meta);
+                        if (backupAfternoon && backupAfternoon.length) {
+                            afternoon.items = backupAfternoon;
+                        } else {
+                            afternoon.items = [makePlaceholderActivity(
+                                '13:00 - 16:00',
+                                dest + ' 人氣景點深度漫遊',
+                                '依【' + dest + '】熱門打卡點安排',
+                                '大眾運輸＋步行，動線已串連'
+                            )];
+                        }
                     }
                     if (isLast && afternoon && !getDayPhaseItems(afternoon).length) {
                         afternoon.items = [makePlaceholderActivity(
@@ -6404,7 +7342,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     }
                     if (t && t.length > 1) items.push(t);
                 });
-                return items.length ? items.slice(0, 10) : ['10:00 - 11:00｜自由活動｜亮點：彈性安排｜備註：可依體力調整'];
+                return items.length ? items.slice(0, 10) : ['10:00 - 11:00｜市區人氣景點｜亮點：依目的地熱門打卡點安排｜備註：大眾運輸＋步行'];
             }
 
             function parseStructuredActivity(text) {
@@ -6457,12 +7395,58 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 return { time: time, title: title, koreanName: '', highlight: highlight, note: note, raw: t };
             }
 
+            function standardizeActivityForDisplay(input) {
+                var p;
+                try {
+                    p = typeof input === 'object' && input !== null && (input.title || input.time || input.raw)
+                        ? normalizeActivityItem(input)
+                        : parseStructuredActivity(input);
+                } catch (e) {
+                    return parseStructuredActivity(String(input || ''));
+                }
+                if (!p) return { time: '', title: '', koreanName: '', highlight: '', note: '', raw: '' };
+                var timeRangeRe = /\d{1,2}:\d{2}\s*[-–—~至到]\s*\d{1,2}:\d{2}/;
+                var singleTimeRe = /^\d{1,2}:\d{2}$/;
+                if (!p.time && p.title) {
+                    var tm = String(p.title).match(/^(\d{1,2}:\d{2}\s*[-–—~至到]\s*\d{1,2}:\d{2}|\d{1,2}:\d{2})\s+(.+)$/);
+                    if (tm) {
+                        p.time = tm[1].replace(/\s+/g, ' ').trim();
+                        p.title = tm[2].trim();
+                    }
+                }
+                if (!p.time && p.raw) {
+                    var rawTm = String(p.raw).match(/(\d{1,2}:\d{2}\s*[-–—~至到]\s*\d{1,2}:\d{2}|\d{1,2}:\d{2})/);
+                    if (rawTm) p.time = rawTm[1].replace(/\s+/g, ' ').trim();
+                }
+                if (p.time && !timeRangeRe.test(p.time) && !singleTimeRe.test(p.time)) {
+                    var mixed = String(p.time).match(/^(\d{1,2}:\d{2}\s*[-–—~至到]\s*\d{1,2}:\d{2}|\d{1,2}:\d{2})\s+(.+)$/);
+                    if (mixed) {
+                        p.time = mixed[1].replace(/\s+/g, ' ').trim();
+                        if (!p.title) p.title = mixed[2].trim();
+                    }
+                }
+                if (!p.title && p.highlight) {
+                    var hlLead = String(p.highlight).split(/[。；;\n]/)[0].trim();
+                    p.title = hlLead.length > 52 ? hlLead.slice(0, 49) + '…' : hlLead;
+                }
+                if (!p.title && p.raw) {
+                    var rawParts = String(p.raw).split('｜').map(function (x) { return x.trim(); }).filter(Boolean);
+                    rawParts.forEach(function (part) {
+                        if (p.title) return;
+                        if (timeRangeRe.test(part) || singleTimeRe.test(part)) return;
+                        if (/^亮點[：:]|^備註[：:]|^導航[：:]/.test(part)) return;
+                        p.title = part;
+                    });
+                }
+                p.title = cleanPlaceName(p.title || '');
+                if (!p.title) p.title = '行程景點';
+                return p;
+            }
+
             function formatActivityItemHtml(text) {
                 var p;
                 try {
-                    p = typeof text === 'object' && text !== null && (text.title || text.raw)
-                        ? normalizeActivityItem(text)
-                        : parseStructuredActivity(text);
+                    p = standardizeActivityForDisplay(text);
                 } catch (e) {
                     return '<li class="activity-item">' + escapeHtml(String(text || '')) + '</li>';
                 }
@@ -6471,10 +7455,12 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     return '<li class="activity-item">' + escapeHtml(String(fallback)) + '</li>';
                 }
                 var html = '<li class="activity-item">';
+                html += '<div class="activity-head">';
                 if (p.time) {
                     html += '<span class="activity-time">' + escapeHtml(p.time) + '</span>';
                 }
                 html += '<span class="activity-title">' + escapeHtml(p.title) + '</span>';
+                html += '</div>';
                 if (p.koreanName) {
                     html += '<div class="activity-note">🇰🇷 ' + escapeHtml(p.koreanName) + '</div>';
                 }
@@ -6500,10 +7486,10 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             function getBackupWelcomeText(meta) {
-                var key = pickBackupItineraryKey(meta && meta.destination);
-                var pack = (window.backupItinerary && window.backupItinerary[key]) || null;
+                var payload = meta || window.soarvibeTripPayload || collectTripPayload();
+                var pack = getBackupItineraryPack(payload);
                 var style = getSelectedStyleLabel(meta);
-                var dest = (meta && meta.destination) || '目的地';
+                var dest = (meta && meta.destination) || payload.destination || '目的地';
                 if (pack && pack.summary) {
                     return pack.summary.replace(/\{dest\}/g, dest).replace(/\{style\}/g, style);
                 }
@@ -6639,7 +7625,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     html += '<section class="ui-day-block" data-day="' + escapeHtml(day.dayNum) + '">';
                     html += '<h3 class="ui-day-title">📅 ' + escapeHtml(day.dateLabel) + ' · Day ' + escapeHtml(day.dayNum) + '</h3>';
                     day.phases.forEach(function (phase) {
-                        var phaseItems = getDayPhaseItems(phase);
+                        var phaseItems = getPhaseDisplayItems(phase);
                         if (!phaseItems.length) return;
                         var label = phase.label ? phase.label + '：' : '行程重點：';
                         html += '<h4 class="ui-phase-title">' + (phase.emoji || getPhaseEmoji(phase.label)) + escapeHtml(label) + '</h4>';
@@ -6840,15 +7826,17 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             function buildBookletActivityHtml(text) {
-                var p = parseStructuredActivity(text);
+                var p = standardizeActivityForDisplay(text);
                 if (!p || !p.title) {
                     return '<div class="bk-act"><div class="bk-act-body">' + escapeHtml(String(text || '')) + '</div></div>';
                 }
                 var html = '<div class="bk-act">';
+                html += '<div class="bk-act-head">';
                 if (p.time) {
-                    html += '<div class="bk-act-time">' + escapeHtml(p.time) + '</div>';
+                    html += '<span class="bk-act-time">' + escapeHtml(p.time) + '</span>';
                 }
-                html += '<div class="bk-act-title">' + escapeHtml(p.title) + '</div>';
+                html += '<span class="bk-act-title">' + escapeHtml(p.title) + '</span>';
+                html += '</div>';
                 if (p.highlight) {
                     html += '<div class="bk-act-hl">✨ ' + escapeHtml(p.highlight) + '</div>';
                 }
@@ -6860,20 +7848,41 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             function resolveBookletCoverUrl(destination) {
-                var key = resolveEpithetCityKey(destination);
+                var raw = String(destination || '');
+                var snowKey = resolveSnowBookletCoverKey(raw);
+                if (snowKey && BOOKLET_SNOW_COVERS[snowKey]) {
+                    return BOOKLET_SNOW_COVERS[snowKey];
+                }
+                if (snowKey && BOOKLET_LOCAL_COVERS[snowKey]) {
+                    return BOOKLET_LOCAL_COVERS[snowKey];
+                }
+                if (snowKey && BOOKLET_DESTINATION_COVERS[snowKey]) {
+                    return BOOKLET_DESTINATION_COVERS[snowKey];
+                }
+                var key = resolveBookletCoverKey(destination);
                 if (key && BOOKLET_LOCAL_COVERS[key]) {
                     return BOOKLET_LOCAL_COVERS[key];
                 }
                 if (key && BOOKLET_DESTINATION_COVERS[key]) {
                     return BOOKLET_DESTINATION_COVERS[key];
                 }
-                if (destination && BOOKLET_LOCAL_COVERS[destination]) {
-                    return BOOKLET_LOCAL_COVERS[destination];
-                }
                 if (destination && BOOKLET_DESTINATION_COVERS[destination]) {
                     return BOOKLET_DESTINATION_COVERS[destination];
                 }
-                return BOOKLET_LOCAL_COVERS['東京'] || BOOKLET_DESTINATION_COVERS['東京'];
+                var raw = String(destination || '');
+                var i;
+                for (i = 0; i < BOOKLET_COUNTRY_COVER_FALLBACK.length; i++) {
+                    if (BOOKLET_COUNTRY_COVER_FALLBACK[i][0].test(raw)) {
+                        var fbKey = BOOKLET_COUNTRY_COVER_FALLBACK[i][1];
+                        if (BOOKLET_DESTINATION_COVERS[fbKey]) {
+                            return BOOKLET_DESTINATION_COVERS[fbKey];
+                        }
+                    }
+                }
+                if (isKoreaDestination(raw) && BOOKLET_DESTINATION_COVERS['首爾']) {
+                    return BOOKLET_DESTINATION_COVERS['首爾'];
+                }
+                return BOOKLET_DESTINATION_COVERS['東京'] || BOOKLET_LOCAL_COVERS['東京'];
             }
 
             function calcTripDayNight(meta) {
@@ -6921,8 +7930,27 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 if (culture) {
                     profile.lead = culture.lead;
                     profile.cultureSections = culture.sections;
+                    profile.introParagraphs = [];
+                    function pushIntroPara(text) {
+                        if (!text || !String(text).trim()) return;
+                        var t = String(text).trim();
+                        if (profile.introParagraphs.indexOf(t) === -1) {
+                            profile.introParagraphs.push(t);
+                        }
+                    }
+                    pushIntroPara(culture.lead);
+                    pushIntroPara(culture.leadExtra);
+                    if (profile.paragraphs && profile.paragraphs.length) {
+                        profile.paragraphs.forEach(pushIntroPara);
+                    }
+                    if (!profile.introParagraphs.length) {
+                        pushIntroPara(profile.lead);
+                    }
                 } else if (!profile.cultureSections) {
                     profile.lead = profile.paragraphs && profile.paragraphs[0] ? profile.paragraphs[0] : '';
+                    profile.introParagraphs = (profile.paragraphs && profile.paragraphs.length)
+                        ? profile.paragraphs.slice()
+                        : (profile.lead ? [profile.lead] : []);
                     profile.cultureSections = [
                         { icon: '🌏', title: '目的地概況', text: (profile.paragraphs && profile.paragraphs[1]) || profile.lead || '' },
                         { icon: '💡', title: '旅行提醒', text: (profile.tips && profile.tips.join(' ')) || '出發前確認護照、機票與住宿。' }
@@ -7045,14 +8073,21 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 return '<div class="bk-page-head"><span class="bk-brand">SOARVIBE</span><span class="bk-page-label">' + escapeHtml(label) + '</span></div>';
             }
 
+            function buildBookletPageSafeZone() {
+                return '<div class="bk-page-safe-zone" aria-hidden="true"></div>';
+            }
+
             function buildBookletIntroHtml(destination, dest, dayCount) {
                 var profile = resolveBookletProfile(destination);
                 var html = '<div class="bk-intro-content">';
                 html += '<div class="bk-intro-block bk-intro-top">';
                 html += '<p class="bk-intro-region">' + (profile.coverEmoji || '🌏') + ' 認識 ' + escapeHtml(dest) + '　<span class="bk-intro-region-sub">' + escapeHtml(profile.region) + '</span></p>';
-                if (profile.lead) {
-                    html += '<p class="bk-intro-lead">' + escapeHtml(profile.lead) + '</p>';
-                }
+                var introParas = profile.introParagraphs && profile.introParagraphs.length
+                    ? profile.introParagraphs
+                    : (profile.lead ? [profile.lead] : []);
+                introParas.forEach(function (para) {
+                    html += '<p class="bk-intro-lead">' + escapeHtml(para) + '</p>';
+                });
                 html += '</div>';
                 html += '<div class="bk-intro-block bk-intro-facts">';
                 html += '<div class="bk-intro-rich-list">';
@@ -7071,11 +8106,11 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 html += '</div></div>';
                 html += '<div class="bk-intro-block bk-intro-mid">';
                 if (profile.cultureSections && profile.cultureSections.length) {
-                    html += '<div class="bk-culture-grid">';
+                    html += '<div class="bk-culture-compact">';
                     profile.cultureSections.slice(0, 4).forEach(function (sec) {
-                        html += '<div class="bk-culture-card">';
-                        html += '<h3 class="bk-culture-title">' + sec.icon + ' ' + escapeHtml(sec.title) + '</h3>';
-                        html += '<p class="bk-culture-text">' + escapeHtml(sec.text) + '</p>';
+                        html += '<div class="bk-culture-row">';
+                        html += '<span class="bk-culture-row-title">' + sec.icon + ' ' + escapeHtml(sec.title) + '</span>';
+                        html += '<span class="bk-culture-row-text">' + escapeHtml(sec.text) + '</span>';
                         html += '</div>';
                     });
                     html += '</div>';
@@ -7091,6 +8126,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     html += '</div></div>';
                 }
                 html += '</div>';
+                html += buildBookletPageSafeZone();
                 html += '</div>';
                 return html;
             }
@@ -7185,29 +8221,37 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             var BK_PAGE_TOP_PAD_PX = 22;
-            var BK_PAGE_BOTTOM_PAD_PX = 22;
-            var BK_WATERMARK_ZONE_PX = 44;
+            var BK_PAGE_BOTTOM_PAD_PX = 36;
+            var BK_WATERMARK_ZONE_PX = 132;
+            var BK_DAY_SAFE_ZONE_PX = 120;
             var BK_PAGE_HEAD_PX = 68;
-            var BK_DAY_TITLE_PX = 40;
-            var BK_DAY_CONT_PX = 28;
-            var BK_PHASE_HEAD_PX = 28;
-            var BK_PAGINATE_SAFETY = 1.04;
+            var BK_DAY_TITLE_PX = 36;
+            var BK_DAY_CONT_PX = 24;
+            var BK_PHASE_HEAD_PX = 24;
+            var BK_PAGINATE_SAFETY = 1.22;
+            var BK_WHOLE_DAY_SAFETY = 1.28;
 
             function estimateBookletActHeightPx(item) {
-                var p = parseStructuredActivity(item);
+                var p = standardizeActivityForDisplay(item);
                 if (!p || !p.title) {
                     var plain = String(item || '');
-                    return 38 + Math.min(36, Math.ceil(plain.length / 32) * 13);
+                    return 44 + Math.min(48, Math.ceil(plain.length / 26) * 15);
                 }
-                var h = 42;
-                if (p.time) h += 2;
+                var h = 50;
+                if (p.time) h += 16;
+                if (p.title) {
+                    h += 14 + Math.min(56, Math.ceil(String(p.title).length / 22) * 14);
+                }
                 if (p.highlight) {
-                    h += 14 + Math.min(56, Math.ceil(String(p.highlight).length / 28) * 13);
+                    h += 14 + Math.min(72, Math.ceil(String(p.highlight).length / 24) * 14);
                 }
                 if (p.note) {
-                    h += 14 + Math.min(42, Math.ceil(String(p.note).length / 28) * 13);
+                    h += 16 + Math.min(72, Math.ceil(String(p.note).length / 22) * 15);
                 }
-                return h + 6;
+                if (p.koreanName) {
+                    h += 14;
+                }
+                return Math.round((h + 14) * 1.12);
             }
 
             function collectBookletDayBlocks(day) {
@@ -7264,7 +8308,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
                 function pageBudget(firstPage) {
                     var overhead = BK_PAGE_TOP_PAD_PX + BK_PAGE_BOTTOM_PAD_PX + BK_WATERMARK_ZONE_PX +
-                        BK_PAGE_HEAD_PX + (firstPage ? BK_DAY_TITLE_PX : BK_DAY_CONT_PX);
+                        BK_DAY_SAFE_ZONE_PX + BK_PAGE_HEAD_PX + (firstPage ? BK_DAY_TITLE_PX : BK_DAY_CONT_PX);
                     return pageH - overhead;
                 }
 
@@ -7279,7 +8323,8 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     } else {
                         pageHtml += '<p class="bk-day-cont">📅 ' + escapeHtml(day.dateLabel || '') + ' · Day ' + escapeHtml(dayNum) + '（續）</p>';
                     }
-                    pageHtml += '<div class="bk-day-body">' + blockHtmlList.join('') + '</div></div>';
+                    pageHtml += '<div class="bk-day-body">' + blockHtmlList.join('') + '</div>';
+                    pageHtml += '<div class="bk-day-safe-zone" aria-hidden="true"></div></div>';
                     pageCount += 1;
                     return pageHtml;
                 }
@@ -7287,7 +8332,8 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 var totalHeight = blocks.reduce(function (sum, block) {
                     return sum + block.height;
                 }, 0);
-                if (totalHeight <= pageBudget(true)) {
+                var firstBudget = pageBudget(true);
+                if (totalHeight * BK_WHOLE_DAY_SAFETY <= firstBudget - 24) {
                     html += renderDayPage(blocks.map(function (b) { return b.html; }), true, false);
                     return { html: html, pageCount: pageCount };
                 }
@@ -7338,6 +8384,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                         buildBookletPageHead('景點＆美食') +
                         '<h2 class="bk-section-title">🍱 Google 景點＆美食推薦</h2>' +
                         '<p class="bk-muted">提示：可先在 App 點「景點＆美食」載入 Google 推薦，再重新製作小本本以納入完整資訊。</p>' +
+                        buildBookletPageSafeZone() +
                         '<div class="bk-footer">資料來源：Google Maps · SOARVIBE 精選</div></div>';
                 }
                 var html = '';
@@ -7359,7 +8406,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     chunk.forEach(function (spot) {
                         html += buildBookletFoodCardHtml(spot);
                     });
-                    html += '</div></div><div class="bk-footer">資料來源：Google Maps · SOARVIBE 精選</div></div>';
+                    html += '</div></div>' + buildBookletPageSafeZone() + '<div class="bk-footer">資料來源：Google Maps · SOARVIBE 精選</div></div>';
                     idx += chunk.length;
                     pageIndex += 1;
                 }
@@ -7599,36 +8646,112 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             var lastBookletPrintHtml = '';
             var pdfExportInProgress = false;
 
+            function refreshSoarvibeViewportHeight() {
+                var h = Math.round(
+                    (window.visualViewport && window.visualViewport.height) ||
+                    window.innerHeight ||
+                    document.documentElement.clientHeight ||
+                    0
+                );
+                if (h > 0) {
+                    document.documentElement.style.setProperty('--soarvibe-vh', h + 'px');
+                }
+            }
+
+            function schedulePostShareLayoutRestore() {
+                [0, 120, 350, 700, 1200].forEach(function (ms) {
+                    setTimeout(function () {
+                        refreshSoarvibeViewportHeight();
+                        restoreAppLayoutAfterPdf();
+                    }, ms);
+                });
+            }
+
             function restoreAppLayoutAfterPdf() {
                 document.documentElement.classList.remove(
                     'bk-pdf-export-mode', 'booklet-preview-open', 'pdf-capture-busy', 'splash-pending'
                 );
+                document.body.classList.remove('bk-pdf-export-mode', 'booklet-preview-open', 'pdf-capture-busy');
                 document.documentElement.style.removeProperty('zoom');
                 document.documentElement.style.removeProperty('transform');
                 document.documentElement.style.removeProperty('width');
                 document.documentElement.style.removeProperty('min-width');
                 document.documentElement.style.removeProperty('max-width');
+                document.documentElement.style.removeProperty('height');
+                document.documentElement.style.removeProperty('min-height');
+                document.documentElement.style.removeProperty('font-size');
                 document.body.style.removeProperty('zoom');
                 document.body.style.removeProperty('transform');
                 document.body.style.removeProperty('width');
                 document.body.style.removeProperty('min-width');
                 document.body.style.removeProperty('max-width');
+                document.body.style.removeProperty('height');
+                document.body.style.removeProperty('min-height');
+                document.body.style.removeProperty('overflow');
+                document.body.style.removeProperty('position');
+                document.body.style.removeProperty('padding');
+                document.body.style.removeProperty('display');
                 var shell = document.querySelector('.app-shell');
+                var isMobileShell = window.matchMedia('(max-width: 768px), (display-mode: standalone)').matches;
                 if (shell) {
                     shell.style.removeProperty('width');
                     shell.style.removeProperty('min-width');
                     shell.style.removeProperty('max-width');
+                    shell.style.removeProperty('height');
+                    shell.style.removeProperty('min-height');
                     shell.style.removeProperty('transform');
+                    shell.style.removeProperty('zoom');
+                    shell.style.removeProperty('overflow');
+                    shell.style.removeProperty('margin');
+                    shell.style.removeProperty('border-radius');
                     shell.style.visibility = '';
+                    if (isMobileShell) {
+                        shell.style.width = '100%';
+                        shell.style.maxWidth = 'none';
+                        shell.style.margin = '0';
+                        shell.style.transform = 'none';
+                        shell.style.borderRadius = '0';
+                        shell.style.overflow = 'hidden';
+                    }
                 }
                 if (phoneScroll) {
                     phoneScroll.style.removeProperty('width');
                     phoneScroll.style.removeProperty('min-width');
                     phoneScroll.style.removeProperty('max-width');
+                    phoneScroll.style.removeProperty('height');
+                    phoneScroll.style.removeProperty('overflow');
+                    phoneScroll.style.removeProperty('transform');
+                    phoneScroll.style.flex = '1 1 auto';
+                    phoneScroll.style.minHeight = '0';
+                    phoneScroll.style.overflowY = 'auto';
+                    phoneScroll.style.overflowX = 'hidden';
+                    phoneScroll.style.webkitOverflowScrolling = 'touch';
                 }
+                refreshSoarvibeViewportHeight();
+                var previewFrame = document.getElementById('booklet-preview-frame');
+                if (previewFrame) {
+                    restorePreviewFrameAfterPdfCapture(previewFrame);
+                    previewFrame.style.visibility = '';
+                }
+                cleanupBookletPdfArtifacts();
                 if (hasSplashBeenSeen()) {
                     markSplashSeen();
                 }
+                var isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
+                    /iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent);
+                forceIosViewportReset();
+                if (isStandalone) {
+                    setTimeout(function () { forceIosViewportReset(); }, 120);
+                    setTimeout(function () { forceIosViewportReset(); }, 420);
+                }
+                window.scrollTo(0, 0);
+                if (phoneScroll) {
+                    phoneScroll.scrollLeft = 0;
+                    phoneScroll.scrollTop = 0;
+                }
+                try {
+                    window.dispatchEvent(new Event('resize'));
+                } catch (resizeErr) { /* silent */ }
             }
 
             function resetParentViewportZoom(hardReset) {
@@ -7816,6 +8939,8 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     'var PAGE_W=' + BOOKLET_PDF_PAGE_W + ',PAGE_H=' + BOOKLET_PDF_PAGE_H + ';' +
                     'function loadScript(src){return new Promise(function(res,rej){var s=document.createElement("script");s.src=src;s.onload=res;s.onerror=function(){rej(new Error("load fail"));};document.head.appendChild(s);});}' +
                     'function getPages(){var out=[];Array.prototype.forEach.call(document.body.children,function(el){if(!el||!el.classList)return;if(el.classList.contains("bk-cover-page")||el.classList.contains("bk-page")||el.classList.contains("bk-day-page"))out.push(el);});return out;}' +
+                    'function reflowOverflowIntroPage(){var page=document.querySelector(".bk-intro-page");if(!page)return;var content=page.querySelector(".bk-intro-content");var safe=content?content.querySelector(".bk-page-safe-zone"):null;if(!content||!safe)return;var reserve=210,head=page.querySelector(".bk-page-head"),budget=PAGE_H-reserve;if(head)budget-=head.offsetHeight||0;budget-=safe.offsetHeight||0;if(content.scrollHeight<=budget+2)return;var mid=content.querySelector(".bk-intro-mid"),highlights=content.querySelector(".bk-intro-highlights");if(!mid&&!highlights)return;var newPage=page.cloneNode(false);newPage.className=page.className+" bk-intro-continued";var wm=page.querySelector(".bk-watermark");if(wm)newPage.appendChild(wm.cloneNode(true));if(head)newPage.appendChild(head.cloneNode(true));var cont=document.createElement("p");cont.className="bk-intro-cont";var region=page.querySelector(".bk-intro-region");cont.textContent=(region?region.textContent.replace(/\\s+/g," ").trim():"目的地指南")+"（續）";newPage.appendChild(cont);var nb=document.createElement("div");nb.className="bk-intro-content bk-intro-content-cont";if(mid){nb.appendChild(mid);}if(highlights){nb.appendChild(highlights);}var ns=document.createElement("div");ns.className="bk-page-safe-zone";ns.setAttribute("aria-hidden","true");nb.appendChild(ns);newPage.appendChild(nb);page.parentNode.insertBefore(newPage,page.nextSibling);}' +
+                    'function reflowOverflowDayPages(){var reserve=210,idx=0,pages=getPages();while(idx<pages.length){var page=pages[idx];if(!page.classList.contains("bk-day-page")){idx++;continue;}var body=page.querySelector(".bk-day-body");if(!body||body.children.length<=1){idx++;continue;}var budget=PAGE_H-reserve;var head=page.querySelector(".bk-page-head");var title=page.querySelector(".bk-day-title,.bk-day-cont");if(head)budget-=head.offsetHeight||0;if(title)budget-=title.offsetHeight||0;var safe=page.querySelector(".bk-day-safe-zone");if(safe)budget-=safe.offsetHeight||0;if(body.scrollHeight<=budget+2){idx++;continue;}var children=Array.prototype.slice.call(body.children);var keep=[],moved=[],ci;for(ci=0;ci<children.length;ci++){keep.push(children[ci]);body.textContent="";keep.forEach(function(n){body.appendChild(n);});if(body.scrollHeight>budget&&keep.length>1){moved.unshift(keep.pop());body.textContent="";keep.forEach(function(n){body.appendChild(n);});break;}}if(!moved.length){idx++;continue;}var newPage=page.cloneNode(false);newPage.className=page.className+" bk-day-continued";var wm=page.querySelector(".bk-watermark");if(wm)newPage.appendChild(wm.cloneNode(true));var headEl=page.querySelector(".bk-page-head");if(headEl)newPage.appendChild(headEl.cloneNode(true));var cont=document.createElement("p");cont.className="bk-day-cont";cont.textContent=(title&&title.textContent?title.textContent.replace(/（續）/,""):"")+"（續）";newPage.appendChild(cont);var nb=document.createElement("div");nb.className="bk-day-body";moved.forEach(function(n){nb.appendChild(n);});newPage.appendChild(nb);var ns=document.createElement("div");ns.className="bk-day-safe-zone";ns.setAttribute("aria-hidden","true");newPage.appendChild(ns);page.parentNode.insertBefore(newPage,page.nextSibling);pages=getPages();idx++;}}' +
                     'function ensureNoteLines(clonedDoc){var areas=clonedDoc.querySelectorAll(".bk-lines-area");areas.forEach(function(area){if(area.querySelector(".bk-note-line"))return;for(var li=0;li<32;li++){var d=clonedDoc.createElement("div");d.className="bk-note-line";area.appendChild(d);}});}' +
                     'function reportProgress(cur,total){var cfg=window.parent&&window.parent.__SOARVIBE_PDF_RUN;if(cfg&&cfg.progress)cfg.progress(cur,total);}' +
                     'function reportDone(blob){var cfg=window.parent&&window.parent.__SOARVIBE_PDF_RUN;if(cfg&&cfg.done)cfg.done(blob);}' +
@@ -7826,6 +8951,8 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     'await loadScript("' + BOOKLET_H2C_SRC + '");' +
                     'await loadScript("' + BOOKLET_JSPDF_SRC + '");' +
                     'await new Promise(function(r){setTimeout(r,650);});' +
+                    'reflowOverflowIntroPage();reflowOverflowDayPages();' +
+                    'await new Promise(function(r){setTimeout(r,120);});' +
                     'var pages=getPages();if(!pages.length)throw new Error("no booklet pages");' +
                     'var jsPDF=window.jspdf.jsPDF;var pdf=new jsPDF({orientation:"portrait",unit:"mm",format:"a4",compress:true});' +
                     'var scales=[1,0.92,1.08];' +
@@ -7920,8 +9047,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 var frame = document.createElement('iframe');
                 frame.setAttribute('title', 'booklet-pdf-capture');
                 frame.setAttribute('aria-hidden', 'true');
-                frame.style.cssText = 'width:' + BOOKLET_PDF_PAGE_W + 'px;height:' + BOOKLET_PDF_PAGE_H +
-                    'px;border:0;margin:0;padding:0;display:block;';
+                frame.style.cssText = 'position:absolute!important;left:0!important;top:0!important;width:1px!important;height:1px!important;max-width:1px!important;max-height:1px!important;border:0!important;margin:0!important;padding:0!important;opacity:0!important;visibility:hidden!important;overflow:hidden!important;';
                 sandbox.appendChild(frame);
 
                 var ok = await writeBookletPreviewFrame(frame, printHtml);
@@ -8007,8 +9133,8 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 }
                 lastBookletPrintHtml = '';
                 cleanupBookletPdfArtifacts();
-                if (options.hardReset) {
-                    resetParentViewportZoom(true);
+                if (!options.skipLayoutRestore) {
+                    restoreAppLayoutAfterPdf();
                 }
             }
 
@@ -8213,6 +9339,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 markSplashSeen();
                 restoreAppLayoutAfterPdf();
                 var file = new File([blob], filename, { type: 'application/pdf' });
+                var result = 'download';
                 if (navigator.canShare) {
                     try {
                         if (navigator.canShare({ files: [file] })) {
@@ -8221,23 +9348,29 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                                 title: 'SOARVIBE 旅行小本本',
                                 text: 'SOARVIBE 專屬旅行小本本'
                             });
-                            return 'share';
+                            result = 'share';
                         }
                     } catch (shareErr) {
-                        if (shareErr && shareErr.name === 'AbortError') return 'cancel';
+                        if (shareErr && shareErr.name === 'AbortError') {
+                            schedulePostShareLayoutRestore();
+                            return 'cancel';
+                        }
                         console.warn('[SOARVIBE] share PDF:', shareErr);
                     }
                 }
-                var url = URL.createObjectURL(blob);
-                var link = document.createElement('a');
-                link.href = url;
-                link.download = filename;
-                link.style.display = 'none';
-                document.body.appendChild(link);
-                link.click();
-                link.remove();
-                setTimeout(function () { URL.revokeObjectURL(url); }, 8000);
-                return 'download';
+                if (result === 'download') {
+                    var url = URL.createObjectURL(blob);
+                    var link = document.createElement('a');
+                    link.href = url;
+                    link.download = filename;
+                    link.style.display = 'none';
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                    setTimeout(function () { URL.revokeObjectURL(url); }, 8000);
+                }
+                schedulePostShareLayoutRestore();
+                return result;
             }
 
             async function saveBookletPdfFromInAppPreview(triggerBtn) {
@@ -8282,7 +9415,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     pdfExportInProgress = false;
                     setBookletPdfProgressVisible(false);
                     cleanupBookletPdfArtifacts();
-                    closeBookletInAppPreview();
+                    closeBookletInAppPreview({ skipLayoutRestore: true });
                     restoreAppLayoutAfterPdf();
                     if (btn) {
                         btn.disabled = false;
@@ -8371,14 +9504,15 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             function buildBookletWatermarkCss() {
-                return '.bk-page,.bk-note-page,.bk-day-page,.bk-food-page{position:relative;overflow:visible;padding-bottom:18mm}' +
+                return '.bk-page,.bk-note-page,.bk-day-page,.bk-food-page{position:relative;overflow:visible;padding-bottom:26mm}' +
                     '.bk-watermark{position:absolute;pointer-events:none;z-index:3;text-align:center}' +
-                    '.bk-watermark-footer{left:50%;bottom:4mm;top:auto;transform:translateX(-50%);width:18mm;max-width:18mm;opacity:0.55}' +
+                    '.bk-watermark-footer{left:50%;bottom:6mm;top:auto;transform:translateX(-50%);width:18mm;max-width:18mm;opacity:0.55}' +
                     '.bk-watermark-center{left:50%;top:50%;bottom:auto;transform:translate(-50%,-50%);width:68%;max-width:105mm;opacity:' + BOOKLET_WATERMARK_OPACITY + '}' +
                     '.bk-watermark img{width:100%;height:auto;display:block}' +
                     '.bk-page>*:not(.bk-watermark),.bk-note-page>*:not(.bk-watermark),' +
                     '.bk-day-page>*:not(.bk-watermark),.bk-food-page>*:not(.bk-watermark){position:relative;z-index:1}' +
-                    '.bk-day-body,.bk-food-body{position:relative;z-index:1}' +
+                    '.bk-day-body,.bk-food-body,.bk-intro-content{position:relative;z-index:1}' +
+                    '.bk-day-safe-zone,.bk-page-safe-zone{flex-shrink:0;height:30mm;min-height:30mm;width:100%;pointer-events:none}' +
                     '.bk-logo-img{display:block;max-height:' + BOOKLET_COVER_LOGO_MAX_HEIGHT +
                     ';width:auto;margin:0 auto 6mm;object-fit:contain;border-radius:8px}';
             }
@@ -8426,25 +9560,26 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     '.bk-tips-title{font-size:11.5pt;font-weight:900;color:#37474F;margin:0 0 2.5mm}' +
                     '.bk-tips-list{margin:0;padding:0 0 0 5mm;font-size:10.5pt;line-height:1.65;color:#455A64}' +
                     '.bk-tips-list li{margin-bottom:1.5mm}' +
-                    '.bk-intro-page{padding:5mm 8mm 10mm;height:281mm;max-height:281mm;overflow:hidden;break-inside:avoid-page;page-break-inside:avoid;display:flex;flex-direction:column;box-sizing:border-box}' +
-                    '.bk-intro-page .bk-page-head{margin-bottom:3mm;padding-bottom:2mm;flex-shrink:0}' +
-                    '.bk-intro-content{flex:1 1 auto;min-height:0;display:grid;grid-template-rows:auto auto 1fr auto auto;gap:3.5mm;align-content:space-between;overflow:hidden}' +
-                    '.bk-intro-block{min-height:0}' +
-                    '.bk-intro-region{font-size:14pt;font-weight:900;color:#37474F;letter-spacing:.04em;margin:0;line-height:1.35}' +
-                    '.bk-intro-region-sub{font-size:11.5pt;font-weight:800;color:#F06292;margin-left:2mm}' +
-                    '.bk-intro-lead{font-size:12pt;line-height:1.65;color:#37474F;margin:0;text-align:justify;font-weight:700}' +
-                    '.bk-intro-rich-list{display:grid;grid-template-columns:1fr 1fr;gap:2.5mm;margin:0}' +
-                    '.bk-intro-rich-item{padding:2.5mm 3mm;background:#F5F9FA;border:1px solid #E0E0E0;border-left:3px solid #80CBC4;border-radius:0 8px 8px 0;height:100%;display:flex;flex-direction:column;justify-content:flex-start}' +
-                    '.bk-intro-rich-label{display:block;font-size:10.5pt;font-weight:900;color:#1565c0;margin:0 0 1mm}' +
-                    '.bk-intro-rich-item p{font-size:10.25pt;line-height:1.55;color:#455A64;margin:0;text-align:justify;flex:1}' +
-                    '.bk-culture-grid{display:grid;grid-template-columns:1fr 1fr;gap:2.5mm;margin:0;height:100%;align-content:stretch}' +
-                    '.bk-culture-card{background:#FAFAFA;border:1px solid #E0E0E0;border-left:3px solid #80CBC4;border-radius:0 8px 8px 0;padding:3mm 3.5mm;break-inside:avoid;page-break-inside:avoid;min-height:26mm;display:flex;flex-direction:column;justify-content:center}' +
-                    '.bk-culture-title{font-size:10.5pt;font-weight:900;color:#37474F;margin:0 0 1.5mm;line-height:1.3}' +
-                    '.bk-culture-text{font-size:9.5pt;line-height:1.52;color:#546E7A;margin:0;text-align:justify}' +
-                    '.bk-highlights-wrap{margin:0;padding:3mm 3.5mm;background:linear-gradient(135deg,#FFF8F0,#E8F5F3);border:1px solid rgba(128,203,196,.4);border-radius:10px;break-inside:avoid;page-break-inside:avoid}' +
-                    '.bk-highlights-title{font-size:10.5pt;font-weight:900;color:#37474F;margin:0 0 2mm}' +
-                    '.bk-highlights-grid{display:grid;grid-template-columns:1fr 1fr;gap:2mm}' +
-                    '.bk-highlight-pill{font-size:9.5pt;font-weight:800;color:#455A64;padding:2mm 2.5mm;background:rgba(255,255,255,.82);border-radius:6px;border:1px solid rgba(128,203,196,.35);text-align:center}' +
+                    '.bk-intro-page{padding:5mm 8mm 8mm;height:281mm;max-height:281mm;overflow:hidden;break-inside:avoid-page;page-break-inside:avoid;display:flex;flex-direction:column;box-sizing:border-box}' +
+                    '.bk-intro-page .bk-page-head{margin-bottom:2.5mm;padding-bottom:2mm;flex-shrink:0}' +
+                    '.bk-intro-content{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:2.5mm;overflow:hidden}' +
+                    '.bk-intro-block{min-height:0;flex-shrink:0}' +
+                    '.bk-intro-region{font-size:13pt;font-weight:900;color:#37474F;letter-spacing:.04em;margin:0;line-height:1.35}' +
+                    '.bk-intro-region-sub{font-size:10.5pt;font-weight:800;color:#F06292;margin-left:2mm}' +
+                    '.bk-intro-lead{font-size:10.25pt;line-height:1.58;color:#37474F;margin:0 0 1.5mm;text-align:justify;font-weight:700}' +
+                    '.bk-intro-cont{font-size:10pt;font-weight:800;color:#F06292;margin:0 0 2mm;line-height:1.3}' +
+                    '.bk-intro-rich-list{display:grid;grid-template-columns:1fr 1fr;gap:2mm;margin:0}' +
+                    '.bk-intro-rich-item{padding:2mm 2.5mm;background:#F5F9FA;border:1px solid #E0E0E0;border-left:3px solid #80CBC4;border-radius:0 8px 8px 0;display:flex;flex-direction:column;justify-content:flex-start}' +
+                    '.bk-intro-rich-label{display:block;font-size:9.75pt;font-weight:900;color:#1565c0;margin:0 0 0.75mm}' +
+                    '.bk-intro-rich-item p{font-size:9.25pt;line-height:1.48;color:#455A64;margin:0;text-align:justify}' +
+                    '.bk-culture-compact{display:grid;grid-template-columns:1fr 1fr;gap:1.5mm 2mm;margin:0}' +
+                    '.bk-culture-row{padding:1.5mm 2mm;background:#FAFAFA;border:1px solid #E0E0E0;border-left:2px solid #80CBC4;border-radius:0 6px 6px 0;break-inside:avoid;page-break-inside:avoid}' +
+                    '.bk-culture-row-title{display:block;font-size:9.25pt;font-weight:900;color:#37474F;margin:0 0 0.5mm;line-height:1.25}' +
+                    '.bk-culture-row-text{display:block;font-size:8.75pt;line-height:1.45;color:#546E7A;margin:0;text-align:justify}' +
+                    '.bk-highlights-wrap{margin:0;padding:2.5mm 3mm;background:linear-gradient(135deg,#FFF8F0,#E8F5F3);border:1px solid rgba(128,203,196,.4);border-radius:10px;break-inside:avoid;page-break-inside:avoid}' +
+                    '.bk-highlights-title{font-size:9.75pt;font-weight:900;color:#37474F;margin:0 0 1.5mm}' +
+                    '.bk-highlights-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5mm}' +
+                    '.bk-highlight-pill{font-size:9pt;font-weight:800;color:#455A64;padding:1.5mm 2mm;background:rgba(255,255,255,.82);border-radius:6px;border:1px solid rgba(128,203,196,.35);text-align:center}' +
                     '.bk-tips-compact{padding:3mm 3.5mm;margin:0}' +
                     '.bk-tips-compact .bk-tips-title{font-size:10.5pt;margin:0 0 1.5mm}' +
                     '.bk-tips-compact .bk-tips-list{font-size:9.5pt;line-height:1.52}' +
@@ -8452,11 +9587,11 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     '.bk-day-page{break-after:page;page-break-after:always;min-height:0}' +
                     '.bk-day-page:last-of-type{break-after:auto;page-break-after:auto}' +
                     '.bk-itinerary-start{break-before:page;page-break-before:always}' +
-                    '.bk-day-title{font-size:14pt;font-weight:900;color:#F06292;margin:0 0 4mm;line-height:1.25}' +
-                    '.bk-day-cont{font-size:12pt;font-weight:800;color:#F06292;margin:0 0 4mm;line-height:1.25}' +
-                    '.bk-food-cont{font-size:13pt;font-weight:900;color:#37474F;margin:0 0 4mm}' +
+                    '.bk-day-title{font-size:12.5pt;font-weight:900;color:#F06292;margin:0 0 2.5mm;line-height:1.25}' +
+                    '.bk-day-cont{font-size:10.5pt;font-weight:800;color:#F06292;margin:0 0 2.5mm;line-height:1.25}' +
+                    '.bk-food-cont{font-size:12pt;font-weight:900;color:#37474F;margin:0 0 3mm}' +
                     '.bk-food-page{break-after:page;page-break-after:always}' +
-                    '.bk-phase{font-size:11pt;font-weight:900;color:#546E7A;margin:3mm 0 2mm}' +
+                    '.bk-phase{font-size:10pt;font-weight:900;color:#546E7A;margin:2mm 0 1.5mm}' +
                     '.bk-page-head{display:flex;justify-content:space-between;align-items:center;border-bottom:2.5px solid #80CBC4;padding-bottom:3.5mm;margin-bottom:5mm}' +
                     '.bk-brand{font-weight:900;color:#F06292;letter-spacing:.08em;font-size:11pt}' +
                     '.bk-page-label{font-size:13pt;color:#37474F;font-weight:900;letter-spacing:.06em}' +
@@ -8476,10 +9611,11 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     '.bk-check-final-title{font-size:12pt;font-weight:900;color:#37474F;margin:0 0 3mm}' +
                     '.bk-check-final-list{margin:0;padding:0 0 0 5mm;font-size:11pt;line-height:1.7;color:#455A64}' +
                     '.bk-check-final-list li{margin-bottom:1.5mm}' +
-                    '.bk-act{background:#FAFAFA;border-left:3px solid #80CBC4;border-radius:0 8px 8px 0;padding:3mm 4mm;margin-bottom:2.5mm;break-inside:avoid;page-break-inside:avoid}' +
-                    '.bk-act-time{font-size:9.5pt;font-weight:900;color:#1565c0}' +
-                    '.bk-act-title{font-size:11pt;font-weight:900;margin:1mm 0}' +
-                    '.bk-act-hl,.bk-act-note{font-size:10pt;color:#546E7A;margin-top:1mm}' +
+                    '.bk-act{background:#FAFAFA;border-left:3px solid #80CBC4;border-radius:0 8px 8px 0;padding:2mm 3.5mm;margin-bottom:1.8mm;break-inside:avoid;page-break-inside:avoid}' +
+                    '.bk-act-head{line-height:1.3;margin-bottom:0.75mm}' +
+                    '.bk-act-time{font-size:8.5pt;font-weight:900;color:#1565c0;display:inline;margin-right:1.5mm;white-space:nowrap}' +
+                    '.bk-act-title{font-size:10pt;font-weight:900;display:inline;margin:0}' +
+                    '.bk-act-hl,.bk-act-note{font-size:9pt;color:#546E7A;margin-top:0.75mm;line-height:1.38}' +
                     '.bk-food-grid{display:grid;grid-template-columns:1fr 1fr;gap:4mm}' +
                     '.bk-food-card{border:1px solid #E0E0E0;border-radius:8px;padding:4mm;background:#FFFBF7;break-inside:avoid;page-break-inside:avoid}' +
                     '.bk-food-name{font-weight:900;font-size:10.5pt;margin-bottom:1mm}' +
@@ -8509,16 +9645,22 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     '.bk-pdf-export-mode .bk-intro-page{height:1123px!important;max-height:1123px!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;padding:24px 32px!important}' +
                     '.bk-pdf-export-mode .bk-check-page{height:1123px!important;min-height:1123px!important;max-height:1123px!important;overflow:hidden!important;display:flex!important;flex-direction:column!important}' +
                     '.bk-pdf-export-mode .bk-note-page{height:1123px!important;min-height:1123px!important;max-height:1123px!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;padding:16px!important}' +
-                    '.bk-pdf-export-mode .bk-day-page,.bk-pdf-export-mode .bk-food-page{display:flex!important;flex-direction:column!important;padding:20px 28px 18mm!important}' +
-                    '.bk-pdf-export-mode .bk-day-body,.bk-pdf-export-mode .bk-food-body{flex:1 1 auto;min-height:0;position:relative;z-index:1}' +
-                    '.bk-pdf-export-mode .bk-day-title{font-size:12pt!important;margin:0 0 2mm!important}' +
-                    '.bk-pdf-export-mode .bk-day-cont{font-size:10.5pt!important;margin:0 0 2mm!important}' +
-                    '.bk-pdf-export-mode .bk-phase{font-size:9.5pt!important;margin:2mm 0 1mm!important}' +
-                    '.bk-pdf-export-mode .bk-act{padding:2mm 3mm!important;margin-bottom:1.5mm!important}' +
-                    '.bk-pdf-export-mode .bk-act-time{font-size:8.5pt!important}' +
-                    '.bk-pdf-export-mode .bk-act-title{font-size:9.5pt!important;margin:0.5mm 0!important;line-height:1.3!important}' +
-                    '.bk-pdf-export-mode .bk-act-hl,.bk-pdf-export-mode .bk-act-note{font-size:8.5pt!important;line-height:1.35!important;margin-top:0.5mm!important}' +
-                    '.bk-pdf-export-mode .bk-watermark-footer{bottom:4mm!important;opacity:0.55!important}' +
+                    '.bk-pdf-export-mode .bk-day-page,.bk-pdf-export-mode .bk-food-page{display:flex!important;flex-direction:column!important;padding:20px 28px 0!important}' +
+                    '.bk-pdf-export-mode .bk-day-body,.bk-pdf-export-mode .bk-food-body{flex:1 1 auto;min-height:0;max-height:calc(1123px - 196px)!important;overflow:hidden!important;position:relative;z-index:1;padding-bottom:2mm!important;box-sizing:border-box!important}' +
+                    '.bk-pdf-export-mode .bk-day-safe-zone,.bk-pdf-export-mode .bk-page-safe-zone{height:32mm!important;min-height:32mm!important;flex-shrink:0!important}' +
+                    '.bk-pdf-export-mode .bk-day-title{font-size:11pt!important;margin:0 0 1.5mm!important}' +
+                    '.bk-pdf-export-mode .bk-day-cont{font-size:9.5pt!important;margin:0 0 1.5mm!important}' +
+                    '.bk-pdf-export-mode .bk-phase{font-size:9pt!important;margin:1.5mm 0 1mm!important}' +
+                    '.bk-pdf-export-mode .bk-act{padding:1.5mm 2.5mm!important;margin-bottom:1.2mm!important}' +
+                    '.bk-pdf-export-mode .bk-act-head{line-height:1.28!important;margin-bottom:0.4mm!important}' +
+                    '.bk-pdf-export-mode .bk-act-time{font-size:8pt!important;display:inline!important}' +
+                    '.bk-pdf-export-mode .bk-act-title{font-size:9pt!important;display:inline!important;margin:0!important;line-height:1.28!important}' +
+                    '.bk-pdf-export-mode .bk-act-hl,.bk-pdf-export-mode .bk-act-note{font-size:8pt!important;line-height:1.32!important;margin-top:0.4mm!important}' +
+                    '.bk-pdf-export-mode .bk-intro-content{gap:6px!important;overflow:hidden!important}' +
+                    '.bk-pdf-export-mode .bk-intro-lead{font-size:9.5pt!important;line-height:1.52!important;margin:0 0 3px!important}' +
+                    '.bk-pdf-export-mode .bk-intro-rich-item p{font-size:8.75pt!important;line-height:1.42!important}' +
+                    '.bk-pdf-export-mode .bk-culture-row-text{font-size:8.25pt!important;line-height:1.4!important}' +
+                    '.bk-pdf-export-mode .bk-watermark-footer{bottom:6mm!important;opacity:0.55!important}' +
                     '.bk-pdf-export-mode .bk-note-keeper{max-height:none!important;flex:1!important;overflow:hidden!important}' +
                     '.bk-pdf-export-mode .bk-lines-area{min-height:640px!important;max-height:680px!important;flex:1!important}' +
                     '@media screen{html,body{width:100%;height:100%;background:#111}.bk-cover-page{width:100vw;height:100vh;min-height:100vh;max-width:none;max-height:none;margin:0}}' +
@@ -8648,6 +9790,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     '</div>' +
                     '<h2 class="bk-section-title">✈️ ' + escapeHtml(dest) + ' · 您的航程資訊</h2>' +
                     buildBookletTripSummaryPageHtml(dest, meta, styleLabel, dateRange, depText, retText, hotel, transport, profile) +
+                    buildBookletPageSafeZone() +
                     '<div class="bk-footer">Generated by SOARVIBE · ' + escapeHtml(new Date().toLocaleDateString('zh-TW')) + '</div></div>' +
 
                     '<div class="bk-page bk-intro-page">' + wmFooter +
@@ -8659,6 +9802,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     buildBookletPageHead('行前必備 CHECK 清單') +
                     '<h2 class="bk-section-title">✅ 出發前請逐項勾選確認</h2>' +
                     buildBookletChecklistPageHtml(checklist, profile, transport) +
+                    buildBookletPageSafeZone() +
                     '<div class="bk-footer">出發前一夜再檢查一次，旅途更安心</div></div>' +
 
                     itineraryHtml +
@@ -8926,26 +10070,87 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 generateBtn.classList.toggle('pointer-events-none', isLoading);
             }
 
+            const BACKUP_ITINERARY_KEY_RULES = [
+                { re: /香港|Hong\s*Kong|港島|九龙|九龍|尖沙咀|銅鑼灣|旺角|中環|蘭桂坊/i, key: '香港' },
+                { re: /澳門|澳门|Macau|Macao|氹仔|路氹/i, key: '澳門' },
+                { re: /台北|Taipei|高雄|Kaohsiung|台中|Taichung|台南|花蓮|墾丁|垦丁|九份|十分|清境/i, key: '台北' },
+                { re: /台灣|台湾|Taiwan/i, key: '台北' },
+                { re: /釜山|Busan/i, key: '釜山' },
+                { re: /濟州|济州|Jeju/i, key: '濟州' },
+                { re: /首爾|首尔|Seoul|仁川|Incheon|大邱|Daegu|光州|Gwangju|江原道|平昌/i, key: '首爾' },
+                { re: /京都|Kyoto|奈良|Nara|宇治/i, key: '京都' },
+                { re: /大阪|Osaka|神戶|Kobe|USJ|環球/i, key: '大阪' },
+                { re: /北海道|Hokkaido|札幌|Sapporo|函館|小樽|富良野|Niseko|二世谷|旭川|帶廣|登別/i, key: '北海道' },
+                { re: /沖繩|Okinawa/i, key: '沖繩' },
+                { re: /東京|Tokyo|橫濱|橫浜|Yokohama|箱根|Hakone|富士|Fuji|鎌倉|Kamakura|日光|Nikko|長野|Nagano|白馬|Hakuba|湯澤|Yuzawa|輕井澤/i, key: '東京' },
+                { re: /福岡|Fukuoka|名古屋|Nagoya|廣島|Hiroshima|金澤|Kanazawa/i, key: '大阪' },
+                { re: /曼谷|Bangkok|芭達雅|Pattaya|芭提雅/i, key: '曼谷' },
+                { re: /清邁|清迈|Chiang\s*Mai|清莱|Chiang\s*Rai|pai|拜縣/i, key: '清邁' },
+                { re: /普吉|Phuket|Krabi|喀比|蘇梅|Samui|甲米|皮皮/i, key: '普吉島' },
+                { re: /新加坡|Singapore|Sentosa|聖淘沙/i, key: '新加坡' },
+                { re: /吉隆坡|Kuala\s*Lumpur|檳城|槟城|Penang|Langkawi|兰卡威|沙巴|Sabah|Kota\s*Kinabalu|仙本那|Semporna/i, key: '馬來西亞' },
+                { re: /河內|河内|Hanoi|胡志明|Ho\s*Chi\s*Minh|Saigon|峴港|Da\s*Nang|會安|Hoi\s*An|芽莊|Nha\s*Trang/i, key: '越南' },
+                { re: /峇里|Bali|雅加達|Jakarta|龍目|Lombok|日惹|Yogyakarta/i, key: '峇里島' },
+                { re: /馬尼拉|Manila|宿霧|Cebu|長灘|Boracay|薄荷|Bohol|Palawan|巴拉望/i, key: '菲律賓' },
+                { re: /倫敦|London|Edinburgh|愛丁堡|Manchester|利物浦|Liverpool|Bath|劍橋|Cambridge/i, key: '倫敦' },
+                { re: /巴黎|Paris|Nice|尼斯|Lyon|里昂|馬賽|Marseille|Provence|普羅旺斯/i, key: '巴黎' },
+                { re: /柏林|Berlin|慕尼黑|Munich|Frankfurt|科隆|Cologne|漢堡|Hamburg|海德堡|Heidelberg/i, key: '歐洲' },
+                { re: /羅馬|Rome|Milan|米蘭|威尼斯|Venice|佛羅倫斯|Florence|Barcelona|巴塞隆納|Madrid|馬德里|Amsterdam|阿姆斯特丹|Prague|布拉格|Vienna|維也納|Zurich|蘇黎世|布達佩斯|Budapest|里斯本|Lisbon|雅典|Athens|布魯塞爾|Brussels|哥本哈根|Copenhagen|斯德哥爾摩|Stockholm|Oslo|奧斯陸|赫爾辛基|Helsinki|都柏林|Dublin|歐洲|Europe|EU\b/i, key: '歐洲' },
+                { re: /紐約|纽约|New\s*York|NYC|Manhattan|布魯克林|Brooklyn|波士頓|Boston|華盛頓|Washington|費城|Philadelphia/i, key: '美國' },
+                { re: /洛杉磯|洛杉矶|Los\s*Angeles|舊金山|旧金山|San\s*Francisco|西雅圖|Seattle|芝加哥|Chicago|邁阿密|Miami|夏威夷|Hawaii|Honolulu|Las\s*Vegas|拉斯維加斯|Denver|Aspen|Colorado|阿拉斯加|Alaska|Anchorage|Salt\s*Lake|黃石|Yellowstone/i, key: '美國' },
+                { re: /溫哥華|Vancouver|多倫多|Toronto|Montreal|蒙特利尔|魁北克|Quebec|Banff|班夫|Calgary|Whistler|惠斯勒|渥太華|Ottawa/i, key: '加拿大' },
+                { re: /雪梨|悉尼|Sydney|墨爾本|Melbourne|布里斯班|Brisbane|黃金海岸|Gold\s*Coast|珀斯|Perth|坎培拉|Canberra|大堡礁|Great\s*Barrier/i, key: '澳洲' },
+                { re: /紐西蘭|新西兰|New\s*Zealand|Auckland|奧克蘭|Queenstown|皇后鎮|Christchurch|Wellington|Rotorua|Milford|米佛/i, key: '紐西蘭' },
+                { re: /杜拜|迪拜|Dubai|Abu\s*Dhabi|阿布扎比|UAE|阿聯酋|Sharjah/i, key: '杜拜' },
+                { re: /馬爾地夫|马尔代夫|Maldives|Male|馬累/i, key: '馬爾地夫' },
+                { re: CHINA_DESTINATION_RE, key: '中國' },
+                { re: /韓國|韩国|Korea/i, key: '首爾' },
+                { re: /日本|Japan/i, key: '東京' },
+                { re: /泰國|泰国|Thailand/i, key: '曼谷' },
+                { re: /越南|Vietnam/i, key: '越南' },
+                { re: /印尼|Indonesia/i, key: '峇里島' },
+                { re: /菲律賓|菲律宾|Philippines/i, key: '菲律賓' },
+                { re: /馬來西亞|马来西亚|Malaysia/i, key: '馬來西亞' },
+                { re: /英國|英国|UK|United\s*Kingdom|Britain|England|Scotland|Wales/i, key: '倫敦' },
+                { re: /法國|法国|France/i, key: '巴黎' },
+                { re: /德國|德国|Germany|義大利|意大利|Italy|西班牙|Spain|荷蘭|荷兰|Netherlands|瑞士|Switzerland|奧地利|奥地利|Austria|捷克|Czech|土耳其|Turkey|希臘|Greece|葡萄牙|Portugal|比利時|Belgium|北歐|Nordic|Scandinavia/i, key: '歐洲' },
+                { re: /美國|美国|USA|United\s*States|America/i, key: '美國' },
+                { re: /加拿大|Canada/i, key: '加拿大' },
+                { re: /澳洲|澳大利亚|Australia/i, key: '澳洲' }
+            ];
+
             function pickBackupItineraryKey(destination) {
                 var dest = String(destination || '').trim();
                 if (!dest) return 'default';
                 var keys = Object.keys(window.backupItinerary || {}).filter(function (k) {
                     return k !== 'default';
                 });
+                keys.sort(function (a, b) { return b.length - a.length; });
                 var i;
                 for (i = 0; i < keys.length; i++) {
                     if (dest.indexOf(keys[i]) !== -1) {
                         return keys[i];
                     }
                 }
-                if (/seoul|首尔/i.test(dest)) return '首爾';
-                if (/kyoto|京都/i.test(dest)) return '京都';
-                if (/bangkok|曼谷/i.test(dest)) return '曼谷';
-                if (/hokkaido|北海道|sapporo|札幌/i.test(dest)) return '北海道';
-                if (/tokyo|東京/i.test(dest)) return '東京';
-                if (/osaka|大阪/i.test(dest)) return '大阪';
-                if (/okinawa|沖繩/i.test(dest)) return '東京';
+                for (i = 0; i < BACKUP_ITINERARY_KEY_RULES.length; i++) {
+                    if (BACKUP_ITINERARY_KEY_RULES[i].re.test(dest)) {
+                        return BACKUP_ITINERARY_KEY_RULES[i].key;
+                    }
+                }
                 return 'default';
+            }
+
+            function getBackupItineraryPack(payload) {
+                var key = pickBackupItineraryKey(payload && payload.destination);
+                var pack = (window.backupItinerary && window.backupItinerary[key])
+                    || window.backupItinerary.default
+                    || { days: [], summary: '' };
+                var dest = (payload && payload.destination) || key || '目的地';
+                var clone = fitBackupDaysToTrip(JSON.parse(JSON.stringify(pack)), payload);
+                if (clone.summary) {
+                    clone.summary = clone.summary.replace(/\{dest\}/g, dest);
+                }
+                return clone;
             }
 
             function fitBackupDaysToTrip(pack, payload) {
@@ -8960,9 +10165,10 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 if (clone.days.length > needDays) {
                     clone.days = clone.days.slice(0, needDays);
                 } else {
-                    var template = clone.days[clone.days.length - 1];
+                    var srcLen = clone.days.length;
                     while (clone.days.length < needDays) {
-                        var extra = JSON.parse(JSON.stringify(template));
+                        var srcIdx = clone.days.length % srcLen;
+                        var extra = JSON.parse(JSON.stringify(clone.days[srcIdx]));
                         extra.day = clone.days.length + 1;
                         clone.days.push(extra);
                     }
@@ -8974,11 +10180,8 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             function getBackupItineraryRaw(payload) {
-                var key = pickBackupItineraryKey(payload && payload.destination);
-                var pack = (window.backupItinerary && window.backupItinerary[key])
-                    || window.backupItinerary.default
-                    || { days: [] };
-                return JSON.stringify(fitBackupDaysToTrip(pack, payload));
+                var pack = getBackupItineraryPack(payload);
+                return JSON.stringify({ days: pack.days });
             }
 
             function isValidGeminiApiKey(key) {
@@ -9660,6 +10863,54 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 }
             }
 
+            async function repairLazyItineraryDays(aiResult, payload) {
+                if (!aiResult || aiResult.fromBackup || !payload) return aiResult;
+                var needDays = countTripDays(payload.dateStart, payload.dateEnd);
+                if (needDays <= 2) return aiResult;
+                var json = extractJsonFromAiText(aiResult.text);
+                if (!json || !Array.isArray(json.days) || !json.days.length) return aiResult;
+
+                var lazyDays = [];
+                json.days.forEach(function (day, idx) {
+                    var dayNum = parseInt(day.day, 10) || idx + 1;
+                    if (isLazyItineraryDay(day, dayNum, needDays)) {
+                        lazyDays.push(dayNum);
+                    }
+                });
+                if (!lazyDays.length) return aiResult;
+
+                console.warn('[SOARVIBE] 偵測到', lazyDays.length, '天內容過於空泛 → 逐日重新生成', lazyDays.join(', '));
+                var anyBackup = false;
+                var priorSummary = '';
+                var d;
+                for (d = 0; d < json.days.length; d++) {
+                    var num = parseInt(json.days[d].day, 10) || d + 1;
+                    if (lazyDays.indexOf(num) === -1) {
+                        priorSummary = summarizePriorDays(json.days.slice(0, d + 1));
+                        continue;
+                    }
+                    setGeneratingDayProgress(num, needDays, payload.destination);
+                    try {
+                        var freshDay = await generateSingleDayWithKeyRotation(payload, num, needDays, priorSummary);
+                        json.days[d] = freshDay;
+                        priorSummary = summarizePriorDays(json.days.slice(0, d + 1));
+                    } catch (regenErr) {
+                        if (isAllKeysExhaustedError(regenErr)) break;
+                        var backupDay = getBackupDayForIndex(payload, num - 1);
+                        if (backupDay) {
+                            json.days[d] = backupDay;
+                            anyBackup = true;
+                            priorSummary = summarizePriorDays(json.days.slice(0, d + 1));
+                        }
+                    }
+                }
+                return {
+                    text: JSON.stringify({ days: json.days }),
+                    fromBackup: anyBackup,
+                    reason: anyBackup ? 'partial_backup_days' : undefined
+                };
+            }
+
             async function runItineraryGeneration() {
                 var customerSelectedTransport = getCustomerSelectedTransport();
                 window.customerSelectedTransport = customerSelectedTransport;
@@ -9686,19 +10937,27 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     var aiResult;
 
                     setGeneratingDayProgress(null, totalDays, payload.destination);
-                    aiResult = await fetchGeminiItinerary(buildGeminiRequestText(payload), payload);
+                    if (totalDays >= 4) {
+                        console.log('[SOARVIBE]', totalDays, '天行程 → 逐日 AI 確保每一天充實');
+                        aiResult = await fetchGeminiItineraryDayByDay(payload);
+                    } else {
+                        aiResult = await fetchGeminiItinerary(buildGeminiRequestText(payload), payload);
 
-                    if (!aiResult.fromBackup) {
-                        var gotDays = countParsedTripDays(aiResult.text);
-                        if (gotDays >= totalDays) {
-                            console.log('[SOARVIBE] 一次生成完整', totalDays, '天 ✓');
-                        } else if (gotDays > 0) {
-                            console.log('[SOARVIBE] 一次生成', gotDays, '/', totalDays, '天 → 僅 AI 補缺失天數');
-                            aiResult = await fillPartialItineraryWithAi(aiResult, payload);
-                        } else {
-                            console.log('[SOARVIBE] 一次生成無有效天數 → 逐日 AI');
-                            aiResult = await fetchGeminiItineraryDayByDay(payload);
+                        if (!aiResult.fromBackup) {
+                            var gotDays = countParsedTripDays(aiResult.text);
+                            if (gotDays >= totalDays) {
+                                console.log('[SOARVIBE] 一次生成完整', totalDays, '天 ✓');
+                            } else if (gotDays > 0) {
+                                console.log('[SOARVIBE] 一次生成', gotDays, '/', totalDays, '天 → 僅 AI 補缺失天數');
+                                aiResult = await fillPartialItineraryWithAi(aiResult, payload);
+                            } else {
+                                console.log('[SOARVIBE] 一次生成無有效天數 → 逐日 AI');
+                                aiResult = await fetchGeminiItineraryDayByDay(payload);
+                            }
                         }
+                    }
+                    if (!aiResult.fromBackup) {
+                        aiResult = await repairLazyItineraryDays(aiResult, payload);
                     }
                     if (aiResult.fromBackup) {
                         window.soarvibeItineraryFromBackup = true;
@@ -9942,10 +11201,28 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', function () {
-                    navigator.serviceWorker.register('./service-worker.js?v=34').catch(function (err) {
+                    refreshSoarvibeViewportHeight();
+                    navigator.serviceWorker.register('./service-worker.js?v=39').catch(function (err) {
                         console.warn('[SOARVIBE] Service worker registration failed:', err);
                     });
                 });
+            }
+
+            refreshSoarvibeViewportHeight();
+            console.info('[SOARVIBE] build', SOARVIBE_APP_BUILD);
+            window.addEventListener('resize', refreshSoarvibeViewportHeight);
+            window.addEventListener('orientationchange', function () {
+                setTimeout(refreshSoarvibeViewportHeight, 120);
+            });
+            window.addEventListener('pageshow', function (ev) {
+                if (ev.persisted) {
+                    refreshSoarvibeViewportHeight();
+                    restoreAppLayoutAfterPdf();
+                }
+            });
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('resize', refreshSoarvibeViewportHeight);
+                window.visualViewport.addEventListener('scroll', refreshSoarvibeViewportHeight);
             }
 
             if (navHome) {
