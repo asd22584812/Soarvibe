@@ -3153,7 +3153,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
-            const SOARVIBE_APP_BUILD = 'v45';
+            const SOARVIBE_APP_BUILD = 'v46';
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
@@ -8236,30 +8236,159 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             var BK_DAY_TITLE_PX = 32;
             var BK_DAY_CONT_PX = 22;
             var BK_PHASE_HEAD_PX = 22;
-            var BK_PAGINATE_SAFETY = 1.12;
+            var BK_PAGINATE_SAFETY = 1.0;
             var BK_WHOLE_DAY_SAFETY = 1.0;
-            var BK_PDF_BODY_RESERVE_PX = 188;
+            var BK_PDF_BODY_RESERVE_PX = 196;
 
             function isBookletPhaseBlockHtml(html) {
                 return html && html.indexOf('bk-phase') !== -1;
             }
 
-            function mergeBookletDayBlocks(blocks) {
-                var merged = [];
+            function groupBookletPhaseBlocks(blocks) {
+                var groups = [];
                 var i;
                 for (i = 0; i < blocks.length; i++) {
                     var block = blocks[i];
-                    if (isBookletPhaseBlockHtml(block.html) && i + 1 < blocks.length && !isBookletPhaseBlockHtml(blocks[i + 1].html)) {
-                        merged.push({
-                            height: block.height + blocks[i + 1].height,
-                            html: block.html + blocks[i + 1].html
-                        });
+                    if (isBookletPhaseBlockHtml(block.html)) {
+                        var groupBlocks = [block];
+                        var groupH = block.height;
                         i += 1;
+                        while (i < blocks.length && !isBookletPhaseBlockHtml(blocks[i].html)) {
+                            groupBlocks.push(blocks[i]);
+                            groupH += blocks[i].height;
+                            i += 1;
+                        }
+                        groups.push({ blocks: groupBlocks, height: groupH, isPhaseGroup: true });
+                        i -= 1;
                     } else {
-                        merged.push(block);
+                        groups.push({ blocks: [block], height: block.height, isPhaseGroup: false });
                     }
                 }
-                return merged;
+                return groups;
+            }
+
+            function sumBookletBlockHeights(blockList) {
+                return blockList.reduce(function (sum, block) {
+                    return sum + block.height;
+                }, 0);
+            }
+
+            function paginateBookletDayBlocks(day, dayNum, wm, itineraryStart) {
+                var groups = groupBookletPhaseBlocks(collectBookletDayBlocks(day));
+                if (!groups.length) return { html: '', pageCount: 0 };
+                var pageH = BOOKLET_PDF_PAGE_H || 1123;
+                var html = '';
+                var pageCount = 0;
+
+                function pageBudget(firstPage) {
+                    var overhead = BK_PDF_BODY_RESERVE_PX + BK_PAGE_HEAD_PX +
+                        (firstPage ? BK_DAY_TITLE_PX : BK_DAY_CONT_PX);
+                    return pageH - overhead;
+                }
+
+                function renderDayPage(blockHtmlList, isFirstPage, isContinued) {
+                    var pageCls = 'bk-page bk-day-page';
+                    if (itineraryStart && pageCount === 0) pageCls += ' bk-itinerary-start';
+                    if (isContinued) pageCls += ' bk-day-continued';
+                    var pageHtml = '<div class="' + pageCls + '">' + wm;
+                    pageHtml += buildBookletPageHead('Day ' + dayNum);
+                    if (isFirstPage) {
+                        pageHtml += '<h2 class="bk-day-title">📅 ' + escapeHtml(day.dateLabel || '') + ' · Day ' + escapeHtml(dayNum) + '</h2>';
+                    } else {
+                        pageHtml += '<p class="bk-day-cont">📅 ' + escapeHtml(day.dateLabel || '') + ' · Day ' + escapeHtml(dayNum) + '（續）</p>';
+                    }
+                    pageHtml += '<div class="bk-day-body">' + blockHtmlList.join('') + '</div>';
+                    pageHtml += '<div class="bk-day-safe-zone" aria-hidden="true"></div></div>';
+                    pageCount += 1;
+                    return pageHtml;
+                }
+
+                function scaledHeight(h) {
+                    return Math.max(28, Math.round(h * BK_PAGINATE_SAFETY));
+                }
+
+                var flatBlocks = [];
+                groups.forEach(function (group) {
+                    group.blocks.forEach(function (block) {
+                        flatBlocks.push(block);
+                    });
+                });
+                var totalHeight = sumBookletBlockHeights(flatBlocks);
+                var firstBudget = pageBudget(true);
+                if (totalHeight * BK_WHOLE_DAY_SAFETY <= firstBudget) {
+                    html += renderDayPage(flatBlocks.map(function (b) { return b.html; }), true, false);
+                    return { html: html, pageCount: pageCount };
+                }
+
+                var groupIdx = 0;
+                var isFirstPage = true;
+                while (groupIdx < groups.length) {
+                    var chunk = [];
+                    var used = 0;
+                    var budget = pageBudget(isFirstPage);
+
+                    while (groupIdx < groups.length) {
+                        var group = groups[groupIdx];
+                        var groupH = scaledHeight(group.height);
+
+                        if (chunk.length && used + groupH > budget) {
+                            break;
+                        }
+
+                        if (!chunk.length && groupH > budget && group.isPhaseGroup && group.blocks.length > 1) {
+                            var phaseBlock = group.blocks[0];
+                            var packed = [phaseBlock.html];
+                            var packedUsed = scaledHeight(phaseBlock.height);
+                            var bi;
+                            for (bi = 1; bi < group.blocks.length; bi++) {
+                                var actH = scaledHeight(group.blocks[bi].height);
+                                if (packedUsed + actH > budget) break;
+                                packed.push(group.blocks[bi].html);
+                                packedUsed += actH;
+                            }
+                            if (bi <= 1) {
+                                packed.push(group.blocks[1].html);
+                                bi = 2;
+                                packedUsed += scaledHeight(group.blocks[1].height);
+                            }
+                            chunk = packed;
+                            used = packedUsed;
+                            if (bi >= group.blocks.length) {
+                                groupIdx += 1;
+                            } else {
+                                groups[groupIdx] = {
+                                    blocks: group.blocks.slice(bi),
+                                    height: sumBookletBlockHeights(group.blocks.slice(bi)),
+                                    isPhaseGroup: false
+                                };
+                            }
+                            break;
+                        }
+
+                        group.blocks.forEach(function (block) {
+                            chunk.push(block.html);
+                        });
+                        used += groupH;
+                        groupIdx += 1;
+                    }
+
+                    if (!chunk.length && groupIdx < groups.length) {
+                        chunk.push(groups[groupIdx].blocks[0].html);
+                        if (groups[groupIdx].blocks.length === 1) {
+                            groupIdx += 1;
+                        } else {
+                            groups[groupIdx] = {
+                                blocks: groups[groupIdx].blocks.slice(1),
+                                height: sumBookletBlockHeights(groups[groupIdx].blocks.slice(1)),
+                                isPhaseGroup: false
+                            };
+                        }
+                    }
+
+                    html += renderDayPage(chunk, isFirstPage, !isFirstPage);
+                    isFirstPage = false;
+                }
+                return { html: html, pageCount: pageCount };
             }
 
             function estimateBookletTextBlockPx(text, charsPerLine, linePx, capPx) {
@@ -8330,71 +8459,6 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     }
                 }
                 return blocks;
-            }
-
-            function paginateBookletDayBlocks(day, dayNum, wm, itineraryStart) {
-                var blocks = mergeBookletDayBlocks(collectBookletDayBlocks(day));
-                if (!blocks.length) return { html: '', pageCount: 0 };
-                var pageH = BOOKLET_PDF_PAGE_H || 1123;
-                var html = '';
-                var pageCount = 0;
-
-                function pageBudget(firstPage) {
-                    var overhead = BK_PDF_BODY_RESERVE_PX + BK_PAGE_HEAD_PX +
-                        (firstPage ? BK_DAY_TITLE_PX : BK_DAY_CONT_PX);
-                    return pageH - overhead;
-                }
-
-                function renderDayPage(blockHtmlList, isFirstPage, isContinued) {
-                    var pageCls = 'bk-page bk-day-page';
-                    if (itineraryStart && pageCount === 0) pageCls += ' bk-itinerary-start';
-                    if (isContinued) pageCls += ' bk-day-continued';
-                    var pageHtml = '<div class="' + pageCls + '">' + wm;
-                    pageHtml += buildBookletPageHead('Day ' + dayNum);
-                    if (isFirstPage) {
-                        pageHtml += '<h2 class="bk-day-title">📅 ' + escapeHtml(day.dateLabel || '') + ' · Day ' + escapeHtml(dayNum) + '</h2>';
-                    } else {
-                        pageHtml += '<p class="bk-day-cont">📅 ' + escapeHtml(day.dateLabel || '') + ' · Day ' + escapeHtml(dayNum) + '（續）</p>';
-                    }
-                    pageHtml += '<div class="bk-day-body">' + blockHtmlList.join('') + '</div>';
-                    pageHtml += '<div class="bk-day-safe-zone" aria-hidden="true"></div></div>';
-                    pageCount += 1;
-                    return pageHtml;
-                }
-
-                var totalHeight = blocks.reduce(function (sum, block) {
-                    return sum + block.height;
-                }, 0);
-                var firstBudget = pageBudget(true);
-                if (totalHeight * BK_WHOLE_DAY_SAFETY <= firstBudget) {
-                    html += renderDayPage(blocks.map(function (b) { return b.html; }), true, false);
-                    return { html: html, pageCount: pageCount };
-                }
-
-                var blockIdx = 0;
-                var isFirstPage = true;
-                while (blockIdx < blocks.length) {
-                    var chunk = [];
-                    var used = 0;
-                    var budget = pageBudget(isFirstPage);
-                    while (blockIdx < blocks.length) {
-                        var block = blocks[blockIdx];
-                        var blockH = Math.max(28, Math.round(block.height * BK_PAGINATE_SAFETY));
-                        if (chunk.length && used + blockH > budget) {
-                            break;
-                        }
-                        chunk.push(block.html);
-                        used += blockH;
-                        blockIdx += 1;
-                    }
-                    if (!chunk.length && blockIdx < blocks.length) {
-                        chunk.push(blocks[blockIdx].html);
-                        blockIdx += 1;
-                    }
-                    html += renderDayPage(chunk, isFirstPage, !isFirstPage);
-                    isFirstPage = false;
-                }
-                return { html: html, pageCount: pageCount };
             }
 
             function buildBookletFoodCardHtml(spot) {
@@ -8771,12 +8835,20 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
             var soarvibePrePdfLayoutHeight = 0;
             var soarvibePdfSessionActive = false;
+            var soarvibeLayoutBaseline = { vh: 0, shellWidth: '' };
+
+            function snapshotLayoutBaseline() {
+                var innerH = Math.round(window.innerHeight || document.documentElement.clientHeight || 0);
+                var shell = document.querySelector('.app-shell');
+                soarvibeLayoutBaseline.vh = innerH;
+                soarvibeLayoutBaseline.shellWidth = shell ? (shell.style.width || '') : '';
+            }
 
             function markSoarvibePdfSession() {
                 soarvibePdfSessionActive = true;
                 setTimeout(function () {
                     soarvibePdfSessionActive = false;
-                }, 45000);
+                }, 120000);
             }
 
             function snapshotPrePdfLayoutHeight() {
@@ -8885,12 +8957,33 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 function applyShellHeight() {
                     var innerH = Math.round(window.innerHeight || document.documentElement.clientHeight || 0);
                     var h = innerH;
+                    if (soarvibeLayoutBaseline.vh > 0 && innerH > 0 &&
+                        Math.abs(innerH - soarvibeLayoutBaseline.vh) < 96) {
+                        h = soarvibeLayoutBaseline.vh;
+                    }
                     if (document.documentElement.classList.contains('soarvibe-keyboard-open') && soarvibeLockedLayoutHeight > 0) {
                         h = soarvibeLockedLayoutHeight;
                     }
                     if (h > 0) {
                         document.documentElement.style.setProperty('--soarvibe-vh', h + 'px');
                     }
+                    var shell = document.querySelector('.app-shell');
+                    var isMobileShell = window.matchMedia('(max-width: 768px), (display-mode: standalone)').matches;
+                    if (shell && isMobileShell) {
+                        shell.style.width = '100%';
+                        shell.style.maxWidth = '100%';
+                        shell.style.minHeight = h + 'px';
+                        shell.style.height = h + 'px';
+                        shell.style.margin = '0';
+                        shell.style.transform = 'none';
+                        shell.style.borderRadius = '0';
+                    }
+                    document.body.style.display = 'block';
+                    document.body.style.padding = '0';
+                    document.body.style.margin = '0';
+                    document.body.style.width = '100%';
+                    document.body.style.maxWidth = '100%';
+                    document.body.style.overflow = 'hidden';
                 }
 
                 applyShellHeight();
@@ -8918,7 +9011,17 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     }, 80);
                 }
                 document.addEventListener('visibilitychange', function () {
-                    if (!document.hidden) scheduleResumeRestore();
+                    if (!document.hidden) {
+                        scheduleResumeRestore();
+                        if (soarvibePdfSessionActive) {
+                            setTimeout(function () {
+                                restoreHomeLayoutAfterBooklet({ hard: true });
+                            }, 160);
+                            setTimeout(function () {
+                                restoreHomeLayoutAfterBooklet({ hard: true });
+                            }, 700);
+                        }
+                    }
                 });
                 window.addEventListener('pageshow', function () {
                     scheduleResumeRestore();
@@ -8930,11 +9033,11 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
             function armPostShareLayoutRestore() {
                 markSoarvibePdfSession();
-                restoreHomeLayoutAfterBooklet({ hard: true });
-                setTimeout(function () { restoreHomeLayoutAfterBooklet({ hard: true }); }, 220);
-                setTimeout(function () { restoreHomeLayoutAfterBooklet({ hard: true }); }, 900);
-                setTimeout(function () { restoreHomeLayoutAfterBooklet({ hard: false }); }, 2400);
-                setTimeout(function () { restoreHomeLayoutAfterBooklet({ hard: false }); }, 5000);
+                [400, 1200, 2800, 6000, 12000].forEach(function (ms) {
+                    setTimeout(function () {
+                        restoreHomeLayoutAfterBooklet({ hard: ms < 2000 });
+                    }, ms);
+                });
                 setTimeout(function () { soarvibePrePdfLayoutHeight = 0; }, 800);
             }
 
@@ -9122,6 +9225,92 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 }
             }
 
+            function fixOrphanPhaseHeadersInDoc(doc) {
+                if (!doc || !doc.body) return;
+                var pages = Array.prototype.slice.call(doc.querySelectorAll('.bk-day-page'));
+                pages.forEach(function (page) {
+                    var body = page.querySelector('.bk-day-body');
+                    if (!body || !body.lastElementChild) return;
+                    if (!body.lastElementChild.classList || !body.lastElementChild.classList.contains('bk-phase')) return;
+                    var nextPage = page.nextElementSibling;
+                    while (nextPage && (!nextPage.classList || !nextPage.classList.contains('bk-day-page'))) {
+                        nextPage = nextPage.nextElementSibling;
+                    }
+                    if (!nextPage) return;
+                    var nextBody = nextPage.querySelector('.bk-day-body');
+                    if (!nextBody) return;
+                    nextBody.insertBefore(body.lastElementChild, nextBody.firstChild);
+                });
+            }
+
+            function tightenBookletDayPagesInDoc(doc) {
+                if (!doc || !doc.body) return;
+                doc.documentElement.classList.add('bk-pdf-export-mode');
+                var pageH = BOOKLET_PDF_PAGE_H || 1123;
+                var guard = 0;
+
+                function sameDay(pageA, pageB) {
+                    if (!pageA || !pageB) return false;
+                    var la = pageA.querySelector('.bk-day-title') || pageA.querySelector('.bk-day-cont');
+                    var lb = pageB.querySelector('.bk-day-title') || pageB.querySelector('.bk-day-cont');
+                    var da = la && String(la.textContent || '').match(/Day\s*(\d+)/i);
+                    var db = lb && String(lb.textContent || '').match(/Day\s*(\d+)/i);
+                    return !!(da && db && da[1] === db[1]);
+                }
+
+                while (guard < 400) {
+                    guard += 1;
+                    var pages = Array.prototype.slice.call(doc.querySelectorAll('.bk-day-page'));
+                    var moved = false;
+                    var pi;
+                    for (pi = 0; pi < pages.length - 1; pi++) {
+                        var page = pages[pi];
+                        var next = pages[pi + 1];
+                        if (!sameDay(page, next)) continue;
+                        var body = page.querySelector('.bk-day-body');
+                        var nextBody = next.querySelector('.bk-day-body');
+                        if (!body || !nextBody || !nextBody.firstElementChild) continue;
+
+                        var node = nextBody.firstElementChild;
+                        var pullPhase = node.classList && node.classList.contains('bk-phase');
+                        var pullAct = pullPhase && node.nextElementSibling && node.nextElementSibling.classList &&
+                            node.nextElementSibling.classList.contains('bk-act') ? node.nextElementSibling : null;
+
+                        if (pullPhase && pullAct) {
+                            body.appendChild(node);
+                            body.appendChild(pullAct);
+                        } else {
+                            body.appendChild(node);
+                        }
+
+                        if ((page.scrollHeight || 0) > pageH + 2) {
+                            if (pullPhase && pullAct) {
+                                body.removeChild(pullAct);
+                                body.removeChild(node);
+                            } else {
+                                body.removeChild(node);
+                            }
+                            continue;
+                        }
+
+                        if (body.lastElementChild && body.lastElementChild.classList &&
+                            body.lastElementChild.classList.contains('bk-phase')) {
+                            var orphan = body.lastElementChild;
+                            body.removeChild(orphan);
+                            nextBody.insertBefore(orphan, nextBody.firstChild);
+                        }
+
+                        if (!nextBody.firstElementChild && next.parentNode) {
+                            next.parentNode.removeChild(next);
+                        }
+                        moved = true;
+                        break;
+                    }
+                    if (!moved) break;
+                }
+                fixOrphanPhaseHeadersInDoc(doc);
+            }
+
             function splitOverflowBookletDayPagesInDoc(doc) {
                 if (!doc || !doc.body) return;
                 doc.documentElement.classList.add('bk-pdf-export-mode');
@@ -9219,6 +9408,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     }
                     if (!didSplit) break;
                 }
+                fixOrphanPhaseHeadersInDoc(doc);
             }
 
             function buildBookletIframePdfRunnerScript() {
@@ -9605,7 +9795,9 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     var frameDoc = capture.doc;
                     setBookletPdfExportMode(frameDoc, false);
                     await waitForPrintDocumentReady(frameDoc, 12000);
+                    tightenBookletDayPagesInDoc(frameDoc);
                     splitOverflowBookletDayPagesInDoc(frameDoc);
+                    fixOrphanPhaseHeadersInDoc(frameDoc);
                     await new Promise(function (resolve) { setTimeout(resolve, 100); });
                     return await runBookletPdfInsideIframe(capture.frame, frameDoc, onProgress);
                 } finally {
@@ -9665,6 +9857,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 }
                 markSplashSeen();
                 markSoarvibePdfSession();
+                snapshotLayoutBaseline();
                 snapshotPrePdfLayoutHeight();
                 pdfExportInProgress = true;
                 var prevText = btn ? btn.textContent : '';
@@ -9700,7 +9893,6 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     setBookletPdfProgressVisible(false);
                     cleanupBookletPdfArtifacts();
                     closeBookletInAppPreview({ skipLayoutRestore: true });
-                    restoreHomeLayoutAfterBooklet({ hard: true });
                     if (btn) {
                         btn.disabled = false;
                         btn.textContent = prevText || '📥 儲存 PDF';
@@ -11479,7 +11671,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', function () {
                     refreshSoarvibeViewportHeight();
-                    navigator.serviceWorker.register('./service-worker.js?v=45').catch(function (err) {
+                    navigator.serviceWorker.register('./service-worker.js?v=46').catch(function (err) {
                         console.warn('[SOARVIBE] Service worker registration failed:', err);
                     });
                 });
@@ -11500,14 +11692,18 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 setTimeout(function () { refreshSoarvibeViewportHeight({ force: true }); }, 120);
             });
             window.addEventListener('pageshow', function (ev) {
-                if (ev.persisted) {
+                if (ev.persisted || soarvibePdfSessionActive) {
                     refreshSoarvibeViewportHeight({ force: true });
-                    restoreHomeLayoutAfterBooklet();
+                    restoreHomeLayoutAfterBooklet({ hard: soarvibePdfSessionActive });
                 }
             });
             if (window.visualViewport) {
                 window.visualViewport.addEventListener('resize', function () {
                     if (document.documentElement.classList.contains('soarvibe-keyboard-open') || isSoarvibeKeyboardLikelyOpen()) {
+                        return;
+                    }
+                    if (soarvibePdfSessionActive) {
+                        restoreHomeLayoutAfterBooklet({ hard: true });
                         return;
                     }
                     refreshSoarvibeViewportHeight();
