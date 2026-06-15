@@ -8816,7 +8816,9 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     phoneScroll.style.overflowX = 'hidden';
                     phoneScroll.style.webkitOverflowScrolling = 'touch';
                 }
-                refreshSoarvibeViewportHeight();
+                document.documentElement.classList.remove('soarvibe-keyboard-open');
+                soarvibeLockedLayoutHeight = 0;
+                refreshSoarvibeViewportHeight(hadPdfState ? { force: true, preferVisual: true } : {});
                 var previewFrame = document.getElementById('booklet-preview-frame');
                 if (previewFrame) {
                     restorePreviewFrameAfterPdfCapture(previewFrame);
