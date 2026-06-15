@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <style id="splash-critical">html.splash-pending,html.splash-pending body{background:linear-gradient(165deg,#1a237e 0%,#37474F 42%,#00838f 100%)!important;margin:0;padding:0;overflow:hidden}html.splash-pending #soarvibe-splash{display:flex!important}html.splash-pending body>.app-shell{visibility:hidden}</style>
-    <script>(function(){var skip=false;try{skip=localStorage.getItem('soarvibe_splash_done')==='1'||sessionStorage.getItem('soarvibe_splash_done')==='1';}catch(e){}var s=window.matchMedia('(display-mode: standalone)').matches||window.matchMedia('(display-mode: fullscreen)').matches||window.navigator.standalone===true;if(s){document.documentElement.classList.add('pwa-standalone');if(!skip){document.documentElement.classList.add('splash-pending');}}})();</script>
+    <script>(function(){var skip=false;try{skip=sessionStorage.getItem('soarvibe_splash_done')==='1';}catch(e){}var s=window.matchMedia('(display-mode: standalone)').matches||window.matchMedia('(display-mode: fullscreen)').matches||window.navigator.standalone===true;if(s){document.documentElement.classList.add('pwa-standalone');if(!skip){document.documentElement.classList.add('splash-pending');}}})();</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=overlays-content">
     <meta name="theme-color" content="#1a237e">
     <meta name="description" content="SOARVIBE — AI 旅遊規劃，提升你的旅程，翱翔你的風格">
@@ -24,8 +24,7 @@
                 if (standalone) {
                     var skipSplash = false;
                     try {
-                        skipSplash = localStorage.getItem('soarvibe_splash_done') === '1'
-                            || sessionStorage.getItem('soarvibe_splash_done') === '1';
+                        skipSplash = sessionStorage.getItem('soarvibe_splash_done') === '1';
                     } catch (splashStoreErr) { /* silent */ }
                     if (!skipSplash) {
                         document.documentElement.classList.add('splash-pending');
@@ -3153,7 +3152,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
-            const SOARVIBE_APP_BUILD = 'v48';
+            const SOARVIBE_APP_BUILD = 'v49';
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
@@ -4141,7 +4140,6 @@
 
             function hasSplashBeenSeen() {
                 try {
-                    if (localStorage.getItem('soarvibe_splash_done') === '1') return true;
                     if (sessionStorage.getItem('soarvibe_splash_done') === '1') return true;
                 } catch (splashSeenErr) { /* silent */ }
                 return false;
@@ -4149,8 +4147,8 @@
 
             function markSplashSeen() {
                 try {
-                    localStorage.setItem('soarvibe_splash_done', '1');
                     sessionStorage.setItem('soarvibe_splash_done', '1');
+                    localStorage.removeItem('soarvibe_splash_done');
                 } catch (splashMarkErr) { /* silent */ }
                 document.documentElement.classList.remove('splash-pending');
                 var splashEl = document.getElementById('soarvibe-splash');
@@ -11685,7 +11683,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', function () {
                     refreshSoarvibeViewportHeight();
-                    navigator.serviceWorker.register('./service-worker.js?v=48').catch(function (err) {
+                    navigator.serviceWorker.register('./service-worker.js?v=49').catch(function (err) {
                         console.warn('[SOARVIBE] Service worker registration failed:', err);
                     });
                 });
