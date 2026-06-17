@@ -1,4 +1,4 @@
-const CACHE_NAME = 'soarvibe-v62';
+const CACHE_NAME = 'soarvibe-v63';
 const STATIC_ASSETS = [
   './manifest.json',
   './bg.png',
