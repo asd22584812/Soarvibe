@@ -1957,7 +1957,7 @@
             <button type="button" id="booklet-preview-print" class="booklet-preview-btn booklet-preview-btn-primary">📥 儲存 PDF</button>
         </div>
         <iframe id="booklet-preview-frame" title="旅行小本本列印預覽"></iframe>
-        <p class="booklet-preview-hint">一鍵儲存 PDF，無需設定列印。點「儲存 PDF」→ 分享 →「儲存到檔案」即可。<span id="booklet-preview-build" class="booklet-preview-build"></span></p>
+        <p class="booklet-preview-hint">一鍵儲存 PDF。iPhone：點「儲存 PDF」→ 列印畫面 → 分享 →「儲存到檔案」。<span id="booklet-preview-build" class="booklet-preview-build"></span></p>
     </div>
 
     <div id="booklet-pdf-progress" class="hidden" aria-live="polite" role="status" aria-hidden="true">
@@ -3179,7 +3179,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
-            const SOARVIBE_APP_BUILD = 'v56';
+            const SOARVIBE_APP_BUILD = 'v57';
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
@@ -9600,10 +9600,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 try {
                     if (sessionStorage.getItem('soarvibe_pdf_exporting') === '1') {
                         sessionStorage.removeItem('soarvibe_pdf_exporting');
-                        markPdfCanvasCrashOnIos();
-                        setTimeout(function () {
-                            showModal('PDF 生成被系統中斷，請再試一次。若仍失敗會改以列印方式存檔 📖', '📖');
-                        }, 500);
+                        sessionStorage.removeItem('soarvibe_pdf_canvas_crash');
                     }
                 } catch (storageErr) { /* silent */ }
             }
@@ -9625,7 +9622,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                         sheet.setAttribute('aria-hidden', 'false');
                         document.documentElement.classList.add('booklet-preview-open');
                     }
-                    if (!shouldUsePreviewIframePdfCapture()) {
+                    if (!shouldUseIosPrintOnlyPdf()) {
                         loadBookletPdfLibs().catch(function (preloadErr) {
                             console.warn('[SOARVIBE] preload PDF libs:', preloadErr);
                         });
@@ -9670,8 +9667,8 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 return /iPhone|iPad|iPod/i.test(navigator.userAgent);
             }
 
-            /** iPhone/iPad：在預覽 iframe 內跑 html2canvas（舊版穩定路徑，避免父視窗記憶體崩潰） */
-            function shouldUsePreviewIframePdfCapture() {
+            /** iPhone/iPad：Safari 無法承受 html2canvas，一律用系統列印存 PDF */
+            function shouldUseIosPrintOnlyPdf() {
                 return shouldUseIosLowMemoryPdf();
             }
 
@@ -9884,34 +9881,9 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 if (!printHtml) {
                     throw new Error('PDF libs unavailable');
                 }
-
-                if (shouldUsePreviewIframePdfCapture()) {
-                    var previewCapture = null;
-                    try {
-                        previewCapture = await resolveBookletCaptureDoc();
-                        var previewDoc = previewCapture.doc;
-                        setBookletPdfExportMode(previewDoc, true);
-                        prepareBookletCoverForPdfExport(previewDoc);
-                        try {
-                            reflowBookletDayPagesForPdf(previewDoc);
-                        } catch (reflowErr) {
-                            console.warn('[SOARVIBE] reflowBookletDayPagesForPdf (preview):', reflowErr);
-                        }
-                        await waitForPrintDocumentReady(previewDoc, 12000);
-                        await new Promise(function (resolve) { setTimeout(resolve, 500); });
-                        return await runBookletPdfInsideIframe(previewCapture.frame, previewDoc, onProgress);
-                    } finally {
-                        if (previewCapture && previewCapture.doc) {
-                            setBookletPdfExportMode(previewCapture.doc, false);
-                            cleanupPreviewPdfRunnerScripts(previewCapture.doc);
-                        }
-                        if (previewCapture && previewCapture.frame) {
-                            removeHiddenCaptureFrame(previewCapture.frame, !!previewCapture.fromPreview);
-                        }
-                        cleanupBookletPdfArtifacts();
-                    }
+                if (shouldUseIosPrintOnlyPdf()) {
+                    throw new Error('ios print only');
                 }
-
                 if (!window.html2canvas || !window.jspdf || !window.jspdf.jsPDF) {
                     throw new Error('PDF libs unavailable');
                 }
@@ -10010,28 +9982,49 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 return result;
             }
 
-            async function printBookletPdfExportModeFromPreview() {
+            async function saveBookletPdfViaIosPrint(triggerBtn) {
+                var btn = triggerBtn || document.getElementById('booklet-preview-print');
                 var frame = document.getElementById('booklet-preview-frame');
                 if (!frame || !frame.contentDocument || !frame.contentWindow) {
-                    throw new Error('preview not ready');
+                    showModal('預覽尚未準備好，請稍候再試 📖', '📖');
+                    return;
                 }
-                var frameDoc = frame.contentDocument;
-                endBookletPdfExportUi();
-                document.documentElement.classList.remove('pdf-export-busy');
-                pdfExportInProgress = false;
-                markPdfExportSessionStorage(false);
-                setBookletPdfExportMode(frameDoc, true);
-                prepareBookletCoverForPdfExport(frameDoc);
+                var prevText = btn ? btn.textContent : '';
+                if (btn) {
+                    btn.disabled = true;
+                    btn.textContent = '📄 準備列印…';
+                }
+                pdfExportInProgress = true;
                 try {
-                    reflowBookletDayPagesForPdf(frameDoc);
-                } catch (reflowErr) {
-                    console.warn('[SOARVIBE] printBookletPdfExportModeFromPreview reflow:', reflowErr);
+                    var frameDoc = frame.contentDocument;
+                    await waitForPrintDocumentReady(frameDoc, 8000);
+                    setBookletPdfExportMode(frameDoc, true);
+                    prepareBookletCoverForPdfExport(frameDoc);
+                    try {
+                        reflowBookletDayPagesForPdf(frameDoc);
+                    } catch (reflowErr) {
+                        console.warn('[SOARVIBE] reflowBookletDayPagesForPdf (iOS print):', reflowErr);
+                    }
+                    await new Promise(function (resolve) { setTimeout(resolve, 280); });
+                    showModal('接下來會開啟列印畫面。請點右上角「分享」→「儲存到檔案」即可存成 PDF 📖', '📖');
+                    await new Promise(function (resolve) { setTimeout(resolve, 1100); });
+                    frame.contentWindow.focus();
+                    frame.contentWindow.print();
+                    markSoarvibePdfSession();
+                } catch (printErr) {
+                    console.warn('[SOARVIBE] saveBookletPdfViaIosPrint:', printErr);
+                    showModal('無法開啟列印，請再試一次 📖', '📖');
+                } finally {
+                    pdfExportInProgress = false;
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.textContent = prevText || '📥 儲存 PDF';
+                    }
                 }
-                await new Promise(function (resolve) { setTimeout(resolve, 350); });
-                showModal('請在列印畫面點右上角「分享」→ 選「儲存到檔案」即可存成 PDF 📖', '📖');
-                await new Promise(function (resolve) { setTimeout(resolve, 900); });
-                frame.contentWindow.focus();
-                frame.contentWindow.print();
+            }
+
+            async function printBookletPdfExportModeFromPreview() {
+                await saveBookletPdfViaIosPrint();
             }
 
             async function saveBookletPdfFromInAppPreview(triggerBtn) {
@@ -10042,65 +10035,15 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 }
                 if (pdfExportInProgress) return;
 
+                if (shouldUseIosPrintOnlyPdf()) {
+                    await saveBookletPdfViaIosPrint(btn);
+                    return;
+                }
+
                 var prevText = btn ? btn.textContent : '';
                 if (btn) {
                     btn.disabled = true;
                     btn.textContent = '📄 PDF 準備中…';
-                }
-
-                if (shouldUsePreviewIframePdfCapture()) {
-                    pdfExportInProgress = true;
-                    hideBookletPreviewForPdfCapture();
-                    setBookletPdfProgressVisible(true, 'PDF 排版中…', '正在準備每一頁');
-                    await new Promise(function (resolve) { setTimeout(resolve, 80); });
-                    try {
-                        markPdfExportSessionStorage(true);
-                        var iosMeta = currentItineraryMeta || collectTripPayload();
-                        var iosFilename = buildBookletPdfFilename(iosMeta);
-                        var blob = await generateBookletPdfBlob(lastBookletPrintHtml, iosMeta, function (cur, total) {
-                            var iosLabel = '📄 生成 PDF ' + cur + '/' + total + '…';
-                            if (btn) btn.textContent = iosLabel;
-                            setBookletPdfProgressVisible(true, iosLabel, '完成後會自動開啟分享');
-                        });
-                        markPdfExportSessionStorage(false);
-                        clearPdfCanvasCrashOnIos();
-                        setBookletPdfProgressVisible(true, '📤 開啟分享…', '請選「儲存到檔案」');
-                        var iosResult = await saveOrShareBookletPdf(blob, iosFilename);
-                        if (iosResult === 'cancel') {
-                            restoreBookletPreviewAfterPdfCapture();
-                            return;
-                        }
-                        markSoarvibePdfSession();
-                        restoreBookletPreviewAfterPdfCapture();
-                        if (iosResult === 'share') {
-                            showModal('已開啟分享，請選「儲存到檔案」即可完成 📖', '📖');
-                        }
-                    } catch (iosPdfErr) {
-                        markPdfExportSessionStorage(false);
-                        console.error('[SOARVIBE] saveBookletPdfFromInAppPreview (iOS):', iosPdfErr);
-                        restoreBookletPreviewAfterPdfCapture();
-                        try {
-                            await printBookletPdfExportModeFromPreview();
-                            return;
-                        } catch (printFallbackErr) {
-                            console.warn('[SOARVIBE] printBookletPdfExportModeFromPreview:', printFallbackErr);
-                        }
-                        var iosHint = 'PDF 生成失敗，請稍後再試 📖';
-                        if (iosPdfErr && iosPdfErr.message === 'preview not ready') {
-                            iosHint = '預覽尚未準備好，請關閉後重新開啟小本本 📖';
-                        } else if (iosPdfErr && /canvas|empty page|timeout|load fail|no booklet pages|iframe failed/i.test(String(iosPdfErr.message || iosPdfErr))) {
-                            iosHint = 'PDF 排版失敗，請關閉預覽後重新製作小本本 📖';
-                        }
-                        showModal(iosHint, '📖');
-                    } finally {
-                        pdfExportInProgress = false;
-                        setBookletPdfProgressVisible(false);
-                        if (btn) {
-                            btn.disabled = false;
-                            btn.textContent = prevText || '📥 儲存 PDF';
-                        }
-                    }
-                    return;
                 }
 
                 snapshotLayoutBaseline();
