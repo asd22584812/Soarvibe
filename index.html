@@ -3180,7 +3180,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
-            const SOARVIBE_APP_BUILD = 'v59';
+            const SOARVIBE_APP_BUILD = 'v60';
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
@@ -9192,10 +9192,44 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             function getBookletWatermarkClearLine(page, win) {
                 var safe = page.querySelector('.bk-day-safe-zone, .bk-page-safe-zone');
                 if (safe) {
-                    return safe.getBoundingClientRect().top;
+                    var safeTop = safe.getBoundingClientRect().top;
+                    if (safeTop > 0) return safeTop;
                 }
                 var pageRect = page.getBoundingClientRect();
-                return pageRect.bottom - Math.round(((win || window).innerHeight ? 91 : 91));
+                return pageRect.bottom - (BK_DAY_SAFE_ZONE_PX || 88);
+            }
+
+            function groupBookletBodyNodesIntoUnits(nodes) {
+                var units = [];
+                var i = 0;
+                while (i < nodes.length) {
+                    var node = nodes[i];
+                    if (node.classList && node.classList.contains('bk-phase')) {
+                        var unit = [node];
+                        i += 1;
+                        while (i < nodes.length && !(nodes[i].classList && nodes[i].classList.contains('bk-phase'))) {
+                            unit.push(nodes[i]);
+                            i += 1;
+                        }
+                        units.push(unit);
+                    } else {
+                        units.push([node]);
+                        i += 1;
+                    }
+                }
+                return units;
+            }
+
+            function prepareBookletPagesForPrint(doc) {
+                if (!doc || !doc.body) return;
+                setBookletPdfExportMode(doc, true);
+                prepareBookletCoverForPdfExport(doc);
+                try {
+                    reflowBookletDayPagesForPdf(doc);
+                } catch (reflowErr) {
+                    console.warn('[SOARVIBE] reflowBookletDayPagesForPdf:', reflowErr);
+                }
+                fixOrphanPhaseHeadersInDoc(doc);
             }
 
             function bookletBlockCrossesWatermark(page, block, win) {
@@ -9296,10 +9330,11 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     if (!body) return;
                     body.textContent = '';
 
-                    var blockIdx = 0;
+                    var units = groupBookletBodyNodesIntoUnits(blocks);
+                    var unitIdx = 0;
                     var pageIsFirst = true;
 
-                    while (blockIdx < blocks.length) {
+                    while (unitIdx < units.length) {
                         if (!pageIsFirst) {
                             page = createBookletContinuedDayPage(doc, anchorPage);
                             if (insertAfter.nextSibling) {
@@ -9312,26 +9347,31 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                         }
 
                         var placedOnPage = 0;
-                        while (blockIdx < blocks.length) {
-                            var node = blocks[blockIdx];
-                            body.appendChild(node);
-
-                            if (bookletBlockCrossesWatermark(page, node, win)) {
-                                body.removeChild(node);
-                                if (body.lastElementChild && body.lastElementChild.classList.contains('bk-phase')) {
-                                    var lonePhase = body.lastElementChild;
-                                    body.removeChild(lonePhase);
-                                    blocks.splice(blockIdx, 0, lonePhase);
+                        while (unitIdx < units.length) {
+                            var unit = units[unitIdx];
+                            var ui;
+                            for (ui = 0; ui < unit.length; ui++) {
+                                body.appendChild(unit[ui]);
+                            }
+                            var lastInUnit = unit[unit.length - 1];
+                            if (bookletBlockCrossesWatermark(page, lastInUnit, win)) {
+                                for (ui = unit.length - 1; ui >= 0; ui--) {
+                                    if (unit[ui].parentNode === body) {
+                                        body.removeChild(unit[ui]);
+                                    }
                                 }
                                 break;
                             }
-                            blockIdx += 1;
+                            unitIdx += 1;
                             placedOnPage += 1;
                         }
 
-                        if (placedOnPage === 0 && blockIdx < blocks.length) {
-                            body.appendChild(blocks[blockIdx]);
-                            blockIdx += 1;
+                        if (placedOnPage === 0 && unitIdx < units.length) {
+                            var forcedUnit = units[unitIdx];
+                            forcedUnit.forEach(function (forcedNode) {
+                                body.appendChild(forcedNode);
+                            });
+                            unitIdx += 1;
                         }
 
                         pageIsFirst = false;
@@ -9918,12 +9958,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                         setBookletMobilePdfCaptureMode(frameDoc, true);
                     }
                     await waitForPrintDocumentReady(frameDoc, 12000);
-                    prepareBookletCoverForPdfExport(frameDoc);
-                    try {
-                        reflowBookletDayPagesForPdf(frameDoc);
-                    } catch (reflowErr) {
-                        console.warn('[SOARVIBE] reflowBookletDayPagesForPdf:', reflowErr);
-                    }
+                    prepareBookletPagesForPrint(frameDoc);
                     await new Promise(function (resolve) { setTimeout(resolve, shouldUseIosLowMemoryPdf() ? 450 : 320); });
 
                     var pages = getBookletPdfPageElements(frameDoc);
@@ -10020,9 +10055,13 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
                 try {
                     var frameDoc = frame.contentDocument;
-                    setBookletPdfExportMode(frameDoc, true);
-                    applyBookletCoverPrintSizing(frameDoc);
-                    await new Promise(function (resolve) { setTimeout(resolve, 120); });
+                    prepareBookletPagesForPrint(frameDoc);
+                    await new Promise(function (resolve) {
+                        requestAnimationFrame(function () {
+                            requestAnimationFrame(resolve);
+                        });
+                    });
+                    await new Promise(function (resolve) { setTimeout(resolve, 400); });
                     frame.contentWindow.focus();
                     frame.contentWindow.print();
                     markSoarvibePdfSession();
@@ -10409,6 +10448,22 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     '.bk-note-page{height:auto!important;min-height:100vh!important;max-height:none!important;overflow:visible!important}' +
                     '.bk-note-keeper{max-height:none!important;overflow:visible!important}' +
                     '.bk-lines-area{min-height:180mm!important;max-height:none!important}' +
+                    'html.bk-pdf-export-mode,html.bk-pdf-export-mode body{width:210mm!important;margin:0 auto!important;padding:0!important;background:#fff!important}' +
+                    'html.bk-pdf-export-mode .bk-cover-page,html.bk-pdf-export-mode .bk-page,html.bk-pdf-export-mode .bk-day-page,html.bk-pdf-export-mode .bk-note-page,html.bk-pdf-export-mode .bk-food-page{' +
+                    'width:210mm!important;height:297mm!important;max-width:210mm!important;max-height:297mm!important;min-height:297mm!important;' +
+                    'overflow:hidden!important;margin:0!important;box-sizing:border-box!important;' +
+                    'break-after:page!important;page-break-after:always!important;position:relative!important}' +
+                    'html.bk-pdf-export-mode .bk-cover-page{padding:0!important;margin:0!important}' +
+                    'html.bk-pdf-export-mode .bk-cover-bg-img{width:210mm!important;height:297mm!important;object-fit:cover!important;object-position:center center!important}' +
+                    'html.bk-pdf-export-mode .bk-page:not(.bk-cover-page),html.bk-pdf-export-mode .bk-day-page{padding:16mm 14mm 0!important}' +
+                    'html.bk-pdf-export-mode .bk-day-page.bk-day-continued .bk-day-title{display:none!important}' +
+                    'html.bk-pdf-export-mode .bk-day-body,html.bk-pdf-export-mode .bk-food-body{' +
+                    'flex:1 1 auto!important;min-height:0!important;max-height:calc(297mm - 54mm)!important;overflow:hidden!important;position:relative!important;z-index:1!important}' +
+                    'html.bk-pdf-export-mode .bk-day-safe-zone,html.bk-pdf-export-mode .bk-page-safe-zone{' +
+                    'height:22mm!important;min-height:22mm!important;flex-shrink:0!important}' +
+                    'html.bk-pdf-export-mode .bk-phase,html.bk-pdf-export-mode .bk-act{break-inside:avoid!important;page-break-inside:avoid!important}' +
+                    'html.bk-pdf-export-mode .bk-watermark-footer{bottom:5mm!important;opacity:.55!important}' +
+                    'html.bk-pdf-export-mode .bk-day-page:last-of-type,html.bk-pdf-export-mode .bk-page:last-of-type{break-after:auto!important;page-break-after:auto!important}' +
                     'body,.bk-watermark,.bk-watermark img,.bk-cover-bg-img,.bk-cover-shade,.bk-cover-panel,.bk-fact-pill,.bk-culture-card,.bk-tips-box,.bk-checklist-extra,.bk-check-final,.bk-stamp-zone{-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
                     '}';
             }
