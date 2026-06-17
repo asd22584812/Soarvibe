@@ -3180,7 +3180,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
-            const SOARVIBE_APP_BUILD = 'v60';
+            const SOARVIBE_APP_BUILD = 'v61';
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
@@ -8303,16 +8303,146 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             function paginateBookletDayBlocks(day, dayNum, wm, itineraryStart) {
-                var blocks = collectBookletDayBlocks(day);
-                if (!blocks.length) return { html: '', pageCount: 0 };
-                var pageCls = 'bk-page bk-day-page';
-                if (itineraryStart) pageCls += ' bk-itinerary-start';
-                var html = '<div class="' + pageCls + '">' + wm;
-                html += buildBookletPageHead('Day ' + dayNum);
-                html += '<h2 class="bk-day-title">📅 ' + escapeHtml(day.dateLabel || '') + ' · Day ' + escapeHtml(dayNum) + '</h2>';
-                html += '<div class="bk-day-body">' + blocks.map(function (b) { return b.html; }).join('') + '</div>';
-                html += '<div class="bk-day-safe-zone" aria-hidden="true"></div></div>';
-                return { html: html, pageCount: 1 };
+                var groups = groupBookletPhaseBlocks(collectBookletDayBlocks(day));
+                if (!groups.length) return { html: '', pageCount: 0 };
+                var pageH = BOOKLET_PDF_PAGE_H || 1123;
+                var html = '';
+                var pageCount = 0;
+
+                function pageBudget(firstPage) {
+                    var overhead = BK_PDF_BODY_RESERVE_PX + BK_PAGE_HEAD_PX +
+                        (firstPage ? BK_DAY_TITLE_PX : BK_DAY_CONT_PX);
+                    return pageH - overhead;
+                }
+
+                function renderDayPage(blockHtmlList, isFirstPage, isContinued) {
+                    var pageCls = 'bk-page bk-day-page';
+                    if (itineraryStart && pageCount === 0) pageCls += ' bk-itinerary-start';
+                    if (isContinued) pageCls += ' bk-day-continued';
+                    var pageHtml = '<div class="' + pageCls + '">' + wm;
+                    pageHtml += buildBookletPageHead('Day ' + dayNum);
+                    if (isFirstPage) {
+                        pageHtml += '<h2 class="bk-day-title">📅 ' + escapeHtml(day.dateLabel || '') + ' · Day ' + escapeHtml(dayNum) + '</h2>';
+                    } else {
+                        pageHtml += '<p class="bk-day-cont">📅 ' + escapeHtml(day.dateLabel || '') + ' · Day ' + escapeHtml(dayNum) + '（續）</p>';
+                    }
+                    pageHtml += '<div class="bk-day-body">' + blockHtmlList.join('') + '</div>';
+                    pageHtml += '<div class="bk-day-safe-zone" aria-hidden="true"></div></div>';
+                    pageCount += 1;
+                    return pageHtml;
+                }
+
+                function scaledHeight(h) {
+                    return Math.max(28, Math.round(h * BK_PAGINATE_SAFETY));
+                }
+
+                var flatBlocks = [];
+                groups.forEach(function (group) {
+                    group.blocks.forEach(function (block) {
+                        flatBlocks.push(block);
+                    });
+                });
+                var totalHeight = sumBookletBlockHeights(flatBlocks);
+                var firstBudget = pageBudget(true);
+                if (totalHeight * BK_WHOLE_DAY_SAFETY <= firstBudget) {
+                    html += renderDayPage(flatBlocks.map(function (b) { return b.html; }), true, false);
+                    return { html: html, pageCount: pageCount };
+                }
+
+                var groupIdx = 0;
+                var isFirstPage = true;
+                while (groupIdx < groups.length) {
+                    var chunk = [];
+                    var used = 0;
+                    var budget = pageBudget(isFirstPage);
+
+                    while (groupIdx < groups.length) {
+                        var group = groups[groupIdx];
+                        var groupH = scaledHeight(group.height);
+
+                        if (chunk.length && used + groupH > budget) {
+                            if (group.isPhaseGroup && group.blocks.length) {
+                                var bi = 0;
+                                var partialUsed = used;
+                                var partialChunk = chunk.slice();
+                                for (bi = 0; bi < group.blocks.length; bi++) {
+                                    var bh = scaledHeight(group.blocks[bi].height);
+                                    if (partialUsed + bh > budget) break;
+                                    partialChunk.push(group.blocks[bi].html);
+                                    partialUsed += bh;
+                                }
+                                if (bi > 0) {
+                                    chunk = partialChunk;
+                                    used = partialUsed;
+                                    if (bi >= group.blocks.length) {
+                                        groupIdx += 1;
+                                    } else {
+                                        groups[groupIdx] = {
+                                            blocks: group.blocks.slice(bi),
+                                            height: sumBookletBlockHeights(group.blocks.slice(bi)),
+                                            isPhaseGroup: isBookletPhaseBlockHtml(group.blocks[bi].html)
+                                        };
+                                    }
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+
+                        if (!chunk.length && groupH > budget && group.isPhaseGroup && group.blocks.length > 1) {
+                            var phaseBlock = group.blocks[0];
+                            var packed = [phaseBlock.html];
+                            var packedUsed = scaledHeight(phaseBlock.height);
+                            var bi2;
+                            for (bi2 = 1; bi2 < group.blocks.length; bi2++) {
+                                var actH = scaledHeight(group.blocks[bi2].height);
+                                if (packedUsed + actH > budget) break;
+                                packed.push(group.blocks[bi2].html);
+                                packedUsed += actH;
+                            }
+                            if (bi2 <= 1) {
+                                packed.push(group.blocks[1].html);
+                                bi2 = 2;
+                                packedUsed += scaledHeight(group.blocks[1].height);
+                            }
+                            chunk = packed;
+                            used = packedUsed;
+                            if (bi2 >= group.blocks.length) {
+                                groupIdx += 1;
+                            } else {
+                                groups[groupIdx] = {
+                                    blocks: group.blocks.slice(bi2),
+                                    height: sumBookletBlockHeights(group.blocks.slice(bi2)),
+                                    isPhaseGroup: false
+                                };
+                            }
+                            break;
+                        }
+
+                        group.blocks.forEach(function (block) {
+                            chunk.push(block.html);
+                        });
+                        used += groupH;
+                        groupIdx += 1;
+                    }
+
+                    if (!chunk.length && groupIdx < groups.length) {
+                        chunk.push(groups[groupIdx].blocks[0].html);
+                        if (groups[groupIdx].blocks.length === 1) {
+                            groupIdx += 1;
+                        } else {
+                            groups[groupIdx] = {
+                                blocks: groups[groupIdx].blocks.slice(1),
+                                height: sumBookletBlockHeights(groups[groupIdx].blocks.slice(1)),
+                                isPhaseGroup: false
+                            };
+                        }
+                    }
+
+                    html += renderDayPage(chunk, isFirstPage, !isFirstPage);
+                    isFirstPage = false;
+                }
+                return { html: html, pageCount: pageCount };
             }
 
             function estimateBookletTextBlockPx(text, charsPerLine, linePx, capPx) {
@@ -9220,16 +9350,24 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 return units;
             }
 
-            function prepareBookletPagesForPrint(doc) {
+            function prepareBookletPagesForPrint(doc, options) {
+                options = options || {};
                 if (!doc || !doc.body) return;
                 setBookletPdfExportMode(doc, true);
                 prepareBookletCoverForPdfExport(doc);
+                if (options.skipReflow) return;
                 try {
                     reflowBookletDayPagesForPdf(doc);
                 } catch (reflowErr) {
                     console.warn('[SOARVIBE] reflowBookletDayPagesForPdf:', reflowErr);
                 }
                 fixOrphanPhaseHeadersInDoc(doc);
+            }
+
+            function prepareBookletPagesForIosPrint(doc) {
+                if (!doc || !doc.body) return;
+                setBookletPdfExportMode(doc, true);
+                prepareBookletCoverForPdfExport(doc);
             }
 
             function bookletBlockCrossesWatermark(page, block, win) {
@@ -10055,13 +10193,8 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
                 try {
                     var frameDoc = frame.contentDocument;
-                    prepareBookletPagesForPrint(frameDoc);
-                    await new Promise(function (resolve) {
-                        requestAnimationFrame(function () {
-                            requestAnimationFrame(resolve);
-                        });
-                    });
-                    await new Promise(function (resolve) { setTimeout(resolve, 400); });
+                    prepareBookletPagesForIosPrint(frameDoc);
+                    await new Promise(function (resolve) { setTimeout(resolve, 180); });
                     frame.contentWindow.focus();
                     frame.contentWindow.print();
                     markSoarvibePdfSession();
