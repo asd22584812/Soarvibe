@@ -1957,7 +1957,7 @@
             <button type="button" id="booklet-preview-print" class="booklet-preview-btn booklet-preview-btn-primary">📥 儲存 PDF</button>
         </div>
         <iframe id="booklet-preview-frame" title="旅行小本本列印預覽"></iframe>
-        <p class="booklet-preview-hint">上下滑動預覽。儲存 PDF → 列印 → 分享 → 儲存到檔案。<span id="booklet-preview-build" class="booklet-preview-build"></span></p>
+        <p class="booklet-preview-hint">預覽為 A4 比例。儲存 PDF → 列印 → 關閉「頁首與頁尾」→ 分享 → 儲存到檔案。<span id="booklet-preview-build" class="booklet-preview-build"></span></p>
     </div>
 
     <div id="booklet-pdf-progress" class="hidden" aria-live="polite" role="status" aria-hidden="true">
@@ -3180,7 +3180,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
-            const SOARVIBE_APP_BUILD = 'v64';
+            const SOARVIBE_APP_BUILD = 'v65';
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
@@ -9417,11 +9417,45 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 fixOrphanPhaseHeadersInDoc(doc);
             }
 
-            function clearBookletPrintInlineStyles(doc) {
-                if (!doc) return;
-                doc.querySelectorAll('.bk-cover-page, .bk-cover-bg-img').forEach(function (el) {
-                    el.removeAttribute('style');
-                });
+            function lockBookletLayoutForPrint(doc) {
+                if (!doc || !doc.body) return;
+                doc.documentElement.style.width = '210mm';
+                doc.documentElement.style.margin = '0';
+                doc.documentElement.style.padding = '0';
+                doc.body.style.width = '210mm';
+                doc.body.style.margin = '0';
+                doc.body.style.padding = '0';
+                doc.body.style.background = '#fff';
+                var cover = doc.querySelector('.bk-cover-page');
+                if (cover) {
+                    cover.style.width = '210mm';
+                    cover.style.height = '297mm';
+                    cover.style.maxWidth = '210mm';
+                    cover.style.maxHeight = '297mm';
+                    cover.style.minHeight = '297mm';
+                    cover.style.margin = '0';
+                    cover.style.padding = '0';
+                    cover.style.overflow = 'hidden';
+                    cover.style.position = 'relative';
+                    cover.style.boxSizing = 'border-box';
+                    cover.style.backgroundSize = 'cover';
+                    cover.style.backgroundPosition = 'center center';
+                    cover.style.backgroundRepeat = 'no-repeat';
+                }
+                var bg = doc.querySelector('.bk-cover-bg-img');
+                if (bg) {
+                    bg.style.position = 'absolute';
+                    bg.style.top = '0';
+                    bg.style.left = '0';
+                    bg.style.width = '100%';
+                    bg.style.height = '100%';
+                    bg.style.objectFit = 'cover';
+                    bg.style.objectPosition = 'center center';
+                    bg.style.display = 'block';
+                    bg.style.zIndex = '0';
+                    bg.style.margin = '0';
+                    bg.style.padding = '0';
+                }
             }
 
             async function prepareBookletPagesForIosPrint(doc) {
@@ -9430,11 +9464,12 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     'bk-pdf-export-mode', 'bk-ios-print', 'bk-mobile-pdf-capture',
                     'bk-a4-preview', 'bk-print-faithful'
                 );
-                clearBookletPrintInlineStyles(doc);
                 if (lastBookletCoverDataUrl) {
                     injectBookletCoverIntoDoc(doc, lastBookletCoverDataUrl);
                 }
+                lockBookletLayoutForPrint(doc);
                 await waitForPrintDocumentReady(doc, 12000);
+                lockBookletLayoutForPrint(doc);
             }
 
             function bookletBlockCrossesWatermark(page, block, win) {
@@ -9908,20 +9943,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             function applyBookletCoverPrintSizing(doc) {
-                if (!doc) return;
-                var win = doc.defaultView || window;
-                var h = (win && win.innerHeight) ? win.innerHeight : 0;
-                if (!h) return;
-                var c = doc.querySelector('.bk-cover-page');
-                var bg = doc.querySelector('.bk-cover-bg-img');
-                if (c) {
-                    c.style.height = h + 'px';
-                    c.style.maxHeight = h + 'px';
-                    c.style.minHeight = h + 'px';
-                }
-                if (bg) {
-                    bg.style.height = h + 'px';
-                }
+                lockBookletLayoutForPrint(doc);
             }
 
             var BOOKLET_PDF_PAGE_W = 794;
@@ -10623,9 +10645,10 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     '.bk-mobile-pdf-capture .bk-day-body,.bk-mobile-pdf-capture .bk-food-body{max-height:calc(562px - 130px)!important;overflow:hidden!important}' +
                     '@media screen{' +
                     'html,body{width:100%;min-height:100%;margin:0;padding:0;background:#eceff1!important}' +
-                    '.bk-cover-page{width:100%;height:100vh;min-height:100vh;max-width:100%;margin:0;padding:0;overflow:hidden;position:relative;background-color:#B0BEC5}' +
+                    '.bk-cover-page{width:100%;max-width:100%;height:auto;aspect-ratio:210/297;min-height:0;max-height:none;margin:0 0 10px;padding:0;overflow:hidden;position:relative;background-color:#B0BEC5;box-sizing:border-box}' +
                     '.bk-cover-bg-img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block}' +
                     '.bk-page,.bk-day-page,.bk-note-page,.bk-food-page{width:100%;max-width:100%;margin:0 0 10px;padding:14px 12px;box-sizing:border-box;background:#fff!important}' +
+                    '.bk-intro-page,.bk-check-page,.bk-note-page{height:auto!important;min-height:0!important;max-height:none!important}' +
                     '.bk-day-body,.bk-food-body,.bk-note-keeper,.bk-intro-content{overflow:visible!important;max-height:none!important}' +
                     '}' +
                     '@media print{' +
@@ -10728,6 +10751,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 var foodPagesHtml = buildBookletFoodPagesHtml(foodSpots, wmFooter);
 
                 return '<!DOCTYPE html><html lang="zh-TW"><head><meta charset="UTF-8">' +
+                    '<meta name="viewport" content="width=794, initial-scale=1">' +
                     '<base href="' + escapeHtml(printBaseHref) + '">' +
                     '<title> </title>' +
                     '<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">' +
