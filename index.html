@@ -3242,7 +3242,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
-            const SOARVIBE_APP_BUILD = 'v70';
+            const SOARVIBE_APP_BUILD = 'v71';
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
@@ -10010,14 +10010,9 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
             function checkPdfExportCrashRecovery() {
                 try {
-                    if (sessionStorage.getItem('soarvibe_pdf_exporting') === '1') {
-                        sessionStorage.removeItem('soarvibe_pdf_exporting');
-                    }
-                    var lastBuild = sessionStorage.getItem('soarvibe_last_build');
-                    if (lastBuild !== SOARVIBE_APP_BUILD) {
-                        sessionStorage.removeItem('soarvibe_pdf_canvas_crash');
-                        sessionStorage.setItem('soarvibe_last_build', SOARVIBE_APP_BUILD);
-                    }
+                    sessionStorage.removeItem('soarvibe_pdf_exporting');
+                    sessionStorage.removeItem('soarvibe_pdf_canvas_crash');
+                    sessionStorage.setItem('soarvibe_last_build', SOARVIBE_APP_BUILD);
                 } catch (storageErr) { /* silent */ }
             }
 
@@ -10071,9 +10066,9 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 return /iPhone|iPad|iPod/i.test(navigator.userAgent);
             }
 
-            /** iPhone/iPad：優先 canvas 生成 PDF；僅在上次 canvas 崩潰時改走系統列印 */
+            /** 儲存 PDF 一律走 canvas → PDF 檢視器，不自動改系統列印 */
             function shouldUseIosPrintOnlyPdf() {
-                return shouldSkipCanvasPdfOnIos();
+                return false;
             }
 
             async function createMobileBookletCaptureDoc(printHtml) {
@@ -10597,11 +10592,6 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 }
                 if (pdfExportInProgress) return;
 
-                if (shouldUseIosPrintOnlyPdf()) {
-                    await saveBookletPdfViaIosPrint(btn);
-                    return;
-                }
-
                 var prevText = btn ? btn.textContent : '';
                 if (btn) {
                     btn.disabled = true;
@@ -10656,18 +10646,6 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     console.error('[SOARVIBE] saveBookletPdfFromInAppPreview:', pdfErr);
                     endBookletPdfExportUi();
                     document.documentElement.classList.remove('pdf-export-busy');
-                    if (shouldUseIosLowMemoryPdf()) {
-                        setBookletPdfProgressVisible(true, '改用列印備援…', '若仍失敗請重新製作小本本');
-                        await new Promise(function (resolve) { setTimeout(resolve, 900); });
-                        setBookletPdfProgressVisible(false);
-                        pdfExportInProgress = false;
-                        if (btn) {
-                            btn.disabled = false;
-                            btn.textContent = prevText || '📥 儲存 PDF';
-                        }
-                        await saveBookletPdfViaIosPrint(btn);
-                        return;
-                    }
                     var pdfHint = 'PDF 生成失敗，請稍後再試 📖';
                     if (pdfErr && pdfErr.message === 'PDF libs unavailable') {
                         pdfHint = 'PDF 元件載入失敗，請確認網路連線後再試 📖';
@@ -10675,7 +10653,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                         pdfHint = '預覽尚未準備好，請關閉後重新開啟小本本 📖';
                     } else if (pdfErr && /script load failed/i.test(String(pdfErr.message || pdfErr))) {
                         pdfHint = 'PDF 元件載入失敗，請確認網路連線後再試 📖';
-                    } else if (pdfErr && /canvas|empty page|timeout|load fail|no booklet pages/i.test(String(pdfErr.message || pdfErr))) {
+                    } else if (pdfErr && /canvas|empty page|timeout|load fail|no booklet pages|mobile capture/i.test(String(pdfErr.message || pdfErr))) {
                         pdfHint = 'PDF 排版失敗，請關閉預覽後重新製作小本本 📖';
                     }
                     showModal(pdfHint, '📖');
