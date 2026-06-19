@@ -1,4 +1,4 @@
-const CACHE_NAME = 'soarvibe-v79';
+const CACHE_NAME = 'soarvibe-v80';
 const STATIC_ASSETS = [
   './manifest.json',
   './bg.png',
@@ -15,6 +15,12 @@ const STATIC_ASSETS = [
   './cover-photos/paris.jpg'
 ];
 
+self.addEventListener('message', function (event) {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
 self.addEventListener('install', function (event) {
   event.waitUntil(
     caches.open(CACHE_NAME).then(function (cache) {
@@ -29,7 +35,9 @@ self.addEventListener('activate', function (event) {
   event.waitUntil(
     caches.keys().then(function (keys) {
       return Promise.all(
-        keys.filter(function (key) { return key !== CACHE_NAME; }).map(function (key) {
+        keys.filter(function (key) {
+          return key.startsWith('soarvibe-') && key !== CACHE_NAME;
+        }).map(function (key) {
           return caches.delete(key);
         })
       );
