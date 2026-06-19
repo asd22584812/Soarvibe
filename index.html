@@ -3242,7 +3242,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
-            const SOARVIBE_APP_BUILD = 'v74';
+            const SOARVIBE_APP_BUILD = 'v75';
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
@@ -8890,17 +8890,48 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             function injectBookletCoverIntoDoc(doc, coverDataUrl) {
                 if (!doc || !isValidCoverDataUrl(coverDataUrl)) return false;
                 var cover = doc.querySelector('.bk-cover-page');
-                var bg = doc.querySelector('.bk-cover-bg-img');
-                if (bg) {
-                    bg.src = coverDataUrl;
-                    bg.removeAttribute('style');
+                var img = doc.querySelector('.bk-cover-image');
+                if (!img && cover) {
+                    img = doc.createElement('img');
+                    img.className = 'bk-cover-image';
+                    img.alt = 'cover';
+                    cover.insertBefore(img, cover.firstChild);
+                }
+                if (img) {
+                    img.src = coverDataUrl;
+                    img.removeAttribute('style');
                 }
                 if (cover) {
-                    cover.style.backgroundImage = 'url(' + coverDataUrl + ')';
-                    cover.style.backgroundSize = 'cover';
-                    cover.style.backgroundPosition = 'center center';
+                    cover.style.backgroundImage = '';
+                    cover.style.backgroundSize = '';
+                    cover.style.backgroundPosition = '';
                 }
-                return true;
+                return !!img;
+            }
+
+            function waitForImages(doc) {
+                var imgs = Array.from((doc && doc.images) || []);
+                return Promise.all(
+                    imgs.map(function (img) {
+                        if (img.complete && img.naturalWidth > 0) return Promise.resolve();
+                        return new Promise(function (resolve) {
+                            img.onload = resolve;
+                            img.onerror = resolve;
+                        });
+                    })
+                );
+            }
+
+            function logBookletPrintPages(doc) {
+                if (!doc || !doc.body) return;
+                var sheets = doc.querySelectorAll('body > .bk-cover-page, body > .bk-a4-page');
+                console.log('[SOARVIBE] print sheets:', sheets.length);
+                Array.prototype.forEach.call(sheets, function (el, i) {
+                    console.log('[SOARVIBE] sheet', i + 1, {
+                        className: el.className,
+                        textLen: (el.textContent || '').replace(/\s+/g, ' ').trim().length
+                    });
+                });
             }
 
             function waitForPrintDocumentReady(doc, timeoutMs) {
@@ -9540,17 +9571,15 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     cover.style.height = '297mm';
                     cover.style.maxWidth = '210mm';
                     cover.style.maxHeight = '297mm';
-                    cover.style.minHeight = '297mm';
+                    cover.style.minHeight = '0';
                     cover.style.margin = '0';
                     cover.style.padding = '0';
                     cover.style.overflow = 'hidden';
                     cover.style.position = 'relative';
                     cover.style.boxSizing = 'border-box';
-                    cover.style.backgroundSize = 'cover';
-                    cover.style.backgroundPosition = 'center center';
-                    cover.style.backgroundRepeat = 'no-repeat';
+                    cover.style.backgroundImage = '';
                 }
-                var bg = doc.querySelector('.bk-cover-bg-img');
+                var bg = doc.querySelector('.bk-cover-image');
                 if (bg) {
                     bg.style.position = 'absolute';
                     bg.style.top = '0';
@@ -9572,7 +9601,9 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 if (lastBookletCoverDataUrl) {
                     injectBookletCoverIntoDoc(doc, lastBookletCoverDataUrl);
                 }
+                await waitForImages(doc);
                 await waitForPrintDocumentReady(doc, 12000);
+                logBookletPrintPages(doc);
             }
 
             function bookletBlockCrossesWatermark(page, block, win) {
@@ -9612,7 +9643,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 doc.documentElement.classList.add('bk-pdf-export-mode');
                 if (mobile) doc.documentElement.classList.add('bk-mobile-pdf-capture');
                 var cover = doc.querySelector('.bk-cover-page');
-                var bg = doc.querySelector('.bk-cover-bg-img');
+                var bg = doc.querySelector('.bk-cover-image');
                 if (cover) {
                     cover.style.width = w + 'px';
                     cover.style.height = h + 'px';
@@ -9767,7 +9798,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     'function reportDone(blob){var cfg=window.parent&&window.parent.__SOARVIBE_PDF_RUN;if(cfg&&cfg.done)cfg.done(blob);}' +
                     'function reportFail(msg){var cfg=window.parent&&window.parent.__SOARVIBE_PDF_RUN;if(cfg&&cfg.fail)cfg.fail(msg);}' +
                     'async function capturePage(el,scale,h2c,isCover){return h2c(el,{scale:scale,window:window,useCORS:true,allowTaint:true,backgroundColor:"#ffffff",logging:false,width:PAGE_W,height:PAGE_H,windowWidth:PAGE_W,windowHeight:PAGE_H,scrollX:0,scrollY:0,x:0,y:0,foreignObjectRendering:false,removeContainer:true,onclone:function(clonedDoc,clonedEl){clonedDoc.documentElement.classList.add("bk-pdf-export-mode");' + mobileInit +
-                    'ensureNoteLines(clonedDoc);if(clonedEl&&clonedEl.style){clonedEl.style.width=PAGE_W+"px";clonedEl.style.height=PAGE_H+"px";clonedEl.style.boxSizing="border-box";}if(isCover){var bg=clonedEl&&clonedEl.querySelector?clonedEl.querySelector(".bk-cover-bg-img"):null;if(bg){bg.style.width=PAGE_W+"px";bg.style.height=PAGE_H+"px";bg.style.objectFit="cover";bg.style.objectPosition="center center";}}}});}' +
+                    'ensureNoteLines(clonedDoc);if(clonedEl&&clonedEl.style){clonedEl.style.width=PAGE_W+"px";clonedEl.style.height=PAGE_H+"px";clonedEl.style.boxSizing="border-box";}if(isCover){var bg=clonedEl&&clonedEl.querySelector?clonedEl.querySelector(".bk-cover-image"):null;if(bg){bg.style.width=PAGE_W+"px";bg.style.height=PAGE_H+"px";bg.style.objectFit="cover";bg.style.objectPosition="center center";}}}});}' +
                     'async function run(){try{' +
                     'document.documentElement.classList.add("bk-pdf-export-mode");' + mobileInit +
                     'await loadScript("' + BOOKLET_H2C_SRC + '");' +
@@ -10325,7 +10356,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                             clonedEl.style.boxSizing = 'border-box';
                         }
                         if (isCover && clonedEl && clonedEl.querySelector) {
-                            var bg = clonedEl.querySelector('.bk-cover-bg-img');
+                            var bg = clonedEl.querySelector('.bk-cover-image');
                             if (bg) {
                                 bg.style.width = BOOKLET_PDF_PAGE_W + 'px';
                                 bg.style.height = BOOKLET_PDF_PAGE_H + 'px';
@@ -10386,7 +10417,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                             clonedEl.style.boxSizing = 'border-box';
                         }
                         if (isCover && clonedEl && clonedEl.querySelector) {
-                            var bg = clonedEl.querySelector('.bk-cover-bg-img');
+                            var bg = clonedEl.querySelector('.bk-cover-image');
                             if (bg) {
                                 bg.style.width = w + 'px';
                                 bg.style.height = h + 'px';
@@ -10557,6 +10588,8 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 try {
                     var frameDoc = frame.contentDocument;
                     await prepareBookletPagesForIosPrint(frameDoc);
+                    await waitForImages(frameDoc);
+                    logBookletPrintPages(frameDoc);
                     await new Promise(function (resolve) { setTimeout(resolve, 200); });
                     frame.contentWindow.focus();
                     frame.contentWindow.print();
@@ -10618,7 +10651,11 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 try {
                     var frameDoc = frame.contentDocument;
                     await waitForPrintDocumentReady(frameDoc, 8000);
-                    applyBookletCoverPrintSizing(frameDoc);
+                    if (lastBookletCoverDataUrl) {
+                        injectBookletCoverIntoDoc(frameDoc, lastBookletCoverDataUrl);
+                    }
+                    await waitForImages(frameDoc);
+                    logBookletPrintPages(frameDoc);
                     await new Promise(function (resolve) {
                         setTimeout(resolve, 120);
                     });
@@ -10681,7 +10718,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             function buildBookletWatermarkCss() {
-                return '.bk-page,.bk-note-page,.bk-day-page,.bk-food-page{position:relative;overflow:visible;padding-bottom:26mm;background:#fff}' +
+                return '.bk-page:not(.bk-a4-page),.bk-note-page:not(.bk-a4-page),.bk-day-page:not(.bk-a4-page),.bk-food-page:not(.bk-a4-page){position:relative;overflow:visible;padding-bottom:26mm;background:#fff}' +
                     '.bk-watermark{position:absolute;pointer-events:none;z-index:3;text-align:center}' +
                     '.bk-watermark-footer{left:50%;bottom:6mm;top:auto;transform:translateX(-50%);width:18mm;max-width:18mm;opacity:0.55}' +
                     '.bk-watermark-center{left:50%;top:50%;bottom:auto;transform:translate(-50%,-50%);width:68%;max-width:105mm;opacity:' + BOOKLET_WATERMARK_OPACITY + '}' +
@@ -10695,9 +10732,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             function buildBookletPaginationCss() {
-                return 'body>.bk-cover-page,body>.bk-a4-page{break-after:page;page-break-after:always;break-inside:auto;page-break-inside:auto}' +
-                    'body>:last-child{break-after:auto;page-break-after:auto}' +
-                    '.bk-day-page,.bk-day-cont,.bk-phase,.bk-note-page,.bk-food-page,.bk-page,.bk-intro-page,.bk-check-page{break-inside:auto;page-break-inside:auto}' +
+                return '.bk-day-page,.bk-day-cont,.bk-phase,.bk-note-page,.bk-food-page,.bk-page,.bk-intro-page,.bk-check-page{break-inside:auto;page-break-inside:auto;break-after:auto;page-break-after:auto;break-before:auto;page-break-before:auto}' +
                     '.bk-itinerary-start,.bk-notes-start,.bk-food-continued,.bk-day-continued{break-before:auto;page-break-before:auto}' +
                     '.bk-day-title,.bk-phase{break-after:avoid;page-break-after:avoid}' +
                     '.bk-act,.bk-food-card,.bk-check-item,.bk-cover-meta,.bk-checklist-extra,.bk-check-final{break-inside:avoid;page-break-inside:avoid}';
@@ -10708,7 +10743,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     'html.bk-booklet-a4 .bk-a4-page,html.bk-booklet-a4 .bk-cover-page{width:794px;max-width:100%;height:1123px;min-height:1123px;max-height:1123px;margin:0 auto 10px;box-sizing:border-box;background:#fff!important;position:relative;overflow:hidden}' +
                     'html.bk-booklet-a4 .bk-cover-page{padding:0}' +
                     'html.bk-booklet-a4 .bk-a4-page{padding:46px 52px 56px;display:flex;flex-direction:column}' +
-                    'html.bk-booklet-a4 .bk-cover-bg-img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block}' +
+                    'html.bk-booklet-a4 .bk-cover-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;display:block}' +
                     'html.bk-booklet-a4 .bk-day-page,html.bk-booklet-a4 .bk-food-page{display:flex!important;flex-direction:column!important}' +
                     'html.bk-booklet-a4 .bk-day-body,html.bk-booklet-a4 .bk-food-body{flex:1 1 auto;min-height:0;overflow:hidden}' +
                     'html.bk-booklet-a4 .bk-act{break-inside:avoid;page-break-inside:avoid}' +
@@ -10730,13 +10765,13 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     buildBookletPaginationCss() +
                     '.bk-page{padding:6mm 8mm;position:relative;background:#fff}' +
                     buildBookletWatermarkCss() +
-                    '.bk-cover-page{position:relative;display:block;width:210mm;height:297mm;max-width:210mm;max-height:297mm;min-height:297mm;margin:0;padding:0;overflow:hidden;background-color:#B0BEC5;background-size:cover;background-position:center center;background-repeat:no-repeat}' +
-                    '.bk-cover-bg-img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:0;display:block;margin:0;padding:0}' +
+                    '.bk-cover-page{position:relative;display:block;width:210mm;height:297mm;max-width:210mm;max-height:297mm;min-height:297mm;margin:0;padding:0;overflow:hidden;background-color:#B0BEC5}' +
+                    '.bk-cover-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;display:block;margin:0;padding:0}' +
                     '.bk-cover-shade{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(0,0,0,.15) 0%,rgba(0,0,0,.05) 45%,rgba(0,0,0,.72) 100%);pointer-events:none}' +
                     '.bk-cover-top{position:absolute;top:10mm;left:0;right:10mm;z-index:4;display:flex;align-items:center;justify-content:flex-end}' +
                     '.bk-cover-duration{font-size:11pt;font-weight:900;color:#fff;background:rgba(255,255,255,.22);padding:2mm 5mm;border-radius:999px;letter-spacing:.08em;backdrop-filter:blur(4px)}' +
                     '.bk-cover-layout{position:absolute;left:0;right:0;bottom:0;z-index:3;padding:0 12mm 16mm 12mm;display:flex;justify-content:center}' +
-                    '.bk-cover-panel{width:100%;max-width:186mm;padding:8mm 9mm 7mm;border-radius:14px;background:rgba(15,23,42,.58);border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(6px);color:#fff;box-sizing:border-box;text-align:center}' +
+                    '.bk-cover-panel{position:relative;z-index:1;width:100%;max-width:186mm;padding:8mm 9mm 7mm;border-radius:14px;background:rgba(15,23,42,.58);border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(6px);color:#fff;box-sizing:border-box;text-align:center}' +
                     '.bk-cover-brand-mark{display:block;font-size:10pt;font-weight:900;letter-spacing:.32em;color:#80CBC4;margin:0 0 1.5mm}' +
                     '.bk-cover-book-label{display:block;font-size:9pt;font-weight:700;letter-spacing:.28em;opacity:.88;margin:0 0 4mm}' +
                     '.bk-cover-name{font-size:28pt;font-weight:900;line-height:1.15;margin:0 0 2mm;text-shadow:0 2px 12px rgba(0,0,0,.45)}' +
@@ -10837,7 +10872,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     'width:794px!important;height:1123px!important;max-width:794px!important;max-height:1123px!important;min-height:1123px!important;' +
                     'overflow:hidden!important;margin:0!important;break-after:auto!important;page-break-after:auto!important;position:relative!important;box-sizing:border-box!important}' +
                     '.bk-pdf-export-mode .bk-cover-page{background-color:#455A64!important}' +
-                    '.bk-pdf-export-mode .bk-cover-bg-img{position:absolute!important;top:0!important;left:0!important;width:794px!important;height:1123px!important;object-fit:cover!important;z-index:0!important;display:block!important}' +
+                    '.bk-pdf-export-mode .bk-cover-image{position:absolute!important;top:0!important;left:0!important;width:794px!important;height:1123px!important;object-fit:cover!important;z-index:0!important;display:block!important}' +
                     '.bk-pdf-export-mode .bk-cover-shade{position:absolute!important;inset:0!important;z-index:1!important}' +
                     '.bk-pdf-export-mode .bk-cover-layout{bottom:0!important;padding:0 48px 56px!important}' +
                     '.bk-pdf-export-mode .bk-cover-panel{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:rgba(15,23,42,.78)!important}' +
@@ -10866,35 +10901,36 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     '.bk-pdf-export-mode .bk-lines-area{min-height:640px!important;max-height:680px!important;flex:1!important}' +
                     '.bk-mobile-pdf-capture .bk-cover-page,.bk-mobile-pdf-capture .bk-page,.bk-mobile-pdf-capture .bk-day-page,.bk-mobile-pdf-capture .bk-note-page,.bk-mobile-pdf-capture .bk-food-page{' +
                     'width:397px!important;height:562px!important;max-width:397px!important;max-height:562px!important;min-height:562px!important;overflow:hidden!important}' +
-                    '.bk-mobile-pdf-capture .bk-cover-bg-img{width:397px!important;height:562px!important;object-fit:cover!important}' +
+                    '.bk-mobile-pdf-capture .bk-cover-image{width:397px!important;height:562px!important;object-fit:cover!important}' +
                     '.bk-mobile-pdf-capture .bk-day-body,.bk-mobile-pdf-capture .bk-food-body{max-height:calc(562px - 130px)!important;overflow:hidden!important}' +
                     buildBookletA4LayoutCss() +
                     '@media screen{' +
                     'html:not(.bk-booklet-a4),html:not(.bk-booklet-a4) body{width:100%;min-height:100%;margin:0;padding:0;background:#eceff1!important}' +
                     'html:not(.bk-booklet-a4) .bk-cover-page{width:100%;max-width:100%;height:auto;aspect-ratio:210/297;min-height:0;max-height:none;margin:0 0 10px;padding:0;overflow:hidden;position:relative;background-color:#B0BEC5;box-sizing:border-box}' +
-                    'html:not(.bk-booklet-a4) .bk-cover-bg-img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block}' +
+                    'html:not(.bk-booklet-a4) .bk-cover-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}' +
                     'html:not(.bk-booklet-a4) .bk-page,html:not(.bk-booklet-a4) .bk-day-page,html:not(.bk-booklet-a4) .bk-note-page,html:not(.bk-booklet-a4) .bk-food-page{width:100%;max-width:100%;margin:0 0 10px;padding:14px 12px;box-sizing:border-box;background:#fff!important}' +
                     'html:not(.bk-booklet-a4) .bk-intro-page,html:not(.bk-booklet-a4) .bk-check-page,html:not(.bk-booklet-a4) .bk-note-page{height:auto!important;min-height:0!important;max-height:none!important}' +
                     'html:not(.bk-booklet-a4) .bk-day-body,html:not(.bk-booklet-a4) .bk-food-body,html:not(.bk-booklet-a4) .bk-note-keeper,html:not(.bk-booklet-a4) .bk-intro-content{overflow:visible!important;max-height:none!important}' +
                     '}' +
                     '@media print{' +
                     '@page{size:A4 portrait;margin:0}' +
-                    'html,body{margin:0!important;padding:0!important;width:100%!important;height:auto!important;background:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
-                    'body>.bk-cover-page,body>.bk-a4-page{width:210mm!important;height:297mm!important;max-width:210mm!important;max-height:297mm!important;min-height:297mm!important;margin:0!important;box-sizing:border-box!important;position:relative!important;overflow:hidden!important;padding:10mm 12mm 14mm!important;background:#fff!important;break-inside:auto!important;page-break-inside:auto!important;break-after:page!important;page-break-after:always!important}' +
-                    'body>.bk-cover-page{padding:0!important;break-inside:avoid!important;page-break-inside:avoid!important;background-color:#B0BEC5!important}' +
-                    'body>:last-child{break-after:auto!important;page-break-after:auto!important}' +
-                    '.bk-cover-bg-img{position:absolute!important;top:0!important;left:0!important;width:100%!important;height:100%!important;object-fit:cover!important;object-position:center center!important;display:block!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;z-index:0!important;opacity:1!important}' +
+                    'html,html.bk-booklet-a4,html.bk-booklet-a4 body,body{margin:0!important;padding:0!important;width:100%!important;background:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
+                    'body>.bk-cover-page,body>.bk-a4-page{width:210mm!important;height:297mm!important;max-width:210mm!important;max-height:297mm!important;min-height:0!important;margin:0!important;padding:0!important;box-sizing:border-box!important;position:relative!important;overflow:hidden!important;background:#fff!important;break-inside:auto!important;page-break-inside:auto!important;break-before:auto!important;page-break-before:auto!important;break-after:auto!important;page-break-after:auto!important}' +
+                    'body>.bk-cover-page:not(:last-child),body>.bk-a4-page:not(:last-child){break-after:page!important;page-break-after:always!important}' +
+                    'body>.bk-cover-page{padding:0!important;background-color:#B0BEC5!important}' +
+                    'body>.bk-a4-page{padding:10mm 12mm 14mm!important}' +
+                    '.bk-cover-image{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important;z-index:0!important;display:block!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}' +
                     '.bk-cover-shade{position:absolute!important;inset:0!important;z-index:1!important}' +
                     '.bk-cover-top{position:absolute!important;top:8mm!important;right:10mm!important;z-index:4!important}' +
                     '.bk-cover-layout{position:absolute!important;left:0!important;right:0!important;bottom:0!important;z-index:3!important;padding:0 10mm 8mm!important}' +
-                    '.bk-cover-panel{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:rgba(15,23,42,.78)!important}' +
+                    '.bk-cover-panel{position:relative!important;z-index:1!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:rgba(15,23,42,.78)!important}' +
                     '.bk-cover-brand-foot{position:absolute!important;left:50%!important;bottom:3mm!important;transform:translateX(-50%)!important;z-index:4!important}' +
                     '.bk-day-body,.bk-food-body,.bk-note-keeper,.bk-intro-content{overflow:hidden!important;max-height:none!important;height:auto!important}' +
-                    '.bk-day-page,.bk-day-cont,.bk-phase,.bk-note-page,.bk-food-page,.bk-page,.bk-intro-page,.bk-check-page{break-inside:auto!important;page-break-inside:auto!important}' +
+                    '.bk-day-page,.bk-day-cont,.bk-phase,.bk-note-page,.bk-food-page,.bk-page,.bk-intro-page,.bk-check-page{break-inside:auto!important;page-break-inside:auto!important;break-after:auto!important;page-break-after:auto!important;break-before:auto!important;page-break-before:auto!important}' +
                     '.bk-itinerary-start,.bk-notes-start,.bk-food-continued,.bk-day-continued{break-before:auto!important;page-break-before:auto!important}' +
                     '.bk-day-title,.bk-phase{break-after:avoid!important;page-break-after:avoid!important}' +
                     '.bk-act,.bk-food-card,.bk-check-item{break-inside:avoid!important;page-break-inside:avoid!important}' +
-                    'body,.bk-watermark,.bk-watermark img,.bk-cover-bg-img,.bk-cover-shade,.bk-cover-panel,.bk-fact-pill,.bk-culture-card,.bk-tips-box,.bk-checklist-extra,.bk-check-final,.bk-stamp-zone{-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
+                    'body,.bk-watermark,.bk-watermark img,.bk-cover-image,.bk-cover-shade,.bk-cover-panel,.bk-fact-pill,.bk-culture-card,.bk-tips-box,.bk-checklist-extra,.bk-check-final,.bk-stamp-zone{-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
                     '}';
             }
 
@@ -10934,15 +10970,9 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 var coverPersonal = buildBookletCoverPersonalHtml(userName, profile);
                 var coverTitleName = escapeHtml(userName || '旅人');
                 var coverTitleDest = escapeHtml(dest) + ' 專屬小本本';
-                var coverStyleAttr = '';
-                var coverBgHtml = '';
+                var coverImgHtml = '';
                 if (isValidCoverDataUrl(coverDataUrl)) {
-                    coverStyleAttr = ' style="background-image:url(' + coverDataUrl + ');background-size:cover;background-position:center"';
-                    coverBgHtml = '<img class="bk-cover-bg-img" src="' + coverDataUrl + '" alt="">';
-                } else {
-                    var svgCover = buildBookletCoverSvgDataUrl(dest);
-                    coverStyleAttr = ' style="background-image:url(' + svgCover + ');background-size:cover;background-position:center"';
-                    coverBgHtml = '<img class="bk-cover-bg-img" src="' + svgCover + '" alt="">';
+                    coverImgHtml = '<img class="bk-cover-image" src="' + coverDataUrl + '" alt="cover">';
                 }
                 var printBaseHref = resolveBookletAssetUrl('./');
                 var coverBrandFoot = buildBookletCoverFooterLogo(watermarkDataUrl);
@@ -10970,8 +11000,8 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     '<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">' +
                     '<style>' + buildBookletPrintCss() + '</style></head><body>' +
 
-                    '<div class="bk-cover-page"' + coverStyleAttr + '>' +
-                    coverBgHtml +
+                    '<div class="bk-cover-page">' +
+                    coverImgHtml +
                     '<div class="bk-cover-shade"></div>' +
                     coverTop +
                     '<div class="bk-cover-layout"><div class="bk-cover-panel">' +
