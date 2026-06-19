@@ -3242,7 +3242,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
-            const SOARVIBE_APP_BUILD = 'v75';
+            const SOARVIBE_APP_BUILD = 'v76';
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
@@ -8923,14 +8923,93 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             function logBookletPrintPages(doc) {
+                logBookletPrintSheetDiagnostics(doc);
+            }
+
+            function logBookletPrintSheetDiagnostics(doc) {
                 if (!doc || !doc.body) return;
+                var win = doc.defaultView || window;
                 var sheets = doc.querySelectorAll('body > .bk-cover-page, body > .bk-a4-page');
-                console.log('[SOARVIBE] print sheets:', sheets.length);
+                console.log('[SOARVIBE] print DOM sheets:', sheets.length);
+                Array.prototype.forEach.call(doc.body.children, function (el, i) {
+                    if (!el || el.nodeType !== 1) return;
+                    console.log('[SOARVIBE] body child', i, el.tagName, el.className || '');
+                });
                 Array.prototype.forEach.call(sheets, function (el, i) {
+                    var cs = win.getComputedStyle(el);
+                    var img = el.querySelector('.bk-cover-image');
+                    var imgCs = img ? win.getComputedStyle(img) : null;
                     console.log('[SOARVIBE] sheet', i + 1, {
                         className: el.className,
-                        textLen: (el.textContent || '').replace(/\s+/g, ' ').trim().length
+                        textLen: (el.textContent || '').replace(/\s+/g, ' ').trim().length,
+                        height: cs.height,
+                        minHeight: cs.minHeight,
+                        marginBottom: cs.marginBottom,
+                        breakAfter: cs.breakAfter,
+                        breakBefore: cs.breakBefore,
+                        pageBreakAfter: cs.pageBreakAfter,
+                        pageBreakBefore: cs.pageBreakBefore,
+                        coverImg: img ? {
+                            srcLen: (img.currentSrc || img.src || '').length,
+                            naturalWidth: img.naturalWidth,
+                            naturalHeight: img.naturalHeight,
+                            width: imgCs.width,
+                            height: imgCs.height,
+                            display: imgCs.display,
+                            position: imgCs.position
+                        } : null
                     });
+                });
+            }
+
+            function prepareBookletCoverForPrint(doc) {
+                if (!doc) return;
+                var cover = doc.querySelector('.bk-cover-page');
+                var img = doc.querySelector('.bk-cover-image');
+                if (!cover) return;
+                cover.style.setProperty('width', '210mm', 'important');
+                cover.style.setProperty('height', '297mm', 'important');
+                cover.style.setProperty('max-height', '297mm', 'important');
+                cover.style.setProperty('min-height', '0', 'important');
+                cover.style.setProperty('margin', '0', 'important');
+                cover.style.setProperty('padding', '0', 'important');
+                cover.style.setProperty('position', 'relative', 'important');
+                cover.style.setProperty('overflow', 'hidden', 'important');
+                cover.style.setProperty('background-image', 'none', 'important');
+                cover.style.setProperty('background-color', '#B0BEC5', 'important');
+                if (img) {
+                    img.style.setProperty('position', 'absolute', 'important');
+                    img.style.setProperty('top', '0', 'important');
+                    img.style.setProperty('left', '0', 'important');
+                    img.style.setProperty('width', '210mm', 'important');
+                    img.style.setProperty('height', '297mm', 'important');
+                    img.style.setProperty('object-fit', 'cover', 'important');
+                    img.style.setProperty('object-position', 'center center', 'important');
+                    img.style.setProperty('z-index', '0', 'important');
+                    img.style.setProperty('display', 'block', 'important');
+                    img.style.setProperty('-webkit-print-color-adjust', 'exact', 'important');
+                    img.style.setProperty('print-color-adjust', 'exact', 'important');
+                }
+            }
+
+            /** iOS：用 break-before 分頁，禁止 sheet 上 break-after（避免 1:1 空白頁） */
+            function applyBookletPrintSheetBreaks(doc) {
+                if (!doc || !doc.body) return;
+                var sheets = doc.querySelectorAll('body > .bk-cover-page, body > .bk-a4-page');
+                Array.prototype.forEach.call(sheets, function (el, i) {
+                    el.style.setProperty('margin', '0', 'important');
+                    el.style.setProperty('break-after', 'avoid', 'important');
+                    el.style.setProperty('page-break-after', 'avoid', 'important');
+                    el.style.setProperty('-webkit-column-break-after', 'avoid', 'important');
+                    el.style.setProperty('break-inside', 'avoid', 'important');
+                    el.style.setProperty('page-break-inside', 'avoid', 'important');
+                    if (i === 0) {
+                        el.style.setProperty('break-before', 'auto', 'important');
+                        el.style.setProperty('page-break-before', 'auto', 'important');
+                    } else {
+                        el.style.setProperty('break-before', 'page', 'important');
+                        el.style.setProperty('page-break-before', 'always', 'important');
+                    }
                 });
             }
 
@@ -9597,13 +9676,16 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
             async function prepareBookletPagesForIosPrint(doc) {
                 if (!doc || !doc.body) return;
+                doc.documentElement.classList.add('bk-ios-print');
                 applyBookletA4LayoutMode(doc);
                 if (lastBookletCoverDataUrl) {
                     injectBookletCoverIntoDoc(doc, lastBookletCoverDataUrl);
                 }
+                prepareBookletCoverForPrint(doc);
+                applyBookletPrintSheetBreaks(doc);
                 await waitForImages(doc);
                 await waitForPrintDocumentReady(doc, 12000);
-                logBookletPrintPages(doc);
+                logBookletPrintSheetDiagnostics(doc);
             }
 
             function bookletBlockCrossesWatermark(page, block, win) {
@@ -10650,12 +10732,9 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 }
                 try {
                     var frameDoc = frame.contentDocument;
-                    await waitForPrintDocumentReady(frameDoc, 8000);
-                    if (lastBookletCoverDataUrl) {
-                        injectBookletCoverIntoDoc(frameDoc, lastBookletCoverDataUrl);
-                    }
+                    await prepareBookletPagesForIosPrint(frameDoc);
                     await waitForImages(frameDoc);
-                    logBookletPrintPages(frameDoc);
+                    logBookletPrintSheetDiagnostics(frameDoc);
                     await new Promise(function (resolve) {
                         setTimeout(resolve, 120);
                     });
@@ -10739,7 +10818,8 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             function buildBookletA4LayoutCss() {
-                return 'html.bk-booklet-a4,html.bk-booklet-a4 body{width:794px;max-width:100%;margin:0 auto;padding:0;background:#eceff1!important}' +
+                return '@media screen{' +
+                    'html.bk-booklet-a4,html.bk-booklet-a4 body{width:794px;max-width:100%;margin:0 auto;padding:0;background:#eceff1!important}' +
                     'html.bk-booklet-a4 .bk-a4-page,html.bk-booklet-a4 .bk-cover-page{width:794px;max-width:100%;height:1123px;min-height:1123px;max-height:1123px;margin:0 auto 10px;box-sizing:border-box;background:#fff!important;position:relative;overflow:hidden}' +
                     'html.bk-booklet-a4 .bk-cover-page{padding:0}' +
                     'html.bk-booklet-a4 .bk-a4-page{padding:46px 52px 56px;display:flex;flex-direction:column}' +
@@ -10754,7 +10834,31 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     'html.bk-booklet-a4 .bk-act{padding:8px 10px;margin-bottom:7px;line-height:1.35}' +
                     'html.bk-booklet-a4 .bk-act-time{font-size:9pt}' +
                     'html.bk-booklet-a4 .bk-act-title{font-size:10pt;line-height:1.35}' +
-                    'html.bk-booklet-a4 .bk-act-hl,html.bk-booklet-a4 .bk-act-note{font-size:9pt;line-height:1.35}';
+                    'html.bk-booklet-a4 .bk-act-hl,html.bk-booklet-a4 .bk-act-note{font-size:9pt;line-height:1.35}' +
+                    '}';
+            }
+
+            function buildBookletPrintSheetCss() {
+                return '@media print{' +
+                    '@page{size:A4 portrait;margin:0}' +
+                    'html,html.bk-booklet-a4,html.bk-ios-print,html.bk-booklet-a4 body,body{margin:0!important;padding:0!important;width:100%!important;background:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
+                    'body>.bk-cover-page,body>.bk-a4-page{width:210mm!important;height:297mm!important;max-width:210mm!important;max-height:297mm!important;min-height:0!important;margin:0!important;padding:0!important;box-sizing:border-box!important;position:relative!important;overflow:hidden!important;break-inside:avoid!important;page-break-inside:avoid!important;break-after:avoid!important;page-break-after:avoid!important;-webkit-column-break-after:avoid!important;break-before:auto!important;page-break-before:auto!important}' +
+                    'body>.bk-cover-page~.bk-cover-page,body>.bk-cover-page~.bk-a4-page,body>.bk-a4-page~.bk-a4-page,body>.bk-a4-page~.bk-cover-page{break-before:page!important;page-break-before:always!important}' +
+                    'body>.bk-cover-page{padding:0!important;background-color:#B0BEC5!important}' +
+                    'body>.bk-a4-page{padding:10mm 12mm 14mm!important;background:#fff!important}' +
+                    '.bk-intro-page,.bk-check-page,.bk-note-page{height:auto!important;min-height:0!important;max-height:none!important}' +
+                    '.bk-cover-image{position:absolute!important;top:0!important;left:0!important;width:210mm!important;height:297mm!important;object-fit:cover!important;object-position:center!important;z-index:0!important;display:block!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}' +
+                    '.bk-cover-shade{position:absolute!important;inset:0!important;z-index:1!important}' +
+                    '.bk-cover-top{position:absolute!important;top:8mm!important;right:10mm!important;z-index:4!important}' +
+                    '.bk-cover-layout{position:absolute!important;left:0!important;right:0!important;bottom:0!important;z-index:3!important;padding:0 10mm 8mm!important}' +
+                    '.bk-cover-panel{position:relative!important;z-index:1!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:rgba(15,23,42,.78)!important}' +
+                    '.bk-cover-brand-foot{position:absolute!important;left:50%!important;bottom:3mm!important;transform:translateX(-50%)!important;z-index:4!important}' +
+                    '.bk-day-body,.bk-food-body,.bk-note-keeper,.bk-intro-content{overflow:hidden!important;max-height:none!important;height:auto!important}' +
+                    '.bk-day-page,.bk-day-cont,.bk-phase,.bk-note-page,.bk-food-page,.bk-page,.bk-intro-page,.bk-check-page,.bk-itinerary-start,.bk-notes-start,.bk-food-continued,.bk-day-continued{break-inside:auto!important;page-break-inside:auto!important;break-after:auto!important;page-break-after:auto!important;break-before:auto!important;page-break-before:auto!important}' +
+                    '.bk-day-title,.bk-phase{break-after:avoid!important;page-break-after:avoid!important}' +
+                    '.bk-act,.bk-food-card,.bk-check-item{break-inside:avoid!important;page-break-inside:avoid!important}' +
+                    'body,.bk-watermark,.bk-watermark img,.bk-cover-image,.bk-cover-shade,.bk-cover-panel,.bk-fact-pill,.bk-culture-card,.bk-tips-box,.bk-checklist-extra,.bk-check-final,.bk-stamp-zone{-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
+                    '}';
             }
 
             function buildBookletPrintCss() {
@@ -10765,7 +10869,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     buildBookletPaginationCss() +
                     '.bk-page{padding:6mm 8mm;position:relative;background:#fff}' +
                     buildBookletWatermarkCss() +
-                    '.bk-cover-page{position:relative;display:block;width:210mm;height:297mm;max-width:210mm;max-height:297mm;min-height:297mm;margin:0;padding:0;overflow:hidden;background-color:#B0BEC5}' +
+                    '.bk-cover-page{position:relative;display:block;overflow:hidden;background-color:#B0BEC5}' +
                     '.bk-cover-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;display:block;margin:0;padding:0}' +
                     '.bk-cover-shade{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(0,0,0,.15) 0%,rgba(0,0,0,.05) 45%,rgba(0,0,0,.72) 100%);pointer-events:none}' +
                     '.bk-cover-top{position:absolute;top:10mm;left:0;right:10mm;z-index:4;display:flex;align-items:center;justify-content:flex-end}' +
@@ -10904,6 +11008,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     '.bk-mobile-pdf-capture .bk-cover-image{width:397px!important;height:562px!important;object-fit:cover!important}' +
                     '.bk-mobile-pdf-capture .bk-day-body,.bk-mobile-pdf-capture .bk-food-body{max-height:calc(562px - 130px)!important;overflow:hidden!important}' +
                     buildBookletA4LayoutCss() +
+                    buildBookletPrintSheetCss() +
                     '@media screen{' +
                     'html:not(.bk-booklet-a4),html:not(.bk-booklet-a4) body{width:100%;min-height:100%;margin:0;padding:0;background:#eceff1!important}' +
                     'html:not(.bk-booklet-a4) .bk-cover-page{width:100%;max-width:100%;height:auto;aspect-ratio:210/297;min-height:0;max-height:none;margin:0 0 10px;padding:0;overflow:hidden;position:relative;background-color:#B0BEC5;box-sizing:border-box}' +
@@ -10911,26 +11016,6 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     'html:not(.bk-booklet-a4) .bk-page,html:not(.bk-booklet-a4) .bk-day-page,html:not(.bk-booklet-a4) .bk-note-page,html:not(.bk-booklet-a4) .bk-food-page{width:100%;max-width:100%;margin:0 0 10px;padding:14px 12px;box-sizing:border-box;background:#fff!important}' +
                     'html:not(.bk-booklet-a4) .bk-intro-page,html:not(.bk-booklet-a4) .bk-check-page,html:not(.bk-booklet-a4) .bk-note-page{height:auto!important;min-height:0!important;max-height:none!important}' +
                     'html:not(.bk-booklet-a4) .bk-day-body,html:not(.bk-booklet-a4) .bk-food-body,html:not(.bk-booklet-a4) .bk-note-keeper,html:not(.bk-booklet-a4) .bk-intro-content{overflow:visible!important;max-height:none!important}' +
-                    '}' +
-                    '@media print{' +
-                    '@page{size:A4 portrait;margin:0}' +
-                    'html,html.bk-booklet-a4,html.bk-booklet-a4 body,body{margin:0!important;padding:0!important;width:100%!important;background:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
-                    'body>.bk-cover-page,body>.bk-a4-page{width:210mm!important;height:297mm!important;max-width:210mm!important;max-height:297mm!important;min-height:0!important;margin:0!important;padding:0!important;box-sizing:border-box!important;position:relative!important;overflow:hidden!important;background:#fff!important;break-inside:auto!important;page-break-inside:auto!important;break-before:auto!important;page-break-before:auto!important;break-after:auto!important;page-break-after:auto!important}' +
-                    'body>.bk-cover-page:not(:last-child),body>.bk-a4-page:not(:last-child){break-after:page!important;page-break-after:always!important}' +
-                    'body>.bk-cover-page{padding:0!important;background-color:#B0BEC5!important}' +
-                    'body>.bk-a4-page{padding:10mm 12mm 14mm!important}' +
-                    '.bk-cover-image{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important;z-index:0!important;display:block!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}' +
-                    '.bk-cover-shade{position:absolute!important;inset:0!important;z-index:1!important}' +
-                    '.bk-cover-top{position:absolute!important;top:8mm!important;right:10mm!important;z-index:4!important}' +
-                    '.bk-cover-layout{position:absolute!important;left:0!important;right:0!important;bottom:0!important;z-index:3!important;padding:0 10mm 8mm!important}' +
-                    '.bk-cover-panel{position:relative!important;z-index:1!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:rgba(15,23,42,.78)!important}' +
-                    '.bk-cover-brand-foot{position:absolute!important;left:50%!important;bottom:3mm!important;transform:translateX(-50%)!important;z-index:4!important}' +
-                    '.bk-day-body,.bk-food-body,.bk-note-keeper,.bk-intro-content{overflow:hidden!important;max-height:none!important;height:auto!important}' +
-                    '.bk-day-page,.bk-day-cont,.bk-phase,.bk-note-page,.bk-food-page,.bk-page,.bk-intro-page,.bk-check-page{break-inside:auto!important;page-break-inside:auto!important;break-after:auto!important;page-break-after:auto!important;break-before:auto!important;page-break-before:auto!important}' +
-                    '.bk-itinerary-start,.bk-notes-start,.bk-food-continued,.bk-day-continued{break-before:auto!important;page-break-before:auto!important}' +
-                    '.bk-day-title,.bk-phase{break-after:avoid!important;page-break-after:avoid!important}' +
-                    '.bk-act,.bk-food-card,.bk-check-item{break-inside:avoid!important;page-break-inside:avoid!important}' +
-                    'body,.bk-watermark,.bk-watermark img,.bk-cover-image,.bk-cover-shade,.bk-cover-panel,.bk-fact-pill,.bk-culture-card,.bk-tips-box,.bk-checklist-extra,.bk-check-final,.bk-stamp-zone{-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
                     '}';
             }
 
