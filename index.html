@@ -3242,7 +3242,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
-            const SOARVIBE_APP_BUILD = 'v77';
+            const SOARVIBE_APP_BUILD = 'v78';
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
@@ -8328,16 +8328,21 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             var BK_A4_DAY_CONT = 16;
             var BK_A4_PHASE = 18;
             var BK_A4_ACT_LINE = 14;
-            var BK_PAGINATE_SAFETY = 0.96;
+            var BK_A4_SAFE_BOTTOM = 50;
+            var BK_A4_WATERMARK_SAFE = 91;
+            var BK_PAGINATE_INFLATE = 1.12;
             var BK_WHOLE_DAY_SAFETY = 1.0;
 
             function getBookletA4PaginateMetrics() {
                 return {
                     pageH: BK_A4_PAGE_H,
-                    padV: BK_A4_PAD_TOP + BK_A4_PAD_BOTTOM,
+                    padTop: BK_A4_PAD_TOP,
+                    padBottom: BK_A4_PAD_BOTTOM,
                     pageHead: BK_A4_HEAD,
                     dayTitle: BK_A4_DAY_TITLE,
-                    dayCont: BK_A4_DAY_CONT
+                    dayCont: BK_A4_DAY_CONT,
+                    safeBottom: BK_A4_SAFE_BOTTOM,
+                    watermarkSafe: BK_A4_WATERMARK_SAFE
                 };
             }
 
@@ -8345,18 +8350,22 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 return html && html.indexOf('bk-phase') !== -1;
             }
 
+            function buildBookletDaySafeZone() {
+                return '<div class="bk-day-safe-zone" aria-hidden="true"></div>';
+            }
+
             function paginateBookletDayBlocks(day, dayNum, wm, itineraryStart) {
                 var groups = groupBookletPhaseBlocks(collectBookletDayBlocks(day));
                 if (!groups.length) return { html: '', pageCount: 0 };
                 var metrics = getBookletPaginateMetrics();
                 var pageH = metrics.pageH;
-                var padV = metrics.padV;
                 var html = '';
                 var pageCount = 0;
                 var pendingPhase = null;
 
                 function pageBudget(firstPage) {
-                    var overhead = padV + metrics.pageHead +
+                    var overhead = metrics.padTop + metrics.padBottom + metrics.pageHead +
+                        metrics.safeBottom + metrics.watermarkSafe +
                         (firstPage ? metrics.dayTitle : metrics.dayCont);
                     return pageH - overhead;
                 }
@@ -8372,13 +8381,15 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     } else {
                         pageHtml += '<p class="bk-day-cont">📅 ' + escapeHtml(day.dateLabel || '') + ' · Day ' + escapeHtml(dayNum) + '（續）</p>';
                     }
-                    pageHtml += '<div class="bk-day-body">' + blockHtmlList.join('') + '</div></div>';
+                    pageHtml += '<div class="bk-day-body">' + blockHtmlList.join('') + '</div>';
+                    pageHtml += buildBookletDaySafeZone();
+                    pageHtml += '</div>';
                     pageCount += 1;
                     return pageHtml;
                 }
 
                 function scaledHeight(h) {
-                    return Math.max(24, Math.round(h * BK_PAGINATE_SAFETY));
+                    return Math.max(24, Math.round(h * BK_PAGINATE_INFLATE));
                 }
 
                 function stripLonelyPhaseTail(chunk) {
@@ -8458,10 +8469,9 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                                 packed.push(group.blocks[bi2].html);
                                 packedUsed += actH;
                             }
-                            if (bi2 <= 1 && group.blocks.length > 1) {
-                                packed.push(group.blocks[1].html);
-                                bi2 = 2;
-                                packedUsed += scaledHeight(group.blocks[1].height);
+                            if (bi2 <= 1) {
+                                pendingPhase = phaseBlock.html;
+                                break;
                             }
                             chunk = packed;
                             used = packedUsed;
@@ -8484,7 +8494,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                         groupIdx += 1;
                     }
 
-                    if (!chunk.length && groupIdx < groups.length) {
+                    if (!chunk.length && !pendingPhase && groupIdx < groups.length) {
                         chunk.push(groups[groupIdx].blocks[0].html);
                         if (groups[groupIdx].blocks.length === 1) {
                             groupIdx += 1;
@@ -8571,7 +8581,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     h += estimateBookletTextBlockPx(p.note, 36, BK_A4_ACT_LINE, 64);
                 }
                 if (p.koreanName) h += 10;
-                return h + 6;
+                return h + 14;
             }
 
             function collectBookletDayBlocks(day) {
@@ -9597,7 +9607,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 var datePart = labelText.replace(/（續）/g, '').split('·')[0].trim();
 
                 var page = doc.createElement('div');
-                page.className = 'bk-page bk-day-page bk-day-continued';
+                page.className = 'bk-a4-page bk-page bk-day-page bk-day-continued';
                 var wm = refPage.querySelector('.bk-watermark');
                 if (wm) page.appendChild(wm.cloneNode(true));
 
@@ -9781,6 +9791,135 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 }
             }
 
+            function lockBookletSheetForCapture(sheet) {
+                if (!sheet) return;
+                var isCover = sheet.classList.contains('bk-cover-page');
+                sheet.style.setProperty('width', BK_A4_PAGE_W + 'px', 'important');
+                sheet.style.setProperty('height', BK_A4_PAGE_H + 'px', 'important');
+                sheet.style.setProperty('max-width', BK_A4_PAGE_W + 'px', 'important');
+                sheet.style.setProperty('max-height', BK_A4_PAGE_H + 'px', 'important');
+                sheet.style.setProperty('min-height', BK_A4_PAGE_H + 'px', 'important');
+                sheet.style.setProperty('overflow', 'hidden', 'important');
+                sheet.style.setProperty('box-sizing', 'border-box', 'important');
+                sheet.style.setProperty('margin', '0', 'important');
+                if (isCover) {
+                    sheet.style.setProperty('padding', '0', 'important');
+                }
+            }
+
+            function lockAllBookletSheetsForCapture(doc) {
+                if (!doc || !doc.body) return;
+                getBookletPdfSheets(doc).forEach(lockBookletSheetForCapture);
+                doc.querySelectorAll('body > .bk-day-page:not(.bk-a4-page)').forEach(function (page) {
+                    page.classList.add('bk-a4-page');
+                    lockBookletSheetForCapture(page);
+                });
+            }
+
+            function sheetHasCaptureOverflow(sheet) {
+                if (!sheet) return false;
+                if (sheet.scrollHeight > sheet.offsetHeight + 2) return true;
+                var inner = sheet.querySelector('.bk-day-body, .bk-trip-sheet, .bk-food-body, .bk-intro-content');
+                if (inner && inner.scrollHeight > inner.clientHeight + 2) return true;
+                return false;
+            }
+
+            function logBookletSheetCaptureDiagnostics(doc) {
+                var sheets = getBookletPdfSheets(doc);
+                var overflows = [];
+                sheets.forEach(function (sheet, idx) {
+                    var inner = sheet.querySelector('.bk-day-body, .bk-trip-sheet, .bk-food-body, .bk-intro-content');
+                    var metrics = {
+                        index: idx + 1,
+                        className: sheet.className,
+                        offsetWidth: sheet.offsetWidth,
+                        offsetHeight: sheet.offsetHeight,
+                        scrollWidth: sheet.scrollWidth,
+                        scrollHeight: sheet.scrollHeight,
+                        innerScrollHeight: inner ? inner.scrollHeight : null,
+                        innerClientHeight: inner ? inner.clientHeight : null
+                    };
+                    console.log('[SOARVIBE] sheet capture metrics', metrics);
+                    if (sheetHasCaptureOverflow(sheet)) {
+                        overflows.push(metrics);
+                        console.warn('[SOARVIBE] sheet overflow detected', metrics);
+                    }
+                });
+                return overflows;
+            }
+
+            function reflowBookletTripSummaryForPdf(doc) {
+                if (!doc || !doc.body) return;
+                var page = doc.querySelector('.bk-trip-summary-page:not(.bk-trip-summary-cont)');
+                if (!page) return;
+                lockBookletSheetForCapture(page);
+                if (page.scrollHeight <= page.offsetHeight + 2) return;
+
+                var tipsBox = page.querySelector('.bk-tips-box');
+                if (!tipsBox || !tipsBox.parentNode) return;
+
+                var wm = page.querySelector('.bk-watermark');
+                var contPage = doc.createElement('div');
+                contPage.className = 'bk-a4-page bk-page bk-trip-summary-page bk-trip-summary-cont';
+
+                if (wm) contPage.appendChild(wm.cloneNode(true));
+
+                var headWrap = doc.createElement('div');
+                headWrap.innerHTML = buildBookletPageHead('行程概要（續）');
+                while (headWrap.firstChild) contPage.appendChild(headWrap.firstChild);
+
+                var sheetWrap = doc.createElement('div');
+                sheetWrap.className = 'bk-trip-sheet';
+                sheetWrap.appendChild(tipsBox);
+                contPage.appendChild(sheetWrap);
+                var safeWrap = doc.createElement('div');
+                safeWrap.innerHTML = buildBookletPageSafeZone();
+                while (safeWrap.firstChild) contPage.appendChild(safeWrap.firstChild);
+
+                if (page.nextSibling) {
+                    page.parentNode.insertBefore(contPage, page.nextSibling);
+                } else {
+                    page.parentNode.appendChild(contPage);
+                }
+                lockBookletSheetForCapture(contPage);
+            }
+
+            async function ensureBookletSheetsReadyForCapture(doc) {
+                if (!doc || !doc.body) return;
+                lockAllBookletSheetsForCapture(doc);
+                try {
+                    reflowBookletDayPagesForPdf(doc);
+                } catch (reflowErr) {
+                    console.warn('[SOARVIBE] reflowBookletDayPagesForPdf:', reflowErr);
+                }
+                fixOrphanPhaseHeadersInDoc(doc);
+                try {
+                    reflowBookletTripSummaryForPdf(doc);
+                } catch (tripReflowErr) {
+                    console.warn('[SOARVIBE] reflowBookletTripSummaryForPdf:', tripReflowErr);
+                }
+                lockAllBookletSheetsForCapture(doc);
+                await new Promise(function (resolve) { setTimeout(resolve, 120); });
+                var overflows = logBookletSheetCaptureDiagnostics(doc);
+                if (overflows.length) {
+                    try {
+                        reflowBookletDayPagesForPdf(doc);
+                        fixOrphanPhaseHeadersInDoc(doc);
+                        reflowBookletTripSummaryForPdf(doc);
+                        lockAllBookletSheetsForCapture(doc);
+                        await new Promise(function (resolve) { setTimeout(resolve, 120); });
+                        overflows = logBookletSheetCaptureDiagnostics(doc);
+                    } catch (retryErr) {
+                        console.warn('[SOARVIBE] sheet reflow retry:', retryErr);
+                    }
+                }
+                if (overflows.length) {
+                    throw new Error('booklet sheet overflow pages: ' + overflows.map(function (o) {
+                        return o.index;
+                    }).join(', '));
+                }
+            }
+
             async function prepareBookletDocForPdfCapture(doc) {
                 if (!doc || !doc.body) return;
                 doc.documentElement.classList.remove('bk-ios-print');
@@ -9794,6 +9933,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 await waitForBookletCaptureFonts(doc, 4000);
                 await waitForPrintDocumentReady(doc, 12000);
                 await ensureBookletCoverImageReady(doc);
+                await ensureBookletSheetsReadyForCapture(doc);
                 await new Promise(function (resolve) {
                     setTimeout(resolve, shouldUseIosLowMemoryPdf() ? 320 : 180);
                 });
@@ -9862,8 +10002,9 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                             for (ui = 0; ui < unit.length; ui++) {
                                 body.appendChild(unit[ui]);
                             }
+                            lockBookletSheetForCapture(page);
                             var lastInUnit = unit[unit.length - 1];
-                            if (bookletBlockCrossesWatermark(page, lastInUnit, win)) {
+                            if (bookletBlockCrossesWatermark(page, lastInUnit, win) || sheetHasCaptureOverflow(page)) {
                                 for (ui = unit.length - 1; ui >= 0; ui--) {
                                     if (unit[ui].parentNode === body) {
                                         body.removeChild(unit[ui]);
@@ -9904,7 +10045,15 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     if (!nextPage) return;
                     var nextBody = nextPage.querySelector('.bk-day-body');
                     if (!nextBody) return;
-                    nextBody.insertBefore(body.lastElementChild, nextBody.firstChild);
+                    var phaseNode = body.lastElementChild;
+                    body.removeChild(phaseNode);
+                    nextBody.insertBefore(phaseNode, nextBody.firstChild);
+                    if (nextBody.firstElementChild && nextBody.firstElementChild.classList &&
+                        nextBody.firstElementChild.classList.contains('bk-phase') &&
+                        nextBody.children.length > 1 &&
+                        nextBody.children[1].classList.contains('bk-act')) {
+                        return;
+                    }
                 });
             }
 
@@ -10475,8 +10624,9 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     throw new Error('html2canvas unavailable');
                 }
                 var isCover = !!options.isCover;
-                var pageW = BOOKLET_PDF_PAGE_W;
-                var pageH = BOOKLET_PDF_PAGE_H;
+                lockBookletSheetForCapture(sheet);
+                var sw = sheet.offsetWidth || BK_A4_PAGE_W;
+                var sh = sheet.offsetHeight || BK_A4_PAGE_H;
                 var scales = getBookletPdfCaptureScales(isCover);
                 var lastErr = null;
                 var si;
@@ -10489,29 +10639,27 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                             allowTaint: false,
                             backgroundColor: '#ffffff',
                             logging: false,
-                            width: pageW,
-                            height: pageH,
-                            windowWidth: pageW,
-                            windowHeight: pageH,
+                            width: sw,
+                            height: sh,
+                            windowWidth: sw,
+                            windowHeight: sh,
                             scrollX: 0,
                             scrollY: 0,
-                            x: 0,
-                            y: 0,
                             foreignObjectRendering: false,
                             removeContainer: true,
                             onclone: function (clonedDoc, clonedEl) {
                                 setBookletPdfExportMode(clonedDoc, true);
                                 if (clonedEl && clonedEl.style) {
-                                    clonedEl.style.width = pageW + 'px';
-                                    clonedEl.style.height = pageH + 'px';
+                                    clonedEl.style.width = sw + 'px';
+                                    clonedEl.style.height = sh + 'px';
                                     clonedEl.style.boxSizing = 'border-box';
                                     clonedEl.style.overflow = 'hidden';
                                 }
                                 if (isCover && clonedEl && clonedEl.querySelector) {
                                     var bg = clonedEl.querySelector('.bk-cover-image');
                                     if (bg) {
-                                        bg.style.width = pageW + 'px';
-                                        bg.style.height = pageH + 'px';
+                                        bg.style.width = sw + 'px';
+                                        bg.style.height = sh + 'px';
                                         bg.style.objectFit = 'cover';
                                         bg.style.objectPosition = 'center center';
                                     }
@@ -10549,7 +10697,6 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     throw new Error('no booklet sheets');
                 }
                 console.log('[SOARVIBE] PDF sheets:', sheets.length);
-                logBookletPrintSheetDiagnostics(doc);
 
                 var jsPDF = window.jspdf.jsPDF;
                 var pdf = new jsPDF('p', 'mm', 'a4');
@@ -10563,6 +10710,10 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     var sheet = sheets[pi];
                     var isCover = sheet.classList.contains('bk-cover-page');
                     if (isCover) await ensureBookletCoverImageReady(doc);
+                    lockBookletSheetForCapture(sheet);
+                    if (sheetHasCaptureOverflow(sheet)) {
+                        throw new Error('sheet ' + (pi + 1) + ' overflow before capture');
+                    }
                     var canvas = await captureBookletSheetToCanvas(sheet, frameWin, { isCover: isCover });
                     var quality = iosLowMem ? (isCover ? 0.85 : 0.82) : (isCover ? 0.92 : 0.9);
                     var imgData = canvas.toDataURL('image/jpeg', quality);
@@ -11156,8 +11307,8 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     '.bk-pdf-export-mode .bk-check-page{height:1123px!important;min-height:1123px!important;max-height:1123px!important;overflow:hidden!important;display:flex!important;flex-direction:column!important}' +
                     '.bk-pdf-export-mode .bk-note-page{height:1123px!important;min-height:1123px!important;max-height:1123px!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;padding:16px!important}' +
                     '.bk-pdf-export-mode .bk-day-page,.bk-pdf-export-mode .bk-food-page,.bk-pdf-export-mode .bk-page.bk-trip-summary-page{display:flex!important;flex-direction:column!important;padding:20px 28px 0!important}' +
-                    '.bk-pdf-export-mode .bk-page.bk-trip-summary-page .bk-trip-sheet{flex:1 1 auto;min-height:0;overflow:hidden!important}' +
-                    '.bk-pdf-export-mode .bk-day-body,.bk-pdf-export-mode .bk-food-body{flex:1 1 auto;min-height:0;max-height:calc(1123px - 196px)!important;overflow:hidden!important;position:relative;z-index:1;padding-bottom:2mm!important;box-sizing:border-box!important}' +
+                    '.bk-pdf-export-mode .bk-page.bk-trip-summary-page .bk-trip-sheet{flex:1 1 auto;min-height:0;max-height:none!important;overflow:visible!important}' +
+                    '.bk-pdf-export-mode .bk-day-body,.bk-pdf-export-mode .bk-food-body{flex:1 1 auto;min-height:0;max-height:none!important;overflow:visible!important;position:relative;z-index:1;padding-bottom:2mm!important;box-sizing:border-box!important}' +
                     '.bk-pdf-export-mode .bk-day-safe-zone,.bk-pdf-export-mode .bk-page-safe-zone{height:24mm!important;min-height:24mm!important;flex-shrink:0!important}' +
                     '.bk-pdf-export-mode .bk-day-title{font-size:11pt!important;margin:0 0 1.5mm!important}' +
                     '.bk-pdf-export-mode .bk-day-cont{font-size:9.5pt!important;margin:0 0 1.5mm!important}' +
