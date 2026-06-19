@@ -2009,7 +2009,7 @@
             <button type="button" id="booklet-preview-print" class="booklet-preview-btn booklet-preview-btn-primary">📥 儲存 PDF</button>
         </div>
         <iframe id="booklet-preview-frame" title="旅行小本本列印預覽"></iframe>
-        <p class="booklet-preview-hint">A4 預覽與 PDF 同版。儲存 PDF → 列印 → 分享 → 儲存到檔案。<span id="booklet-preview-build" class="booklet-preview-build"></span></p>
+        <p class="booklet-preview-hint">A4 預覽與 PDF 同版。儲存 PDF → App 內預覽 → 分享／儲存到檔案。<span id="booklet-preview-build" class="booklet-preview-build"></span></p>
     </div>
 
     <div id="booklet-pdf-viewer-sheet" class="hidden" aria-hidden="true" role="dialog" aria-modal="true" aria-label="PDF 檢視">
@@ -3242,7 +3242,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
-            const SOARVIBE_APP_BUILD = 'v76';
+            const SOARVIBE_APP_BUILD = 'v77';
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
@@ -8922,6 +8922,37 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 );
             }
 
+            function getBookletPdfSheets(doc) {
+                if (!doc || !doc.body) return [];
+                return Array.prototype.slice.call(
+                    doc.querySelectorAll('body > .bk-cover-page, body > .bk-a4-page')
+                );
+            }
+
+            async function ensureBookletCoverImageReady(doc) {
+                if (!doc) return;
+                var img = doc.querySelector('.bk-cover-image');
+                if (!img) return;
+                if (lastBookletCoverDataUrl && (!img.src || img.src.indexOf('data:') !== 0)) {
+                    img.src = lastBookletCoverDataUrl;
+                }
+                if (img.complete && img.naturalWidth > 0) return;
+                await new Promise(function (resolve) {
+                    var settled = false;
+                    function finish() {
+                        if (settled) return;
+                        settled = true;
+                        resolve();
+                    }
+                    img.onload = finish;
+                    img.onerror = finish;
+                    setTimeout(finish, 8000);
+                });
+                if (!img.naturalWidth) {
+                    console.warn('[SOARVIBE] bk-cover-image not ready before PDF capture');
+                }
+            }
+
             function logBookletPrintPages(doc) {
                 logBookletPrintSheetDiagnostics(doc);
             }
@@ -9473,7 +9504,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 var previewFrame = document.getElementById('booklet-preview-frame');
                 if (previewFrame && previewFrame.contentDocument && previewFrame.contentDocument.body) {
                     var previewDoc = previewFrame.contentDocument;
-                    var previewPages = getBookletPdfPageElements(previewDoc);
+                    var previewPages = getBookletPdfSheets(previewDoc);
                     if (previewPages.length) {
                         return { frame: previewFrame, doc: previewDoc, fromPreview: true };
                     }
@@ -9750,6 +9781,24 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 }
             }
 
+            async function prepareBookletDocForPdfCapture(doc) {
+                if (!doc || !doc.body) return;
+                doc.documentElement.classList.remove('bk-ios-print');
+                applyBookletA4LayoutMode(doc);
+                setBookletPdfExportMode(doc, true);
+                if (lastBookletCoverDataUrl) {
+                    injectBookletCoverIntoDoc(doc, lastBookletCoverDataUrl);
+                }
+                prepareBookletCoverForPdfExport(doc, false);
+                await waitForImages(doc);
+                await waitForBookletCaptureFonts(doc, 4000);
+                await waitForPrintDocumentReady(doc, 12000);
+                await ensureBookletCoverImageReady(doc);
+                await new Promise(function (resolve) {
+                    setTimeout(resolve, shouldUseIosLowMemoryPdf() ? 320 : 180);
+                });
+            }
+
             function reflowBookletDayPagesForPdf(doc) {
                 if (!doc || !doc.body) return;
                 doc.documentElement.classList.add('bk-pdf-export-mode');
@@ -9873,7 +9922,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 return '(function(){' +
                     'var PAGE_W=' + pageW + ',PAGE_H=' + pageH + ';' +
                     'function loadScript(src){return new Promise(function(res,rej){var s=document.createElement("script");s.src=src;s.onload=res;s.onerror=function(){rej(new Error("load fail"));};document.head.appendChild(s);});}' +
-                    'function getPages(){var out=[];Array.prototype.forEach.call(document.body.children,function(el){if(!el||!el.classList)return;var c=el.classList;if(c.contains("bk-cover-page")||c.contains("bk-page")||c.contains("bk-day-page")||c.contains("bk-note-page")||c.contains("bk-food-page"))out.push(el);});return out;}' +
+                    'function getPages(){return Array.prototype.slice.call(document.querySelectorAll("body > .bk-cover-page, body > .bk-a4-page"));}' +
                     'function ensureNoteLines(clonedDoc){var areas=clonedDoc.querySelectorAll(".bk-lines-area");areas.forEach(function(area){if(area.querySelector(".bk-note-line"))return;for(var li=0;li<32;li++){var d=clonedDoc.createElement("div");d.className="bk-note-line";area.appendChild(d);}});}' +
                     'function reportProgress(cur,total){var cfg=window.parent&&window.parent.__SOARVIBE_PDF_RUN;if(cfg&&cfg.progress)cfg.progress(cur,total);}' +
                     'function reportPageImage(url){var cfg=window.parent&&window.parent.__SOARVIBE_PDF_RUN;if(cfg&&cfg.pageImage)cfg.pageImage(url);}' +
@@ -10172,6 +10221,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     if (frame.contentDocument) {
                         applyBookletA4LayoutMode(frame.contentDocument);
                     }
+                    loadBookletPdfLibs().catch(function () { /* preload */ });
                     if (!options.deferShow) {
                         sheet.classList.remove('hidden');
                         sheet.setAttribute('aria-hidden', 'false');
@@ -10267,7 +10317,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             async function generateBookletPdfBlobViaPreviewRunner(previewFrame, onProgress) {
-                return generateBookletPdfBlobIos(lastBookletPrintHtml, onProgress);
+                return generateBookletPdfBlobFromPreviewFrame(previewFrame, onProgress);
             }
 
             function closeBookletPdfViewer() {
@@ -10378,6 +10428,8 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             function getBookletPdfPageElements(doc) {
+                var sheets = getBookletPdfSheets(doc);
+                if (sheets.length) return sheets;
                 if (!doc || !doc.body) return [];
                 var pages = [];
                 var nodes = doc.body.children;
@@ -10405,6 +10457,140 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             function setBookletPdfExportMode(doc, enabled) {
                 if (!doc || !doc.documentElement) return;
                 doc.documentElement.classList.toggle('bk-pdf-export-mode', !!enabled);
+            }
+
+            function getBookletPdfCaptureScales(isCover) {
+                if (shouldUseIosLowMemoryPdf()) {
+                    return isCover ? [1.5, 1.25, 1] : [1.5, 1.25, 1];
+                }
+                return isCover ? [2, 1.5, 1.25, 1] : [2, 1.5, 1.25, 1];
+            }
+
+            async function captureBookletSheetToCanvas(sheet, frameWin, options) {
+                options = options || {};
+                var ownerDoc = sheet && sheet.ownerDocument;
+                frameWin = frameWin || (ownerDoc && ownerDoc.defaultView) || window;
+                var h2c = window.html2canvas || (frameWin && frameWin.html2canvas);
+                if (!h2c) {
+                    throw new Error('html2canvas unavailable');
+                }
+                var isCover = !!options.isCover;
+                var pageW = BOOKLET_PDF_PAGE_W;
+                var pageH = BOOKLET_PDF_PAGE_H;
+                var scales = getBookletPdfCaptureScales(isCover);
+                var lastErr = null;
+                var si;
+                for (si = 0; si < scales.length; si++) {
+                    try {
+                        var canvas = await h2c(sheet, {
+                            scale: scales[si],
+                            window: frameWin,
+                            useCORS: true,
+                            allowTaint: false,
+                            backgroundColor: '#ffffff',
+                            logging: false,
+                            width: pageW,
+                            height: pageH,
+                            windowWidth: pageW,
+                            windowHeight: pageH,
+                            scrollX: 0,
+                            scrollY: 0,
+                            x: 0,
+                            y: 0,
+                            foreignObjectRendering: false,
+                            removeContainer: true,
+                            onclone: function (clonedDoc, clonedEl) {
+                                setBookletPdfExportMode(clonedDoc, true);
+                                if (clonedEl && clonedEl.style) {
+                                    clonedEl.style.width = pageW + 'px';
+                                    clonedEl.style.height = pageH + 'px';
+                                    clonedEl.style.boxSizing = 'border-box';
+                                    clonedEl.style.overflow = 'hidden';
+                                }
+                                if (isCover && clonedEl && clonedEl.querySelector) {
+                                    var bg = clonedEl.querySelector('.bk-cover-image');
+                                    if (bg) {
+                                        bg.style.width = pageW + 'px';
+                                        bg.style.height = pageH + 'px';
+                                        bg.style.objectFit = 'cover';
+                                        bg.style.objectPosition = 'center center';
+                                    }
+                                }
+                            }
+                        });
+                        if (ownerDoc && ownerDoc.body) {
+                            ownerDoc.querySelectorAll('.html2canvas-container, div.html2canvas-container').forEach(function (node) {
+                                if (node.parentNode) node.parentNode.removeChild(node);
+                            });
+                        }
+                        document.querySelectorAll('body > .html2canvas-container, body > div.html2canvas-container').forEach(function (node) {
+                            if (node.parentNode) node.parentNode.removeChild(node);
+                        });
+                        if (!canvas || !canvas.width || !canvas.height) {
+                            throw new Error('empty canvas');
+                        }
+                        return canvas;
+                    } catch (capErr) {
+                        lastErr = capErr;
+                        console.warn('[SOARVIBE] sheet capture failed scale=' + scales[si], capErr);
+                        cleanupBookletPdfArtifacts();
+                        await new Promise(function (resolve) { setTimeout(resolve, 80); });
+                    }
+                }
+                throw lastErr || new Error('sheet capture failed');
+            }
+
+            async function buildBookletPdfFromSheets(doc, frameWin, onProgress) {
+                if (!window.html2canvas || !window.jspdf || !window.jspdf.jsPDF) {
+                    throw new Error('PDF libs unavailable');
+                }
+                var sheets = getBookletPdfSheets(doc);
+                if (!sheets.length) {
+                    throw new Error('no booklet sheets');
+                }
+                console.log('[SOARVIBE] PDF sheets:', sheets.length);
+                logBookletPrintSheetDiagnostics(doc);
+
+                var jsPDF = window.jspdf.jsPDF;
+                var pdf = new jsPDF('p', 'mm', 'a4');
+                var iosLowMem = shouldUseIosLowMemoryPdf();
+                var pageImages = [];
+                var pi;
+
+                for (pi = 0; pi < sheets.length; pi++) {
+                    if (onProgress) onProgress(pi + 1, sheets.length);
+                    if (pi > 0) pdf.addPage();
+                    var sheet = sheets[pi];
+                    var isCover = sheet.classList.contains('bk-cover-page');
+                    if (isCover) await ensureBookletCoverImageReady(doc);
+                    var canvas = await captureBookletSheetToCanvas(sheet, frameWin, { isCover: isCover });
+                    var quality = iosLowMem ? (isCover ? 0.85 : 0.82) : (isCover ? 0.92 : 0.9);
+                    var imgData = canvas.toDataURL('image/jpeg', quality);
+                    if (!imgData || imgData.length < 800) {
+                        throw new Error('empty sheet image ' + (pi + 1));
+                    }
+                    pageImages.push(imgData);
+                    pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
+                    canvas.width = 0;
+                    canvas.height = 0;
+                    cleanupBookletPdfArtifacts();
+                    await new Promise(function (resolve) {
+                        setTimeout(resolve, iosLowMem ? 280 : 60);
+                    });
+                }
+
+                setBookletPdfExportMode(doc, false);
+                return { blob: pdf.output('blob'), pageImages: pageImages };
+            }
+
+            async function generateBookletPdfBlobFromPreviewFrame(previewFrame, onProgress) {
+                if (!previewFrame || !previewFrame.contentDocument) {
+                    throw new Error('preview not ready');
+                }
+                var frameDoc = previewFrame.contentDocument;
+                var frameWin = previewFrame.contentWindow || window;
+                await prepareBookletDocForPdfCapture(frameDoc);
+                return buildBookletPdfFromSheets(frameDoc, frameWin, onProgress);
             }
 
             async function captureBookletPageCanvas(el, scale, frameWin, isCover) {
@@ -10525,25 +10711,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
             async function captureBookletPageForPdf(el, frameWin) {
                 var isCover = !!(el && el.classList && el.classList.contains('bk-cover-page'));
-                if (shouldUseIosLowMemoryPdf()) {
-                    return captureBookletPageCanvasMobileSafe(el, frameWin, isCover);
-                }
-                var scales = isCover
-                    ? [1.5, 1.25, 1]
-                    : (shouldUseBookletInAppPreview() ? [1] : [1, 0.92, 1.08]);
-                var lastErr = null;
-                var i;
-                for (i = 0; i < scales.length; i++) {
-                    try {
-                        return await captureBookletPageCanvas(el, scales[i], frameWin, isCover);
-                    } catch (capErr) {
-                        lastErr = capErr;
-                        console.warn('[SOARVIBE] booklet canvas capture failed scale=' + scales[i], capErr);
-                        cleanupBookletPdfArtifacts();
-                        await new Promise(function (resolve) { setTimeout(resolve, 80); });
-                    }
-                }
-                throw lastErr || new Error('canvas capture failed');
+                return captureBookletSheetToCanvas(el, frameWin, { isCover: isCover });
             }
 
             async function captureBookletPageCanvasWithRetry(el, frameWin) {
@@ -10553,7 +10721,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             async function generateBookletPdfBlob(printHtml, meta, onProgress, options) {
                 options = options || {};
                 if (!printHtml) {
-                    throw new Error('PDF libs unavailable');
+                    throw new Error('no print html');
                 }
                 if (!window.html2canvas || !window.jspdf || !window.jspdf.jsPDF) {
                     throw new Error('PDF libs unavailable');
@@ -10563,56 +10731,16 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 var frameDoc = capture.doc;
                 var frameWin = capture.frame.contentWindow || window;
                 try {
-                    setBookletPdfExportMode(frameDoc, true);
-                    await waitForPrintDocumentReady(frameDoc, 12000);
-                    if (lastBookletCoverDataUrl) {
-                        injectBookletCoverIntoDoc(frameDoc, lastBookletCoverDataUrl);
-                    }
-                    prepareBookletCoverForPdfExport(frameDoc, false);
-                    prepareBookletPagesForPrint(frameDoc, {
-                        skipReflow: !!options.skipReflow
-                    });
-                    await new Promise(function (resolve) { setTimeout(resolve, shouldUseIosLowMemoryPdf() ? 520 : 320); });
-
-                    var pages = getBookletPdfPageElements(frameDoc);
-                    if (!pages.length) {
-                        throw new Error('no booklet pages');
-                    }
-
-                    var jsPDF = window.jspdf.jsPDF;
-                    var pdf = new jsPDF({
-                        orientation: 'portrait',
-                        unit: 'mm',
-                        format: 'a4',
-                        compress: true
-                    });
-                    var iosLowMem = shouldUseIosLowMemoryPdf();
-                    var pi;
-                    var pageImages = [];
-
-                    for (pi = 0; pi < pages.length; pi++) {
-                        if (onProgress) onProgress(pi + 1, pages.length);
-                        if (pi > 0) pdf.addPage();
-                        var pageEl = pages[pi];
-                        var isCover = pageEl.classList.contains('bk-cover-page');
-                        var canvas = await captureBookletPageForPdf(pageEl, frameWin);
-                        var quality = iosLowMem ? (isCover ? 0.82 : 0.78) : (isCover ? 0.97 : 0.93);
-                        var img = canvas.toDataURL('image/jpeg', quality);
-                        if (!img || img.length < 1000) {
-                            throw new Error('empty page image ' + (pi + 1));
+                    await prepareBookletDocForPdfCapture(frameDoc);
+                    if (!options.skipReflow) {
+                        try {
+                            reflowBookletDayPagesForPdf(frameDoc);
+                            fixOrphanPhaseHeadersInDoc(frameDoc);
+                        } catch (reflowErr) {
+                            console.warn('[SOARVIBE] reflow before PDF:', reflowErr);
                         }
-                        pageImages.push(img);
-                        pdf.addImage(img, 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
-                        canvas.width = 0;
-                        canvas.height = 0;
-                        cleanupBookletPdfArtifacts();
-                        await new Promise(function (resolve) {
-                            setTimeout(resolve, iosLowMem ? 350 : 40);
-                        });
                     }
-
-                    setBookletPdfExportMode(frameDoc, false);
-                    return { blob: pdf.output('blob'), pageImages: pageImages };
+                    return await buildBookletPdfFromSheets(frameDoc, frameWin, onProgress);
                 } finally {
                     removeHiddenCaptureFrame(capture.frame, false);
                 }
@@ -10704,15 +10832,58 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
             async function saveBookletPdfFromInAppPreview(triggerBtn) {
                 if (pdfExportInProgress) return;
-                if (!lastBookletPrintHtml) {
+                var frame = document.getElementById('booklet-preview-frame');
+                if (!frame || !frame.contentDocument || !lastBookletPrintHtml) {
                     showModal('預覽尚未準備好，請稍候再試 📖', '📖');
                     return;
                 }
+                var btn = triggerBtn || document.getElementById('booklet-preview-print');
+                var prevText = btn ? btn.textContent : '';
+                pdfExportInProgress = true;
+                if (btn) {
+                    btn.disabled = true;
+                    btn.textContent = '📄 PDF 產生中…';
+                }
+                beginBookletPdfExportUi();
+                markSoarvibePdfSession();
+
+                function onProgress(cur, total) {
+                    setBookletPdfProgressVisible(true, 'PDF 產生中…', '第 ' + cur + ' / ' + total + ' 頁');
+                }
+
                 try {
-                    await saveBookletPdfViaIosPrint(triggerBtn);
+                    await loadBookletPdfLibs();
+                    var meta = currentItineraryMeta || {};
+                    var filename = buildBookletPdfFilename(meta);
+                    var pdfResult = await generateBookletPdfBlobFromPreviewFrame(frame, onProgress);
+                    endBookletPdfExportUi();
+                    openBookletPdfViewer(pdfResult.blob, filename, pdfResult.pageImages);
                 } catch (pdfErr) {
                     console.error('[SOARVIBE] saveBookletPdfFromInAppPreview:', pdfErr);
-                    showModal('PDF 列印失敗，請稍後再試 📖', '📖');
+                    try {
+                        setBookletPdfProgressVisible(true, 'PDF 備用產生中…', '正在重試');
+                        await loadBookletPdfLibs();
+                        var metaFallback = currentItineraryMeta || {};
+                        var filenameFallback = buildBookletPdfFilename(metaFallback);
+                        var fallbackResult = await generateBookletPdfBlob(
+                            lastBookletPrintHtml,
+                            metaFallback,
+                            onProgress,
+                            { skipReflow: true }
+                        );
+                        endBookletPdfExportUi();
+                        openBookletPdfViewer(fallbackResult.blob, filenameFallback, fallbackResult.pageImages);
+                    } catch (fallbackErr) {
+                        console.warn('[SOARVIBE] PDF blob fallback failed:', fallbackErr);
+                        endBookletPdfExportUi();
+                        showModal('PDF 產生失敗。若需備用，請長按「儲存 PDF」改用系統列印 📖', '📖');
+                    }
+                } finally {
+                    pdfExportInProgress = false;
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.textContent = prevText || '📥 儲存 PDF';
+                    }
                 }
             }
 
@@ -12597,6 +12768,27 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     bookletPreviewPrint.textContent = '📥 儲存 PDF';
                 }
                 bookletPreviewPrint.addEventListener('click', handleBookletPreviewAction);
+                var bookletPrintFallbackTimer = null;
+                bookletPreviewPrint.addEventListener('touchstart', function () {
+                    bookletPrintFallbackTimer = setTimeout(function () {
+                        bookletPrintFallbackTimer = null;
+                        if (!pdfExportInProgress) {
+                            saveBookletPdfViaIosPrint(bookletPreviewPrint);
+                        }
+                    }, 850);
+                }, { passive: true });
+                bookletPreviewPrint.addEventListener('touchend', function () {
+                    if (bookletPrintFallbackTimer) {
+                        clearTimeout(bookletPrintFallbackTimer);
+                        bookletPrintFallbackTimer = null;
+                    }
+                });
+                bookletPreviewPrint.addEventListener('touchmove', function () {
+                    if (bookletPrintFallbackTimer) {
+                        clearTimeout(bookletPrintFallbackTimer);
+                        bookletPrintFallbackTimer = null;
+                    }
+                });
             }
             var bookletPdfViewerClose = document.getElementById('booklet-pdf-viewer-close');
             var bookletPdfViewerShare = document.getElementById('booklet-pdf-viewer-share');
