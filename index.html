@@ -3284,7 +3284,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
-            const SOARVIBE_APP_BUILD = 'v83-diag';
+            const SOARVIBE_APP_BUILD = 'v84';
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
@@ -8754,6 +8754,90 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 return dataUrl.length > 1200;
             }
 
+            function isSafeBookletCoverImgSrc(src) {
+                if (!src) return false;
+                var s = String(src);
+                if (/^blob:/i.test(s)) return false;
+                if (!/^data:image\/(jpeg|jpg|png|webp);base64,/i.test(s)) return false;
+                return isValidCoverDataUrl(s);
+            }
+
+            function removeBookletCoverImageFromDoc(doc) {
+                if (!doc) return;
+                doc.querySelectorAll('.bk-cover-image').forEach(function (img) {
+                    if (img.parentNode) img.parentNode.removeChild(img);
+                });
+            }
+
+            function logBookletCoverImgPreCapture(doc) {
+                var img = doc && doc.querySelector('.bk-cover-image');
+                if (!img) {
+                    console.log('[SOARVIBE] cover img pre-capture: none (solid fallback)');
+                    return null;
+                }
+                var info = {
+                    complete: img.complete,
+                    naturalWidth: img.naturalWidth,
+                    naturalHeight: img.naturalHeight,
+                    srcPrefix: String(img.currentSrc || img.src || '').slice(0, 30)
+                };
+                console.log('[SOARVIBE] cover img pre-capture', info);
+                return info;
+            }
+
+            function applyBookletSolidCoverFallback(doc, meta) {
+                if (!doc) return;
+                var cover = doc.querySelector('.bk-cover-page');
+                if (!cover) return;
+                removeBookletCoverImageFromDoc(doc);
+                cover.classList.add('bk-cover-solid-fallback');
+                cover.style.backgroundImage = 'linear-gradient(165deg, #37474F 0%, #546E7A 45%, #00838f 100%)';
+                cover.style.backgroundColor = '#546E7A';
+                cover.style.backgroundSize = 'cover';
+                cover.style.backgroundPosition = 'center center';
+                var shade = cover.querySelector('.bk-cover-shade');
+                if (shade) shade.style.opacity = '0.35';
+                console.log('[SOARVIBE] cover solid fallback applied', {
+                    destination: meta && meta.destination,
+                    userName: resolveBookletUserName()
+                });
+            }
+
+            async function ensureBookletCoverSafeForPdfCapture(doc, meta) {
+                if (!doc) return false;
+                var cover = doc.querySelector('.bk-cover-page');
+                if (!cover) return false;
+                var img = doc.querySelector('.bk-cover-image');
+
+                if (img && /^blob:/i.test(String(img.src || ''))) {
+                    console.warn('[SOARVIBE] cover img blob URL rejected');
+                    removeBookletCoverImageFromDoc(doc);
+                    img = null;
+                }
+
+                if (lastBookletCoverDataUrl && isSafeBookletCoverImgSrc(lastBookletCoverDataUrl)) {
+                    if (!img || !isSafeBookletCoverImgSrc(img.src)) {
+                        injectBookletCoverIntoDoc(doc, lastBookletCoverDataUrl);
+                        img = doc.querySelector('.bk-cover-image');
+                    }
+                }
+
+                if (img) {
+                    await ensureBookletCoverImageReady(doc);
+                    img = doc.querySelector('.bk-cover-image');
+                    logBookletCoverImgPreCapture(doc);
+                    if (!img || !img.complete || !img.naturalWidth || !isSafeBookletCoverImgSrc(img.src)) {
+                        console.warn('[SOARVIBE] cover img invalid before capture → solid fallback');
+                        applyBookletSolidCoverFallback(doc, meta);
+                        return false;
+                    }
+                    return true;
+                }
+
+                applyBookletSolidCoverFallback(doc, meta);
+                return false;
+            }
+
             function resolveBookletAssetUrl(relativePath) {
                 try {
                     return new URL(relativePath, window.location.href).href;
@@ -8781,10 +8865,10 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                             canvas.getContext('2d').drawImage(img, 0, 0, w, h);
                             resolve(canvas.toDataURL('image/jpeg', 0.86));
                         } catch (canvasErr) {
-                            resolve(dataUrl);
+                            resolve('');
                         }
                     };
-                    img.onerror = function () { resolve(dataUrl); };
+                    img.onerror = function () { resolve(''); };
                     img.src = dataUrl;
                 });
             }
@@ -8885,7 +8969,9 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             function injectBookletCoverIntoDoc(doc, coverDataUrl) {
-                if (!doc || !isValidCoverDataUrl(coverDataUrl)) return false;
+                if (!doc || !coverDataUrl) return false;
+                if (/^blob:/i.test(String(coverDataUrl))) return false;
+                if (!isSafeBookletCoverImgSrc(coverDataUrl)) return false;
                 var cover = doc.querySelector('.bk-cover-page');
                 var img = doc.querySelector('.bk-cover-image');
                 if (!img && cover) {
@@ -8899,9 +8985,11 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     img.removeAttribute('style');
                 }
                 if (cover) {
+                    cover.classList.remove('bk-cover-solid-fallback');
                     cover.style.backgroundImage = '';
                     cover.style.backgroundSize = '';
                     cover.style.backgroundPosition = '';
+                    cover.style.backgroundColor = '';
                 }
                 return !!img;
             }
@@ -8930,7 +9018,12 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 if (!doc) return;
                 var img = doc.querySelector('.bk-cover-image');
                 if (!img) return;
-                if (lastBookletCoverDataUrl && (!img.src || img.src.indexOf('data:') !== 0)) {
+                if (/^blob:/i.test(String(img.src || ''))) {
+                    removeBookletCoverImageFromDoc(doc);
+                    return;
+                }
+                if (lastBookletCoverDataUrl && isSafeBookletCoverImgSrc(lastBookletCoverDataUrl) &&
+                    (!img.src || !isSafeBookletCoverImgSrc(img.src))) {
                     img.src = lastBookletCoverDataUrl;
                 }
                 if (img.complete && img.naturalWidth > 0) return;
@@ -8947,6 +9040,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 });
                 if (!img.naturalWidth) {
                     console.warn('[SOARVIBE] bk-cover-image not ready before PDF capture');
+                    removeBookletCoverImageFromDoc(doc);
                 }
             }
 
@@ -9869,7 +9963,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 if (!doc || !doc.body) return;
                 doc.documentElement.classList.add('bk-ios-print');
                 applyBookletA4LayoutMode(doc);
-                if (lastBookletCoverDataUrl) {
+                if (lastBookletCoverDataUrl && isSafeBookletCoverImgSrc(lastBookletCoverDataUrl)) {
                     injectBookletCoverIntoDoc(doc, lastBookletCoverDataUrl);
                 }
                 prepareBookletCoverForPrint(doc);
@@ -9936,7 +10030,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     bg.style.objectFit = 'cover';
                     bg.style.objectPosition = 'center center';
                 }
-                if (lastBookletCoverDataUrl) {
+                if (lastBookletCoverDataUrl && isSafeBookletCoverImgSrc(lastBookletCoverDataUrl)) {
                     injectBookletCoverIntoDoc(doc, lastBookletCoverDataUrl);
                 }
             }
@@ -10158,7 +10252,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 if (!ok || !frame.contentDocument) return false;
                 var doc = frame.contentDocument;
                 applyBookletA4LayoutMode(doc);
-                if (lastBookletCoverDataUrl) {
+                if (lastBookletCoverDataUrl && isSafeBookletCoverImgSrc(lastBookletCoverDataUrl)) {
                     injectBookletCoverIntoDoc(doc, lastBookletCoverDataUrl);
                 }
                 await waitForImages(doc);
@@ -10172,7 +10266,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 doc.documentElement.classList.remove('bk-ios-print');
                 applyBookletA4LayoutMode(doc);
                 setBookletPdfExportMode(doc, true);
-                if (lastBookletCoverDataUrl) {
+                if (lastBookletCoverDataUrl && isSafeBookletCoverImgSrc(lastBookletCoverDataUrl)) {
                     injectBookletCoverIntoDoc(doc, lastBookletCoverDataUrl);
                 }
                 prepareBookletCoverForPdfExport(doc, false);
@@ -10855,7 +10949,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 var frame = capture.frame;
                 try {
                     frameDoc.documentElement.classList.add('bk-pdf-export-mode', 'bk-mobile-pdf-capture');
-                    if (lastBookletCoverDataUrl) {
+                    if (lastBookletCoverDataUrl && isSafeBookletCoverImgSrc(lastBookletCoverDataUrl)) {
                         injectBookletCoverIntoDoc(frameDoc, lastBookletCoverDataUrl);
                     }
                     prepareBookletCoverForPdfExport(frameDoc, true);
@@ -11080,11 +11174,13 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                                 }
                                 if (isCover && clonedEl && clonedEl.querySelector) {
                                     var bg = clonedEl.querySelector('.bk-cover-image');
-                                    if (bg) {
+                                    if (bg && bg.naturalWidth > 0 && isSafeBookletCoverImgSrc(bg.src || bg.currentSrc)) {
                                         bg.style.width = sw + 'px';
                                         bg.style.height = sh + 'px';
                                         bg.style.objectFit = 'cover';
                                         bg.style.objectPosition = 'center center';
+                                    } else if (bg && bg.parentNode) {
+                                        bg.parentNode.removeChild(bg);
                                     }
                                 }
                             }
@@ -11133,6 +11229,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 var pi;
                 var pageProfile = getBookletPdfCaptureProfile(false);
                 var captureScaleUsed = null;
+                var pdfMeta = currentItineraryMeta || {};
 
                 for (pi = 0; pi < sheets.length; pi++) {
                     if (onProgress) onProgress(pi + 1, sheets.length);
@@ -11156,7 +11253,10 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     });
 
                     try {
-                        if (isCover) await ensureBookletCoverImageReady(doc);
+                        if (isCover) {
+                            await ensureBookletCoverSafeForPdfCapture(doc, pdfMeta);
+                            logBookletCoverImgPreCapture(doc);
+                        }
                         lockBookletSheetForCapture(sheet);
                         console.log('[SOARVIBE] PDF capture locked page ' + pageIndex + '/' + sheets.length, {
                             index: pageIndex,
@@ -11184,12 +11284,38 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                         console.log('[SOARVIBE] captured page ' + pageIndex + '/' + sheets.length, {
                             index: pageIndex,
                             captureScale: captureScaleUsed,
-                            jpegBytes: imgData.length
+                            jpegBytes: imgData.length,
+                            coverFallback: isCover && sheet.classList.contains('bk-cover-solid-fallback')
                         });
                     } catch (pageCapErr) {
-                        console.error('[SOARVIBE] PDF capture FAILED page ' + pageIndex + '/' + sheets.length, pageCapErr);
-                        throw new Error('PDF capture failed page ' + pageIndex + '/' + sheets.length + ': ' +
-                            String((pageCapErr && pageCapErr.message) || pageCapErr));
+                        if (isCover && pageIndex === 1) {
+                            console.warn('[SOARVIBE] cover capture failed, retry with solid fallback', pageCapErr);
+                            applyBookletSolidCoverFallback(doc, pdfMeta);
+                            lockBookletSheetForCapture(sheet);
+                            logBookletCoverImgPreCapture(doc);
+                            canvas = await captureBookletSheetToCanvas(sheet, frameWin, {
+                                isCover: true,
+                                profile: pageProfile,
+                                pageIndex: pageIndex,
+                                pageTotal: sheets.length
+                            });
+                            captureScaleUsed = pageProfile.scales[0];
+                            imgData = canvas.toDataURL('image/jpeg', pageProfile.quality);
+                            if (!imgData || imgData.length < 800) {
+                                throw new Error('empty cover fallback image');
+                            }
+                            pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
+                            if (storePreviews) pageImages.push(imgData);
+                            console.log('[SOARVIBE] captured page ' + pageIndex + '/' + sheets.length + ' (solid cover fallback)', {
+                                index: pageIndex,
+                                captureScale: captureScaleUsed,
+                                jpegBytes: imgData.length
+                            });
+                        } else {
+                            console.error('[SOARVIBE] PDF capture FAILED page ' + pageIndex + '/' + sheets.length, pageCapErr);
+                            throw new Error('PDF capture failed page ' + pageIndex + '/' + sheets.length + ': ' +
+                                String((pageCapErr && pageCapErr.message) || pageCapErr));
+                        }
                     } finally {
                         if (canvas) {
                             canvas.width = 0;
@@ -11817,7 +11943,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 var coverTitleName = escapeHtml(userName || '旅人');
                 var coverTitleDest = escapeHtml(dest) + ' 專屬小本本';
                 var coverImgHtml = '';
-                if (isValidCoverDataUrl(coverDataUrl)) {
+                if (isSafeBookletCoverImgSrc(coverDataUrl)) {
                     coverImgHtml = '<img class="bk-cover-image" src="' + coverDataUrl + '" alt="cover">';
                 }
                 var printBaseHref = resolveBookletAssetUrl('./');
@@ -11922,7 +12048,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     if (isValidCoverDataUrl(coverDataUrl)) {
                         coverDataUrl = await normalizeCoverDataUrl(coverDataUrl);
                     }
-                    lastBookletCoverDataUrl = isValidCoverDataUrl(coverDataUrl) ? coverDataUrl : '';
+                    lastBookletCoverDataUrl = isSafeBookletCoverImgSrc(coverDataUrl) ? coverDataUrl : '';
                     if (watermarkDataUrl) {
                         console.log('[SOARVIBE] 小本本 LOGO 已嵌入浮水印');
                     } else if (isBookletLocalFile()) {
@@ -11951,7 +12077,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                             previewFrame && previewFrame.contentDocument,
                             12000
                         );
-                        if (previewFrame && previewFrame.contentDocument && lastBookletCoverDataUrl) {
+                        if (previewFrame && previewFrame.contentDocument && isSafeBookletCoverImgSrc(lastBookletCoverDataUrl)) {
                             injectBookletCoverIntoDoc(previewFrame.contentDocument, lastBookletCoverDataUrl);
                         }
                         if (previewFrame && previewFrame.contentDocument) {
