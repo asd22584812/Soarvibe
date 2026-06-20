@@ -3284,7 +3284,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
-            const SOARVIBE_APP_BUILD = 'v84';
+            const SOARVIBE_APP_BUILD = 'v85';
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
@@ -9341,6 +9341,46 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 if (recoverBtn) recoverBtn.classList.remove('hidden');
             }
 
+            function ensureBookletPreviewReleasedAfterCapture() {
+                var frame = document.getElementById('booklet-preview-frame');
+                document.documentElement.classList.remove(
+                    'bk-pdf-export-mode', 'pdf-capture-busy', 'pdf-export-busy'
+                );
+                if (frame && frame.contentDocument) {
+                    setBookletPdfExportMode(frame.contentDocument, false);
+                    setBookletMobilePdfCaptureMode(frame.contentDocument, false);
+                    clearBookletCaptureInlineStyles(frame.contentDocument);
+                }
+                cleanupBookletPdfArtifacts();
+                restoreBookletPreviewScale();
+            }
+
+            function logCaptureSheetDom(sheet, pageIndex, label) {
+                if (!sheet) return;
+                var ownerDoc = sheet.ownerDocument;
+                var docEl = ownerDoc && ownerDoc.documentElement;
+                console.log('[SOARVIBE] ' + label + ' page ' + pageIndex, {
+                    outerHtmlLength: sheet.outerHTML.length,
+                    scrollHeight: sheet.scrollHeight,
+                    offsetHeight: sheet.offsetHeight,
+                    offsetWidth: sheet.offsetWidth,
+                    className: sheet.className,
+                    docTransform: docEl ? docEl.style.transform || '(none)' : '(no doc)',
+                    docWidth: docEl ? docEl.style.width || '(none)' : '(no doc)'
+                });
+            }
+
+            function stripBookletPreviewTransformForCapture(doc) {
+                if (!doc || !doc.documentElement) return;
+                doc.documentElement.style.removeProperty('transform');
+                doc.documentElement.style.removeProperty('transform-origin');
+                doc.documentElement.style.removeProperty('zoom');
+                if (doc.body) {
+                    doc.body.style.removeProperty('transform');
+                    doc.body.style.removeProperty('zoom');
+                }
+            }
+
             function restoreBookletPreviewScale() {
                 var frame = document.getElementById('booklet-preview-frame');
                 if (!frame || !frame.contentDocument) return;
@@ -9358,9 +9398,8 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 );
                 var sheet = document.getElementById('booklet-preview-sheet');
                 if (sheet) sheet.classList.remove('booklet-pdf-busy');
-                cleanupBookletPdfArtifacts();
                 resetBookletPreviewLayout({ reopenPreview: true });
-                restoreBookletPreviewScale();
+                ensureBookletPreviewReleasedAfterCapture();
             }
 
             function resetBookletPdfGeneratingState(options) {
@@ -10265,6 +10304,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 if (!doc || !doc.body) return;
                 doc.documentElement.classList.remove('bk-ios-print');
                 applyBookletA4LayoutMode(doc);
+                stripBookletPreviewTransformForCapture(doc);
                 setBookletPdfExportMode(doc, true);
                 if (lastBookletCoverDataUrl && isSafeBookletCoverImgSrc(lastBookletCoverDataUrl)) {
                     injectBookletCoverIntoDoc(doc, lastBookletCoverDataUrl);
@@ -10947,6 +10987,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 var capture = await createMobileBookletCaptureDoc(printHtml);
                 var frameDoc = capture.doc;
                 var frame = capture.frame;
+                var pdfMeta = currentItineraryMeta || {};
                 try {
                     frameDoc.documentElement.classList.add('bk-pdf-export-mode', 'bk-mobile-pdf-capture');
                     if (lastBookletCoverDataUrl && isSafeBookletCoverImgSrc(lastBookletCoverDataUrl)) {
@@ -10955,12 +10996,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     prepareBookletCoverForPdfExport(frameDoc, true);
                     await waitForPrintDocumentReady(frameDoc, 12000);
                     await waitForBookletCaptureFonts(frameDoc, 4000);
-                    try {
-                        reflowBookletDayPagesForPdf(frameDoc);
-                        fixOrphanPhaseHeadersInDoc(frameDoc);
-                    } catch (reflowErr) {
-                        console.warn('[SOARVIBE] reflow before PDF:', reflowErr);
-                    }
+                    await ensureBookletCoverSafeForPdfCapture(frameDoc, pdfMeta);
                     await new Promise(function (resolve) { setTimeout(resolve, 520); });
                     return await runBookletPdfInsideIframe(frame, frameDoc, onProgress, true);
                 } finally {
@@ -10969,6 +11005,11 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             async function generateBookletPdfBlobViaPreviewRunner(previewFrame, onProgress) {
+                if (shouldUseBookletMobilePdfProfile()) {
+                    console.log('[SOARVIBE] PDF path: hidden iframe runner (mobile)');
+                    return generateBookletPdfBlobIos(lastBookletPrintHtml, onProgress);
+                }
+                console.log('[SOARVIBE] PDF path: preview frame capture (desktop)');
                 return generateBookletPdfBlobFromPreviewFrame(previewFrame, onProgress);
             }
 
@@ -11134,21 +11175,25 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 if (shouldUseBookletMobilePdfProfile()) {
                     scales = [scales[0]];
                 }
+                var pageIndex = options.pageIndex || '?';
+                var pageTotal = options.pageTotal || '?';
+                logCaptureSheetDom(sheet, pageIndex, 'capture target DOM');
                 lockBookletSheetForCapture(sheet);
                 var sw = sheet.offsetWidth || BK_A4_PAGE_W;
                 var sh = sheet.offsetHeight || BK_A4_PAGE_H;
-                var pageIndex = options.pageIndex || '?';
-                var pageTotal = options.pageTotal || '?';
                 var lastErr = null;
                 var si;
                 for (si = 0; si < scales.length; si++) {
                     try {
-                        console.log('[SOARVIBE] html2canvas page ' + pageIndex + '/' + pageTotal + ' scale=' + scales[si], {
+                        console.log('[SOARVIBE] before capture page ' + pageIndex + '/' + pageTotal + ' scale=' + scales[si], {
                             offsetWidth: sw,
                             offsetHeight: sh,
                             scrollHeight: sheet.scrollHeight,
-                            captureScale: scales[si]
+                            captureScale: scales[si],
+                            tagName: sheet.tagName,
+                            className: sheet.className
                         });
+                        console.log('[SOARVIBE] html2canvas invoke page ' + pageIndex + '/' + pageTotal);
                         var canvas = await h2c(sheet, {
                             scale: scales[si],
                             window: frameWin,
@@ -11185,6 +11230,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                                 }
                             }
                         });
+                        console.log('[SOARVIBE] after capture page ' + pageIndex + '/' + pageTotal);
                         if (ownerDoc && ownerDoc.body) {
                             ownerDoc.querySelectorAll('.html2canvas-container, div.html2canvas-container').forEach(function (node) {
                                 if (node.parentNode) node.parentNode.removeChild(node);
@@ -11216,6 +11262,8 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 if (!window.html2canvas || !window.jspdf || !window.jspdf.jsPDF) {
                     throw new Error('PDF libs unavailable');
                 }
+                var previewFrame = frameWin && frameWin.frameElement;
+                try {
                 var sheets = getBookletPdfSheets(doc);
                 if (!sheets.length) {
                     throw new Error('no booklet sheets');
@@ -11257,6 +11305,8 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                             await ensureBookletCoverSafeForPdfCapture(doc, pdfMeta);
                             logBookletCoverImgPreCapture(doc);
                         }
+                        stripBookletPreviewTransformForCapture(doc);
+                        logCaptureSheetDom(sheet, pageIndex, 'pre-capture');
                         lockBookletSheetForCapture(sheet);
                         console.log('[SOARVIBE] PDF capture locked page ' + pageIndex + '/' + sheets.length, {
                             index: pageIndex,
@@ -11275,7 +11325,9 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                             pageTotal: sheets.length
                         });
                         captureScaleUsed = pageProfile.scales[0];
+                        console.log('[SOARVIBE] toDataURL start page ' + pageIndex + '/' + sheets.length);
                         imgData = canvas.toDataURL('image/jpeg', pageProfile.quality);
+                        console.log('[SOARVIBE] toDataURL OK page ' + pageIndex + '/' + sheets.length, imgData ? imgData.length : 0);
                         if (!imgData || imgData.length < 800) {
                             throw new Error('empty sheet image ' + pageIndex);
                         }
@@ -11300,7 +11352,9 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                                 pageTotal: sheets.length
                             });
                             captureScaleUsed = pageProfile.scales[0];
+                            console.log('[SOARVIBE] toDataURL start page ' + pageIndex + '/' + sheets.length + ' (solid fallback)');
                             imgData = canvas.toDataURL('image/jpeg', pageProfile.quality);
+                            console.log('[SOARVIBE] toDataURL OK page ' + pageIndex + '/' + sheets.length + ' (solid fallback)', imgData ? imgData.length : 0);
                             if (!imgData || imgData.length < 800) {
                                 throw new Error('empty cover fallback image');
                             }
@@ -11332,11 +11386,17 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 }
 
                 setBookletPdfExportMode(doc, false);
-                var previewFrame = frameWin && frameWin.frameElement;
-                if (previewFrame) {
-                    fitBookletPreviewToViewport(previewFrame);
-                }
                 return { blob: pdf.output('blob'), pageImages: pageImages };
+                } finally {
+                    if (doc) {
+                        setBookletPdfExportMode(doc, false);
+                        setBookletMobilePdfCaptureMode(doc, false);
+                        clearBookletCaptureInlineStyles(doc);
+                    }
+                    if (previewFrame) {
+                        restoreBookletPreviewScale();
+                    }
+                }
             }
 
             async function generateBookletPdfBlobFromPreviewFrame(previewFrame, onProgress) {
@@ -11345,8 +11405,12 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 }
                 var frameDoc = previewFrame.contentDocument;
                 var frameWin = previewFrame.contentWindow || window;
-                await prepareBookletDocForPdfCapture(frameDoc);
-                return buildBookletPdfFromSheets(frameDoc, frameWin, onProgress);
+                try {
+                    await prepareBookletDocForPdfCapture(frameDoc);
+                    return await buildBookletPdfFromSheets(frameDoc, frameWin, onProgress);
+                } finally {
+                    ensureBookletPreviewReleasedAfterCapture();
+                }
             }
 
             async function captureBookletPageCanvas(el, scale, frameWin, isCover) {
@@ -11569,11 +11633,10 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     await loadBookletPdfLibs();
                     var meta = currentItineraryMeta || {};
                     var filename = buildBookletPdfFilename(meta);
-                    var pdfResult = await generateBookletPdfBlobFromPreviewFrame(frame, onProgress);
+                    var pdfResult = await generateBookletPdfBlobViaPreviewRunner(frame, onProgress);
                     pdfOk = true;
                     endBookletPdfExportUi();
                     resetBookletPreviewLayout({ reopenPreview: true });
-                    restoreBookletPreviewScale();
                     openBookletPdfViewer(pdfResult.blob, filename, pdfResult.pageImages);
                 } catch (pdfErr) {
                     console.error('[SOARVIBE] saveBookletPdfFromInAppPreview FAILED:', pdfErr);
@@ -11583,19 +11646,16 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                             sessionStorage.setItem('soarvibe_pdf_canvas_crash', '1');
                         } catch (storageErr) { /* silent */ }
                     }
-                    recoverBookletPdfFailure();
                     var modalMsg = getBookletPdfErrorMessage(pdfErr);
                     if (failDetail.indexOf('PDF capture failed page') !== -1) {
                         modalMsg = failDetail + ' 📖';
                     }
                     showModal(modalMsg, '📖');
                 } finally {
-                    if (pdfOk) {
-                        pdfExportInProgress = false;
-                        clearBookletPdfEmergencyTimer();
-                        markPdfExportSessionStorage(false);
-                        cleanupBookletPdfArtifacts();
-                    }
+                    ensureBookletPreviewReleasedAfterCapture();
+                    pdfExportInProgress = false;
+                    clearBookletPdfEmergencyTimer();
+                    markPdfExportSessionStorage(false);
                     if (btn) {
                         btn.disabled = false;
                         btn.textContent = prevText || '📥 儲存 PDF';
