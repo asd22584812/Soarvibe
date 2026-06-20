@@ -3284,7 +3284,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
-            const SOARVIBE_APP_BUILD = 'v82';
+            const SOARVIBE_APP_BUILD = 'v83';
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
@@ -8370,9 +8370,9 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             var BK_A4_DAY_CONT = 16;
             var BK_A4_PHASE = 18;
             var BK_A4_ACT_LINE = 14;
-            var BK_A4_FOOTER_SAFE = 62;
+            var BK_A4_FOOTER_SAFE = 50;
             var BK_A4_FOOTER_GUARD = 20;
-            var BK_PAGINATE_INFLATE = 1.05;
+            var BK_PAGINATE_INFLATE = 1.0;
             var BK_WHOLE_DAY_SAFETY = 1.0;
 
             function getBookletA4PaginateMetrics() {
@@ -8429,7 +8429,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 }
 
                 function scaledHeight(h) {
-                    return Math.max(20, Math.round(h * BK_PAGINATE_INFLATE));
+                    return Math.max(16, Math.round(h * BK_PAGINATE_INFLATE));
                 }
 
                 function stripLonelyPhaseTail(chunk) {
@@ -9247,6 +9247,28 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 if (recoverBtn) recoverBtn.classList.remove('hidden');
             }
 
+            function restoreBookletPreviewScale() {
+                var frame = document.getElementById('booklet-preview-frame');
+                if (!frame || !frame.contentDocument) return;
+                clearBookletCaptureInlineStyles(frame.contentDocument);
+                fitBookletPreviewToViewport(frame);
+            }
+
+            function recoverBookletPdfFailure() {
+                hideBookletPdfLoading();
+                pdfExportInProgress = false;
+                clearBookletPdfEmergencyTimer();
+                markPdfExportSessionStorage(false);
+                document.documentElement.classList.remove(
+                    'pdf-export-busy', 'ios-print-active', 'pdf-capture-busy', 'bk-pdf-export-mode'
+                );
+                var sheet = document.getElementById('booklet-preview-sheet');
+                if (sheet) sheet.classList.remove('booklet-pdf-busy');
+                cleanupBookletPdfArtifacts();
+                resetBookletPreviewLayout({ reopenPreview: true });
+                restoreBookletPreviewScale();
+            }
+
             function resetBookletPdfGeneratingState(options) {
                 options = options || {};
                 pdfExportInProgress = false;
@@ -9259,6 +9281,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 cleanupBookletPdfArtifacts();
                 if (options.keepPreviewOpen !== false) {
                     resetBookletPreviewLayout({ reopenPreview: true });
+                    restoreBookletPreviewScale();
                 }
             }
 
@@ -9577,9 +9600,9 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 }
                 if (shouldUseBookletMobilePdfProfile()) {
                     return {
-                        scales: isCover ? [1.3, 1.1, 1] : [1.25, 1.1, 1],
-                        quality: 0.88,
-                        pageDelay: 80
+                        scales: [1.1],
+                        quality: 0.82,
+                        pageDelay: 120
                     };
                 }
                 return {
@@ -9606,10 +9629,10 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 if (msg.indexOf('overflow') !== -1) {
                     return '部分頁面內容超出版面，請重新匯出小本本後再試 📖';
                 }
-                if (isBookletPdfMemoryError(err)) {
-                    return '手機記憶體不足，請改用標準畫質或電腦輸出高清版 📖';
+                if (isBookletPdfMemoryError(err) || shouldUseBookletMobilePdfProfile()) {
+                    return '手機記憶體不足，請改用電腦輸出高清版 📖';
                 }
-                return 'PDF 產生失敗。長按「儲存 PDF」0.8 秒可改用系統列印備援 📖';
+                return 'PDF 產生失敗，請稍後再試 📖';
             }
 
             function hideBookletPreviewForPdfCapture() {
@@ -10034,18 +10057,6 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 lockAllBookletSheetsForCapture(doc);
                 await new Promise(function (resolve) { setTimeout(resolve, 120); });
                 var overflows = logBookletSheetCaptureDiagnostics(doc);
-                if (overflows.length && !shouldUseBookletMobilePdfProfile()) {
-                    try {
-                        reflowBookletDayPagesForPdf(doc);
-                        fixOrphanPhaseHeadersInDoc(doc);
-                        reflowBookletTripSummaryForPdf(doc);
-                        lockAllBookletSheetsForCapture(doc);
-                        await new Promise(function (resolve) { setTimeout(resolve, 120); });
-                        overflows = logBookletSheetCaptureDiagnostics(doc);
-                    } catch (retryErr) {
-                        console.warn('[SOARVIBE] sheet reflow retry:', retryErr);
-                    }
-                }
                 if (overflows.length) {
                     if (shouldUseBookletMobilePdfProfile()) {
                         console.warn('[SOARVIBE] mobile sheet overflow (warn only):', overflows);
@@ -10223,11 +10234,11 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             function buildBookletIframePdfRunnerScript(mobile) {
                 var pageW = mobile ? BOOKLET_PDF_MOBILE_W : BOOKLET_PDF_PAGE_W;
                 var pageH = mobile ? BOOKLET_PDF_MOBILE_H : BOOKLET_PDF_PAGE_H;
-                var coverScales = mobile ? '[1]' : '[2,1.75,1.5,1.25]';
-                var dayScales = mobile ? '[1]' : '[1,0.92,1.08]';
-                var qCover = mobile ? '0.85' : '0.97';
-                var qDay = mobile ? '0.80' : '0.93';
-                var pageDelay = mobile ? '450' : '80';
+                var coverScales = mobile ? '[1.1]' : '[2,1.75,1.5,1.25]';
+                var dayScales = mobile ? '[1.1]' : '[1,0.92,1.08]';
+                var qCover = mobile ? '0.82' : '0.97';
+                var qDay = mobile ? '0.82' : '0.93';
+                var pageDelay = mobile ? '120' : '80';
                 var mobileInit = mobile
                     ? 'document.documentElement.classList.add("bk-mobile-pdf-capture");'
                     : '';
@@ -10284,13 +10295,14 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     }, mobile ? 180000 : 120000);
 
                     var pageImages = [];
+                    var storePageImages = !mobile;
 
                     window.__SOARVIBE_PDF_RUN = {
                         progress: function (cur, total) {
                             if (onProgress) onProgress(cur, total);
                         },
                         pageImage: function (url) {
-                            if (url) pageImages.push(url);
+                            if (url && storePageImages) pageImages.push(url);
                         },
                         done: function (blob) {
                             if (settled) return;
@@ -10603,7 +10615,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     try {
                         if (frame.contentDocument) {
                             cleanupPreviewPdfRunnerScripts(frame.contentDocument);
-                            fitBookletPreviewToViewport(frame);
+                            restoreBookletPreviewScale();
                         }
                     } catch (layoutErr) {
                         console.warn('[SOARVIBE] resetBookletPreviewLayout:', layoutErr);
@@ -10940,6 +10952,9 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 var isCover = !!options.isCover;
                 var profile = options.profile || getBookletPdfCaptureProfile(isCover);
                 var scales = options.scales || profile.scales;
+                if (shouldUseBookletMobilePdfProfile()) {
+                    scales = [scales[0]];
+                }
                 lockBookletSheetForCapture(sheet);
                 var sw = sheet.offsetWidth || BK_A4_PAGE_W;
                 var sh = sheet.offsetHeight || BK_A4_PAGE_H;
@@ -11267,53 +11282,11 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             async function saveBookletPdfViaIosPrint(triggerBtn) {
-                var btn = triggerBtn || document.getElementById('booklet-preview-print');
-                var frame = document.getElementById('booklet-preview-frame');
-                if (!frame || !frame.contentWindow || !frame.contentDocument) {
-                    showModal('預覽尚未準備好，請稍候再試 📖', '📖');
-                    return;
-                }
-                var prevText = btn ? btn.textContent : '';
-                if (btn) {
-                    btn.disabled = true;
-                    btn.textContent = '📄 開啟列印…';
-                }
-                pdfExportInProgress = true;
-                document.documentElement.classList.add('pdf-export-busy', 'ios-print-active');
-
-                try {
-                    var frameDoc = frame.contentDocument;
-                    await prepareBookletPagesForIosPrint(frameDoc);
-                    await waitForImages(frameDoc);
-                    logBookletPrintPages(frameDoc);
-                    await new Promise(function (resolve) { setTimeout(resolve, 200); });
-                    frame.contentWindow.focus();
-                    frame.contentWindow.print();
-                    markSoarvibePdfSession();
-                } catch (printErr) {
-                    console.warn('[SOARVIBE] saveBookletPdfViaIosPrint:', printErr);
-                    showModal('無法開啟列印，請再試一次 📖', '📖');
-                    pdfExportInProgress = false;
-                    document.documentElement.classList.remove('pdf-export-busy', 'ios-print-active');
-                    if (btn) {
-                        btn.disabled = false;
-                        btn.textContent = prevText || '📥 儲存 PDF';
-                    }
-                    return;
-                }
-
-                setTimeout(function () {
-                    pdfExportInProgress = false;
-                    document.documentElement.classList.remove('pdf-export-busy', 'ios-print-active');
-                    if (btn) {
-                        btn.disabled = false;
-                        btn.textContent = prevText || '📥 儲存 PDF';
-                    }
-                }, 15000);
+                showModal('此裝置請使用「儲存 PDF」產生檔案，系統列印備援已停用 📖', '📖');
             }
 
             async function printBookletPdfExportModeFromPreview() {
-                await saveBookletPdfViaIosPrint();
+                await saveBookletPdfFromInAppPreview();
             }
 
             async function saveBookletPdfFromInAppPreview(triggerBtn) {
@@ -11331,6 +11304,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 }
                 beginBookletPdfExportUi();
                 markSoarvibePdfSession();
+                var pdfOk = false;
 
                 function onProgress(cur, total) {
                     updateBookletPdfProgress(cur, total);
@@ -11341,8 +11315,10 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     var meta = currentItineraryMeta || {};
                     var filename = buildBookletPdfFilename(meta);
                     var pdfResult = await generateBookletPdfBlobFromPreviewFrame(frame, onProgress);
+                    pdfOk = true;
                     endBookletPdfExportUi();
                     resetBookletPreviewLayout({ reopenPreview: true });
+                    restoreBookletPreviewScale();
                     openBookletPdfViewer(pdfResult.blob, filename, pdfResult.pageImages);
                 } catch (pdfErr) {
                     console.error('[SOARVIBE] saveBookletPdfFromInAppPreview:', pdfErr);
@@ -11351,9 +11327,15 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                             sessionStorage.setItem('soarvibe_pdf_canvas_crash', '1');
                         } catch (storageErr) { /* silent */ }
                     }
+                    recoverBookletPdfFailure();
                     showModal(getBookletPdfErrorMessage(pdfErr), '📖');
                 } finally {
-                    resetBookletPdfGeneratingState({ keepPreviewOpen: true });
+                    if (pdfOk) {
+                        pdfExportInProgress = false;
+                        clearBookletPdfEmergencyTimer();
+                        markPdfExportSessionStorage(false);
+                        cleanupBookletPdfArtifacts();
+                    }
                     if (btn) {
                         btn.disabled = false;
                         btn.textContent = prevText || '📥 儲存 PDF';
@@ -11450,7 +11432,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     '.bk-page>*:not(.bk-watermark),.bk-note-page>*:not(.bk-watermark),' +
                     '.bk-day-page>*:not(.bk-watermark),.bk-food-page>*:not(.bk-watermark){position:relative;z-index:1}' +
                     '.bk-day-body,.bk-food-body,.bk-intro-content{position:relative;z-index:1}' +
-                    '.bk-day-safe-zone,.bk-page-safe-zone{flex-shrink:0;height:62px;min-height:62px;width:100%;pointer-events:none}' +
+                    '.bk-day-safe-zone,.bk-page-safe-zone{flex-shrink:0;height:50px;min-height:50px;width:100%;pointer-events:none}' +
                     '.bk-logo-img{display:block;max-height:' + BOOKLET_COVER_LOGO_MAX_HEIGHT +
                     ';width:auto;margin:0 auto 6mm;object-fit:contain;border-radius:8px}';
             }
@@ -11632,7 +11614,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     '.bk-pdf-export-mode .bk-day-page,.bk-pdf-export-mode .bk-food-page,.bk-pdf-export-mode .bk-page.bk-trip-summary-page{display:flex!important;flex-direction:column!important;padding:20px 28px 0!important}' +
                     '.bk-pdf-export-mode .bk-page.bk-trip-summary-page .bk-trip-sheet{flex:1 1 auto;min-height:0;max-height:none!important;overflow:visible!important}' +
                     '.bk-pdf-export-mode .bk-day-body,.bk-pdf-export-mode .bk-food-body{flex:1 1 auto;min-height:0;max-height:none!important;overflow:visible!important;position:relative;z-index:1;padding-bottom:2mm!important;box-sizing:border-box!important}' +
-                    '.bk-pdf-export-mode .bk-day-safe-zone,.bk-pdf-export-mode .bk-page-safe-zone{height:62px!important;min-height:62px!important;flex-shrink:0!important}' +
+                    '.bk-pdf-export-mode .bk-day-safe-zone,.bk-pdf-export-mode .bk-page-safe-zone{height:50px!important;min-height:50px!important;flex-shrink:0!important}' +
                     '.bk-pdf-export-mode .bk-day-title{font-size:11pt!important;margin:0 0 1.5mm!important}' +
                     '.bk-pdf-export-mode .bk-day-cont{font-size:9.5pt!important;margin:0 0 1.5mm!important}' +
                     '.bk-pdf-export-mode .bk-phase{font-size:10pt!important;font-weight:900!important;margin:2mm 0 1.5mm!important}' +
@@ -13258,27 +13240,6 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     bookletPreviewPrint.textContent = '📥 儲存 PDF';
                 }
                 bookletPreviewPrint.addEventListener('click', handleBookletPreviewAction);
-                var bookletPrintFallbackTimer = null;
-                bookletPreviewPrint.addEventListener('touchstart', function () {
-                    bookletPrintFallbackTimer = setTimeout(function () {
-                        bookletPrintFallbackTimer = null;
-                        if (!pdfExportInProgress) {
-                            saveBookletPdfViaIosPrint(bookletPreviewPrint);
-                        }
-                    }, 800);
-                }, { passive: true });
-                bookletPreviewPrint.addEventListener('touchend', function () {
-                    if (bookletPrintFallbackTimer) {
-                        clearTimeout(bookletPrintFallbackTimer);
-                        bookletPrintFallbackTimer = null;
-                    }
-                });
-                bookletPreviewPrint.addEventListener('touchmove', function () {
-                    if (bookletPrintFallbackTimer) {
-                        clearTimeout(bookletPrintFallbackTimer);
-                        bookletPrintFallbackTimer = null;
-                    }
-                });
             }
             var bookletPdfProgressRecover = document.getElementById('booklet-pdf-progress-recover');
             if (bookletPdfProgressRecover) {
