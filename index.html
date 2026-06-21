@@ -1825,6 +1825,7 @@
         }
         .flight-times-row .date-field,
         .hotel-row-full .field-input,
+        .accommodation-card .field-input,
         #advanced-settings .field-select,
         #advanced-settings .field-textarea {
             padding: 0.35rem 0.5rem;
@@ -1833,6 +1834,113 @@
         }
         .hotel-row-full {
             width: 100%;
+        }
+        .accommodations-block {
+            width: 100%;
+        }
+        .accommodations-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .accommodation-card {
+            border: 1px solid rgba(255, 255, 255, 0.65);
+            border-radius: 0.625rem;
+            padding: 0.5rem 0.55rem;
+            background: rgba(255, 255, 255, 0.35);
+        }
+        .accommodation-card-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.35rem;
+            margin-bottom: 0.35rem;
+        }
+        .accommodation-card-title {
+            font-size: 0.6875rem;
+            font-weight: 800;
+            color: #546E7A;
+        }
+        .accommodation-remove-btn {
+            border: none;
+            background: transparent;
+            color: #90A4AE;
+            font-size: 0.75rem;
+            line-height: 1;
+            padding: 0.15rem 0.25rem;
+            cursor: pointer;
+        }
+        .accommodation-nights-label {
+            display: block;
+            font-size: 0.6875rem;
+            font-weight: 700;
+            color: #546E7A;
+            margin: 0.25rem 0 0.2rem;
+        }
+        .accommodation-nights {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.25rem 0.35rem;
+        }
+        .accommodation-night-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2rem;
+            font-size: 0.6875rem;
+            color: #37474F;
+            background: rgba(255, 255, 255, 0.55);
+            border: 1px solid rgba(255, 255, 255, 0.75);
+            border-radius: 9999px;
+            padding: 0.15rem 0.45rem;
+            cursor: pointer;
+            user-select: none;
+        }
+        .accommodation-night-chip input {
+            width: 0.75rem;
+            height: 0.75rem;
+            margin: 0;
+            accent-color: #00838f;
+        }
+        .accommodation-optional-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.35rem;
+            margin-top: 0.35rem;
+        }
+        .accommodation-optional-row label,
+        .accommodation-note-wrap label {
+            font-size: 0.625rem;
+            font-weight: 700;
+            color: #78909C;
+        }
+        .accommodation-optional-row input,
+        .accommodation-note-wrap input {
+            width: 100%;
+            margin-top: 0.1rem;
+            padding: 0.3rem 0.45rem;
+            min-height: 1.75rem;
+            font-size: 0.75rem;
+            border-radius: 0.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.85);
+        }
+        .accommodation-note-wrap {
+            margin-top: 0.35rem;
+        }
+        .add-accommodation-btn {
+            width: 100%;
+            margin-top: 0.35rem;
+            padding: 0.35rem 0.5rem;
+            border: 1px dashed rgba(0, 131, 143, 0.45);
+            border-radius: 0.5rem;
+            background: rgba(255, 255, 255, 0.25);
+            color: #00838f;
+            font-size: 0.75rem;
+            font-weight: 800;
+            cursor: pointer;
+        }
+        .add-accommodation-btn:active {
+            transform: scale(0.98);
         }
         #advanced-settings .advanced-panel-inner {
             padding-top: 0.25rem;
@@ -2202,9 +2310,10 @@
                                         </div>
                                     </label>
                                 </div>
-                                <div class="hotel-row-full">
-                                    <label for="advanced-hotel" class="field-label">住宿飯店</label>
-                                    <input type="text" id="advanced-hotel" name="advanced-hotel" class="field-input w-full rounded-lg border border-white/70" placeholder="如：淺草飯店">
+                                <div class="accommodations-block">
+                                    <span class="field-label">住宿飯店</span>
+                                    <div id="accommodations-list" class="accommodations-list" aria-live="polite"></div>
+                                    <button type="button" id="add-accommodation-btn" class="add-accommodation-btn">＋ 新增住宿</button>
                                 </div>
                                 <div>
                                     <label for="advanced-transport" class="field-label">交通方式</label>
@@ -2535,12 +2644,12 @@
             var generatingMsgIdx = 0;
             const GENERATING_STATUS_MESSAGES = [
                 '正在掃描 {dest} 熱門打卡點…',
-                '翻地圖中：哪間排隊名店值得您去排？🍜',
-                '幫您把「必去」跟「必吃」排進同一條順路 ✨',
+                '翻地圖中，看看哪間排隊名店值得您去排 🍜',
+                '幫您把必吃美食和必去景點順路排進去 ✨',
                 '交通動線精算中，走最少路、看最多精彩…',
                 '在地人私藏巷弄，解鎖中 🔍',
                 '行李說它準備好了，行程表也快好了 🧳',
-                '塔台調整航線中，降落的是驚喜不是雷點 🛬',
+                'SOARVIBE 塔台調整中，請您耐心等候 🛬',
                 '小本本油墨還沒乾，再幾秒就送到 📖'
             ];
             const GENERATING_STATUS_HOLD_MS = 3600;
@@ -3227,7 +3336,8 @@
             const dateEndInput = document.getElementById('date-end');
             const advancedSettings = document.getElementById('advanced-settings');
             const advancedToggle = document.getElementById('advanced-toggle');
-            const advancedHotelInput = document.getElementById('advanced-hotel');
+            const accommodationsListEl = document.getElementById('accommodations-list');
+            const addAccommodationBtn = document.getElementById('add-accommodation-btn');
             const advancedTransportSelect = document.getElementById('advanced-transport');
             const itineraryResult = document.getElementById('itinerary-result');
             const itineraryLoading = document.getElementById('itinerary-loading');
@@ -3284,7 +3394,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
-            const SOARVIBE_APP_BUILD = 'v86';
+            const SOARVIBE_APP_BUILD = 'v87';
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
@@ -4240,16 +4350,16 @@
                 var presetKey = findCityPresetKeyForDestination(dest);
                 if (presetKey) {
                     var preset = CITY_PRESETS[presetKey];
-                    if (!advancedHotelInput.value.trim()) {
-                        advancedHotelInput.value = pickRandom(preset.hotels);
+                    if (!hasValidAccommodationInput()) {
+                        setAccommodationsToForm([{ name: pickRandom(preset.hotels), nights: [], checkIn: '', checkOut: '', note: '' }]);
                     }
                     if (!advancedTransportSelect.value) {
                         advancedTransportSelect.value = pickRandom(preset.transports);
                     }
                     applyFlightTimesFromPreset(preset);
                 } else {
-                    if (!advancedHotelInput.value.trim()) {
-                        advancedHotelInput.value = dest + '市中心精品飯店';
+                    if (!hasValidAccommodationInput()) {
+                        setAccommodationsToForm([{ name: dest + '市中心精品飯店', nights: [], checkIn: '', checkOut: '', note: '' }]);
                     }
                     if (!advancedTransportSelect.value) {
                         advancedTransportSelect.value = 'public-transit';
@@ -6172,12 +6282,258 @@
                 fillDefaultTripDatesIfEmpty(3);
                 ensureFirstTravelStyleSelected();
                 applyFlightTimesFromPreset(preset);
-                advancedHotelInput.value = pickRandom(preset.hotels);
+                setAccommodationsToForm([{ name: pickRandom(preset.hotels), nights: [], checkIn: '', checkOut: '', note: '' }]);
                 advancedTransportSelect.value = pickRandom(preset.transports);
 
                 hideAlert();
                 expandAdvancedPanel();
                 advancedSettings.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+
+            function countTripNights(dateStart, dateEnd) {
+                if (!dateStart || !dateEnd) return 1;
+                return Math.max(1, countTripDays(dateStart, dateEnd) - 1);
+            }
+
+            function normalizeAccommodationEntry(entry) {
+                entry = entry || {};
+                var nights = Array.isArray(entry.nights) ? entry.nights.slice() : [];
+                nights = nights.map(function (n) {
+                    return parseInt(n, 10);
+                }).filter(function (n) {
+                    return n > 0;
+                });
+                nights.sort(function (a, b) { return a - b; });
+                return {
+                    name: String(entry.name || entry.hotel || '').trim(),
+                    nights: nights,
+                    checkIn: String(entry.checkIn || entry.check_in || '').trim(),
+                    checkOut: String(entry.checkOut || entry.check_out || '').trim(),
+                    note: String(entry.note || entry.remark || '').trim()
+                };
+            }
+
+            function getAccommodationNightCount() {
+                syncTripDateState();
+                return countTripNights(tripDateState.dateStart, tripDateState.dateEnd);
+            }
+
+            function formatAccommodationNightLabel(nightNum) {
+                return '第 ' + nightNum + ' 晚';
+            }
+
+            function formatAccommodationSummary(accommodations) {
+                accommodations = (accommodations || []).map(normalizeAccommodationEntry).filter(function (a) {
+                    return a.name;
+                });
+                if (!accommodations.length) return '';
+                if (accommodations.length === 1 && !accommodations[0].nights.length) {
+                    return accommodations[0].name;
+                }
+                return accommodations.map(function (acc) {
+                    if (!acc.nights.length) return acc.name;
+                    var nightText = acc.nights.map(formatAccommodationNightLabel).join('、');
+                    return acc.name + '（' + nightText + '）';
+                }).join('；');
+            }
+
+            function buildAccommodationPromptBlock(accommodations, dateStart, dateEnd) {
+                accommodations = (accommodations || []).map(normalizeAccommodationEntry).filter(function (a) {
+                    return a.name;
+                });
+                if (!accommodations.length) return '（未填寫）';
+                var totalNights = countTripNights(dateStart, dateEnd);
+                if (accommodations.length === 1 && !accommodations[0].nights.length) {
+                    return accommodations[0].name;
+                }
+                var nightMap = {};
+                var ni;
+                for (ni = 1; ni <= totalNights; ni++) {
+                    nightMap[ni] = [];
+                }
+                accommodations.forEach(function (acc) {
+                    acc.nights.forEach(function (nightNum) {
+                        if (nightMap[nightNum]) nightMap[nightNum].push(acc.name);
+                    });
+                });
+                var grouped = [];
+                var current = null;
+                for (ni = 1; ni <= totalNights; ni++) {
+                    var hotels = nightMap[ni];
+                    var hotelLabel = hotels.length ? hotels.join('／') : '（未指定）';
+                    if (current && current.hotelLabel === hotelLabel) {
+                        current.endNight = ni;
+                    } else {
+                        if (current) grouped.push(current);
+                        current = { startNight: ni, endNight: ni, hotelLabel: hotelLabel };
+                    }
+                }
+                if (current) grouped.push(current);
+                var lines = grouped.map(function (g) {
+                    var nightLabel = g.startNight === g.endNight
+                        ? formatAccommodationNightLabel(g.startNight)
+                        : formatAccommodationNightLabel(g.startNight) + '、' + formatAccommodationNightLabel(g.endNight);
+                    return nightLabel + ' → ' + g.hotelLabel;
+                });
+                var detailLines = accommodations.map(function (acc) {
+                    var parts = ['• ' + acc.name];
+                    if (acc.nights.length) {
+                        parts.push('適用：' + acc.nights.map(formatAccommodationNightLabel).join('、'));
+                    }
+                    if (acc.checkIn) parts.push('入住 ' + acc.checkIn);
+                    if (acc.checkOut) parts.push('退房 ' + acc.checkOut);
+                    if (acc.note) parts.push('備註 ' + acc.note);
+                    return parts.join('｜');
+                });
+                return lines.join('\n') + '\n' + detailLines.join('\n');
+            }
+
+            function getHotelNameForNight(nightNum, accommodations, fallback) {
+                accommodations = (accommodations || []).map(normalizeAccommodationEntry);
+                var matches = accommodations.filter(function (acc) {
+                    return acc.name && acc.nights.indexOf(nightNum) !== -1;
+                });
+                if (matches.length) return matches[0].name;
+                if (accommodations.length === 1 && accommodations[0].name) return accommodations[0].name;
+                return fallback || '住宿';
+            }
+
+            function getHotelForDay(dayNum, meta) {
+                var accommodations = (meta && meta.accommodations) || [];
+                var fallback = (meta && meta.accommodation) || '住宿';
+                if (!accommodations.length) return fallback;
+                var nightNum = Math.max(1, Math.min(dayNum, getAccommodationNightCount()));
+                return getHotelNameForNight(nightNum, accommodations, fallback);
+            }
+
+            function collectAccommodationsFromDom() {
+                if (!accommodationsListEl) return [];
+                return Array.prototype.slice.call(
+                    accommodationsListEl.querySelectorAll('.accommodation-card')
+                ).map(function (card) {
+                    var nights = [];
+                    card.querySelectorAll('.acc-night-input:checked').forEach(function (input) {
+                        nights.push(parseInt(input.value, 10));
+                    });
+                    return normalizeAccommodationEntry({
+                        name: card.querySelector('.acc-name-input') ? card.querySelector('.acc-name-input').value : '',
+                        nights: nights,
+                        checkIn: card.querySelector('.acc-checkin-input') ? card.querySelector('.acc-checkin-input').value : '',
+                        checkOut: card.querySelector('.acc-checkout-input') ? card.querySelector('.acc-checkout-input').value : '',
+                        note: card.querySelector('.acc-note-input') ? card.querySelector('.acc-note-input').value : ''
+                    });
+                });
+            }
+
+            function renderAccommodationNightOptions(card, selectedNights, nightCount) {
+                var wrap = card.querySelector('.accommodation-nights');
+                if (!wrap) return;
+                var selected = {};
+                (selectedNights || []).forEach(function (n) { selected[n] = true; });
+                wrap.innerHTML = '';
+                var n;
+                for (n = 1; n <= nightCount; n++) {
+                    var chip = document.createElement('label');
+                    chip.className = 'accommodation-night-chip';
+                    var input = document.createElement('input');
+                    input.type = 'checkbox';
+                    input.className = 'acc-night-input';
+                    input.value = String(n);
+                    input.checked = !!selected[n];
+                    chip.appendChild(input);
+                    chip.appendChild(document.createTextNode(formatAccommodationNightLabel(n)));
+                    wrap.appendChild(chip);
+                }
+            }
+
+            function createAccommodationCardElement(entry, index, nightCount) {
+                entry = normalizeAccommodationEntry(entry);
+                var card = document.createElement('div');
+                card.className = 'accommodation-card';
+                card.innerHTML =
+                    '<div class="accommodation-card-head">' +
+                    '<span class="accommodation-card-title">住宿 ' + (index + 1) + '</span>' +
+                    (index > 0 ? '<button type="button" class="accommodation-remove-btn" aria-label="移除住宿">✕</button>' : '') +
+                    '</div>' +
+                    '<label class="field-label">飯店名稱</label>' +
+                    '<input type="text" class="field-input w-full rounded-lg border border-white/70 acc-name-input" placeholder="如：淺草飯店" value="' + escapeHtml(entry.name) + '">' +
+                    '<span class="accommodation-nights-label">適用晚數（可多選）</span>' +
+                    '<div class="accommodation-nights"></div>' +
+                    '<div class="accommodation-optional-row">' +
+                    '<label>入住日期（選填）<input type="date" class="acc-checkin-input" value="' + escapeHtml(entry.checkIn) + '"></label>' +
+                    '<label>退房日期（選填）<input type="date" class="acc-checkout-input" value="' + escapeHtml(entry.checkOut) + '"></label>' +
+                    '</div>' +
+                    '<div class="accommodation-note-wrap">' +
+                    '<label>備註（選填）<input type="text" class="acc-note-input" placeholder="如：近地鐵站" value="' + escapeHtml(entry.note) + '"></label>' +
+                    '</div>';
+                renderAccommodationNightOptions(card, entry.nights, nightCount);
+                var removeBtn = card.querySelector('.accommodation-remove-btn');
+                if (removeBtn) {
+                    removeBtn.addEventListener('click', function () {
+                        if (card.parentNode) card.parentNode.removeChild(card);
+                        refreshAccommodationCardLabels();
+                    });
+                }
+                return card;
+            }
+
+            function refreshAccommodationCardLabels() {
+                if (!accommodationsListEl) return;
+                Array.prototype.slice.call(accommodationsListEl.querySelectorAll('.accommodation-card')).forEach(function (card, idx) {
+                    var title = card.querySelector('.accommodation-card-title');
+                    if (title) title.textContent = '住宿 ' + (idx + 1);
+                });
+            }
+
+            function setAccommodationsToForm(accommodations) {
+                if (!accommodationsListEl) return;
+                accommodations = (accommodations && accommodations.length)
+                    ? accommodations.map(normalizeAccommodationEntry)
+                    : [{ name: '', nights: [], checkIn: '', checkOut: '', note: '' }];
+                var nightCount = getAccommodationNightCount();
+                accommodationsListEl.innerHTML = '';
+                accommodations.forEach(function (entry, idx) {
+                    accommodationsListEl.appendChild(createAccommodationCardElement(entry, idx, nightCount));
+                });
+            }
+
+            function refreshAllAccommodationNightOptions() {
+                if (!accommodationsListEl) return;
+                var nightCount = getAccommodationNightCount();
+                Array.prototype.slice.call(accommodationsListEl.querySelectorAll('.accommodation-card')).forEach(function (card) {
+                    var selected = [];
+                    card.querySelectorAll('.acc-night-input:checked').forEach(function (input) {
+                        selected.push(parseInt(input.value, 10));
+                    });
+                    selected = selected.filter(function (n) { return n <= nightCount; });
+                    renderAccommodationNightOptions(card, selected, nightCount);
+                });
+            }
+
+            function initAccommodationsForm() {
+                if (!accommodationsListEl) return;
+                setAccommodationsToForm([{ name: '', nights: [], checkIn: '', checkOut: '', note: '' }]);
+                if (addAccommodationBtn) {
+                    addAccommodationBtn.addEventListener('click', function () {
+                        var nightCount = getAccommodationNightCount();
+                        var cards = accommodationsListEl.querySelectorAll('.accommodation-card');
+                        accommodationsListEl.appendChild(
+                            createAccommodationCardElement({ name: '', nights: [], checkIn: '', checkOut: '', note: '' }, cards.length, nightCount)
+                        );
+                        refreshAccommodationCardLabels();
+                    });
+                }
+            }
+
+            function hasValidAccommodationInput() {
+                var list = collectAccommodationsFromDom();
+                return !!(list.length && list[0].name);
+            }
+
+            function focusFirstAccommodationInput() {
+                if (!accommodationsListEl) return;
+                var first = accommodationsListEl.querySelector('.acc-name-input');
+                if (first) first.focus();
             }
 
             function getCustomerSelectedTransport() {
@@ -6195,6 +6551,8 @@
                 var depIso = getFlightDepartureIso();
                 var retIso = getFlightReturnIso();
                 var customerSelectedTransport = getCustomerSelectedTransport();
+                var accommodations = collectAccommodationsFromDom();
+                var accommodation = formatAccommodationSummary(accommodations);
                 return {
                     destination: destinationInput.value.trim(),
                     dateStart: tripDateState.dateStart,
@@ -6204,7 +6562,8 @@
                     flightReturn: retIso,
                     departureTime: depIso,
                     returnTime: retIso,
-                    accommodation: advancedHotelInput.value.trim(),
+                    accommodations: accommodations,
+                    accommodation: accommodation,
                     transport: advancedTransportSelect.value,
                     customerSelectedTransport: customerSelectedTransport,
                     customWishes: document.getElementById('customWishes') ? document.getElementById('customWishes').value.trim() : ''
@@ -6251,8 +6610,10 @@
                     var retParts = meta.flightReturn.split('T');
                     if (retParts[1]) flightReturnTimeInput.value = retParts[1].slice(0, 5);
                 }
-                if (meta.accommodation) {
-                    advancedHotelInput.value = meta.accommodation;
+                if (meta.accommodations && meta.accommodations.length) {
+                    setAccommodationsToForm(meta.accommodations);
+                } else if (meta.accommodation) {
+                    setAccommodationsToForm([{ name: meta.accommodation, nights: [], checkIn: '', checkOut: '', note: '' }]);
                 }
                 if (meta.transport) {
                     advancedTransportSelect.value = meta.transport;
@@ -6427,7 +6788,8 @@ ${ctx.typeInstruction}
 【✈️ 航班時間——必填參數（不可忽略）】
 🛫 departureTime（出發航班，含日期+時間）：${ctx.departureTimeText}
 🛬 returnTime（回程航班，含日期+時間）：${ctx.returnTimeText}
-🏨 住宿飯店／區域：${payload.accommodation}
+🏨 住宿飯店／區域：${buildAccommodationPromptBlock(payload.accommodations || [{ name: payload.accommodation, nights: [] }], payload.dateStart, payload.dateEnd)}
+【🏨 住宿晚數對照】若列出不同晚數對應不同飯店，每一天行程起訖點須以「當晚住宿」為圓心；換宿日須安排 Check-out、移動、Check-in 的具體交通，不可忽略行李動線。
 
 【🚇 客戶指定交通方式（customerSelectedTransport）——行程串聯必須 100% 遵守】
 客戶已在前端明確選定：【${ctx.customerSelectedTransport}】
@@ -6471,7 +6833,7 @@ ${buildGeminiJsonOutputBlock(payload, days)}`;
                 } else if (dayNum === totalDays) {
                     dayRules = '【本日為最終日——送機日】上午、下午仍須各有 1–2 個具體行程（採買、午餐、最後打卡）；「晚上」時段才安排前往機場（依 returnTime 倒推，預留至少 3 小時 Buffer）。禁止下午空白直接跳機場。';
                 } else {
-                    dayRules = '【本日為中間日】以住宿區域為圓心，安排充實的上午、下午、晚上各 2–3 個具體景點或餐廳，動線順向不繞路。嚴禁「自由活動／自由行程／彈性安排／可自行安排」等模糊字眼。';
+                    dayRules = '【本日為中間日】以「本日住宿基點」為圓心，安排充實的上午、下午、晚上各 2–3 個具體景點或餐廳，動線順向不繞路。嚴禁「自由活動／自由行程／彈性安排／可自行安排」等模糊字眼。';
                 }
                 var continuityBlock = priorSummary
                     ? '\n【已規劃日子——請勿重複相同景點／餐廳，並從住宿區延續順向動線】\n' + priorSummary + '\n'
@@ -6485,7 +6847,8 @@ ${ctx.wishesInstruction ? ctx.wishesInstruction + '\n\n' : ''}${ctx.globalCityIn
 
 【核心維度】
 📍 目的地（currentCity）：${ctx.currentCity}｜✨ 風格（currentStyle）：【${ctx.selectedStyle}】｜💰 預算：${ctx.budget}
-🏨 住宿：${payload.accommodation}
+🏨 住宿：${buildAccommodationPromptBlock(payload.accommodations || [{ name: payload.accommodation, nights: [] }], payload.dateStart, payload.dateEnd)}
+🏨 本日住宿基點：${getHotelForDay(dayNum, payload)}
 🚇 交通方式（100% 遵守）：【${ctx.customerSelectedTransport}】
 🛫 出發航班：${ctx.departureTimeText}｜🛬 回程航班：${ctx.returnTimeText}
 
@@ -6540,7 +6903,7 @@ ${ctx.wishesInstruction ? ctx.wishesInstruction + '\n\n' : ''}${ctx.globalCityIn
 
 【核心維度】
 📍 目的地（currentCity）：${ctx.currentCity}｜✨ 風格（currentStyle）：【${ctx.selectedStyle}】｜💰 預算：${ctx.budget}
-🏨 住宿：${payload.accommodation}
+🏨 住宿：${buildAccommodationPromptBlock(payload.accommodations || [{ name: payload.accommodation, nights: [] }], payload.dateStart, payload.dateEnd)}
 🚇 交通方式（100% 遵守）：【${ctx.customerSelectedTransport}】
 🛫 出發：${ctx.departureTimeText}｜🛬 回程：${ctx.returnTimeText}
 
@@ -7073,7 +7436,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             function enrichHiddenDaysFromMeta(days, meta) {
                 if (!days.length) return days;
                 var totalDays = days.length;
-                var hotel = (meta && meta.accommodation) || '住宿';
+                var hotel = getHotelForDay(dayNum, meta);
                 var dest = (meta && meta.destination) || '目的地';
 
                 days.forEach(function (day, idx) {
@@ -7589,18 +7952,19 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 try {
                     p = standardizeActivityForDisplay(text);
                 } catch (e) {
-                    return '<li class="activity-item">' + escapeHtml(String(text || '')) + '</li>';
+                    p = { time: '', title: String(text || ''), koreanName: '', highlight: '', note: '', raw: String(text || '') };
                 }
-                if (!p || !p.title) {
-                    var fallback = (p && p.raw) || coerceActivityLine(text) || String(text || '');
-                    return '<li class="activity-item">' + escapeHtml(String(fallback)) + '</li>';
+                if (!p) {
+                    p = { time: '', title: String(text || '行程景點'), koreanName: '', highlight: '', note: '', raw: String(text || '') };
                 }
+                var title = p.title || coerceActivityLine(text) || String(text || '行程景點');
+                if (!title) title = '行程景點';
                 var html = '<li class="activity-item">';
                 html += '<div class="activity-head">';
                 if (p.time) {
                     html += '<span class="activity-time">' + escapeHtml(p.time) + '</span>';
                 }
-                html += '<span class="activity-title">' + escapeHtml(p.title) + '</span>';
+                html += '<span class="activity-title">' + escapeHtml(title) + '</span>';
                 html += '</div>';
                 if (p.koreanName) {
                     html += '<div class="activity-note">🇰🇷 ' + escapeHtml(p.koreanName) + '</div>';
@@ -7763,13 +8127,14 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
                 var html = '';
                 (hidden.days || []).forEach(function (day) {
-                    html += '<section class="ui-day-block" data-day="' + escapeHtml(day.dayNum) + '">';
-                    html += '<h3 class="ui-day-title">📅 ' + escapeHtml(day.dateLabel) + ' · Day ' + escapeHtml(day.dayNum) + '</h3>';
-                    day.phases.forEach(function (phase) {
+                    var dayBlock = ensureStandardPhasesPerDay(day);
+                    html += '<section class="ui-day-block" data-day="' + escapeHtml(dayBlock.dayNum) + '">';
+                    html += '<h3 class="ui-day-title">📅 ' + escapeHtml(dayBlock.dateLabel) + ' · Day ' + escapeHtml(dayBlock.dayNum) + '</h3>';
+                    (dayBlock.phases || []).forEach(function (phase) {
+                        var phaseLabel = normalizePhaseLabel(phase.label || '');
                         var phaseItems = getPhaseDisplayItems(phase);
-                        if (!phaseItems.length) return;
-                        var label = phase.label ? phase.label + '：' : '行程重點：';
-                        html += '<h4 class="ui-phase-title">' + (phase.emoji || getPhaseEmoji(phase.label)) + escapeHtml(label) + '</h4>';
+                        var label = phaseLabel ? phaseLabel + '：' : '行程重點：';
+                        html += '<h4 class="ui-phase-title">' + (phase.emoji || getPhaseEmoji(phaseLabel)) + escapeHtml(label) + '</h4>';
                         html += '<ul class="activity-list">';
                         phaseItems.forEach(function (item) {
                             html += formatActivityItemHtml(item);
@@ -13348,7 +13713,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     || !tripDateState.dateEnd
                     || !getFlightDepartureIso()
                     || !getFlightReturnIso()
-                    || !advancedHotelInput.value.trim()
+                    || !hasValidAccommodationInput()
                     || !advancedTransportSelect.value;
             }
 
@@ -13362,8 +13727,8 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     if (flightDepartureTimeInput) flightDepartureTimeInput.focus();
                 } else if (!flightReturnTimeInput || !flightReturnTimeInput.value) {
                     if (flightReturnTimeInput) flightReturnTimeInput.focus();
-                } else if (!advancedHotelInput.value.trim()) {
-                    advancedHotelInput.focus();
+                } else if (!hasValidAccommodationInput()) {
+                    focusFirstAccommodationInput();
                 } else {
                     advancedTransportSelect.focus();
                 }
@@ -13674,15 +14039,19 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
             dateStartInput.addEventListener('change', function () {
                 syncTripDateState();
+                refreshAllAccommodationNightOptions();
             });
             dateStartInput.addEventListener('input', function () {
                 syncTripDateState();
+                refreshAllAccommodationNightOptions();
             });
             dateEndInput.addEventListener('change', function () {
                 syncTripDateState();
+                refreshAllAccommodationNightOptions();
             });
             dateEndInput.addEventListener('input', function () {
                 syncTripDateState();
+                refreshAllAccommodationNightOptions();
             });
             if (flightDepartureTimeInput) {
                 flightDepartureTimeInput.addEventListener('change', function () {
@@ -13711,6 +14080,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 });
             }
             syncTripDateState();
+            initAccommodationsForm();
             updateTimePickerDisplays();
 
             document.querySelectorAll('input[name="travel-style"]').forEach(function (radio) {
