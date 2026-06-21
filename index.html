@@ -3391,7 +3391,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
-            const SOARVIBE_APP_BUILD = 'v90';
+            const SOARVIBE_APP_BUILD = 'v91';
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
@@ -6292,6 +6292,8 @@
                 return Math.max(1, countTripDays(dateStart, dateEnd) - 1);
             }
 
+            var ACCOMMODATION_HOTEL_PLACEHOLDER = '請輸入住宿飯店名稱...';
+
             function normalizeAccommodationEntry(entry, isDefault) {
                 entry = entry || {};
                 var checkInNight = null;
@@ -6328,8 +6330,8 @@
                 return '第 ' + nightNum + ' 晚';
             }
 
-            function formatAccommodationCheckInOptionLabel(nightNum) {
-                return '第 ' + nightNum + ' 晚開始入住';
+            function resolvePayloadAccommodations(payload) {
+                return payload.accommodations || [{ name: payload.accommodation, checkInNight: null }];
             }
 
             function splitAccommodationEntries(accommodations) {
@@ -6379,7 +6381,7 @@
                 split.additional.forEach(function (entry) {
                     if (!entry.name) return;
                     parts.push(entry.name + (entry.checkInNight
-                        ? '（' + formatAccommodationCheckInOptionLabel(entry.checkInNight) + '）'
+                        ? '（' + formatAccommodationNightLabel(entry.checkInNight) + '）'
                         : ''));
                 });
                 return parts.join('；');
@@ -6388,28 +6390,55 @@
             function buildAccommodationPromptBlock(accommodations, dateStart, dateEnd) {
                 var split = splitAccommodationEntries(accommodations);
                 if (!split.defaultEntry.name) return '（未填寫）';
-                if (!split.additional.length) return split.defaultEntry.name;
-                var totalNights = countTripNights(dateStart, dateEnd);
-                var lines = ['預設住宿：' + split.defaultEntry.name];
-                split.additional.filter(function (entry) {
+                var lines = ['主住宿：', split.defaultEntry.name];
+                var sortedAdditional = split.additional.filter(function (entry) {
                     return entry.name && entry.checkInNight;
                 }).sort(function (a, b) {
                     return a.checkInNight - b.checkInNight;
-                }).forEach(function (entry) {
-                    lines.push(formatAccommodationCheckInOptionLabel(entry.checkInNight) + '：' + entry.name);
                 });
-                var segments = buildAccommodationSegments(accommodations, dateStart, dateEnd);
-                if (segments.length) {
-                    lines.push('【晚數對照】');
-                    segments.forEach(function (seg) {
-                        var nightLabel = seg.startNight === seg.endNight
-                            ? formatAccommodationNightLabel(seg.startNight)
-                            : formatAccommodationNightLabel(seg.startNight) + '～' + formatAccommodationNightLabel(seg.endNight);
-                        lines.push(nightLabel + ' → ' + seg.name);
-                    });
+                sortedAdditional.forEach(function (entry, idx) {
+                    lines.push('');
+                    lines.push('新增住宿 ' + (idx + 1) + '：');
+                    lines.push('更換住宿晚數：' + formatAccommodationNightLabel(entry.checkInNight));
+                    lines.push('飯店名稱：' + entry.name);
+                });
+                if (sortedAdditional.length) {
+                    var segments = buildAccommodationSegments(accommodations, dateStart, dateEnd);
+                    if (segments.length) {
+                        lines.push('');
+                        lines.push('【晚數對照】');
+                        segments.forEach(function (seg) {
+                            var nightLabel = seg.startNight === seg.endNight
+                                ? formatAccommodationNightLabel(seg.startNight)
+                                : formatAccommodationNightLabel(seg.startNight) + '～' + formatAccommodationNightLabel(seg.endNight);
+                            lines.push(nightLabel + ' → ' + seg.name);
+                        });
+                    }
                 }
-                lines.push('共 ' + totalNights + ' 晚；請依上方換宿晚數安排每日起訖點、換宿日 Check-out／移動／Check-in 動線。');
                 return lines.join('\n');
+            }
+
+            function buildAccommodationRoutingRulesBlock(accommodations, dateStart, dateEnd) {
+                var split = splitAccommodationEntries(accommodations);
+                if (!split.additional.length) {
+                    return '【🏨 住宿動線規則——必須遵守】\n僅一間主住宿時，整趟旅程每日起點、終點、交通動線、Check-in／回飯店皆以主住宿為根據；每天晚上行程終點不宜離住宿過遠。';
+                }
+                var segments = buildAccommodationSegments(accommodations, dateStart, dateEnd);
+                var segLines = segments.map(function (seg) {
+                    var nightLabel = seg.startNight === seg.endNight
+                        ? formatAccommodationNightLabel(seg.startNight)
+                        : formatAccommodationNightLabel(seg.startNight) + '～' + formatAccommodationNightLabel(seg.endNight);
+                    return nightLabel + ' 住 ' + seg.name;
+                });
+                return [
+                    '【🏨 住宿動線規則——必須遵守】',
+                    '使用者已設定多間住宿；「更換住宿晚數」表示從該晚起改住該飯店。理解為：',
+                    segLines.join('；') + '。',
+                    '1. 規劃每一天行程時，須依照「當晚住宿」安排起點、終點與交通動線。',
+                    '2. 換宿日須安排 Check-out、行李移動、前往新飯店 Check-in 的具體交通。',
+                    '3. 每天晚上最後一站不宜離當晚住宿過遠。',
+                    '4. Day 1 抵達後 Check-in 至主住宿；各換宿日晚間以新飯店為回宿終點。'
+                ].join('\n');
             }
 
             function getHotelNameForNight(nightNum, accommodations, fallback, dateStart, dateEnd) {
@@ -6469,11 +6498,11 @@
                     options.push(current);
                     options.sort(function (a, b) { return a - b; });
                 }
-                select.innerHTML = '<option value="">請選擇入住晚數</option>';
+                select.innerHTML = '<option value="">請選擇更換住宿晚數</option>';
                 options.forEach(function (nightNum) {
                     var opt = document.createElement('option');
                     opt.value = String(nightNum);
-                    opt.textContent = formatAccommodationCheckInOptionLabel(nightNum);
+                    opt.textContent = formatAccommodationNightLabel(nightNum);
                     if (current === nightNum) opt.selected = true;
                     select.appendChild(opt);
                 });
@@ -6493,7 +6522,7 @@
             }
 
             function buildAccommodationHotelInputHtml(name) {
-                return '<input type="text" class="acc-hotel-input acc-name-input" autocomplete="off" value="' + escapeHtml(name || '') + '">';
+                return '<input type="text" class="acc-hotel-input acc-name-input" autocomplete="off" placeholder="' + escapeHtml(ACCOMMODATION_HOTEL_PLACEHOLDER) + '" value="' + escapeHtml(name || '') + '">';
             }
 
             function createDefaultAccommodationElement(entry) {
@@ -6515,7 +6544,7 @@
                     '<span class="accommodation-card-title">住宿 ' + displayIndex + '</span>' +
                     '<button type="button" class="accommodation-remove-btn" aria-label="移除住宿">✕</button>' +
                     '</div>' +
-                    '<label class="accommodation-field-label">入住晚數</label>' +
+                    '<label class="accommodation-field-label">更換住宿晚數</label>' +
                     '<select class="accommodation-checkin-select acc-checkin-night-select"></select>' +
                     '<label class="accommodation-field-label">飯店名稱</label>' +
                     buildAccommodationHotelInputHtml(entry.name);
@@ -6884,8 +6913,9 @@ ${ctx.typeInstruction}
 【✈️ 航班時間——必填參數（不可忽略）】
 🛫 departureTime（出發航班，含日期+時間）：${ctx.departureTimeText}
 🛬 returnTime（回程航班，含日期+時間）：${ctx.returnTimeText}
-🏨 住宿飯店／區域：${buildAccommodationPromptBlock(payload.accommodations || [{ name: payload.accommodation, checkInNight: null }], payload.dateStart, payload.dateEnd)}
-【🏨 住宿晚數對照】預設住宿為旅程開始入住的飯店；新增住宿從使用者選擇的「第N晚開始入住」起換宿。若有多間飯店，每一天行程起訖點須以「當晚住宿」為圓心；換宿日須安排 Check-out、移動、Check-in 的具體交通。
+🏨 住宿飯店／區域：
+${buildAccommodationPromptBlock(resolvePayloadAccommodations(payload), payload.dateStart, payload.dateEnd)}
+${buildAccommodationRoutingRulesBlock(resolvePayloadAccommodations(payload), payload.dateStart, payload.dateEnd)}
 
 【🚇 客戶指定交通方式（customerSelectedTransport）——行程串聯必須 100% 遵守】
 客戶已在前端明確選定：【${ctx.customerSelectedTransport}】
@@ -6943,7 +6973,9 @@ ${ctx.wishesInstruction ? ctx.wishesInstruction + '\n\n' : ''}${ctx.globalCityIn
 
 【核心維度】
 📍 目的地（currentCity）：${ctx.currentCity}｜✨ 風格（currentStyle）：【${ctx.selectedStyle}】｜💰 預算：${ctx.budget}
-🏨 住宿：${buildAccommodationPromptBlock(payload.accommodations || [{ name: payload.accommodation, checkInNight: null }], payload.dateStart, payload.dateEnd)}
+🏨 住宿：
+${buildAccommodationPromptBlock(resolvePayloadAccommodations(payload), payload.dateStart, payload.dateEnd)}
+${buildAccommodationRoutingRulesBlock(resolvePayloadAccommodations(payload), payload.dateStart, payload.dateEnd)}
 🏨 本日住宿基點：${getHotelForDay(dayNum, payload)}
 🚇 交通方式（100% 遵守）：【${ctx.customerSelectedTransport}】
 🛫 出發航班：${ctx.departureTimeText}｜🛬 回程航班：${ctx.returnTimeText}
@@ -6999,7 +7031,9 @@ ${ctx.wishesInstruction ? ctx.wishesInstruction + '\n\n' : ''}${ctx.globalCityIn
 
 【核心維度】
 📍 目的地（currentCity）：${ctx.currentCity}｜✨ 風格（currentStyle）：【${ctx.selectedStyle}】｜💰 預算：${ctx.budget}
-🏨 住宿：${buildAccommodationPromptBlock(payload.accommodations || [{ name: payload.accommodation, checkInNight: null }], payload.dateStart, payload.dateEnd)}
+🏨 住宿：
+${buildAccommodationPromptBlock(resolvePayloadAccommodations(payload), payload.dateStart, payload.dateEnd)}
+${buildAccommodationRoutingRulesBlock(resolvePayloadAccommodations(payload), payload.dateStart, payload.dateEnd)}
 🚇 交通方式（100% 遵守）：【${ctx.customerSelectedTransport}】
 🛫 出發：${ctx.departureTimeText}｜🛬 回程：${ctx.returnTimeText}
 
