@@ -418,6 +418,16 @@
         .itinerary-skeleton-line.wide { width: 92%; }
         .itinerary-skeleton-line.mid { width: 72%; }
         .itinerary-skeleton-line.short { width: 48%; }
+        .itinerary-render-error {
+            margin-top: 0.5rem;
+            padding: 0.75rem 0.85rem;
+            border-radius: 0.75rem;
+            background: rgba(255, 243, 224, 0.95);
+            border: 1px solid rgba(255, 183, 77, 0.55);
+            color: #5D4037;
+            font-size: 0.8125rem;
+            line-height: 1.55;
+        }
         @keyframes itinerary-shimmer {
             0% { background-position: 200% 0; }
             100% { background-position: -200% 0; }
@@ -3391,7 +3401,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
-            const SOARVIBE_APP_BUILD = 'v91';
+            const SOARVIBE_APP_BUILD = 'v92';
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
@@ -5334,6 +5344,8 @@
             var currentItineraryMarkdown = '';
             var currentItineraryMeta = null;
             var currentTripHiddenData = null;
+            var soarvibeIsGenerating = false;
+            var soarvibeIsLoading = false;
             window.soarvibeTripHiddenData = null;
             var tripDateState = { dateStart: '', dateEnd: '' };
             const SAVED_TRIPS_KEY = 'savedTrips';
@@ -7336,7 +7348,11 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                         });
                         phaseIdx++;
                     }
-                    return buildHiddenFromJson({ days: days }, meta);
+                    try {
+                        return buildHiddenFromJson({ days: days }, meta);
+                    } catch (phaseErr) {
+                        console.warn('[SOARVIBE] 鬆散 phase 解析 buildHidden 失敗:', phaseErr);
+                    }
                 }
                 var actRe = /"(\d{1,2}:\d{2}\s*[-–—~至到]\s*\d{1,2}:\d{2}[^"]*?)"/g;
                 var lines = [];
@@ -7346,7 +7362,11 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 }
                 if (lines.length) {
                     console.warn('[SOARVIBE] 鬆散解析擷取', lines.length, '筆行程');
-                    return buildHiddenFromLooseLines(lines, meta, tripDays);
+                    try {
+                        return buildHiddenFromLooseLines(lines, meta, tripDays);
+                    } catch (looseErr) {
+                        console.warn('[SOARVIBE] 鬆散解析 buildHidden 失敗:', looseErr);
+                    }
                 }
                 return null;
             }
@@ -7566,11 +7586,11 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             function enrichHiddenDaysFromMeta(days, meta) {
                 if (!days.length) return days;
                 var totalDays = days.length;
-                var hotel = getHotelForDay(dayNum, meta);
                 var dest = (meta && meta.destination) || '目的地';
 
                 days.forEach(function (day, idx) {
                     var dayNum = parseInt(day.dayNum, 10) || idx + 1;
+                    var hotel = getHotelForDay(dayNum, meta);
                     var isFirst = dayNum === 1;
                     var isLast = dayNum === totalDays;
                     var afternoon = (day.phases || []).find(function (p) {
@@ -7822,6 +7842,40 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 };
             }
 
+            function hiddenHasRenderableDays(hidden) {
+                if (!hidden || !Array.isArray(hidden.days) || !hidden.days.length) return false;
+                return hidden.days.some(function (d) {
+                    return (d.phases || []).some(function (p) {
+                        return getDayPhaseItems(p).length > 0;
+                    });
+                });
+            }
+
+            function logItineraryRenderDiagnostics(stage, hidden, renderItineraryExecuted) {
+                var itinerary = hidden || currentTripHiddenData || null;
+                console.log('[SOARVIBE] itinerary render diagnostics @', stage);
+                console.log('itinerary:', itinerary);
+                console.log('itinerary.days.length:', itinerary && itinerary.days ? itinerary.days.length : 0);
+                console.log('isGenerating:', soarvibeIsGenerating);
+                console.log('isLoading:', soarvibeIsLoading);
+                console.log('currentItineraryMeta:', currentItineraryMeta);
+                console.log('currentItineraryMarkdown.length:', (currentItineraryMarkdown || '').length);
+                console.log('renderItinerary (showItineraryContent) executed:', !!renderItineraryExecuted);
+            }
+
+            function showItineraryRenderError(message) {
+                hideGeneratingOverlay();
+                soarvibeIsLoading = false;
+                soarvibeIsGenerating = false;
+                itineraryLoading.classList.add('hidden');
+                itineraryLoading.setAttribute('aria-hidden', 'true');
+                aiContent.innerHTML = '<div class="itinerary-render-error" role="alert">' +
+                    escapeHtml(message || '行程天數無法載入，請重新生成。') + '</div>';
+                aiContent.classList.remove('hidden');
+                itineraryActions.classList.add('hidden');
+                itineraryResult.setAttribute('aria-busy', 'false');
+            }
+
             function resolveItineraryFromAi(rawText, meta) {
                 var markdown = '';
                 var hidden = null;
@@ -7884,10 +7938,21 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     };
                 }
                 if (resolved.hidden) {
-                    resolved.hidden = ensureHiddenTripDayCount(resolved.hidden, meta);
-                    resolved.markdown = hiddenToMarkdown(resolved.hidden);
+                    try {
+                        resolved.hidden = ensureHiddenTripDayCount(resolved.hidden, meta);
+                        resolved.markdown = hiddenToMarkdown(resolved.hidden);
+                    } catch (ensureErr) {
+                        console.error('[SOARVIBE] ensureHiddenTripDayCount failed:', ensureErr);
+                    }
+                }
+                logItineraryRenderDiagnostics('after-resolve', resolved.hidden, false);
+                if (!hiddenHasRenderableDays(resolved.hidden)) {
+                    console.warn('[SOARVIBE] itinerary.days 為空或無可顯示項目，停止渲染');
+                    showItineraryRenderError('行程天數無法載入，AI 回覆可能不完整。請重新生成一次。');
+                    return;
                 }
                 showItineraryContent(resolved.markdown, meta, resolved.hidden);
+                logItineraryRenderDiagnostics('after-showItineraryContent', resolved.hidden, true);
             }
 
             function showGeneratingOverlay(meta) {
@@ -7910,6 +7975,8 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             function showItineraryLoading(metaPreview) {
+                soarvibeIsGenerating = true;
+                soarvibeIsLoading = true;
                 itineraryResult.classList.remove('hidden');
                 itineraryResult.setAttribute('aria-busy', 'true');
                 itineraryLoading.classList.remove('hidden');
@@ -8280,6 +8347,8 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 hideGeneratingOverlay();
                 itineraryLoading.classList.add('hidden');
                 itineraryLoading.setAttribute('aria-hidden', 'true');
+                soarvibeIsLoading = false;
+                soarvibeIsGenerating = false;
 
                 currentItineraryMarkdown = markdownText || '';
                 currentItineraryMeta = metaOptional || window.soarvibeTripPayload || collectTripPayload();
@@ -8288,12 +8357,19 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 } catch (e) { /* silent */ }
                 updateTripInfoCard(currentItineraryMeta);
 
+                var hiddenForRender = hiddenOptional;
+                if (!hiddenHasRenderableDays(hiddenForRender)) {
+                    showItineraryRenderError('行程天數無法載入，AI 回覆可能不完整。請重新生成一次。');
+                    logItineraryRenderDiagnostics('showItineraryContent-empty', hiddenForRender, false);
+                    return;
+                }
+
                 aiContent.style.textAlign = 'left';
                 try {
                     aiContent.innerHTML = buildMinimalItineraryHtml(
                         currentItineraryMarkdown,
                         currentItineraryMeta,
-                        hiddenOptional
+                        hiddenForRender
                     );
                 } catch (e) {
                     console.error('buildMinimalItineraryHtml:', e);
@@ -12884,6 +12960,8 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
             function hideItineraryLoadingOnError() {
                 hideGeneratingOverlay();
+                soarvibeIsLoading = false;
+                soarvibeIsGenerating = false;
                 itineraryLoading.classList.add('hidden');
                 itineraryLoading.setAttribute('aria-hidden', 'true');
                 aiContent.classList.add('hidden');
@@ -13812,7 +13890,10 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     );
                 } finally {
                     hideGeneratingOverlay();
+                    soarvibeIsLoading = false;
+                    soarvibeIsGenerating = false;
                     setGenerateButtonLoading(false);
+                    logItineraryRenderDiagnostics('runItineraryGeneration-finally', currentTripHiddenData, false);
                 }
             }
 
