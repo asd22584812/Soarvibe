@@ -1846,6 +1846,9 @@
         .accommodation-default {
             width: 100%;
         }
+        .accommodation-default > .field-label {
+            margin-bottom: 0.25rem;
+        }
         .accommodation-card {
             border: 1px solid rgba(255, 255, 255, 0.65);
             border-radius: 0.625rem;
@@ -1890,24 +1893,6 @@
             border: 1px solid rgba(255, 255, 255, 0.7);
             background: rgba(255, 255, 255, 0.85);
             color: #37474F;
-        }
-        .accommodation-note-wrap {
-            margin-top: 0.35rem;
-        }
-        .accommodation-note-wrap label {
-            font-size: 0.625rem;
-            font-weight: 700;
-            color: #78909C;
-        }
-        .accommodation-note-wrap input {
-            width: 100%;
-            margin-top: 0.1rem;
-            padding: 0.3rem 0.45rem;
-            min-height: 1.75rem;
-            font-size: 0.75rem;
-            border-radius: 0.5rem;
-            border: 1px solid rgba(255, 255, 255, 0.7);
-            background: rgba(255, 255, 255, 0.85);
         }
         .add-accommodation-btn {
             width: 100%;
@@ -2297,7 +2282,6 @@
                                     </label>
                                 </div>
                                 <div class="accommodations-block">
-                                    <span class="field-label">住宿飯店</span>
                                     <div id="accommodations-list" class="accommodations-list" aria-live="polite"></div>
                                     <button type="button" id="add-accommodation-btn" class="add-accommodation-btn">＋ 新增住宿</button>
                                 </div>
@@ -3380,7 +3364,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
-            const SOARVIBE_APP_BUILD = 'v88';
+            const SOARVIBE_APP_BUILD = 'v89';
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
@@ -4337,7 +4321,7 @@
                 if (presetKey) {
                     var preset = CITY_PRESETS[presetKey];
                     if (!hasValidAccommodationInput()) {
-                        setAccommodationsToForm([{ name: pickRandom(preset.hotels), note: '' }]);
+                        setAccommodationsToForm([{ name: pickRandom(preset.hotels) }]);
                     }
                     if (!advancedTransportSelect.value) {
                         advancedTransportSelect.value = pickRandom(preset.transports);
@@ -4345,7 +4329,7 @@
                     applyFlightTimesFromPreset(preset);
                 } else {
                     if (!hasValidAccommodationInput()) {
-                        setAccommodationsToForm([{ name: dest + '市中心精品飯店', note: '' }]);
+                        setAccommodationsToForm([{ name: dest + '市中心精品飯店' }]);
                     }
                     if (!advancedTransportSelect.value) {
                         advancedTransportSelect.value = 'public-transit';
@@ -6268,7 +6252,7 @@
                 fillDefaultTripDatesIfEmpty(3);
                 ensureFirstTravelStyleSelected();
                 applyFlightTimesFromPreset(preset);
-                setAccommodationsToForm([{ name: pickRandom(preset.hotels), note: '' }]);
+                setAccommodationsToForm([{ name: pickRandom(preset.hotels) }]);
                 advancedTransportSelect.value = pickRandom(preset.transports);
 
                 hideAlert();
@@ -6294,8 +6278,7 @@
                 }
                 return {
                     name: String(entry.name || entry.hotel || '').trim(),
-                    checkInNight: checkInNight,
-                    note: String(entry.note || entry.remark || '').trim()
+                    checkInNight: checkInNight
                 };
             }
 
@@ -6316,6 +6299,10 @@
 
             function formatAccommodationNightLabel(nightNum) {
                 return '第 ' + nightNum + ' 晚';
+            }
+
+            function formatAccommodationCheckInOptionLabel(nightNum) {
+                return '第 ' + nightNum + ' 晚開始入住';
             }
 
             function splitAccommodationEntries(accommodations) {
@@ -6361,10 +6348,12 @@
                 var split = splitAccommodationEntries(accommodations);
                 if (!split.defaultEntry.name) return '';
                 if (!split.additional.length) return split.defaultEntry.name;
-                var parts = [split.defaultEntry.name + '（第1晚起）'];
+                var parts = [split.defaultEntry.name];
                 split.additional.forEach(function (entry) {
                     if (!entry.name) return;
-                    parts.push(entry.name + (entry.checkInNight ? '（' + formatAccommodationNightLabel(entry.checkInNight) + '起）' : ''));
+                    parts.push(entry.name + (entry.checkInNight
+                        ? '（' + formatAccommodationCheckInOptionLabel(entry.checkInNight) + '）'
+                        : ''));
                 });
                 return parts.join('；');
             }
@@ -6374,17 +6363,13 @@
                 if (!split.defaultEntry.name) return '（未填寫）';
                 if (!split.additional.length) return split.defaultEntry.name;
                 var totalNights = countTripNights(dateStart, dateEnd);
-                var lines = [
-                    '預設住宿（第1晚起）：' + split.defaultEntry.name +
-                    (split.defaultEntry.note ? '｜備註：' + split.defaultEntry.note : '')
-                ];
+                var lines = ['預設住宿：' + split.defaultEntry.name];
                 split.additional.filter(function (entry) {
                     return entry.name && entry.checkInNight;
                 }).sort(function (a, b) {
                     return a.checkInNight - b.checkInNight;
                 }).forEach(function (entry) {
-                    lines.push(formatAccommodationNightLabel(entry.checkInNight) + ' 起換宿：' + entry.name +
-                        (entry.note ? '｜備註：' + entry.note : ''));
+                    lines.push(formatAccommodationCheckInOptionLabel(entry.checkInNight) + '：' + entry.name);
                 });
                 var segments = buildAccommodationSegments(accommodations, dateStart, dateEnd);
                 if (segments.length) {
@@ -6434,8 +6419,7 @@
                 var defaultEl = accommodationsListEl.querySelector('.accommodation-default');
                 if (defaultEl) {
                     list.push(normalizeAccommodationEntry({
-                        name: defaultEl.querySelector('.acc-name-input') ? defaultEl.querySelector('.acc-name-input').value : '',
-                        note: defaultEl.querySelector('.acc-note-input') ? defaultEl.querySelector('.acc-note-input').value : ''
+                        name: defaultEl.querySelector('.acc-name-input') ? defaultEl.querySelector('.acc-name-input').value : ''
                     }, true));
                 }
                 Array.prototype.slice.call(
@@ -6444,8 +6428,7 @@
                     var select = card.querySelector('.acc-checkin-night-select');
                     list.push(normalizeAccommodationEntry({
                         name: card.querySelector('.acc-name-input') ? card.querySelector('.acc-name-input').value : '',
-                        checkInNight: select ? select.value : null,
-                        note: card.querySelector('.acc-note-input') ? card.querySelector('.acc-note-input').value : ''
+                        checkInNight: select ? select.value : null
                     }, false));
                 });
                 return list;
@@ -6463,7 +6446,7 @@
                 options.forEach(function (nightNum) {
                     var opt = document.createElement('option');
                     opt.value = String(nightNum);
-                    opt.textContent = formatAccommodationNightLabel(nightNum);
+                    opt.textContent = formatAccommodationCheckInOptionLabel(nightNum);
                     if (current === nightNum) opt.selected = true;
                     select.appendChild(opt);
                 });
@@ -6487,29 +6470,25 @@
                 var wrap = document.createElement('div');
                 wrap.className = 'accommodation-default';
                 wrap.innerHTML =
-                    '<input type="text" class="field-input w-full rounded-lg border border-white/70 acc-name-input" placeholder="如：淺草飯店" value="' + escapeHtml(entry.name) + '">' +
-                    '<div class="accommodation-note-wrap">' +
-                    '<label>備註（選填）<input type="text" class="acc-note-input" placeholder="如：近地鐵站" value="' + escapeHtml(entry.note) + '"></label>' +
-                    '</div>';
+                    '<span class="field-label">住宿</span>' +
+                    '<label class="accommodation-field-label">飯店名稱</label>' +
+                    '<input type="text" class="field-input w-full rounded-lg border border-white/70 acc-name-input" placeholder="如：淺草飯店" value="' + escapeHtml(entry.name) + '">';
                 return wrap;
             }
 
-            function createAdditionalAccommodationElement(entry, index) {
+            function createAdditionalAccommodationElement(entry, displayIndex) {
                 entry = normalizeAccommodationEntry(entry, false);
                 var card = document.createElement('div');
                 card.className = 'accommodation-card';
                 card.innerHTML =
                     '<div class="accommodation-card-head">' +
-                    '<span class="accommodation-card-title">新增住宿 ' + index + '</span>' +
+                    '<span class="accommodation-card-title">住宿 ' + displayIndex + '</span>' +
                     '<button type="button" class="accommodation-remove-btn" aria-label="移除住宿">✕</button>' +
                     '</div>' +
                     '<label class="accommodation-field-label">入住日</label>' +
                     '<select class="accommodation-checkin-select acc-checkin-night-select"></select>' +
-                    '<label class="field-label">飯店名稱</label>' +
-                    '<input type="text" class="field-input w-full rounded-lg border border-white/70 acc-name-input" placeholder="如：新宿飯店" value="' + escapeHtml(entry.name) + '">' +
-                    '<div class="accommodation-note-wrap">' +
-                    '<label>備註（選填）<input type="text" class="acc-note-input" placeholder="如：近車站" value="' + escapeHtml(entry.note) + '"></label>' +
-                    '</div>';
+                    '<label class="accommodation-field-label">飯店名稱</label>' +
+                    '<input type="text" class="field-input w-full rounded-lg border border-white/70 acc-name-input" placeholder="如：新宿飯店" value="' + escapeHtml(entry.name) + '">';
                 var totalNights = getAccommodationNightCount();
                 populateCheckInNightSelect(
                     card.querySelector('.acc-checkin-night-select'),
@@ -6540,7 +6519,7 @@
                 if (!accommodationsListEl) return;
                 Array.prototype.slice.call(accommodationsListEl.querySelectorAll('.accommodation-card')).forEach(function (card, idx) {
                     var title = card.querySelector('.accommodation-card-title');
-                    if (title) title.textContent = '新增住宿 ' + (idx + 1);
+                    if (title) title.textContent = '住宿 ' + (idx + 2);
                 });
             }
 
@@ -6554,7 +6533,7 @@
                 accommodationsListEl.innerHTML = '';
                 accommodationsListEl.appendChild(createDefaultAccommodationElement(accommodations[0]));
                 accommodations.slice(1).forEach(function (entry, idx) {
-                    accommodationsListEl.appendChild(createAdditionalAccommodationElement(entry, idx + 1));
+                    accommodationsListEl.appendChild(createAdditionalAccommodationElement(entry, idx + 2));
                 });
                 refreshAllAccommodationCheckInOptions();
                 refreshAddAccommodationButtonState();
@@ -6596,9 +6575,8 @@
                         accommodationsListEl.appendChild(
                             createAdditionalAccommodationElement({
                                 name: '',
-                                checkInNight: options.length ? options[0] : null,
-                                note: ''
-                            }, cards.length + 1)
+                                checkInNight: options.length ? options[0] : null
+                            }, cards.length + 2)
                         );
                         refreshAdditionalAccommodationLabels();
                         refreshAllAccommodationCheckInOptions();
@@ -6701,7 +6679,7 @@
                 if (meta.accommodations && meta.accommodations.length) {
                     setAccommodationsToForm(meta.accommodations);
                 } else if (meta.accommodation) {
-                    setAccommodationsToForm([{ name: meta.accommodation, note: '' }]);
+                    setAccommodationsToForm([{ name: meta.accommodation }]);
                 }
                 if (meta.transport) {
                     advancedTransportSelect.value = meta.transport;
@@ -6877,7 +6855,7 @@ ${ctx.typeInstruction}
 🛫 departureTime（出發航班，含日期+時間）：${ctx.departureTimeText}
 🛬 returnTime（回程航班，含日期+時間）：${ctx.returnTimeText}
 🏨 住宿飯店／區域：${buildAccommodationPromptBlock(payload.accommodations || [{ name: payload.accommodation, checkInNight: null }], payload.dateStart, payload.dateEnd)}
-【🏨 住宿晚數對照】預設第一間住宿從第1晚起；新增住宿從使用者指定的「入住日（第N晚）」開始換宿。若列出不同晚數對應不同飯店，每一天行程起訖點須以「當晚住宿」為圓心；換宿日須安排 Check-out、移動、Check-in 的具體交通，不可忽略行李動線。
+【🏨 住宿晚數對照】預設住宿為旅程開始入住的飯店；新增住宿從使用者選擇的「第N晚開始入住」起換宿。若有多間飯店，每一天行程起訖點須以「當晚住宿」為圓心；換宿日須安排 Check-out、移動、Check-in 的具體交通。
 
 【🚇 客戶指定交通方式（customerSelectedTransport）——行程串聯必須 100% 遵守】
 客戶已在前端明確選定：【${ctx.customerSelectedTransport}】
