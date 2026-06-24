@@ -3874,7 +3874,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
-            const SOARVIBE_APP_BUILD = 'v100';
+            const SOARVIBE_APP_BUILD = 'v101';
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
@@ -14593,7 +14593,44 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             function getCityJournalBundle() {
-                return window.SOARVIBE_CITY_JOURNAL || { meta: {}, articles: {}, editionCatalog: [], imageDefaults: {} };
+                return window.SOARVIBE_CITY_JOURNAL || {
+                    meta: {},
+                    articles: {},
+                    editionCatalog: [],
+                    cityJournalImages: {},
+                    imageFallback: './cover-photos/tokyo.jpg'
+                };
+            }
+
+            function getJournalImageFallback() {
+                var bundle = getCityJournalBundle();
+                return bundle.imageFallback || './cover-photos/tokyo.jpg';
+            }
+
+            function getJournalImage(imageKey, fallback) {
+                var bundle = getCityJournalBundle();
+                if (typeof bundle.getJournalImage === 'function') {
+                    return bundle.getJournalImage(imageKey, fallback || getJournalImageFallback());
+                }
+                var registry = bundle.cityJournalImages || {};
+                var fb = fallback || getJournalImageFallback();
+                if (imageKey && registry[imageKey]) {
+                    return registry[imageKey];
+                }
+                return fb;
+            }
+
+            function cjJournalImgAttrs() {
+                return ' data-cj-img="1"';
+            }
+
+            function handleCityJournalImageError(img) {
+                if (!img || img.getAttribute('data-cj-fallback') === '1') return;
+                var fb = getJournalImageFallback();
+                var current = img.getAttribute('src') || '';
+                if (current === fb) return;
+                img.setAttribute('data-cj-fallback', '1');
+                img.src = fb;
             }
 
             function getCityJournalMeta(cityId) {
@@ -14608,34 +14645,29 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             function getSpotImage(item) {
-                var defaults = getCityJournalBundle().imageDefaults || {};
-                return (item && item.image) || defaults.spot || '';
+                return getJournalImage(item && item.imageKey);
             }
 
             function getRestaurantImage(item) {
-                var defaults = getCityJournalBundle().imageDefaults || {};
-                return (item && item.image) || defaults.food || '';
+                return getJournalImage(item && item.imageKey);
             }
 
             function getHotelImage(item) {
-                var defaults = getCityJournalBundle().imageDefaults || {};
-                return (item && item.image) || defaults.hotel || '';
+                return getJournalImage(item && item.imageKey);
             }
 
             function cjHeroBlock(imageUrl, imageAlt, bodyHtml) {
-                var url = imageUrl || '';
-                var imgHtml = url
-                    ? '<img class="cj-hero-photo" src="' + escapeHtml(url) + '" alt="' + escapeHtml(imageAlt || '') + '" loading="eager" decoding="async">'
-                    : '';
+                var url = imageUrl || getJournalImageFallback();
+                var imgHtml = '<img class="cj-hero-photo"' + cjJournalImgAttrs() + ' src="' + escapeHtml(url) + '" alt="' + escapeHtml(imageAlt || '') + '" loading="eager" decoding="async">';
                 return '<header class="cj-hero">' + imgHtml + '<div class="cj-hero-body">' + bodyHtml + '</div></header>';
             }
 
             function cjFigureBlock(imageUrl, caption, tall) {
-                if (!imageUrl) return '';
+                var url = imageUrl || getJournalImageFallback();
                 var cls = tall ? 'cj-figure-img cj-figure-img--tall' : 'cj-figure-img cj-figure-img--wide';
                 return (
                     '<figure class="cj-figure">' +
-                    '<img class="' + cls + '" src="' + escapeHtml(imageUrl) + '" alt="' + escapeHtml(caption || '') + '" loading="lazy" decoding="async">' +
+                    '<img class="' + cls + '"' + cjJournalImgAttrs() + ' src="' + escapeHtml(url) + '" alt="' + escapeHtml(caption || '') + '" loading="lazy" decoding="async">' +
                     (caption ? '<figcaption class="cj-caption">' + escapeHtml(caption) + '</figcaption>' : '') +
                     '</figure>'
                 );
@@ -14712,12 +14744,12 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
                 return (
                     '<div class="cj-page">' +
-                    cjHeroBlock(article.heroImage, article.title, heroBody) +
+                    cjHeroBlock(getJournalImage(article.heroImageKey), article.title, heroBody) +
                     '<div class="cj-body">' +
                     '<section class="cj-section cj-section-lead" aria-label="導言">' +
                     '<div class="cj-section-head"><p class="cj-section-label">INTRODUCTION</p><h2 class="cj-section-title">導言</h2></div>' +
                     '<p class="cj-intro">' + escapeHtml(article.intro || '') + '</p>' +
-                    (article.introImage ? cjFigureBlock(article.introImage, article.introImageCaption || '', false) : '') +
+                    (article.introImageKey ? cjFigureBlock(getJournalImage(article.introImageKey), article.introImageCaption || '', false) : '') +
                     '</section>' +
                     '<section class="cj-section" aria-label="精選景點">' +
                     '<div class="cj-section-head"><p class="cj-section-label">SPOTS</p><h2 class="cj-section-title">精選景點</h2></div>' +
@@ -14747,15 +14779,13 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 var meta = getCityJournalMeta(cityId);
                 var bundle = getCityJournalBundle();
                 if (!meta) return '<div class="cj-page"><div class="cj-body"><p class="cj-intro">城市專題準備中。</p></div></div>';
-                var hubHero = meta.heroImage || meta.hubHeroImage || '';
+                var hubHero = getJournalImage(meta.hubHeroImageKey);
                 var published = meta.publishedEditions || [];
                 var cardsHtml = (bundle.editionCatalog || []).map(function (edition) {
                     var isLive = published.indexOf(edition.key) !== -1;
                     var article = isLive ? getCityJournalArticle(cityId, edition.key) : null;
-                    var cover = (article && article.heroImage) || hubHero || '';
-                    var coverImg = cover
-                        ? '<img src="' + escapeHtml(cover) + '" alt="' + escapeHtml(edition.label) + '" loading="lazy" decoding="async">'
-                        : '';
+                    var cover = article && article.heroImageKey ? getJournalImage(article.heroImageKey) : hubHero;
+                    var coverImg = '<img' + cjJournalImgAttrs() + ' src="' + escapeHtml(cover) + '" alt="' + escapeHtml(edition.label) + '" loading="lazy" decoding="async">';
                     if (isLive) {
                         return (
                             '<button type="button" class="cj-edition-card" data-cj-city="' + escapeHtml(cityId) + '" data-cj-style="' + escapeHtml(edition.key) + '">' +
@@ -14800,8 +14830,8 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 var meta = getCityJournalMeta(cityId);
                 var tokyoAnime = getCityJournalArticle('tokyo', 'anime');
                 if (!shell || !viewport || !meta) return;
-                console.log('[SOARVIBE CJ] tokyo.heroImage:', meta.heroImage || meta.hubHeroImage || '(empty)');
-                console.log('[SOARVIBE CJ] tokyo.anime heroImage:', (tokyoAnime && tokyoAnime.heroImage) || '(empty)');
+                console.log('[SOARVIBE CJ] hub hero:', getJournalImage(meta.hubHeroImageKey));
+                console.log('[SOARVIBE CJ] tokyo.anime hero:', getJournalImage(tokyoAnime && tokyoAnime.heroImageKey));
                 cjState.view = 'hub';
                 cjState.cityId = cityId;
                 cjState.styleKey = null;
@@ -14927,6 +14957,12 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                         applyJournalToTrip();
                     }
                 });
+
+                shell.addEventListener('error', function (e) {
+                    var img = e.target;
+                    if (!img || img.tagName !== 'IMG' || !img.hasAttribute('data-cj-img')) return;
+                    handleCityJournalImageError(img);
+                }, true);
 
                 document.addEventListener('keydown', function (e) {
                     if (e.key === 'Escape' && !shell.classList.contains('hidden')) {

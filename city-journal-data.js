@@ -11,7 +11,37 @@
         { key: 'streetwear', label: '潮流玩家', icon: '👟' }
     ];
 
-    var TOKYO_HUB_HERO = 'https://images.pexels.com/photos/2506923/pexels-photo-2506923.jpeg?auto=compress&cs=tinysrgb&w=1600';
+    var IMAGE_FALLBACK = './cover-photos/tokyo.jpg';
+
+    var CITY_JOURNAL_IMAGES = {
+        'tokyo-hub': './cover-photos/tokyo.jpg',
+        'tokyo-anime-hero': './cover-photos/tokyo.jpg',
+        'tokyo-akihabara': './assets/journal/tokyo-anime/akihabara.jpg',
+        'tokyo-nakano': './assets/journal/tokyo-anime/nakano.jpg',
+        'tokyo-gachapon': './assets/journal/tokyo-anime/gachapon.jpg',
+        'tokyo-ramen': './assets/journal/tokyo-anime/ramen.jpg',
+        'tokyo-maid-cafe': './assets/journal/tokyo-anime/maid-cafe.jpg',
+        'tokyo-curry': './assets/journal/tokyo-anime/curry.jpg',
+        'tokyo-hotel': './assets/journal/tokyo-anime/hotel.jpg',
+        'tokyo-hostel': './assets/journal/tokyo-anime/hostel.jpg',
+        'tokyo-anime-intro': './assets/journal/tokyo-anime/akihabara.jpg',
+        'kyoto-hub': './cover-photos/kyoto.jpg',
+        'osaka-hub': './cover-photos/osaka.jpg',
+        'seoul-hub': './cover-photos/seoul.jpg',
+        'hokkaido-hub': './cover-photos/hokkaido.jpg',
+        'bangkok-hub': './cover-photos/bangkok.jpg',
+        'vietnam-hub': IMAGE_FALLBACK,
+        'london-hub': './cover-photos/london.jpg',
+        'paris-hub': './cover-photos/paris.jpg'
+    };
+
+    function getJournalImage(imageKey, fallback) {
+        var fb = fallback || IMAGE_FALLBACK;
+        if (imageKey && CITY_JOURNAL_IMAGES[imageKey]) {
+            return CITY_JOURNAL_IMAGES[imageKey];
+        }
+        return fb;
+    }
 
     var META = {
         tokyo: {
@@ -19,8 +49,7 @@
             name: '東京',
             nameEn: 'TOKYO',
             destinationLabel: '東京',
-            heroImage: TOKYO_HUB_HERO,
-            hubHeroImage: TOKYO_HUB_HERO,
+            hubHeroImageKey: 'tokyo-hub',
             hubSubtitle: '七種節奏，讀懂這座永遠不睡的城市',
             publishedEditions: ['anime']
         },
@@ -29,8 +58,7 @@
             name: '京都',
             nameEn: 'KYOTO',
             destinationLabel: '京都',
-            heroImage: 'https://images.pexels.com/photos/2169880/pexels-photo-2169880.jpeg?auto=compress&cs=tinysrgb&w=1600',
-            hubHeroImage: 'https://images.pexels.com/photos/2169880/pexels-photo-2169880.jpeg?auto=compress&cs=tinysrgb&w=1600',
+            hubHeroImageKey: 'kyoto-hub',
             hubSubtitle: '專題即將推出',
             publishedEditions: []
         },
@@ -39,8 +67,7 @@
             name: '大阪',
             nameEn: 'OSAKA',
             destinationLabel: '大阪',
-            heroImage: 'https://images.pexels.com/photos/2404843/pexels-photo-2404843.jpeg?auto=compress&cs=tinysrgb&w=1600',
-            hubHeroImage: 'https://images.pexels.com/photos/2404843/pexels-photo-2404843.jpeg?auto=compress&cs=tinysrgb&w=1600',
+            hubHeroImageKey: 'osaka-hub',
             hubSubtitle: '專題即將推出',
             publishedEditions: []
         },
@@ -49,8 +76,7 @@
             name: '首爾',
             nameEn: 'SEOUL',
             destinationLabel: '首爾',
-            heroImage: 'https://images.pexels.com/photos/358442/pexels-photo-358442.jpeg?auto=compress&cs=tinysrgb&w=1600',
-            hubHeroImage: 'https://images.pexels.com/photos/358442/pexels-photo-358442.jpeg?auto=compress&cs=tinysrgb&w=1600',
+            hubHeroImageKey: 'seoul-hub',
             hubSubtitle: '專題即將推出',
             publishedEditions: []
         },
@@ -59,8 +85,7 @@
             name: '北海道',
             nameEn: 'HOKKAIDO',
             destinationLabel: '北海道',
-            heroImage: 'https://images.pexels.com/photos/1570118/pexels-photo-1570118.jpeg?auto=compress&cs=tinysrgb&w=1600',
-            hubHeroImage: 'https://images.pexels.com/photos/1570118/pexels-photo-1570118.jpeg?auto=compress&cs=tinysrgb&w=1600',
+            hubHeroImageKey: 'hokkaido-hub',
             hubSubtitle: '專題即將推出',
             publishedEditions: []
         },
@@ -69,8 +94,7 @@
             name: '曼谷',
             nameEn: 'BANGKOK',
             destinationLabel: '曼谷',
-            heroImage: 'https://images.pexels.com/photos/3182463/pexels-photo-3182463.jpeg?auto=compress&cs=tinysrgb&w=1600',
-            hubHeroImage: 'https://images.pexels.com/photos/3182463/pexels-photo-3182463.jpeg?auto=compress&cs=tinysrgb&w=1600',
+            hubHeroImageKey: 'bangkok-hub',
             hubSubtitle: '專題即將推出',
             publishedEditions: []
         },
@@ -79,8 +103,7 @@
             name: '越南',
             nameEn: 'VIETNAM',
             destinationLabel: '越南',
-            heroImage: 'https://images.pexels.com/photos/3601425/pexels-photo-3601425.jpeg?auto=compress&cs=tinysrgb&w=1600',
-            hubHeroImage: 'https://images.pexels.com/photos/3601425/pexels-photo-3601425.jpeg?auto=compress&cs=tinysrgb&w=1600',
+            hubHeroImageKey: 'vietnam-hub',
             hubSubtitle: '專題即將推出',
             publishedEditions: []
         },
@@ -89,8 +112,7 @@
             name: '倫敦',
             nameEn: 'LONDON',
             destinationLabel: '倫敦',
-            heroImage: 'https://images.pexels.com/photos/460672/pexels-photo-460672.jpeg?auto=compress&cs=tinysrgb&w=1600',
-            hubHeroImage: 'https://images.pexels.com/photos/460672/pexels-photo-460672.jpeg?auto=compress&cs=tinysrgb&w=1600',
+            hubHeroImageKey: 'london-hub',
             hubSubtitle: '專題即將推出',
             publishedEditions: []
         },
@@ -99,8 +121,7 @@
             name: '巴黎',
             nameEn: 'PARIS',
             destinationLabel: '巴黎',
-            heroImage: 'https://images.pexels.com/photos/2363/france-landmark-lights-night.jpg?auto=compress&cs=tinysrgb&w=1600',
-            hubHeroImage: 'https://images.pexels.com/photos/2363/france-landmark-lights-night.jpg?auto=compress&cs=tinysrgb&w=1600',
+            hubHeroImageKey: 'paris-hub',
             hubSubtitle: '專題即將推出',
             publishedEditions: []
         }
@@ -115,8 +136,8 @@
                 status: 'published',
                 title: '秋葉原與中野：東京動漫聖地巡禮指南',
                 subtitle: '從一番賞到復古玩具，骨灰級玩家的 48 小時地圖',
-                heroImage: 'https://images.pexels.com/photos/32433838/pexels-photo-32433838/free-photo-of-vibrant-akihabara-street-at-night-in-tokyo.jpeg?auto=compress&cs=tinysrgb&w=1600',
-                introImage: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1600&q=80',
+                heroImageKey: 'tokyo-anime-hero',
+                introImageKey: 'tokyo-anime-intro',
                 introImageCaption: '秋葉原電氣街入夜後，霓虹招牌與模型櫥窗交織成動漫迷熟悉的風景。',
                 issueDate: '2026-06',
                 issueLabel: '2026 年 6 月號',
@@ -127,9 +148,8 @@
                         name: '秋葉原電氣街',
                         nameLocal: '秋葉原電気街',
                         subhead: '動漫朝聖的起點',
-                        image: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1600&q=80',
-                        imageCaption: '秋葉原電氣街主幹道，電器行與動漫店櫥窗連成一片。',
                         imageKey: 'tokyo-akihabara',
+                        imageCaption: '秋葉原電氣街主幹道，電器行與動漫店櫥窗連成一片。',
                         intro: '東京動漫朝聖的起點。高樓與巷弄交錯，從大型連鎖動漫店到地下卡牌、模型專賣應有盡有。建議從 JR 秋葉原站電氣街口出發，先逛 2 至 3 間主題明確的店，避免在第一眼就被拉進無限迴圈。',
                         nearestStation: 'JR 秋葉原站（電氣街口）',
                         area: '千代田區・秋葉原',
@@ -140,9 +160,8 @@
                         name: '中野百老匯',
                         nameLocal: '中野ブロードウェイ',
                         subhead: '老玩家公認的挖寶聖地',
-                        image: 'https://images.unsplash.com/photo-1601814933827-fca82567c22b?w=1600&q=80',
+                        imageKey: 'tokyo-nakano',
                         imageCaption: '中野百老匯樓層內，公仔與漫畫櫃位密集排列的尋寶空間。',
-                        imageKey: 'tokyo-nakano-broadway',
                         intro: '被許多老玩家視為比秋葉原更好挖寶的聖地。多層樓匯集漫畫、公仔、卡牌與復古玩具，價格常有驚喜。適合下午進場，光線較暖，邊逛邊比價，預留至少 2 小時。',
                         nearestStation: 'JR 中野站（北口）',
                         area: '中野区・中野',
@@ -153,9 +172,8 @@
                         name: 'GACHAPON 扭蛋會館',
                         nameLocal: 'ガシャポンのデパート',
                         subhead: '整面牆都是驚喜',
-                        image: 'https://images.unsplash.com/photo-1613376021183-4127bb866ebd?w=1600&q=80',
+                        imageKey: 'tokyo-gachapon',
                         imageCaption: '秋葉原扭蛋會館內，成排膠囊玩具機台組成的色彩牆。',
-                        imageKey: 'tokyo-gachapon-hall',
                         intro: '秋葉原周邊知名的扭蛋專門空間，整面牆的機台適合快速試手氣與收藏入門。建議先設定預算上限，避免不知不覺轉到行李箱爆滿——這是過來人的溫柔提醒。',
                         nearestStation: 'JR 秋葉原站',
                         area: '千代田區・秋葉原',
@@ -169,9 +187,8 @@
                         subhead: '掃街中途的熱湯補給',
                         cuisine: '拉麵',
                         priceLevel: '¥',
-                        image: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=1600&q=80',
+                        imageKey: 'tokyo-ramen',
                         imageCaption: '一蘭招牌豚骨拉麵，一人一格的專注食事體驗。',
-                        imageKey: 'tokyo-ichiran-ramen',
                         intro: '掃街到一半最需要熱湯補給的標準答案。一人一格的設計讓獨旅也自在，濃郁豚骨湯底快速回血。建議避開 12:00–13:30 午餐尖峰，或先取號再回周邊逛一圈。',
                         nearestStation: 'JR 秋葉原站',
                         area: '千代田區・秋葉原',
@@ -183,9 +200,8 @@
                         subhead: '次文化體驗的一杯咖啡',
                         cuisine: '主題咖啡',
                         priceLevel: '¥¥',
-                        image: 'https://images.pexels.com/photos/302899/pexels-photo-302899.jpeg?auto=compress&cs=tinysrgb&w=1600',
+                        imageKey: 'tokyo-maid-cafe',
                         imageCaption: '秋葉原巷弄內的主題咖啡廳，色彩與角色氛圍是體驗重點。',
-                        imageKey: 'tokyo-akihabara-maid-cafe',
                         intro: '體驗東京次文化氛圍的經典方式之一。各家風格不同，從經典女僕到主題聯名皆有。若第一次嘗試，選評價穩定、規則說明清楚的分店，把時間控制在 60 分鐘內，留體力給下一間店。',
                         nearestStation: 'JR 秋葉原站',
                         area: '千代田區・秋葉原',
@@ -197,9 +213,8 @@
                         subhead: '平價又飽足的能量餐',
                         cuisine: '日式咖哩',
                         priceLevel: '¥',
-                        image: 'https://images.unsplash.com/photo-1604908176997-43162e978c67?w=1600&q=80',
+                        imageKey: 'tokyo-curry',
                         imageCaption: '日式咖哩飯與炸物配菜，是動漫街區常見的務實晚餐選擇。',
-                        imageKey: 'tokyo-japanese-curry',
                         intro: '動漫街區常見的平價能量補給。香料層次分明、飯量足夠，適合傍晚掃街後的晚餐。上菜快、翻桌率高，是趕夜間活動前的務實選擇。',
                         nearestStation: 'JR 秋葉原站',
                         area: '千代田區・秋葉原',
@@ -212,9 +227,8 @@
                         name: 'Hotel Gracery 秋葉原',
                         subhead: '步行可達電氣街',
                         area: '秋葉原',
-                        image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=1600&q=80',
+                        imageKey: 'tokyo-hotel',
                         imageCaption: '都會型商務飯店客房，適合把時間留給街上的旅人。',
-                        imageKey: 'tokyo-urban-hotel-room',
                         intro: '步行可達電氣街，動漫迷的經典落腳處。房間緊湊但機能完整，適合把時間花在街上而非飯店的人。建議提早預訂週末房型。',
                         nearestStation: 'JR 秋葉原站',
                         priceRange: '¥12,000–18,000 / 晚',
@@ -225,9 +239,8 @@
                         name: 'Nui. HOSTEL & BAR LOUNGE',
                         subhead: '文青感旅宿與酒吧大廳',
                         area: '淺草橋',
-                        image: 'https://images.unsplash.com/photo/1520250497591-112f2f40a3f4?w=1600&q=80',
+                        imageKey: 'tokyo-hostel',
                         imageCaption: '木質調公共空間的設計旅宿，適合獨旅與輕預算玩家。',
-                        imageKey: 'tokyo-hostel-lounge',
                         intro: '文青感十足的旅宿，公共空間寬敞，適合獨旅或輕預算玩家。到秋葉原約 15 分鐘電車，適合想平衡住宿質感與交通的旅人。',
                         nearestStation: '淺草橋站',
                         priceRange: '¥4,500–8,000 / 晚',
@@ -270,17 +283,12 @@
         }
     };
 
-    var IMAGE_DEFAULTS = {
-        spot: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1200&q=80',
-        food: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=1200&q=80',
-        hotel: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=1200&q=80',
-        hero: TOKYO_HUB_HERO
-    };
-
     global.SOARVIBE_CITY_JOURNAL = {
         editionCatalog: EDITION_CATALOG,
         meta: META,
         articles: ARTICLES,
-        imageDefaults: IMAGE_DEFAULTS
+        cityJournalImages: CITY_JOURNAL_IMAGES,
+        imageFallback: IMAGE_FALLBACK,
+        getJournalImage: getJournalImage
     };
 })(typeof window !== 'undefined' ? window : this);

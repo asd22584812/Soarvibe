@@ -1,4 +1,4 @@
-const CACHE_NAME = 'soarvibe-v100';
+const CACHE_NAME = 'soarvibe-v101';
 const STATIC_ASSETS = [
   './manifest.json',
   './city-journal-data.js',
@@ -13,7 +13,16 @@ const STATIC_ASSETS = [
   './cover-photos/okinawa.jpg',
   './cover-photos/hokkaido.jpg',
   './cover-photos/london.jpg',
-  './cover-photos/paris.jpg'
+  './cover-photos/paris.jpg',
+  './assets/journal/tokyo-anime/hero.jpg',
+  './assets/journal/tokyo-anime/akihabara.jpg',
+  './assets/journal/tokyo-anime/nakano.jpg',
+  './assets/journal/tokyo-anime/gachapon.jpg',
+  './assets/journal/tokyo-anime/ramen.jpg',
+  './assets/journal/tokyo-anime/maid-cafe.jpg',
+  './assets/journal/tokyo-anime/curry.jpg',
+  './assets/journal/tokyo-anime/hotel.jpg',
+  './assets/journal/tokyo-anime/hostel.jpg'
 ];
 
 self.addEventListener('message', function (event) {
