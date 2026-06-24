@@ -637,12 +637,41 @@
             color: #37474F;
             line-height: 1.35;
         }
-        #cityJournal .cj-intro {
-            font-size: 0.95rem;
-            line-height: 1.95;
-            color: #546E7A;
+        #cityJournal .cj-intro-lead {
+            font-size: 1rem;
+            line-height: 2;
+            color: #455A64;
             font-weight: 400;
+            letter-spacing: 0.03em;
+            margin-bottom: 2.5rem;
+        }
+        #cityJournal .cj-magazine-section {
+            margin-bottom: 3.75rem;
+        }
+        #cityJournal .cj-magazine-section:last-of-type {
+            margin-bottom: 2rem;
+        }
+        #cityJournal .cj-section-heading {
+            font-size: 1.15rem;
+            font-weight: 900;
+            color: #37474F;
+            line-height: 1.45;
+            margin: 1.15rem 0 0.85rem;
+            letter-spacing: 0.01em;
+        }
+        #cityJournal .cj-section-content {
+            font-size: 0.94rem;
+            line-height: 2;
+            color: #546E7A;
             letter-spacing: 0.02em;
+        }
+        #cityJournal .cj-outro {
+            margin-top: 1rem;
+            padding-top: 2rem;
+            border-top: 1px solid #E8E4DC;
+            font-size: 0.94rem;
+            line-height: 2;
+            color: #546E7A;
         }
         #cityJournal .cj-poi-card {
             margin-bottom: 2rem;
@@ -3874,7 +3903,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
-            const SOARVIBE_APP_BUILD = 'v101';
+            const SOARVIBE_APP_BUILD = 'v102';
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
@@ -14597,27 +14626,38 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     meta: {},
                     articles: {},
                     editionCatalog: [],
-                    cityJournalImages: {},
-                    imageFallback: './cover-photos/tokyo.jpg'
+                    placeholderImage: './assets/city-journal/placeholder-city-journal.jpg',
+                    resolveJournalImage: function (path) {
+                        return path || './assets/city-journal/placeholder-city-journal.jpg';
+                    }
                 };
             }
 
-            function getJournalImageFallback() {
+            function getJournalPlaceholder() {
                 var bundle = getCityJournalBundle();
-                return bundle.imageFallback || './cover-photos/tokyo.jpg';
+                return bundle.placeholderImage || './assets/city-journal/placeholder-city-journal.jpg';
             }
 
-            function getJournalImage(imageKey, fallback) {
+            function resolveJournalImage(localPath) {
                 var bundle = getCityJournalBundle();
-                if (typeof bundle.getJournalImage === 'function') {
-                    return bundle.getJournalImage(imageKey, fallback || getJournalImageFallback());
+                if (typeof bundle.resolveJournalImage === 'function') {
+                    return bundle.resolveJournalImage(localPath);
                 }
-                var registry = bundle.cityJournalImages || {};
-                var fb = fallback || getJournalImageFallback();
-                if (imageKey && registry[imageKey]) {
-                    return registry[imageKey];
+                return localPath || getJournalPlaceholder();
+            }
+
+            function getEditionCoverImage(cityId, editionKey, article) {
+                if (article && article.coverImage) {
+                    return resolveJournalImage(article.coverImage);
                 }
-                return fb;
+                var meta = getCityJournalMeta(cityId);
+                if (meta && meta.editionCovers && meta.editionCovers[editionKey]) {
+                    return resolveJournalImage(meta.editionCovers[editionKey]);
+                }
+                if (typeof getCityJournalBundle().editionCoverImage === 'function') {
+                    return resolveJournalImage(getCityJournalBundle().editionCoverImage(cityId, editionKey));
+                }
+                return getJournalPlaceholder();
             }
 
             function cjJournalImgAttrs() {
@@ -14626,11 +14666,11 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
             function handleCityJournalImageError(img) {
                 if (!img || img.getAttribute('data-cj-fallback') === '1') return;
-                var fb = getJournalImageFallback();
+                var placeholder = getJournalPlaceholder();
                 var current = img.getAttribute('src') || '';
-                if (current === fb) return;
+                if (current.indexOf('placeholder-city-journal.jpg') !== -1) return;
                 img.setAttribute('data-cj-fallback', '1');
-                img.src = fb;
+                img.src = placeholder;
             }
 
             function getCityJournalMeta(cityId) {
@@ -14644,130 +14684,59 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 return bundle.articles[cityId][styleKey] || null;
             }
 
-            function getSpotImage(item) {
-                return getJournalImage(item && item.imageKey);
-            }
-
-            function getRestaurantImage(item) {
-                return getJournalImage(item && item.imageKey);
-            }
-
-            function getHotelImage(item) {
-                return getJournalImage(item && item.imageKey);
-            }
-
             function cjHeroBlock(imageUrl, imageAlt, bodyHtml) {
-                var url = imageUrl || getJournalImageFallback();
+                var url = resolveJournalImage(imageUrl);
                 var imgHtml = '<img class="cj-hero-photo"' + cjJournalImgAttrs() + ' src="' + escapeHtml(url) + '" alt="' + escapeHtml(imageAlt || '') + '" loading="eager" decoding="async">';
                 return '<header class="cj-hero">' + imgHtml + '<div class="cj-hero-body">' + bodyHtml + '</div></header>';
             }
 
-            function cjFigureBlock(imageUrl, caption, tall) {
-                var url = imageUrl || getJournalImageFallback();
-                var cls = tall ? 'cj-figure-img cj-figure-img--tall' : 'cj-figure-img cj-figure-img--wide';
+            function cjFigureBlock(imageUrl, caption) {
+                var url = resolveJournalImage(imageUrl);
                 return (
                     '<figure class="cj-figure">' +
-                    '<img class="' + cls + '"' + cjJournalImgAttrs() + ' src="' + escapeHtml(url) + '" alt="' + escapeHtml(caption || '') + '" loading="lazy" decoding="async">' +
+                    '<img class="cj-figure-img cj-figure-img--wide"' + cjJournalImgAttrs() + ' src="' + escapeHtml(url) + '" alt="' + escapeHtml(caption || '') + '" loading="lazy" decoding="async">' +
                     (caption ? '<figcaption class="cj-caption">' + escapeHtml(caption) + '</figcaption>' : '') +
                     '</figure>'
                 );
             }
 
-            function renderJournalLocationTags(item) {
-                if (!item.nearestStation && !item.area) return '';
+            function renderMagazineSection(section) {
+                if (!section) return '';
                 return (
-                    '<div class="cj-location-tags">' +
-                    (item.nearestStation ? '<span>📍 最近車站：' + escapeHtml(item.nearestStation) + '</span>' : '') +
-                    (item.area ? '<span>📍 所在區域：' + escapeHtml(item.area) + '</span>' : '') +
-                    '</div>'
-                );
-            }
-
-            function renderEditorialStory(item, imageFn, options) {
-                options = options || {};
-                var img = imageFn(item);
-                var caption = item.imageCaption || item.name || '';
-                var metaHtml = '';
-                if (item.cuisine) {
-                    metaHtml = '<p class="cj-rating-inline">' + escapeHtml(item.cuisine) + (item.priceLevel ? ' · ' + escapeHtml(item.priceLevel) : '') + '</p>';
-                } else if (item.priceRange) {
-                    metaHtml = '<p class="cj-rating-inline">' + escapeHtml(item.priceRange) + '</p>';
-                } else if (item.rating) {
-                    metaHtml = '<p class="cj-rating-inline">★ ' + escapeHtml(String(item.rating)) + '</p>';
-                }
-                return (
-                    '<article class="cj-story-block">' +
-                    cjFigureBlock(img, caption, options.tallImage) +
-                    (item.subhead ? '<p class="cj-story-subhead">' + escapeHtml(item.subhead) + '</p>' : '') +
-                    '<h3 class="cj-story-title">' + escapeHtml(item.name || '') + '</h3>' +
-                    '<p class="cj-story-body">' + escapeHtml(item.intro || '') + '</p>' +
-                    metaHtml +
-                    renderJournalLocationTags(item) +
+                    '<article class="cj-magazine-section">' +
+                    cjFigureBlock(section.image, section.caption || '') +
+                    (section.heading ? '<h3 class="cj-section-heading">' + escapeHtml(section.heading) + '</h3>' : '') +
+                    (section.content ? '<p class="cj-section-content">' + escapeHtml(section.content) + '</p>' : '') +
                     '</article>'
                 );
             }
 
-            function renderJournalArticle(article) {
-                var transport = article.transport || {};
-                var transportSections = (transport.sections || []).map(function (section) {
-                    var tipsHtml = (section.tips || []).length
-                        ? '<ul class="cj-tips">' + section.tips.map(function (tip) {
-                            return '<li>' + escapeHtml(tip) + '</li>';
-                        }).join('') + '</ul>'
-                        : '';
-                    return (
-                        '<div class="cj-transport-block">' +
-                        '<h4>' + escapeHtml(section.heading || '') + '</h4>' +
-                        '<p>' + escapeHtml(section.body || '') + '</p>' +
-                        tipsHtml +
-                        '</div>'
-                    );
-                }).join('');
+            function logCityJournalArticle(article) {
+                if (!article) return;
+                console.log('[CITY JOURNAL]', article.title);
+                console.log('[HERO]', resolveJournalImage(article.heroImage));
+                console.log('[COVER]', resolveJournalImage(article.coverImage));
+            }
 
+            function renderJournalArticle(article) {
                 var heroBody =
                     '<p class="cj-kicker">SOARVIBE CITY JOURNAL</p>' +
                     '<h1 class="cj-hero-title">' + escapeHtml(article.title || '') + '</h1>' +
                     '<p class="cj-hero-subtitle">' + escapeHtml(article.subtitle || '') + '</p>' +
-                    '<p class="cj-issue">' + escapeHtml(article.issueLabel || '') + '</p>';
+                    (article.issueLabel ? '<p class="cj-issue">' + escapeHtml(article.issueLabel) + '</p>' : '');
 
-                var spotsHtml = (article.spots || []).map(function (spot) {
-                    return renderEditorialStory(spot, getSpotImage, {});
-                }).join('<hr class="cj-section-divider" aria-hidden="true">');
-
-                var foodsHtml = (article.foods || []).map(function (food) {
-                    return renderEditorialStory(food, getRestaurantImage, {});
-                }).join('<hr class="cj-section-divider" aria-hidden="true">');
-
-                var hotelsHtml = (article.hotels || []).map(function (hotel) {
-                    return renderEditorialStory(hotel, getHotelImage, { tallImage: true });
-                }).join('<hr class="cj-section-divider" aria-hidden="true">');
+                var sectionsHtml = (article.sections || []).map(renderMagazineSection).join('');
+                var outroHtml = article.outro
+                    ? '<div class="cj-outro"><p class="cj-section-content">' + escapeHtml(article.outro) + '</p></div>'
+                    : '';
 
                 return (
                     '<div class="cj-page">' +
-                    cjHeroBlock(getJournalImage(article.heroImageKey), article.title, heroBody) +
+                    cjHeroBlock(article.heroImage, article.title, heroBody) +
                     '<div class="cj-body">' +
-                    '<section class="cj-section cj-section-lead" aria-label="導言">' +
-                    '<div class="cj-section-head"><p class="cj-section-label">INTRODUCTION</p><h2 class="cj-section-title">導言</h2></div>' +
-                    '<p class="cj-intro">' + escapeHtml(article.intro || '') + '</p>' +
-                    (article.introImageKey ? cjFigureBlock(getJournalImage(article.introImageKey), article.introImageCaption || '', false) : '') +
-                    '</section>' +
-                    '<section class="cj-section" aria-label="精選景點">' +
-                    '<div class="cj-section-head"><p class="cj-section-label">SPOTS</p><h2 class="cj-section-title">精選景點</h2></div>' +
-                    spotsHtml +
-                    '</section>' +
-                    '<section class="cj-section" aria-label="精選美食">' +
-                    '<div class="cj-section-head"><p class="cj-section-label">FOOD</p><h2 class="cj-section-title">精選美食</h2></div>' +
-                    foodsHtml +
-                    '</section>' +
-                    '<section class="cj-section" aria-label="住宿推薦">' +
-                    '<div class="cj-section-head"><p class="cj-section-label">STAY</p><h2 class="cj-section-title">住宿推薦</h2></div>' +
-                    hotelsHtml +
-                    '</section>' +
-                    '<section class="cj-section" aria-label="交通攻略">' +
-                    '<div class="cj-section-head"><p class="cj-section-label">TRANSPORT</p><h2 class="cj-section-title">' + escapeHtml(transport.title || '交通攻略') + '</h2></div>' +
-                    (transport.summary ? '<p class="cj-intro cj-transport-lead">' + escapeHtml(transport.summary) + '</p>' : '') +
-                    transportSections +
-                    '</section>' +
+                    '<p class="cj-intro-lead">' + escapeHtml(article.intro || '') + '</p>' +
+                    sectionsHtml +
+                    outroHtml +
                     '</div>' +
                     '<div class="cj-cta-wrap">' +
                     '<button type="button" class="cj-cta-btn" id="cjApplyBtn">' + escapeHtml((article.cta && article.cta.buttonText) || '用這種風格產生行程') + '</button>' +
@@ -14778,13 +14747,13 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             function renderCityHub(cityId) {
                 var meta = getCityJournalMeta(cityId);
                 var bundle = getCityJournalBundle();
-                if (!meta) return '<div class="cj-page"><div class="cj-body"><p class="cj-intro">城市專題準備中。</p></div></div>';
-                var hubHero = getJournalImage(meta.hubHeroImageKey);
+                if (!meta) return '<div class="cj-page"><div class="cj-body"><p class="cj-intro-lead">城市專題準備中。</p></div></div>';
+                var hubHero = resolveJournalImage(meta.heroImage);
                 var published = meta.publishedEditions || [];
                 var cardsHtml = (bundle.editionCatalog || []).map(function (edition) {
                     var isLive = published.indexOf(edition.key) !== -1;
                     var article = isLive ? getCityJournalArticle(cityId, edition.key) : null;
-                    var cover = article && article.heroImageKey ? getJournalImage(article.heroImageKey) : hubHero;
+                    var cover = getEditionCoverImage(cityId, edition.key, article);
                     var coverImg = '<img' + cjJournalImgAttrs() + ' src="' + escapeHtml(cover) + '" alt="' + escapeHtml(edition.label) + '" loading="lazy" decoding="async">';
                     if (isLive) {
                         return (
@@ -14828,10 +14797,8 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 var shell = document.getElementById('cityJournal');
                 var viewport = document.getElementById('cjViewport');
                 var meta = getCityJournalMeta(cityId);
-                var tokyoAnime = getCityJournalArticle('tokyo', 'anime');
                 if (!shell || !viewport || !meta) return;
-                console.log('[SOARVIBE CJ] hub hero:', getJournalImage(meta.hubHeroImageKey));
-                console.log('[SOARVIBE CJ] tokyo.anime hero:', getJournalImage(tokyoAnime && tokyoAnime.heroImageKey));
+                console.log('[CITY JOURNAL HUB]', meta.name, resolveJournalImage(meta.heroImage));
                 cjState.view = 'hub';
                 cjState.cityId = cityId;
                 cjState.styleKey = null;
@@ -14849,6 +14816,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 var viewport = document.getElementById('cjViewport');
                 var article = getCityJournalArticle(cityId, styleKey);
                 if (!shell || !viewport || !article) return;
+                logCityJournalArticle(article);
                 cjState.view = 'article';
                 cjState.cityId = cityId;
                 cjState.styleKey = styleKey;

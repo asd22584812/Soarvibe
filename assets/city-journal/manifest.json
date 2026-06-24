@@ -1,0 +1,6 @@
+{
+  "version": "v102",
+  "policy": "Runtime renders local paths only. Use scripts/download-city-journal-assets.ps1 to refresh from Pexels/Unsplash.",
+  "placeholder": "./assets/city-journal/placeholder-city-journal.jpg",
+  "cities": ["tokyo", "osaka", "kyoto", "seoul", "paris", "london", "bangkok", "hokkaido"]
+}
