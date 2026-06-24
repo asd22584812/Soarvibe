@@ -404,6 +404,8 @@
             transform: scale(0.96);
         }
         #cityJournal {
+            position: fixed;
+            inset: 0;
             z-index: 9990;
         }
         #cityJournal:not(.hidden) {
@@ -414,13 +416,14 @@
             top: 0;
             left: 0;
             right: 0;
-            z-index: 9999;
+            z-index: 10001;
             display: flex;
             align-items: center;
             justify-content: flex-end;
             gap: 0.5rem;
             padding: calc(env(safe-area-inset-top, 0px) + 12px) 16px 12px;
             pointer-events: none;
+            isolation: isolate;
         }
         #cityJournal #cjBackBtn {
             margin-right: auto;
@@ -451,6 +454,8 @@
             pointer-events: none;
         }
         #cityJournal .cj-viewport {
+            position: relative;
+            z-index: 1;
             height: 100%;
             overflow-y: auto;
             overflow-x: hidden;
@@ -468,8 +473,10 @@
         #cityJournal .cj-hero {
             position: relative;
             min-height: 22rem;
+            background-color: #2c3e47;
             background-size: cover;
             background-position: center;
+            background-repeat: no-repeat;
             display: flex;
             align-items: flex-end;
             padding: calc(env(safe-area-inset-top, 0px) + 4.5rem) 1.5rem 2rem;
@@ -720,9 +727,10 @@
         }
         #cityJournal .cj-edition-cover {
             height: 5.5rem;
+            background-color: #EDEAE4;
             background-size: cover;
             background-position: center;
-            background-color: #EDEAE4;
+            background-repeat: no-repeat;
         }
         #cityJournal .cj-edition-body {
             padding: 0.75rem;
@@ -2979,6 +2987,14 @@
 
     </div>
 
+    <div id="cityJournal" class="fixed inset-0 hidden" role="dialog" aria-modal="true" aria-label="城市旅遊雜誌" aria-hidden="true">
+        <main id="cjViewport" class="cj-viewport"></main>
+        <header class="cj-chrome">
+            <button type="button" id="cjBackBtn" class="cj-chrome-btn is-hidden" aria-label="返回城市專題目錄">← 返回</button>
+            <button type="button" id="cjCloseBtn" class="cj-chrome-btn" aria-label="關閉城市旅遊雜誌">✕</button>
+        </header>
+    </div>
+
     <script src="./city-journal-data.js"></script>
     <script>
         (function () {
@@ -3763,7 +3779,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
-            const SOARVIBE_APP_BUILD = 'v98';
+            const SOARVIBE_APP_BUILD = 'v99';
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
@@ -14475,6 +14491,12 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
             var cjState = { view: 'closed', cityId: null, styleKey: null, article: null };
 
+            function cjInlineBgStyle(url) {
+                if (!url) return '';
+                var safeUrl = String(url).replace(/&/g, '&amp;').replace(/'/g, '%27');
+                return ' style="background-image:url(\'' + safeUrl + '\')"';
+            }
+
             function getCityJournalBundle() {
                 return window.SOARVIBE_CITY_JOURNAL || { meta: {}, articles: {}, editionCatalog: [], imageDefaults: {} };
             }
@@ -14582,7 +14604,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 }).join('');
 
                 var heroUrl = article.heroImage || '';
-                var heroStyle = heroUrl ? " style=\"background-image:url('" + heroUrl.replace(/'/g, '%27') + "')\"" : '';
+                var heroStyle = cjInlineBgStyle(heroUrl);
 
                 return (
                     '<div class="cj-page">' +
@@ -14631,13 +14653,13 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 var meta = getCityJournalMeta(cityId);
                 var bundle = getCityJournalBundle();
                 if (!meta) return '<div class="cj-page"><div class="cj-body"><p class="cj-intro">城市專題準備中。</p></div></div>';
-                var heroStyle = meta.hubHeroImage ? " style=\"background-image:url('" + meta.hubHeroImage.replace(/'/g, '%27') + "')\"" : '';
+                var heroStyle = cjInlineBgStyle(meta.hubHeroImage);
                 var published = meta.publishedEditions || [];
                 var cardsHtml = (bundle.editionCatalog || []).map(function (edition) {
                     var isLive = published.indexOf(edition.key) !== -1;
                     var article = isLive ? getCityJournalArticle(cityId, edition.key) : null;
                     var cover = (article && article.heroImage) || meta.hubHeroImage || '';
-                    var coverStyle = cover ? " style=\"background-image:url('" + cover.replace(/'/g, '%27') + "')\"" : '';
+                    var coverStyle = cjInlineBgStyle(cover);
                     if (isLive) {
                         return (
                             '<button type="button" class="cj-edition-card" data-cj-city="' + escapeHtml(cityId) + '" data-cj-style="' + escapeHtml(edition.key) + '">' +
@@ -14680,7 +14702,11 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             function openCityJournal(cityId) {
                 var shell = document.getElementById('cityJournal');
                 var viewport = document.getElementById('cjViewport');
-                if (!shell || !viewport || !getCityJournalMeta(cityId)) return;
+                var meta = getCityJournalMeta(cityId);
+                var tokyoAnime = getCityJournalArticle('tokyo', 'anime');
+                if (!shell || !viewport || !meta) return;
+                console.log('[SOARVIBE CJ] hub hero URL:', meta.hubHeroImage || '(empty)');
+                console.log('[SOARVIBE CJ] tokyo.anime heroImage:', (tokyoAnime && tokyoAnime.heroImage) || '(empty)');
                 cjState.view = 'hub';
                 cjState.cityId = cityId;
                 cjState.styleKey = null;
@@ -14766,10 +14792,9 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
             function initCityJournal() {
                 var shell = document.getElementById('cityJournal');
-                var viewport = document.getElementById('cjViewport');
                 var closeBtn = document.getElementById('cjCloseBtn');
                 var backBtn = document.getElementById('cjBackBtn');
-                if (!shell || !viewport) return;
+                if (!shell) return;
 
                 if (closeBtn) {
                     closeBtn.addEventListener('click', function (e) {
@@ -14786,9 +14811,20 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     });
                 }
 
-                viewport.addEventListener('click', function (e) {
+                shell.addEventListener('click', function (e) {
+                    if (e.target.closest('#cjCloseBtn')) {
+                        e.preventDefault();
+                        closeCityJournal();
+                        return;
+                    }
+                    if (e.target.closest('#cjBackBtn')) {
+                        e.preventDefault();
+                        goBackCityJournal();
+                        return;
+                    }
                     var editionBtn = e.target.closest('.cj-edition-card[data-cj-style]');
                     if (editionBtn) {
+                        e.preventDefault();
                         openJournalArticle(editionBtn.getAttribute('data-cj-city'), editionBtn.getAttribute('data-cj-style'));
                         return;
                     }
@@ -15180,14 +15216,6 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
         })();
     </script>
-
-    <div id="cityJournal" class="fixed inset-0 hidden" role="dialog" aria-modal="true" aria-label="城市旅遊雜誌" aria-hidden="true">
-        <header class="cj-chrome">
-            <button type="button" id="cjBackBtn" class="cj-chrome-btn is-hidden" aria-label="返回城市專題目錄">← 返回</button>
-            <button type="button" id="cjCloseBtn" class="cj-chrome-btn" aria-label="關閉城市旅遊雜誌">✕</button>
-        </header>
-        <main id="cjViewport" class="cj-viewport"></main>
-    </div>
 
 </body>
 
