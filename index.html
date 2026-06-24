@@ -404,26 +404,259 @@
             transform: scale(0.96);
         }
         #magazineModal {
+            z-index: 9990;
             -webkit-overflow-scrolling: touch;
         }
-        #magazineModal .scrollbar-none {
+        #magazineModal:not(.hidden) {
+            pointer-events: auto;
+        }
+        #magazineModal .mag-modal-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background:
+                linear-gradient(165deg, rgba(38, 70, 83, 0.72) 0%, rgba(20, 35, 48, 0.88) 45%, rgba(15, 28, 38, 0.94) 100%);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            pointer-events: none;
+        }
+        #magazineModal .mag-modal-bg-image {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background-size: cover;
+            background-position: center;
+            opacity: 0.28;
+            filter: saturate(0.85) blur(2px);
+            pointer-events: none;
+        }
+        #magazineModal .mag-close-btn {
+            position: fixed;
+            top: calc(env(safe-area-inset-top, 0px) + 16px);
+            right: 16px;
+            z-index: 9999;
+            width: 48px;
+            height: 48px;
+            pointer-events: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 9999px;
+            font-size: 1.25rem;
+            font-weight: 300;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.22);
+            border: 1px solid rgba(255, 255, 255, 0.38);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+            cursor: pointer;
+            transition: transform 0.15s ease, background 0.15s ease;
+        }
+        #magazineModal .mag-close-btn:active {
+            transform: scale(0.92);
+            background: rgba(255, 255, 255, 0.32);
+        }
+        #magazineModal .mag-modal-scroll {
+            position: relative;
+            z-index: 1;
+            height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+        }
+        #magazineModal .mag-shell {
+            max-width: 28rem;
+            margin: 0 auto;
+            padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 2rem);
+        }
+        #magazineModal .mag-hero {
+            position: relative;
+            height: 15rem;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: flex-end;
+            padding: 1.5rem;
+        }
+        #magazineModal .mag-hero::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(12, 24, 32, 0.92) 0%, rgba(12, 24, 32, 0.45) 55%, rgba(12, 24, 32, 0.12) 100%);
+            pointer-events: none;
+        }
+        #magazineModal .mag-hero-inner {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+        }
+        #magazineModal .mag-tabs-sticky {
+            position: sticky;
+            top: 0;
+            z-index: 30;
+            padding: 0.75rem 0 0.75rem 1rem;
+            background: linear-gradient(180deg, rgba(18, 32, 42, 0.92) 0%, rgba(18, 32, 42, 0.78) 100%);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        #magazineModal .mag-tabs-track {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding-right: 24px;
+            padding-bottom: 2px;
             -ms-overflow-style: none;
             scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
         }
-        #magazineModal .scrollbar-none::-webkit-scrollbar {
+        #magazineModal .mag-tabs-track::-webkit-scrollbar {
             display: none;
         }
+        #magazineModal .mag-tab-btn {
+            flex: none;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            white-space: nowrap;
+            color: rgba(255, 255, 255, 0.72);
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+        }
+        #magazineModal .mag-tab-btn:active {
+            transform: scale(0.96);
+        }
         #magazineModal .mag-tab-btn.mag-tab-active {
-            background: rgba(255, 255, 255, 0.3);
             color: #fff;
-            border-color: rgba(255, 255, 255, 0.4);
+            background: rgba(128, 203, 196, 0.28);
+            border-color: rgba(128, 203, 196, 0.55);
+            box-shadow: 0 0 0 1px rgba(128, 203, 196, 0.2);
+        }
+        #magazineModal .mag-content-area {
+            padding: 1rem 1rem 0.5rem;
+        }
+        #magazineModal .mag-edition {
+            animation: mag-fade-in 0.35s ease;
+        }
+        #magazineModal .mag-edition-hero {
+            position: relative;
+            height: 10.5rem;
+            border-radius: 1.25rem;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            background-size: cover;
+            background-position: center;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+        }
+        #magazineModal .mag-edition-hero::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(8, 18, 26, 0.88) 0%, rgba(8, 18, 26, 0.2) 70%);
+            pointer-events: none;
+        }
+        #magazineModal .mag-edition-hero-label {
+            position: absolute;
+            left: 1rem;
+            bottom: 1rem;
+            z-index: 1;
+            font-size: 0.65rem;
+            font-weight: 800;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: rgba(167, 243, 208, 0.95);
+        }
+        #magazineModal .mag-theme-title {
+            font-size: 1.35rem;
+            font-weight: 900;
+            line-height: 1.35;
+            color: #fff;
+            margin-bottom: 0.65rem;
+            letter-spacing: 0.02em;
+        }
+        #magazineModal .mag-intro {
+            font-size: 0.875rem;
+            line-height: 1.75;
+            color: rgba(255, 255, 255, 0.82);
+            font-weight: 300;
+            margin-bottom: 1.25rem;
+        }
+        #magazineModal .mag-section-label {
+            font-size: 0.65rem;
+            font-weight: 800;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: rgba(128, 203, 196, 0.9);
+            margin-bottom: 0.6rem;
+        }
+        #magazineModal .mag-highlight-grid {
+            display: grid;
+            gap: 0.65rem;
+            margin-bottom: 1.25rem;
+        }
+        #magazineModal .mag-highlight-card {
+            padding: 0.85rem 1rem;
+            border-radius: 1rem;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.04) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        }
+        #magazineModal .mag-highlight-card strong {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 0.25rem;
+        }
+        #magazineModal .mag-highlight-card p {
+            font-size: 0.78rem;
+            line-height: 1.55;
+            color: rgba(255, 255, 255, 0.75);
+            font-weight: 300;
+        }
+        #magazineModal .mag-info-card {
+            padding: 1rem 1.1rem;
+            border-radius: 1rem;
+            margin-bottom: 0.85rem;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+        #magazineModal .mag-info-card p {
+            font-size: 0.82rem;
+            line-height: 1.65;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 300;
+        }
+        #magazineModal .mag-cta-btn {
+            width: 100%;
+            margin-top: 0.5rem;
+            padding: 0.95rem 1rem;
+            border-radius: 1rem;
+            font-size: 0.9rem;
+            font-weight: 800;
+            color: #1a2e38;
+            background: linear-gradient(135deg, #a7f3d0 0%, #80cbc4 55%, #4db6ac 100%);
+            border: none;
+            box-shadow: 0 8px 24px rgba(77, 182, 172, 0.35);
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        #magazineModal .mag-cta-btn:active {
+            transform: scale(0.98);
+            box-shadow: 0 4px 12px rgba(77, 182, 172, 0.3);
         }
         @keyframes mag-fade-in {
-            from { opacity: 0; transform: translateY(6px); }
+            from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
-        }
-        #magazineModal .animate-fade-in {
-            animation: mag-fade-in 0.35s ease;
         }
         .itinerary-skeleton-line {
             height: 0.7rem;
@@ -3431,7 +3664,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
-            const SOARVIBE_APP_BUILD = 'v96';
+            const SOARVIBE_APP_BUILD = 'v97';
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
@@ -14142,17 +14375,78 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             var currentMagCity = '';
+            var currentMagStyle = 'budget';
+
+            var MAG_CITY_DEST = {
+                tokyo: '東京',
+                kyoto: '京都',
+                osaka: '大阪',
+                seoul: '首爾',
+                hokkaido: '北海道',
+                bangkok: '曼谷',
+                vietnam: '越南',
+                london: '倫敦',
+                paris: '巴黎'
+            };
+
+            var MAG_FORM_STYLE_MAP = {
+                budget: 'budget',
+                classic: 'sightseeing',
+                trendy: 'trendy',
+                foodie: 'foodie',
+                netbeauty: 'photospot',
+                otaku: 'anime',
+                trendplayer: 'streetwear'
+            };
+
+            var MAG_STYLE_PLAYBOOK = {
+                budget: {
+                    whoFor: '預算有限、但不想放棄在地體驗的小資旅人與學生族群。',
+                    howToPlay: '清晨鎖定市場或連鎖平價餐，午後以步行或地鐵串連街區，夜晚用居酒屋、夜市或百元小吃收尾，全程避開觀光溢價路線。',
+                    icons: ['💰', '🍱', '🚶']
+                },
+                classic: {
+                    whoFor: '第一次造訪、想穩穩收齊城市名片地標的旅人。',
+                    howToPlay: '上午排經典地標，午後走歷史街區，傍晚卡位夕陽或夜景，預留彈性避免趕場，把節奏留給城市本身。',
+                    icons: ['🗺️', '🏛️', '🌅']
+                },
+                trendy: {
+                    whoFor: '追話題、愛逛新開幕空間與設計選品的潮流敏感型旅人。',
+                    howToPlay: '中午前衝話題新店，下午逛複合商場或文創園區，傍晚在霓虹街區收尾，社群發文黃金時段預留 45–60 分鐘。',
+                    icons: ['⚡', '🏙️', '✨']
+                },
+                foodie: {
+                    whoFor: '為了一口美食願意排隊、願意預約的吃貨型旅人。',
+                    howToPlay: '午餐與晚餐各鎖定一間名店，中間穿插咖啡或甜點緩衝，熱門時段預留 60–90 分鐘排隊，其餘時間輕量散步消食。',
+                    icons: ['🍳', '⭐', '🍜']
+                },
+                netbeauty: {
+                    whoFor: '重視光影、構圖與打卡質感的社群創作者與攝影愛好者。',
+                    howToPlay: '清晨或黃昏卡位魔幻時刻，每個機位停留 30–45 分鐘，午間避開頂光，搭配一間高顏值咖啡廳當緩衝與第二機位。',
+                    icons: ['📸', '🌤️', '☕']
+                },
+                otaku: {
+                    whoFor: '動漫、公仔、卡牌與中古挖寶的二次元／收藏玩家。',
+                    howToPlay: '以 2–3 小時為單位塊狀掃街，先攻限定與一番賞現貨，再逛中古與模型店，避免跨區拉車，把體力留給挖寶。',
+                    icons: ['🤖', '🎁', '🔍']
+                },
+                trendplayer: {
+                    whoFor: '古著、街頭、小眾設計師品牌與香氛選物的潮流玩家。',
+                    howToPlay: '下午開逛買手店與古著巷，傍晚探店香氛或選物咖啡，以區域為單位深度逛，不追求打卡數量而追求挖到私藏。',
+                    icons: ['🔥', '👟', '🧴']
+                }
+            };
 
             var MAGAZINE_COVER_URLS = {
-                tokyo: 'https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?q=80&w=600',
-                kyoto: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=600',
-                osaka: 'https://images.unsplash.com/photo-1590559899731-a3826db94655?q=80&w=600',
-                seoul: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?q=80&w=600',
-                hokkaido: 'https://images.unsplash.com/photo-1578507065211-17efed996086?q=80&w=600',
-                bangkok: 'https://images.unsplash.com/photo-1508009603885-50cf7c579365?q=80&w=600',
-                vietnam: 'https://images.unsplash.com/photo-1509060464153-44667396260f?q=80&w=600',
-                london: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?q=80&w=600',
-                paris: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=600'
+                tokyo: 'https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?q=80&w=800',
+                kyoto: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=800',
+                osaka: 'https://images.unsplash.com/photo-1590559899731-a3826db94655?q=80&w=800',
+                seoul: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?q=80&w=800',
+                hokkaido: 'https://images.unsplash.com/photo-1578507065211-17efed996086?q=80&w=800',
+                bangkok: 'https://images.unsplash.com/photo-1508009603885-50cf7c579365?q=80&w=800',
+                vietnam: 'https://images.unsplash.com/photo-1509060464153-44667396260f?q=80&w=800',
+                london: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?q=80&w=800',
+                paris: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=800'
             };
 
             var magazineData = {
@@ -14246,16 +14540,96 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 }
             };
 
+            function parseMagazineLegacy(text) {
+                var raw = String(text || '').trim();
+                var match = raw.match(/^【(.+?)】[—–-]{1,2}\s*(.+)$/);
+                if (match) {
+                    return { title: match[1].trim(), intro: match[2].trim() };
+                }
+                return { title: '本期城市靈感專題', intro: raw };
+            }
+
+            function buildMagazineHighlights(parsed, styleKey) {
+                var playbook = MAG_STYLE_PLAYBOOK[styleKey] || MAG_STYLE_PLAYBOOK.budget;
+                var chunks = parsed.intro.split(/[，、；]/).map(function (s) { return s.trim(); }).filter(Boolean);
+                var titles = ['必訪亮點', '在地體驗', 'SoarVibe 提醒'];
+                if (chunks.length < 3) {
+                    chunks = [parsed.title, parsed.intro, '保留彈性時間，把驚喜留給巷弄與偶遇風景。'];
+                }
+                return [0, 1, 2].map(function (i) {
+                    return {
+                        icon: playbook.icons[i] || '✦',
+                        title: titles[i],
+                        desc: chunks[i] || chunks[0]
+                    };
+                });
+            }
+
+            function buildMagazineEdition(cityId, styleKey) {
+                var city = magazineData[cityId];
+                var playbook = MAG_STYLE_PLAYBOOK[styleKey] || MAG_STYLE_PLAYBOOK.budget;
+                var rawText = (city && city[styleKey]) || '';
+                var parsed = parseMagazineLegacy(rawText);
+                if (!rawText) {
+                    parsed = {
+                        title: '精彩專欄策展中',
+                        intro: '本期精彩專欄正在策展中，敬請期待 SoarVibe 下期創刊號！🌸'
+                    };
+                }
+                return {
+                    cityName: city ? city.name : cityId,
+                    heroUrl: MAGAZINE_COVER_URLS[cityId] || '',
+                    themeTitle: parsed.title,
+                    intro: parsed.intro,
+                    highlights: buildMagazineHighlights(parsed, styleKey),
+                    whoFor: playbook.whoFor,
+                    howToPlay: playbook.howToPlay
+                };
+            }
+
+            function renderMagazineEdition(edition) {
+                var highlightsHtml = edition.highlights.map(function (item) {
+                    return (
+                        '<article class="mag-highlight-card">' +
+                        '<strong>' + escapeHtml(item.icon + ' ' + item.title) + '</strong>' +
+                        '<p>' + escapeHtml(item.desc) + '</p>' +
+                        '</article>'
+                    );
+                }).join('');
+                var heroStyle = edition.heroUrl ? " style=\"background-image:url('" + edition.heroUrl.replace(/'/g, '%27') + "')\"" : '';
+                return (
+                    '<div class="mag-edition">' +
+                    '<div class="mag-edition-hero"' + heroStyle + '>' +
+                    '<span class="mag-edition-hero-label">COVER STORY</span>' +
+                    '</div>' +
+                    '<h3 class="mag-theme-title">' + escapeHtml(edition.themeTitle) + '</h3>' +
+                    '<p class="mag-intro">' + escapeHtml(edition.intro) + '</p>' +
+                    '<p class="mag-section-label">EDITOR\'S PICKS</p>' +
+                    '<div class="mag-highlight-grid">' + highlightsHtml + '</div>' +
+                    '<p class="mag-section-label">適合誰</p>' +
+                    '<div class="mag-info-card"><p>' + escapeHtml(edition.whoFor) + '</p></div>' +
+                    '<p class="mag-section-label">建議玩法</p>' +
+                    '<div class="mag-info-card"><p>' + escapeHtml(edition.howToPlay) + '</p></div>' +
+                    '<button type="button" class="mag-cta-btn" onclick="applyMagazineStyleToTrip()">用這種風格產生行程</button>' +
+                    '</div>'
+                );
+            }
+
             function openMagazine(cityId) {
                 var modal = document.getElementById('magazineModal');
                 var titleEl = document.getElementById('magTitle');
                 var coverEl = document.getElementById('magCover');
+                var bgImageEl = document.getElementById('magBgImage');
                 var tabsContainer = document.getElementById('magTabsContainer');
                 if (!modal || !magazineData[cityId]) return;
                 currentMagCity = cityId;
+                var coverUrl = MAGAZINE_COVER_URLS[cityId] || '';
                 if (titleEl) titleEl.textContent = magazineData[cityId].name;
-                if (coverEl) {
-                    coverEl.style.backgroundImage = "url('" + (MAGAZINE_COVER_URLS[cityId] || '') + "')";
+                if (coverEl && coverUrl) {
+                    coverEl.style.backgroundImage = "url('" + coverUrl + "')";
+                }
+                if (bgImageEl && coverUrl) {
+                    bgImageEl.style.backgroundImage = "url('" + coverUrl + "')";
                 }
                 if (tabsContainer && tabsContainer.firstElementChild) {
                     switchMagStyle('budget', tabsContainer.firstElementChild);
@@ -14263,6 +14637,8 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 modal.classList.remove('hidden');
                 modal.setAttribute('aria-hidden', 'false');
                 document.body.style.overflow = 'hidden';
+                var scrollEl = modal.querySelector('.mag-modal-scroll');
+                if (scrollEl) scrollEl.scrollTop = 0;
             }
 
             function closeMagazine() {
@@ -14275,22 +14651,49 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
             function switchMagStyle(styleKey, element) {
                 var contentEl = document.getElementById('magContent');
-                var allTabs = document.querySelectorAll('.mag-tab-btn');
+                var allTabs = document.querySelectorAll('#magazineModal .mag-tab-btn');
+                currentMagStyle = styleKey;
                 allTabs.forEach(function (btn) {
-                    btn.classList.remove('mag-tab-active', 'bg-white/30', 'text-white', 'border-white/40');
-                    btn.classList.add('bg-white/10', 'text-white/70', 'border-white/10');
+                    btn.classList.remove('mag-tab-active');
                 });
                 if (element) {
-                    element.classList.remove('bg-white/10', 'text-white/70', 'border-white/10');
-                    element.classList.add('mag-tab-active', 'bg-white/30', 'text-white', 'border-white/40');
+                    element.classList.add('mag-tab-active');
                 }
-                var articleText = (magazineData[currentMagCity] && magazineData[currentMagCity][styleKey])
-                    || '本期精彩專欄正在策展中，敬請期待 SoarVibe 下期創刊號！🌸';
+                var edition = buildMagazineEdition(currentMagCity, styleKey);
                 if (contentEl) {
-                    contentEl.innerHTML =
-                        '<div class="animate-fade-in">' +
-                        '<p class="leading-relaxed tracking-wide font-light text-white/90 drop-shadow-sm">' +
-                        escapeHtml(articleText) + '</p></div>';
+                    contentEl.innerHTML = renderMagazineEdition(edition);
+                }
+            }
+
+            function applyMagazineStyleToTrip() {
+                var dest = MAG_CITY_DEST[currentMagCity] || '';
+                var formStyle = MAG_FORM_STYLE_MAP[currentMagStyle] || 'budget';
+                closeMagazine();
+                if (destinationInput && dest) {
+                    destinationInput.value = dest;
+                }
+                var radio = document.querySelector('input[name="travel-style"][value="' + formStyle + '"]');
+                if (radio) {
+                    radio.checked = true;
+                    radio.dispatchEvent(new Event('change', { bubbles: true }));
+                    var styleScroll = document.getElementById('travel-style-scroll');
+                    var label = radio.closest('label');
+                    if (label && styleScroll) {
+                        var labelLeft = label.offsetLeft;
+                        var labelWidth = label.offsetWidth;
+                        var scrollWidth = styleScroll.clientWidth;
+                        styleScroll.scrollTo({
+                            left: Math.max(0, labelLeft - (scrollWidth / 2) + (labelWidth / 2)),
+                            behavior: 'smooth'
+                        });
+                    }
+                }
+                var phoneScrollEl = document.querySelector('.phone-scroll');
+                if (phoneScrollEl) {
+                    phoneScrollEl.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+                if (destinationInput) {
+                    destinationInput.focus({ preventScroll: true });
                 }
             }
 
@@ -14306,7 +14709,15 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
             function initMagazineModal() {
                 var modal = document.getElementById('magazineModal');
+                var closeBtn = document.getElementById('magCloseBtn');
                 if (!modal) return;
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        closeMagazine();
+                    });
+                }
                 document.addEventListener('keydown', function (e) {
                     if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
                         closeMagazine();
@@ -14317,6 +14728,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             window.openMagazine = openMagazine;
             window.closeMagazine = closeMagazine;
             window.switchMagStyle = switchMagStyle;
+            window.applyMagazineStyleToTrip = applyMagazineStyleToTrip;
 
             document.querySelectorAll('.quick-tag').forEach(function (tag) {
                 tag.addEventListener('click', function () {
@@ -14670,32 +15082,32 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
         })();
     </script>
 
-    <div id="magazineModal" class="fixed inset-0 hidden z-[100] bg-black/70 backdrop-blur-xl overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="magTitle" aria-hidden="true">
-        <button type="button" onclick="closeMagazine()" class="fixed top-5 right-5 z-[110] bg-white/20 backdrop-blur-md text-white border border-white/30 rounded-full w-10 h-10 flex items-center justify-center text-xl font-light shadow-lg active:scale-90 transition" aria-label="關閉城市靈感誌">✕</button>
-
-        <div class="max-w-md mx-auto min-h-screen bg-transparent pb-12">
-            <div id="magCover" class="h-64 bg-cover bg-center relative flex items-end p-6">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
-                <div class="relative z-10 w-full">
-                    <span class="text-xs font-bold text-emerald-300 uppercase tracking-widest block mb-1">SOARVIBE DIGITAL MICRO-MAGAZINE</span>
-                    <h2 class="text-2xl font-black text-white tracking-wide">城市特輯：<span id="magTitle"></span> 🌐</h2>
+    <div id="magazineModal" class="mag-modal fixed inset-0 hidden" role="dialog" aria-modal="true" aria-labelledby="magTitle" aria-hidden="true">
+        <button type="button" id="magCloseBtn" class="mag-close-btn" aria-label="關閉城市靈感誌">✕</button>
+        <div id="magBgImage" class="mag-modal-bg-image" aria-hidden="true"></div>
+        <div class="mag-modal-backdrop" aria-hidden="true"></div>
+        <div class="mag-modal-scroll">
+            <div class="mag-shell">
+                <div id="magCover" class="mag-hero">
+                    <div class="mag-hero-inner">
+                        <span class="text-xs font-bold text-emerald-300 uppercase tracking-widest block mb-1">SOARVIBE DIGITAL MICRO-MAGAZINE</span>
+                        <h2 id="magTitle" class="text-2xl font-black text-white tracking-wide">城市靈感誌</h2>
+                    </div>
                 </div>
-            </div>
 
-            <div class="sticky top-0 z-20 bg-black/40 backdrop-blur-md border-b border-white/10 p-4">
-                <div class="flex space-x-2 overflow-x-auto pb-1 scrollbar-none" id="magTabsContainer">
-                    <button type="button" onclick="switchMagStyle('budget', this)" class="mag-tab-btn flex-none px-4 py-2 rounded-full text-xs font-medium bg-white/10 text-white/70 border border-white/10 active:scale-95 transition">💰 小資</button>
-                    <button type="button" onclick="switchMagStyle('classic', this)" class="mag-tab-btn flex-none px-4 py-2 rounded-full text-xs font-medium bg-white/10 text-white/70 border border-white/10 active:scale-95 transition">🗺️ 觀光</button>
-                    <button type="button" onclick="switchMagStyle('trendy', this)" class="mag-tab-btn flex-none px-4 py-2 rounded-full text-xs font-medium bg-white/10 text-white/70 border border-white/10 active:scale-95 transition">⚡ 新潮</button>
-                    <button type="button" onclick="switchMagStyle('foodie', this)" class="mag-tab-btn flex-none px-4 py-2 rounded-full text-xs font-medium bg-white/10 text-white/70 border border-white/10 active:scale-95 transition">🍳 美食</button>
-                    <button type="button" onclick="switchMagStyle('netbeauty', this)" class="mag-tab-btn flex-none px-4 py-2 rounded-full text-xs font-medium bg-white/10 text-white/70 border border-white/10 active:scale-95 transition">📸 網美</button>
-                    <button type="button" onclick="switchMagStyle('otaku', this)" class="mag-tab-btn flex-none px-4 py-2 rounded-full text-xs font-medium bg-white/10 text-white/70 border border-white/10 active:scale-95 transition">🤖 動漫</button>
-                    <button type="button" onclick="switchMagStyle('trendplayer', this)" class="mag-tab-btn flex-none px-4 py-2 rounded-full text-xs font-medium bg-white/10 text-white/70 border border-white/10 active:scale-95 transition">🔥 潮流</button>
+                <div class="mag-tabs-sticky">
+                    <div class="mag-tabs-track" id="magTabsContainer">
+                        <button type="button" onclick="switchMagStyle('budget', this)" class="mag-tab-btn">💰 小資</button>
+                        <button type="button" onclick="switchMagStyle('classic', this)" class="mag-tab-btn">🗺️ 觀光</button>
+                        <button type="button" onclick="switchMagStyle('trendy', this)" class="mag-tab-btn">⚡ 新潮</button>
+                        <button type="button" onclick="switchMagStyle('foodie', this)" class="mag-tab-btn">🍳 美食</button>
+                        <button type="button" onclick="switchMagStyle('netbeauty', this)" class="mag-tab-btn">📸 網美</button>
+                        <button type="button" onclick="switchMagStyle('otaku', this)" class="mag-tab-btn">🤖 動漫</button>
+                        <button type="button" onclick="switchMagStyle('trendplayer', this)" class="mag-tab-btn">🔥 潮流</button>
+                    </div>
                 </div>
-            </div>
 
-            <div class="p-6">
-                <div id="magContent" class="text-white/90 leading-relaxed font-light tracking-wide text-sm bg-white/5 border border-white/10 rounded-2xl p-5 backdrop-blur-md min-h-[250px]"></div>
+                <div id="magContent" class="mag-content-area"></div>
             </div>
         </div>
     </div>
