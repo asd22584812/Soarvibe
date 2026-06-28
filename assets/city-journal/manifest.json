@@ -1,6 +1,7 @@
 {
-  "version": "v102",
-  "policy": "Runtime renders local paths only. Use scripts/download-city-journal-assets.ps1 to refresh from Pexels/Unsplash.",
+  "version": "v103",
+  "policy": "Only manifest-verified images render at runtime. Run scripts/download-tokyo-anime-verified.ps1 to refresh Tokyo Anime assets.",
   "placeholder": "./assets/city-journal/placeholder-city-journal.jpg",
-  "cities": ["tokyo", "osaka", "kyoto", "seoul", "paris", "london", "bangkok", "hokkaido"]
+  "verifiedScope": "tokyo-anime-only",
+  "manifestFile": "./city-journal-image-manifest.js"
 }
