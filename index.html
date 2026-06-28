@@ -884,6 +884,26 @@
             color: #78909C;
             line-height: 1.6;
         }
+        #magazineModal {
+            z-index: 9995;
+        }
+        #magazineModal:not(.hidden) {
+            pointer-events: auto;
+        }
+        @keyframes mag-fade-in {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        #magazineModal .animate-fade-in {
+            animation: mag-fade-in 0.35s ease;
+        }
+        #magazineModal .scrollbar-none {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        #magazineModal .scrollbar-none::-webkit-scrollbar {
+            display: none;
+        }
         @keyframes cj-fade-in {
             from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
@@ -2841,55 +2861,55 @@
                     <span class="text-black text-xl leading-none" aria-hidden="true">❯</span>
                 </div>
                 <div id="mag-city-list" class="recommend-scroll hide-scrollbar snap-x snap-proximity h-[9rem] items-stretch gap-2.5 -mx-0.5 px-0.5" role="list" aria-label="城市靈感誌推薦">
-                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" onclick="openCityJournal('tokyo')" aria-label="開啟東京城市靈感誌">
+                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" onclick="openMagazine('tokyo')" aria-label="開啟東京城市靈感誌">
                         <img src="https://images.unsplash.com/photo-1648301184879-28c6ed4964d7?auto=format&fit=crop&w=600&q=85" alt="東京鐵塔夜景" loading="lazy" class="absolute inset-0 w-full h-full object-cover pointer-events-none">
                         <div class="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/75 to-transparent pointer-events-none">
                             <span class="text-white font-bold text-sm">東京</span>
                         </div>
                     </article>
-                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" onclick="openCityJournal('kyoto')" aria-label="開啟京都城市靈感誌">
+                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" onclick="openMagazine('kyoto')" aria-label="開啟京都城市靈感誌">
                         <img src="https://images.unsplash.com/photo-1573047330192-4e6bb1594325?auto=format&fit=crop&w=600&q=85" alt="京都祇園傳統街道" loading="lazy" class="absolute inset-0 w-full h-full object-cover pointer-events-none">
                         <div class="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/75 to-transparent pointer-events-none">
                             <span class="text-white font-bold text-sm">京都</span>
                         </div>
                     </article>
-                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" onclick="openCityJournal('osaka')" aria-label="開啟大阪城市靈感誌">
+                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" onclick="openMagazine('osaka')" aria-label="開啟大阪城市靈感誌">
                         <img src="https://images.unsplash.com/photo-1773467223754-b9f3eb4d2c0f?auto=format&fit=crop&w=600&q=85" alt="大阪城黃昏夜景" loading="lazy" class="absolute inset-0 w-full h-full object-cover pointer-events-none">
                         <div class="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/75 to-transparent pointer-events-none">
                             <span class="text-white font-bold text-sm">大阪</span>
                         </div>
                     </article>
-                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" onclick="openCityJournal('seoul')" aria-label="開啟首爾城市靈感誌">
+                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" onclick="openMagazine('seoul')" aria-label="開啟首爾城市靈感誌">
                         <img src="https://images.unsplash.com/photo-1517154421773-0529f29ea451?auto=format&fit=crop&w=600&q=85" alt="首爾潮流城市夜景" loading="lazy" class="absolute inset-0 w-full h-full object-cover pointer-events-none">
                         <div class="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/75 to-transparent pointer-events-none">
                             <span class="text-white font-bold text-sm">首爾</span>
                         </div>
                     </article>
-                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" onclick="openCityJournal('hokkaido')" aria-label="開啟北海道城市靈感誌">
+                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" onclick="openMagazine('hokkaido')" aria-label="開啟北海道城市靈感誌">
                         <img src="https://images.unsplash.com/photo-1741225241678-0c7f8fa07917?auto=format&fit=crop&w=600&q=85" alt="北海道札幌雪景" loading="lazy" class="absolute inset-0 w-full h-full object-cover pointer-events-none">
                         <div class="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/75 to-transparent pointer-events-none">
                             <span class="text-white font-bold text-sm">北海道</span>
                         </div>
                     </article>
-                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" onclick="openCityJournal('bangkok')" aria-label="開啟曼谷城市靈感誌">
+                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" onclick="openMagazine('bangkok')" aria-label="開啟曼谷城市靈感誌">
                         <img src="https://images.unsplash.com/photo-1768392810963-017c92313d79?auto=format&fit=crop&w=600&q=85" alt="曼谷鄭王廟泰式建築" loading="lazy" class="absolute inset-0 w-full h-full object-cover pointer-events-none">
                         <div class="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/75 to-transparent pointer-events-none">
                             <span class="text-white font-bold text-sm">曼谷</span>
                         </div>
                     </article>
-                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" onclick="openCityJournal('vietnam')" aria-label="開啟越南城市靈感誌">
+                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" onclick="openMagazine('vietnam')" aria-label="開啟越南城市靈感誌">
                         <img src="https://images.unsplash.com/photo-1509060464153-44667396260f?auto=format&fit=crop&w=600&q=85" alt="越南下龍灣景色" loading="lazy" class="absolute inset-0 w-full h-full object-cover pointer-events-none">
                         <div class="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/75 to-transparent pointer-events-none">
                             <span class="text-white font-bold text-sm">越南</span>
                         </div>
                     </article>
-                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" onclick="openCityJournal('london')" aria-label="開啟倫敦城市靈感誌">
+                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" onclick="openMagazine('london')" aria-label="開啟倫敦城市靈感誌">
                         <img src="https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=600&q=85" alt="倫敦泰晤士河天際線" loading="lazy" class="absolute inset-0 w-full h-full object-cover pointer-events-none">
                         <div class="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/75 to-transparent pointer-events-none">
                             <span class="text-white font-bold text-sm">倫敦</span>
                         </div>
                     </article>
-                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" onclick="openCityJournal('paris')" aria-label="開啟巴黎城市靈感誌">
+                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" onclick="openMagazine('paris')" aria-label="開啟巴黎城市靈感誌">
                         <img src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=600&q=85" alt="巴黎艾菲爾鐵塔" loading="lazy" class="absolute inset-0 w-full h-full object-cover pointer-events-none">
                         <div class="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/75 to-transparent pointer-events-none">
                             <span class="text-white font-bold text-sm">巴黎</span>
@@ -3117,6 +3137,36 @@
             <button type="button" id="cjBackBtn" class="cj-chrome-btn is-hidden" aria-label="返回城市專題目錄">← 返回</button>
             <button type="button" id="cjCloseBtn" class="cj-chrome-btn" aria-label="關閉城市旅遊雜誌">✕</button>
         </header>
+    </div>
+
+    <div id="magazineModal" class="fixed inset-0 hidden z-50 bg-black/70 backdrop-blur-xl overflow-y-auto" role="dialog" aria-modal="true" aria-label="城市靈感誌數位微刊" aria-hidden="true">
+        <button type="button" onclick="closeMagazine()" class="fixed top-5 right-5 z-50 bg-white/20 backdrop-blur-md text-white border border-white/30 rounded-full w-10 h-10 flex items-center justify-center text-xl font-light shadow-lg active:scale-90 transition" aria-label="關閉城市靈感誌">✕</button>
+
+        <div class="max-w-md mx-auto min-h-screen bg-transparent pb-12">
+            <div id="magCover" class="h-64 bg-cover bg-center relative flex items-end p-6">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+                <div class="relative z-10 w-full">
+                    <span class="text-xs font-bold text-emerald-300 uppercase tracking-widest block mb-1">SOARVIBE DIGITAL MICRO-MAGAZINE</span>
+                    <h2 class="text-2xl font-black text-white tracking-wide">城市特輯：<span id="magTitle"></span> 🌐</h2>
+                </div>
+            </div>
+
+            <div class="sticky top-0 z-20 bg-black/40 backdrop-blur-md border-b border-white/10 p-4">
+                <div class="flex space-x-2 overflow-x-auto pb-1 scrollbar-none hide-scrollbar" id="magTabsContainer">
+                    <button type="button" onclick="switchMagStyle('budget', this)" class="mag-tab-btn flex-none px-4 py-2 rounded-full text-xs font-medium bg-white/10 text-white/70 border border-white/10 active:scale-95 transition">💰 小資</button>
+                    <button type="button" onclick="switchMagStyle('classic', this)" class="mag-tab-btn flex-none px-4 py-2 rounded-full text-xs font-medium bg-white/10 text-white/70 border border-white/10 active:scale-95 transition">🗺️ 觀光</button>
+                    <button type="button" onclick="switchMagStyle('trendy', this)" class="mag-tab-btn flex-none px-4 py-2 rounded-full text-xs font-medium bg-white/10 text-white/70 border border-white/10 active:scale-95 transition">⚡ 新潮</button>
+                    <button type="button" onclick="switchMagStyle('foodie', this)" class="mag-tab-btn flex-none px-4 py-2 rounded-full text-xs font-medium bg-white/10 text-white/70 border border-white/10 active:scale-95 transition">🍳 美食</button>
+                    <button type="button" onclick="switchMagStyle('netbeauty', this)" class="mag-tab-btn flex-none px-4 py-2 rounded-full text-xs font-medium bg-white/10 text-white/70 border border-white/10 active:scale-95 transition">📸 網美</button>
+                    <button type="button" onclick="switchMagStyle('otaku', this)" class="mag-tab-btn flex-none px-4 py-2 rounded-full text-xs font-medium bg-white/10 text-white/70 border border-white/10 active:scale-95 transition">🤖 動漫</button>
+                    <button type="button" onclick="switchMagStyle('trendplayer', this)" class="mag-tab-btn flex-none px-4 py-2 rounded-full text-xs font-medium bg-white/10 text-white/70 border border-white/10 active:scale-95 transition">🔥 潮流</button>
+                </div>
+            </div>
+
+            <div class="p-6">
+                <div id="magContent" class="text-white/90 leading-relaxed font-light tracking-wide text-sm bg-white/5 border border-white/10 rounded-2xl p-5 backdrop-blur-md min-h-[250px]"></div>
+            </div>
+        </div>
     </div>
 
     <script src="./city-journal-data.js"></script>
@@ -14956,8 +15006,6 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             window.openCityJournal = openCityJournal;
             window.openJournalArticle = openJournalArticle;
             window.closeCityJournal = closeCityJournal;
-            window.openMagazine = openCityJournal;
-            window.closeMagazine = closeCityJournal;
 
             document.querySelectorAll('.quick-tag').forEach(function (tag) {
                 tag.addEventListener('click', function () {
@@ -15310,6 +15358,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
         })();
     </script>
+    <script src="./magazine-modal.js"></script>
 
 </body>
 
