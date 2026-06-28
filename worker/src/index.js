@@ -326,6 +326,19 @@ async function resolveGooglePhotoUri(mapsKey, photoName) {
   return String(body.photoUri || '').trim();
 }
 
+async function getGooglePlaceById(mapsKey, placeId) {
+  var id = placeIdFromResource(placeId);
+  if (!id) return null;
+  var response = await googlePlacesFetch(mapsKey, 'https://places.googleapis.com/v1/places/' + encodeURIComponent(id), {
+    method: 'GET',
+    headers: {
+      'X-Goog-FieldMask': 'id,displayName,formattedAddress,rating,photos,photos.authorAttributions'
+    }
+  });
+  if (!response.ok) return null;
+  return await response.json();
+}
+
 async function searchGooglePlace(mapsKey, mapsQuery) {
   var response = await googlePlacesFetch(mapsKey, 'https://places.googleapis.com/v1/places:searchText', {
     method: 'POST',
@@ -356,9 +369,9 @@ function validatePlaceMatch(sectionId, place) {
   if (sectionId === 'akihabara') return /akihabara|秋葉原|electric town/.test(blob);
   if (sectionId === 'nakano') return /nakano|中野|broadway/.test(blob);
   if (sectionId === 'gachapon') return /gachapon|gashapon|capsule|扭蛋|ガチャ/.test(blob);
-  if (sectionId === 'ichiran') return /ichiran|一蘭|ramen|拉麵|らーめん/.test(blob) && /akihabara|秋葉原|sotokanda|千代田/.test(blob) && !/ueno|上野/.test(blob) && !badHotel;
+  if (sectionId === 'ichiran') return /tanaka|田中|そば|soba|ramen|拉麵|らーめん|ラーメン/.test(blob) && /akihabara|秋葉原|sotokanda|千代田|外神田/.test(blob) && !/ueno|上野/.test(blob) && !badHotel;
   if (sectionId === 'maid-cafe') return /maid|メイド|maidreamin|@home cafe/.test(blob);
-  if (sectionId === 'hotel-gracery') return /gracery|hotel|ホテル|グレイスリー/.test(blob) && /akihabara|秋葉原|sotokanda|千代田/.test(blob) && !/asakusa|浅草|kaminarimon|雷門/.test(blob) && !badHotel;
+  if (sectionId === 'hotel-gracery') return /washington|ワシントン|華盛頓|hotel|ホテル/.test(blob) && /akihabara|秋葉原|佐久間|sakuma|千代田|sotokanda|kanda/.test(blob) && !/asakusa|浅草|kaminarimon|雷門|新宿|shinjuku|gracery|グレイスリー/.test(blob) && !badHotel;
   if (sectionId === 'nui-hostel') return /nui|hostel|ゲストハウス/.test(blob) && !badHotel;
   return true;
 }
@@ -371,20 +384,19 @@ async function resolvePlaceSection(mapsKey, item) {
     return { sectionId: sectionId, error: 'missing_query' };
   }
   try {
-    var places = await searchGooglePlace(mapsKey, mapsQuery);
-  var chosen = null;
-  for (var i = 0; i < places.length; i++) {
-    if (validatePlaceMatch(sectionId, places[i])) {
-      chosen = places[i];
-      break;
+    var places = [];
+    var chosen = null;
+    if (item.placeId) {
+      chosen = await getGooglePlaceById(mapsKey, item.placeId);
+      if (chosen) places = [chosen];
     }
-  }
-    if (!chosen && places.length) {
-      for (var k = 0; k < places.length; k++) {
-        if (validatePlaceMatch(sectionId, places[k])) {
-          chosen = places[k];
-          break;
-        }
+    if (!chosen) {
+      places = await searchGooglePlace(mapsKey, mapsQuery);
+    }
+    for (var i = 0; i < places.length; i++) {
+      if (validatePlaceMatch(sectionId, places[i])) {
+        chosen = places[i];
+        break;
       }
     }
     if (!chosen) {
@@ -405,7 +417,7 @@ async function resolvePlaceSection(mapsKey, item) {
   var photo = chosen.photos && chosen.photos[0] ? chosen.photos[0] : null;
   var googlePhotoUrl = null;
   var googleAttribution = photo ? buildPhotoAttribution(photo) : null;
-  var strictOk = validatePlaceMatch(sectionId, chosen);
+  var strictOk = item.placeId ? true : validatePlaceMatch(sectionId, chosen);
   if (photo && photo.name && strictOk) {
     googlePhotoUrl = await resolveGooglePhotoUri(mapsKey, photo.name);
   }

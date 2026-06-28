@@ -40,15 +40,16 @@
   },
   {
     "sectionId": "ichiran",
-    "subject": "一蘭拉麵 秋葉原店",
-    "mapsQuery": "一蘭 秋葉原店 東京",
-    "placeId": null,
-    "googleRating": null,
-    "googleAddress": null,
-    "googlePhotoUrl": null,
-    "googleAttribution": null,
-    "imageSource": null,
-    "matched": false
+    "subject": "田中そば店 秋葉原店",
+    "mapsQuery": "田中そば店 秋葉原店",
+    "placeId": "ChIJXTeLYx6MGGARNivhJ55nYVw",
+    "googleRating": 4.2,
+    "googleAddress": "Japan, 〒101-0021 Tokyo, Chiyoda City, Sotokanda, 3-chōme−8−３ 第一針谷ビル1Ｆ",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZMYsqeMfq-2pUSrN2z5RC4XuYyadXAcp_Z4rGIRHXuRI2UeTj8TaYhpqedrvY8WqTvR_4MCn-ALJBnyF7eJnUWsvGfVcveT1C3ONXldESiJ5a8rnc79v3H_imTmX3onCImIKflaGzgs8RgwoQ=s4800-w720-h405",
+    "googleAttribution": "田中そば店 秋葉原店",
+    "imageSource": "google_places",
+    "matched": true,
+    "placeName": "Ramen Tanaka soba Akihabara"
   },
   {
     "sectionId": "maid-cafe",
@@ -65,15 +66,16 @@
   },
   {
     "sectionId": "hotel-gracery",
-    "subject": "Hotel Gracery Akihabara",
-    "mapsQuery": "ホテルグレイスリー秋葉原 東京",
-    "placeId": null,
-    "googleRating": null,
-    "googleAddress": null,
-    "googlePhotoUrl": null,
-    "googleAttribution": null,
-    "imageSource": null,
-    "matched": false
+    "subject": "秋葉原ワシントンホテル",
+    "mapsQuery": "Akihabara Washington Hotel Tokyo",
+    "placeId": "ChIJnxZoFqiOGGAReYJ1ck2lXiw",
+    "googleRating": 4.2,
+    "googleAddress": "Japan, 〒101-0025 Tokyo, Chiyoda City, Kanda Sakumachō, 1-chōme−８−３",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZOJ2RGUQqzztwaYBu7jbowjtr4XO5cjA9joYo0w-zpAX1PLHcAAiCo41Vi7uEo7lPa2uZjM3NLeKMTVCTY2_h01or7ksXRjzGrLHtPn-YrydrlpEzu7J3Nqo3JDUU07sB2_IxdYRyTx6dejKg=s4800-w1280-h900",
+    "googleAttribution": "秋葉原ワシントンホテル",
+    "imageSource": "google_places",
+    "matched": true,
+    "placeName": "Akihabara Washington Hotel"
   },
   {
     "sectionId": "nui-hostel",

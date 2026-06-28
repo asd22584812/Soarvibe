@@ -20,9 +20,9 @@ const SECTION_QUERIES = [
   { sectionId: 'akihabara', subject: '秋葉原電氣街', mapsQuery: 'Akihabara Electric Town Tokyo Japan' },
   { sectionId: 'nakano', subject: '中野百老匯', mapsQuery: 'Nakano Broadway Tokyo Japan' },
   { sectionId: 'gachapon', subject: 'GACHAPON 扭蛋會館', mapsQuery: 'Gachapon Kaikan Akihabara Tokyo' },
-  { sectionId: 'ichiran', subject: '一蘭拉麵 秋葉原店', mapsQuery: '一蘭 秋葉原店 東京' },
+  { sectionId: 'ichiran', subject: '田中そば店 秋葉原店', mapsQuery: '田中そば店 秋葉原店', placeId: 'ChIJXTeLYx6MGGARNivhJ55nYVw' },
   { sectionId: 'maid-cafe', subject: '女僕咖啡廳 秋葉原', mapsQuery: 'Maid Cafe Akihabara Tokyo' },
-  { sectionId: 'hotel-gracery', subject: 'Hotel Gracery Akihabara', mapsQuery: 'ホテルグレイスリー秋葉原 東京' },
+  { sectionId: 'hotel-gracery', subject: '秋葉原ワシントンホテル', mapsQuery: 'Akihabara Washington Hotel Tokyo', placeId: 'ChIJnxZoFqiOGGAReYJ1ck2lXiw' },
   { sectionId: 'nui-hostel', subject: 'Nui Hostel Tokyo', mapsQuery: 'Nui Hostel & Bar Tokyo' }
 ];
 
@@ -58,9 +58,10 @@ function patchDataJs(results) {
     for (const key of fields) {
       const val = jsString(row[key]);
       const fieldRe = new RegExp('(\\n\\s*' + key + ':\\s*)(null|\'(?:\\\\.|[^\'])*\')(,)?');
-      const replacement = '$1' + val + '$3';
       if (fieldRe.test(block)) {
-        block = block.replace(fieldRe, replacement);
+        block = block.replace(fieldRe, function (_match, prefix, _old, suffix) {
+          return prefix + val + (suffix || ',');
+        });
       } else {
         block = block.replace(
           /sectionId:\s*'[^']+',/,
@@ -102,7 +103,15 @@ async function main() {
       'Content-Type': 'application/json',
       Origin: ORIGIN
     },
-    body: JSON.stringify({ sections: SECTION_QUERIES })
+    body: JSON.stringify({ sections: SECTION_QUERIES.map(function (item) {
+      var row = {
+        sectionId: item.sectionId,
+        subject: item.subject,
+        mapsQuery: item.mapsQuery
+      };
+      if (item.placeId) row.placeId = item.placeId;
+      return row;
+    }) })
   });
   const payload = await response.json();
   if (!response.ok) {
