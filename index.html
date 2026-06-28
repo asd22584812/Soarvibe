@@ -2884,8 +2884,8 @@
                             <span class="text-white font-bold text-sm">曼谷</span>
                         </div>
                     </article>
-                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" onclick="openCityJournal('vietnam')" aria-label="開啟越南城市靈感誌">
-                        <img src="https://images.unsplash.com/photo-1509060464153-44667396260f?auto=format&fit=crop&w=600&q=85" alt="越南下龍灣景色" loading="lazy" class="absolute inset-0 w-full h-full object-cover pointer-events-none">
+                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" data-city-id="vietnam" onclick="openCityJournal('vietnam')" aria-label="開啟越南城市靈感誌">
+                        <img src="./cover-photos/vietnam.jpg" alt="越南下龍灣景色" loading="lazy" class="mag-city-card-img absolute inset-0 w-full h-full object-cover pointer-events-none">
                         <div class="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/75 to-transparent pointer-events-none">
                             <span class="text-white font-bold text-sm">越南</span>
                         </div>
@@ -3911,7 +3911,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
-            const SOARVIBE_APP_BUILD = 'v103';
+            const SOARVIBE_APP_BUILD = 'v104';
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
@@ -14843,11 +14843,19 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             function openCityJournal(cityId) {
+                console.log('[CITY CARD CLICK]', cityId);
+                console.log('[OPEN CITY JOURNAL]', cityId);
                 var shell = document.getElementById('cityJournal');
                 var viewport = document.getElementById('cjViewport');
+                if (!shell || !viewport) {
+                    console.warn('[CITY JOURNAL MISSING SHELL]', cityId);
+                    return;
+                }
                 var meta = getCityJournalMeta(cityId);
-                if (!shell || !viewport || !meta) return;
-                console.log('[CITY JOURNAL HUB]', meta.name, hubHero);
+                if (!meta) {
+                    console.warn('[CITY JOURNAL MISSING CITY]', cityId);
+                    return;
+                }
                 cjState.view = 'hub';
                 cjState.cityId = cityId;
                 cjState.styleKey = null;
@@ -14858,6 +14866,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 shell.setAttribute('aria-hidden', 'false');
                 document.body.style.overflow = 'hidden';
                 viewport.scrollTop = 0;
+                console.log('[CITY JOURNAL HUB OPENED]', cityId, meta.name);
             }
 
             function openJournalArticle(cityId, styleKey) {
@@ -14992,8 +15001,26 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 });
             }
 
+            function handleMagCityCardImageError(img) {
+                if (!img || img.getAttribute('data-mag-card-fallback') === '1') return;
+                var step = img.getAttribute('data-mag-card-fallback-step') || '0';
+                if (step === '0') {
+                    img.setAttribute('data-mag-card-fallback-step', '1');
+                    img.src = './cover-photos/default.jpg';
+                    return;
+                }
+                img.setAttribute('data-mag-card-fallback', '1');
+                img.src = './assets/city-journal/placeholder-city-journal.jpg';
+            }
+
             function initCityJournalCityCards() {
                 document.querySelectorAll('.mag-city-card').forEach(function (card) {
+                    var img = card.querySelector('img');
+                    if (img) {
+                        img.addEventListener('error', function () {
+                            handleMagCityCardImageError(img);
+                        });
+                    }
                     card.addEventListener('keydown', function (e) {
                         if (e.key !== 'Enter' && e.key !== ' ') return;
                         e.preventDefault();
