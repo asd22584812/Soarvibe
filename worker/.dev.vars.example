@@ -3,5 +3,8 @@
 # 4 把免費 Gemini 金鑰：逗號或換行分隔（不要放已綁付費、不想扣款的那把）
 GEMINI_API_KEYS=AIzaSy第一把,AIzaSy第二把,AIzaSy第三把,AIzaSy第四把
 
-# Google Maps（Places / 地圖功能）
+# Google Maps（Places / 地圖功能 — 前端 referrer 限制金鑰）
 GOOGLE_MAPS_API_KEY=AIzaSy你的Maps金鑰
+
+# 選填：後端 Places 建稿用（IP 或無應用程式限制，勿 commit）
+# GOOGLE_MAPS_SERVER_KEY=AIzaSy你的Server金鑰

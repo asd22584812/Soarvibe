@@ -1,0 +1,91 @@
+[
+  {
+    "sectionId": "akihabara",
+    "subject": "秋葉原電氣街",
+    "mapsQuery": "Akihabara Electric Town Tokyo Japan",
+    "placeId": "ChIJzdWdgh2MGGARh4kg2pVZL3c",
+    "googleRating": null,
+    "googleAddress": "Akihabara Electric Town, Tokyo",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZO-_8kdgYH3Ad4ZXbj2VE5My2BTDK8FiRt44_QFJve-voltAy3AwlCwFlAbxZyo6yXjjgMfg4Kg1I0TFYl0aPOzSgZYRXPoxJyi-Dg2lBxibMtViFdd4iPKkXoWqnsYYS7ji6vqzFqe-wNd03ldz0fy=s4800-w1600-h1200",
+    "googleAttribution": "Alvin Leow",
+    "imageSource": "google_places",
+    "matched": true,
+    "placeName": "Akihabara Electric Town"
+  },
+  {
+    "sectionId": "nakano",
+    "subject": "中野百老匯",
+    "mapsQuery": "Nakano Broadway Tokyo Japan",
+    "placeId": "ChIJg-7dspDyGGARvvDv4E5-tuE",
+    "googleRating": 4.2,
+    "googleAddress": "5-chōme-52-15 Nakano, Nakano City, Tokyo 164-0001",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZOlZ4_LVYqQB6QfmfbhOJJkyn70NasmNaSKlqh9i4CHUmXAj19B1ZJVi4in5zIfHIbSxwUSwczIUZ-EwwlH1R7_D2JDu0x0Yo1C0ATEIgln1f0-FF3BrfEHJF6boL-OUUo7cGr4HZJXHff7ing=s4800-w1600-h1200",
+    "googleAttribution": "加藤展康",
+    "imageSource": "google_places",
+    "matched": true,
+    "placeName": "中野百老匯"
+  },
+  {
+    "sectionId": "gachapon",
+    "subject": "GACHAPON 扭蛋會館",
+    "mapsQuery": "Gachapon Kaikan Akihabara Tokyo",
+    "placeId": "ChIJBztW3x2MGGARadHYl5vTEK0",
+    "googleRating": 4,
+    "googleAddress": "〒101-0021 Tokyo, Chiyoda City, Sotokanda, 3-chōme−15−５ MNビル 1F",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZN3lw-sSmkEWz9OTLfx_VUg1Tus4Q81rPkEWRYPNjvdGkf-kQricmDMc6aA_EC0wBJ7d5eqhNInGQk9xYAKVLC-8mugCMu6bI0nP7UWSypT0cHEeFNg4kLfIqeskB3_kf8mJNVAW9e4SEd5eIA=s4800-w1600-h1200",
+    "googleAttribution": "ブラウンチョコ",
+    "imageSource": "google_places",
+    "matched": true,
+    "placeName": "秋葉原扭蛋會館"
+  },
+  {
+    "sectionId": "ichiran",
+    "subject": "一蘭拉麵 秋葉原店",
+    "mapsQuery": "一蘭 秋葉原店 東京",
+    "placeId": null,
+    "googleRating": null,
+    "googleAddress": null,
+    "googlePhotoUrl": null,
+    "googleAttribution": null,
+    "imageSource": null,
+    "matched": false
+  },
+  {
+    "sectionId": "maid-cafe",
+    "subject": "女僕咖啡廳 秋葉原",
+    "mapsQuery": "Maid Cafe Akihabara Tokyo",
+    "placeId": "ChIJvQtxBAaNGGARTiTMJ-Nzhvc",
+    "googleRating": 4.9,
+    "googleAddress": "〒101-0021 Tokyo, Chiyoda City, Sotokanda, 1-chōme−15−13 秋葉原 神田B&Vビル 10F",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZNEWaov5aHNNKnBj0J0Ya6RJD4QHqC2Ph1XQUNxFoqJaWoUB_rYzdOr8X0yM-Uytw9XTvc3eWE5hr4CMx1Y1DppyN6375CmIcKHT72qj-Pq-q8jpKO2T2LxLRx1u8S5BkhbKep7cj-BDQ67NFQ=s4800-w1365-h1200",
+    "googleAttribution": "MAID MADE 秋葉原駅前店",
+    "imageSource": "google_places",
+    "matched": true,
+    "placeName": "女僕主題咖啡廳 MAID MADE 秋葉原站前店"
+  },
+  {
+    "sectionId": "hotel-gracery",
+    "subject": "Hotel Gracery Akihabara",
+    "mapsQuery": "ホテルグレイスリー秋葉原 東京",
+    "placeId": null,
+    "googleRating": null,
+    "googleAddress": null,
+    "googlePhotoUrl": null,
+    "googleAttribution": null,
+    "imageSource": null,
+    "matched": false
+  },
+  {
+    "sectionId": "nui-hostel",
+    "subject": "Nui Hostel Tokyo",
+    "mapsQuery": "Nui Hostel & Bar Tokyo",
+    "placeId": "ChIJ4U-9KsiOGGARARhaBLZLqS0",
+    "googleRating": 4.5,
+    "googleAddress": "2-chōme-14-13 Kuramae, Taito City, Tokyo 111-0051",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZMO0KgiICCZV9dyfBhNT-71YuvcPBUsxIq58PyXwooJ0ouqKZ3nwYhN80T7QnlzlTVl52idH_dzoU_IM0q58zuUuZF56bBy3vhud-AqsRJwz-D65T0hyOXXSA1-jXXke-dkgYPDQqubYNWLhw=s4800-w1600-h1200",
+    "googleAttribution": "Nui. HOSTEL & BAR LOUNGE",
+    "imageSource": "google_places",
+    "matched": true,
+    "placeName": "客棧 Nui. Hostel & Bar Lounge"
+  }
+]

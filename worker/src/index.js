@@ -281,11 +281,184 @@ async function handleGemini(request, env, auth) {
 }
 
 async function handleMapsKey(env, auth) {
-  var mapsKey = String(env.GOOGLE_MAPS_API_KEY || '').trim();
+  var mapsKey = getMapsKey(env);
   if (!mapsKey || mapsKey.indexOf('AIzaSy') !== 0) {
     return jsonResponse({ error: 'maps_not_configured' }, 503, auth.origin, env);
   }
   return jsonResponse({ key: mapsKey }, 200, auth.origin, env);
+}
+
+function placeIdFromResource(id) {
+  return String(id || '').replace(/^places\//, '').trim();
+}
+
+function buildPhotoAttribution(photo) {
+  if (!photo || !photo.authorAttributions || !photo.authorAttributions.length) return 'Google Maps';
+  return photo.authorAttributions
+    .map(function (a) { return a.displayName || ''; })
+    .filter(Boolean)
+    .join(' / ') || 'Google Maps';
+}
+
+function getMapsKey(env) {
+  return String(env.GOOGLE_MAPS_SERVER_KEY || env.GOOGLE_MAPS_API_KEY || '').trim();
+}
+
+async function googlePlacesFetch(mapsKey, url, init) {
+  var headers = Object.assign({}, (init && init.headers) || {}, {
+    'X-Goog-Api-Key': mapsKey,
+    Referer: 'https://asd22584812.github.io/'
+  });
+  return fetch(url, Object.assign({}, init || {}, { headers: headers }));
+}
+
+async function resolveGooglePhotoUri(mapsKey, photoName) {
+  var resource = String(photoName || '').trim();
+  if (!resource || resource.indexOf('places/') !== 0) return '';
+  var mediaUrl =
+    'https://places.googleapis.com/v1/' +
+    resource +
+    '/media?maxHeightPx=1200&maxWidthPx=1600&skipHttpRedirect=true&key=' +
+    encodeURIComponent(mapsKey);
+  var response = await googlePlacesFetch(mapsKey, mediaUrl);
+  if (!response.ok) return '';
+  var body = await response.json();
+  return String(body.photoUri || '').trim();
+}
+
+async function searchGooglePlace(mapsKey, mapsQuery) {
+  var response = await googlePlacesFetch(mapsKey, 'https://places.googleapis.com/v1/places:searchText', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.rating,places.photos,places.photos.authorAttributions'
+    },
+    body: JSON.stringify({
+      textQuery: mapsQuery,
+      languageCode: 'zh-TW',
+      regionCode: 'JP',
+      maxResultCount: 5
+    })
+  });
+  if (!response.ok) {
+    var errText = await response.text();
+    throw new Error('places_search_failed:' + response.status + ':' + errText);
+  }
+  var data = await response.json();
+  return data.places || [];
+}
+
+function validatePlaceMatch(sectionId, place) {
+  var name = place && place.displayName && place.displayName.text ? place.displayName.text : '';
+  var addr = place && place.formattedAddress ? place.formattedAddress : '';
+  var blob = (name + ' ' + addr).toLowerCase();
+  var badHotel = /resort|pool|beach|island|spa resort|villa/.test(blob);
+  if (sectionId === 'akihabara') return /akihabara|秋葉原|electric town/.test(blob);
+  if (sectionId === 'nakano') return /nakano|中野|broadway/.test(blob);
+  if (sectionId === 'gachapon') return /gachapon|gashapon|capsule|扭蛋|ガチャ/.test(blob);
+  if (sectionId === 'ichiran') return /ichiran|一蘭|ramen|拉麵|らーめん/.test(blob) && /akihabara|秋葉原|sotokanda|千代田/.test(blob) && !/ueno|上野/.test(blob) && !badHotel;
+  if (sectionId === 'maid-cafe') return /maid|メイド|maidreamin|@home cafe/.test(blob);
+  if (sectionId === 'hotel-gracery') return /gracery|hotel|ホテル|グレイスリー/.test(blob) && /akihabara|秋葉原|sotokanda|千代田/.test(blob) && !/asakusa|浅草|kaminarimon|雷門/.test(blob) && !badHotel;
+  if (sectionId === 'nui-hostel') return /nui|hostel|ゲストハウス/.test(blob) && !badHotel;
+  return true;
+}
+
+async function resolvePlaceSection(mapsKey, item) {
+  var sectionId = String(item.sectionId || '').trim();
+  var subject = String(item.subject || '').trim();
+  var mapsQuery = String(item.mapsQuery || '').trim();
+  if (!sectionId || !mapsQuery) {
+    return { sectionId: sectionId, error: 'missing_query' };
+  }
+  try {
+    var places = await searchGooglePlace(mapsKey, mapsQuery);
+  var chosen = null;
+  for (var i = 0; i < places.length; i++) {
+    if (validatePlaceMatch(sectionId, places[i])) {
+      chosen = places[i];
+      break;
+    }
+  }
+    if (!chosen && places.length) {
+      for (var k = 0; k < places.length; k++) {
+        if (validatePlaceMatch(sectionId, places[k])) {
+          chosen = places[k];
+          break;
+        }
+      }
+    }
+    if (!chosen) {
+    return {
+      sectionId: sectionId,
+      subject: subject,
+      mapsQuery: mapsQuery,
+      placeId: null,
+      googleRating: null,
+      googleAddress: null,
+      googlePhotoUrl: null,
+      googleAttribution: null,
+      imageSource: null,
+      matched: false
+    };
+  }
+  var placeId = placeIdFromResource(chosen.id || chosen.name);
+  var photo = chosen.photos && chosen.photos[0] ? chosen.photos[0] : null;
+  var googlePhotoUrl = null;
+  var googleAttribution = photo ? buildPhotoAttribution(photo) : null;
+  var strictOk = validatePlaceMatch(sectionId, chosen);
+  if (photo && photo.name && strictOk) {
+    googlePhotoUrl = await resolveGooglePhotoUri(mapsKey, photo.name);
+  }
+  return {
+    sectionId: sectionId,
+    subject: subject,
+    mapsQuery: mapsQuery,
+    placeId: placeId,
+    googleRating: chosen.rating != null ? chosen.rating : null,
+    googleAddress: chosen.formattedAddress || null,
+    googlePhotoUrl: googlePhotoUrl || null,
+    googleAttribution: googleAttribution,
+    imageSource: googlePhotoUrl ? 'google_places' : null,
+    matched: !!(googlePhotoUrl && strictOk),
+    placeName: chosen.displayName && chosen.displayName.text ? chosen.displayName.text : null
+  };
+  } catch (err) {
+    return {
+      sectionId: sectionId,
+      subject: subject,
+      mapsQuery: mapsQuery,
+      placeId: null,
+      googleRating: null,
+      googleAddress: null,
+      googlePhotoUrl: null,
+      googleAttribution: null,
+      imageSource: null,
+      matched: false,
+      error: String(err && err.message ? err.message : err)
+    };
+  }
+}
+
+async function handlePlacesResolve(request, env, auth) {
+  var mapsKey = getMapsKey(env);
+  if (!mapsKey) {
+    return jsonResponse({ error: 'maps_not_configured' }, 503, auth.origin, env);
+  }
+  var body = {};
+  try {
+    body = await request.json();
+  } catch (e) {
+    return jsonResponse({ error: 'invalid_json' }, 400, auth.origin, env);
+  }
+  var sections = Array.isArray(body.sections) ? body.sections : [];
+  if (!sections.length) {
+    return jsonResponse({ error: 'missing_sections' }, 400, auth.origin, env);
+  }
+  var results = [];
+  for (var j = 0; j < sections.length; j++) {
+    results.push(await resolvePlaceSection(mapsKey, sections[j]));
+  }
+  return jsonResponse({ results: results }, 200, auth.origin, env);
 }
 
 async function handleCoverImage(request, env, auth) {
@@ -330,7 +503,7 @@ export default {
         service: 'soarvibe-api',
         geminiKeyCount: geminiKeys.length,
         geminiRotation: geminiKeys.length > 1,
-        maps: !!env.GOOGLE_MAPS_API_KEY
+        maps: !!(env.GOOGLE_MAPS_SERVER_KEY || env.GOOGLE_MAPS_API_KEY)
       }, 200, origin, env);
     }
 
@@ -345,6 +518,10 @@ export default {
 
     if (url.pathname === '/api/maps-key' && request.method === 'GET') {
       return handleMapsKey(env, auth);
+    }
+
+    if (url.pathname === '/api/places/resolve' && request.method === 'POST') {
+      return handlePlacesResolve(request, env, auth);
     }
 
     if (url.pathname === '/api/cover-image' && request.method === 'GET') {
