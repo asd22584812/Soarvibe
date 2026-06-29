@@ -4,6 +4,7 @@
  */
 
 import { rankPhotos } from './cj-photo-scoring.js';
+import { generateCaption } from './cj-caption.js';
 
 const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta/models/';
 const DEFAULT_MODEL = 'gemini-2.5-flash';
@@ -379,6 +380,35 @@ function validatePlaceMatch(sectionId, place) {
   return true;
 }
 
+function dedupePhotos(photos) {
+  var seen = {};
+  var out = [];
+  (photos || []).forEach(function (photo) {
+    var key = photo && photo.name ? photo.name : '';
+    if (!key || seen[key]) return;
+    seen[key] = true;
+    out.push(photo);
+  });
+  return out;
+}
+
+async function gatherPhotoPool(mapsKey, item, primaryPlace) {
+  var pool = (primaryPlace.photos || []).slice();
+  var photoPlaceName = primaryPlace.displayName && primaryPlace.displayName.text ? primaryPlace.displayName.text : '';
+  var queries = Array.isArray(item.photoQueries) ? item.photoQueries : [];
+  for (var q = 0; q < queries.length; q++) {
+    var altPlaces = await searchGooglePlace(mapsKey, queries[q]);
+    for (var p = 0; p < altPlaces.length; p++) {
+      if (!altPlaces[p].photos || !altPlaces[p].photos.length) continue;
+      pool = pool.concat(altPlaces[p].photos);
+      if (!photoPlaceName && altPlaces[p].displayName && altPlaces[p].displayName.text) {
+        photoPlaceName = altPlaces[p].displayName.text;
+      }
+    }
+  }
+  return { photos: dedupePhotos(pool), photoPlaceName: photoPlaceName };
+}
+
 async function pickScoredPhoto(mapsKey, place, context, excludeUrls) {
   var placeName = place.displayName && place.displayName.text ? place.displayName.text : '';
   var ranked = rankPhotos(place.photos || [], Object.assign({ placeName: placeName }, context || {}));
@@ -386,17 +416,19 @@ async function pickScoredPhoto(mapsKey, place, context, excludeUrls) {
   (excludeUrls || []).forEach(function (u) {
     if (u) exclude[u] = true;
   });
-  for (var r = 0; r < ranked.length && r < 10; r++) {
+  for (var r = 0; r < ranked.length && r < 12; r++) {
     var row = ranked[r];
-    if (row.score < 12) continue;
     if (!row.photo || !row.photo.name) continue;
+    if (!row.gate || !row.gate.ok) continue;
     var url = await resolveGooglePhotoUri(mapsKey, row.photo.name);
     if (url && !exclude[url]) {
       return {
         googlePhotoUrl: url,
         googleAttribution: buildPhotoAttribution(row.photo),
         photoScore: row.score,
-        photoIndex: row.photo._index
+        photoIndex: row.photo._index,
+        matchedKeywords: row.gate.matchedKeywords || [],
+        photoPlaceName: placeName
       };
     }
   }
@@ -444,12 +476,30 @@ async function resolvePlaceSection(mapsKey, item) {
   var placeName = chosen.displayName && chosen.displayName.text ? chosen.displayName.text : null;
   var strictOk = item.placeId ? true : validatePlaceMatch(sectionId, chosen);
   var photoPick = null;
+  var photoCaption = null;
   if (strictOk) {
-    photoPick = await pickScoredPhoto(mapsKey, chosen, {
+    var photoPool = await gatherPhotoPool(mapsKey, item, chosen);
+    var photoContext = {
       role: item.role || (sectionId.indexOf('hero') === 0 ? 'hero' : 'section'),
       sectionType: item.sectionType || 'landmark',
-      placeName: placeName
-    }, item.excludeUrls || []);
+      placeName: photoPool.photoPlaceName || placeName,
+      mapsQuery: mapsQuery,
+      photoMapsQuery: item.photoMapsQuery || null,
+      visualKeywords: Array.isArray(item.visualKeywords) ? item.visualKeywords : []
+    };
+    photoPick = await pickScoredPhoto(mapsKey, { photos: photoPool.photos, displayName: chosen.displayName }, photoContext, item.excludeUrls || []);
+    if (photoPick && photoPick.googlePhotoUrl) {
+      photoCaption = generateCaption({
+        placeName: photoPick.photoPlaceName || placeName,
+        photoPlaceName: photoPick.photoPlaceName || placeName,
+        mapsQuery: mapsQuery,
+        photoMapsQuery: item.photoMapsQuery || null,
+        sectionType: item.sectionType || 'landmark',
+        subject: subject,
+        matchedKeywords: photoPick.matchedKeywords || [],
+        visualKeywords: item.visualKeywords || []
+      });
+    }
   }
   return {
     sectionId: sectionId,
@@ -465,6 +515,8 @@ async function resolvePlaceSection(mapsKey, item) {
     placeName: placeName,
     photoScore: photoPick ? photoPick.photoScore : null,
     photoIndex: photoPick ? photoPick.photoIndex : null,
+    photoCaption: photoCaption,
+    matchedKeywords: photoPick ? photoPick.matchedKeywords : [],
     sectionType: item.sectionType || null,
     role: item.role || null
   };

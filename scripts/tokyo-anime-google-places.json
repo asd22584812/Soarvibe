@@ -6,13 +6,17 @@
     "placeId": "ChIJzdWdgh2MGGARh4kg2pVZL3c",
     "googleRating": null,
     "googleAddress": "Akihabara Electric Town, Tokyo",
-    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZOFWNZmt37VN1egjDly1hNjhFLENGa4dQBG8FJ_qfT6njqO8yvB9h-9XlQBtesiaeP67O5IPSCMi8se2srZ6f-wA85x97YHz0wyuBfAu1hsFKEUfDqJYWqVvsT4UtxWOivmWyfzM1-PLcNPZGyLtC1l7g=s4800-w1600-h1200",
-    "googleAttribution": "Alvin Leow",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZP2Rd9jIXmhZ3q_qGE9JkdVK0YGx8FTj_vbirFQxXdVqT4KM1IhNEGzIfbmzeCYMAeXzwcO3obVpRcPezHw_ASrInqyM5qQuloqkraLrK9WCjQWq5lBL3FWLVg4RLZhVKIwYo9nhdr3mJBkMWGaIT4-vg=s4800-w1376-h768",
+    "googleAttribution": "Cinema Neon Pod / シネマネオンポッド秋葉原（貸し切り映画館）",
     "imageSource": "google_places",
     "matched": true,
     "placeName": "Akihabara Electric Town",
-    "photoScore": 67,
-    "photoIndex": 2,
+    "photoScore": 85,
+    "photoIndex": 40,
+    "photoCaption": "秋葉原電氣街，動漫招牌與霓虹交織的街景。",
+    "matchedKeywords": [
+      "秋葉原"
+    ],
     "sectionType": "landmark",
     "role": "section"
   },
@@ -28,8 +32,13 @@
     "imageSource": "google_places",
     "matched": true,
     "placeName": "中野百老匯",
-    "photoScore": 67,
+    "photoScore": 103,
     "photoIndex": 0,
+    "photoCaption": "中野百老匯樓層內，公仔與復古玩具一字排開。",
+    "matchedKeywords": [
+      "中野百老匯",
+      "Nakano Broadway"
+    ],
     "sectionType": "landmark",
     "role": "section"
   },
@@ -45,8 +54,13 @@
     "imageSource": "google_places",
     "matched": true,
     "placeName": "秋葉原扭蛋會館",
-    "photoScore": 73,
+    "photoScore": 109,
     "photoIndex": 0,
+    "photoCaption": "扭蛋會館內，成排機台形成色彩繽紛的牆面。",
+    "matchedKeywords": [
+      "扭蛋",
+      "GACHAPON"
+    ],
     "sectionType": "shopping",
     "role": "section"
   },
@@ -62,8 +76,14 @@
     "imageSource": "google_places",
     "matched": true,
     "placeName": "Ramen Tanaka soba Akihabara",
-    "photoScore": 77,
+    "photoScore": 131,
     "photoIndex": 1,
+    "photoCaption": "醬油湯頭拉麵，掃街中途最實用的熱湯補給。",
+    "matchedKeywords": [
+      "田中そば",
+      "soba",
+      "ramen"
+    ],
     "sectionType": "food",
     "role": "section"
   },
@@ -79,8 +99,15 @@
     "imageSource": "google_places",
     "matched": true,
     "placeName": "女僕主題咖啡廳 MAID MADE 秋葉原站前店",
-    "photoScore": 73,
+    "photoScore": 145,
     "photoIndex": 0,
+    "photoCaption": "秋葉原主題咖啡廳，甜點與繽紛內裝是視覺主角。",
+    "matchedKeywords": [
+      "女僕",
+      "咖啡",
+      "maid",
+      "主題咖啡"
+    ],
     "sectionType": "cafe",
     "role": "section"
   },
@@ -96,8 +123,13 @@
     "imageSource": "google_places",
     "matched": true,
     "placeName": "Akihabara Washington Hotel",
-    "photoScore": 75,
+    "photoScore": 111,
     "photoIndex": 0,
+    "photoCaption": "秋葉原華盛頓飯店外觀，距車站步行約一分鐘。",
+    "matchedKeywords": [
+      "秋葉原",
+      "Washington Hotel"
+    ],
     "sectionType": "hotel",
     "role": "section"
   },
@@ -113,8 +145,13 @@
     "imageSource": "google_places",
     "matched": true,
     "placeName": "客棧 Nui. Hostel & Bar Lounge",
-    "photoScore": 71,
+    "photoScore": 107,
     "photoIndex": 0,
+    "photoCaption": "淺草橋青年旅館，公共吧台夜間仍保有旅人交誼的溫度。",
+    "matchedKeywords": [
+      "hostel",
+      "Nui"
+    ],
     "sectionType": "hostel",
     "role": "section"
   },
@@ -130,8 +167,13 @@
     "imageSource": "google_places",
     "matched": true,
     "placeName": "秋葉原無線電會館",
-    "photoScore": 138,
+    "photoScore": 174,
     "photoIndex": 1,
+    "photoCaption": "Radio Kaikan 外觀，是秋葉原最具代表性的模型大樓。",
+    "matchedKeywords": [
+      "Radio Kaikan",
+      "秋葉原"
+    ],
     "sectionType": "landmark",
     "role": "hero"
   }

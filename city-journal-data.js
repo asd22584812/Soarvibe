@@ -56,6 +56,7 @@
                 coverImageKey: 'tokyo-anime-cover',
                 heroSubject: '秋葉原電氣街',
                 heroMapsQuery: 'Radio Kaikan Akihabara Tokyo',
+                heroVisualKeywords: ['Radio Kaikan', 'Animate', '秋葉原', '霓虹', '中央通', '動漫', '電氣街'],
                 heroPlaceId: 'ChIJ__-AdayOGGAR6EGPwvcpzTA',
                 heroGooglePhotoUrl: 'https://lh3.googleusercontent.com/place-photos/AJRVUZPyMqYt48AlW5AkRwxgZ2eUX7mDX-3KcPNXK3YHDDBgnddWa6eabfz5Z1YUMAIahJTK5XYXKS_hmiCP2dyfpuRmcewSUTRBpr82pMIdljzEoBT4VcL44qfiJJcokcbrYHHG0A9yoRH2ADobTbMSU8mEUg=s4800-w1600-h1200',
                 heroGoogleAttribution: 'Giampaolo Mancinelli',
@@ -72,16 +73,17 @@
                     {
                         sectionId: 'akihabara',
                         sectionType: 'landmark',
+                        visualKeywords: ['動漫', '霓虹', 'Animate', 'Radio Kaikan', '中央通', '招牌', '秋葉原', '電氣街'],
                         subject: '秋葉原電氣街',
                         mapsQuery: 'Akihabara Electric Town Tokyo Japan',
                         placeId: 'ChIJzdWdgh2MGGARh4kg2pVZL3c',
                         googleRating: null,
                         googleAddress: 'Akihabara Electric Town, Tokyo',
-                        googlePhotoUrl: 'https://lh3.googleusercontent.com/place-photos/AJRVUZOFWNZmt37VN1egjDly1hNjhFLENGa4dQBG8FJ_qfT6njqO8yvB9h-9XlQBtesiaeP67O5IPSCMi8se2srZ6f-wA85x97YHz0wyuBfAu1hsFKEUfDqJYWqVvsT4UtxWOivmWyfzM1-PLcNPZGyLtC1l7g=s4800-w1600-h1200',
-                        googleAttribution: 'Alvin Leow',
+                        googlePhotoUrl: 'https://lh3.googleusercontent.com/place-photos/AJRVUZP2Rd9jIXmhZ3q_qGE9JkdVK0YGx8FTj_vbirFQxXdVqT4KM1IhNEGzIfbmzeCYMAeXzwcO3obVpRcPezHw_ASrInqyM5qQuloqkraLrK9WCjQWq5lBL3FWLVg4RLZhVKIwYo9nhdr3mJBkMWGaIT4-vg=s4800-w1376-h768',
+                        googleAttribution: 'Cinema Neon Pod / シネマネオンポッド秋葉原（貸し切り映画館）',
                         imageSource: 'google_places',
                         imageKey: 'tokyo-section-akihabara',
-                        caption: '秋葉原電氣街，動漫招牌與霓虹交織。',
+                        caption: '秋葉原電氣街，動漫招牌與霓虹交織的街景。',
                         heading: '秋葉原電氣街 · 動漫朝聖的起點',
                         content: '從 JR 秋葉原站電氣街口走進去，視線很難不被櫥窗裡的模型與海報吸走。這裡不是單一景點，而是一整片可以迷路的地方：連鎖動漫店、卡牌專賣、地下樓層的復古遊戲機，每一轉角都可能是下一個驚喜。上午的人潮還算可控，先把最想逛的兩三間店鎖定，比漫無目的亂鑽更能保留體力。傍晚霓虹亮起，電氣街才真正進入它的主場。',
                         editorialMeta: [
@@ -94,6 +96,7 @@
                     {
                         sectionId: 'nakano',
                         sectionType: 'landmark',
+                        visualKeywords: ['中野百老匯', 'Nakano Broadway', '公仔', '模型', '復古玩具', '漫畫'],
                         subject: '中野百老匯',
                         mapsQuery: 'Nakano Broadway Tokyo Japan',
                         placeId: 'ChIJg-7dspDyGGARvvDv4E5-tuE',
@@ -103,7 +106,7 @@
                         googleAttribution: '加藤展康',
                         imageSource: 'google_places',
                         imageKey: 'tokyo-section-nakano',
-                        caption: '中野百老匯樓層內，公仔櫃位一字排開。',
+                        caption: '中野百老匯樓層內，公仔與復古玩具一字排開。',
                         heading: '中野百老匯 · 老玩家公認的挖寶聖地',
                         content: '老玩家口耳相傳的挖寶聖地。樓層裡擠滿漫畫、公仔、卡牌與復古玩具，價格常有意外驚喜。下午光線較暖，邊逛邊比價剛好；預留兩小時以上，才對得起這座寶庫。',
                         editorialMeta: [
@@ -116,6 +119,7 @@
                     {
                         sectionId: 'gachapon',
                         sectionType: 'shopping',
+                        visualKeywords: ['扭蛋', 'GACHAPON', '轉蛋', '機台', 'capsule'],
                         subject: 'GACHAPON 扭蛋會館',
                         mapsQuery: 'Gachapon Kaikan Akihabara Tokyo',
                         placeId: 'ChIJBztW3x2MGGARadHYl5vTEK0',
@@ -125,7 +129,7 @@
                         googleAttribution: 'ブラウンチョコ',
                         imageSource: 'google_places',
                         imageKey: 'tokyo-section-gachapon',
-                        caption: '扭蛋會館內，成排機台形成色彩牆。',
+                        caption: '扭蛋會館內，成排機台形成色彩繽紛的牆面。',
                         heading: 'GACHAPON 扭蛋會館 · 整面牆都是驚喜',
                         content: '整面牆的扭蛋機，轉一圈就可能入坑。先設定預算上限，再開始試手氣——這是過來人的溫柔提醒。',
                         editorialMeta: [
@@ -138,6 +142,7 @@
                     {
                         sectionId: 'ichiran',
                         sectionType: 'food',
+                        visualKeywords: ['拉麵', '醬油', '湯頭', '田中そば', 'soba', 'ramen'],
                         subject: '田中そば店 秋葉原店',
                         mapsQuery: '田中そば店 秋葉原店',
                         placeId: 'ChIJXTeLYx6MGGARNivhJ55nYVw',
@@ -147,7 +152,7 @@
                         googleAttribution: '田中そば店 秋葉原店',
                         imageSource: 'google_places',
                         imageKey: 'tokyo-section-ichiran',
-                        caption: '醬油湯頭拉麵，掃街中途的熱湯時刻。',
+                        caption: '醬油湯頭拉麵，掃街中途最實用的熱湯補給。',
                         heading: '田中そば店 秋葉原店 · 掃街中途的熱湯補給',
                         content: '醬油湯頭、出餐快，午餐控制在三十分鐘內剛好。尖峰時段先排隊，再回周邊繼續逛。',
                         editorialMeta: [
@@ -159,6 +164,7 @@
                     {
                         sectionId: 'maid-cafe',
                         sectionType: 'cafe',
+                        visualKeywords: ['女僕', '咖啡', '甜點', 'maid', '主題咖啡'],
                         subject: '女僕咖啡廳 秋葉原',
                         mapsQuery: 'Maid Cafe Akihabara Tokyo',
                         placeId: 'ChIJvQtxBAaNGGARTiTMJ-Nzhvc',
@@ -168,7 +174,7 @@
                         googleAttribution: 'MAID MADE 秋葉原駅前店',
                         imageSource: 'google_places',
                         imageKey: 'tokyo-section-maid-cafe',
-                        caption: '秋葉原主題咖啡廳，甜點與色彩是主角。',
+                        caption: '秋葉原主題咖啡廳，甜點與繽紛內裝是視覺主角。',
                         heading: '秋葉原女僕咖啡廳街 · 次文化體驗的一杯咖啡',
                         content: '第一次體驗，選評價穩定、規則說明清楚的分店。把時間控制在六十分鐘內，留體力給下一間店。',
                         editorialMeta: [
@@ -180,6 +186,7 @@
                     {
                         sectionId: 'nui-hostel',
                         sectionType: 'hostel',
+                        visualKeywords: ['hostel', '旅館', '吧台', '交誼廳', 'Nui'],
                         subject: 'Nui Hostel Tokyo',
                         mapsQuery: 'Nui Hostel & Bar Tokyo',
                         placeId: 'ChIJ4U-9KsiOGGARARhaBLZLqS0',
@@ -189,7 +196,7 @@
                         googleAttribution: 'Nui. HOSTEL & BAR LOUNGE',
                         imageSource: 'google_places',
                         imageKey: 'tokyo-section-nui-hostel',
-                        caption: '淺草橋青年旅館，公共吧台夜間仍熱鬧。',
+                        caption: '淺草橋青年旅館，公共吧台夜間仍保有旅人交誼的溫度。',
                         heading: 'Nui Hostel Tokyo · 淺草橋的設計旅宿',
                         content: '離電氣街稍遠，搭 JR 往返仍方便。公共吧台與交誼廳氣氛輕鬆，獨旅或預算控管都合適。週末床位記得提早訂。',
                         editorialMeta: [
@@ -201,6 +208,7 @@
                     {
                         sectionId: 'hotel-gracery',
                         sectionType: 'hotel',
+                        visualKeywords: ['飯店', '外觀', '秋葉原', '華盛頓', 'Washington Hotel'],
                         subject: '秋葉原ワシントンホテル',
                         mapsQuery: 'Akihabara Washington Hotel Tokyo',
                         placeId: 'ChIJnxZoFqiOGGAReYJ1ck2lXiw',

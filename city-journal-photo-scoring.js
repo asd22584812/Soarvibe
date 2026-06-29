@@ -6,7 +6,7 @@
     var BAD_FOOD = /bathroom|toilet|restroom|washroom|洗手|廁所|空桌|empty table|counter only/i;
     var BAD_HOTEL = /parking|garage|elevator|corridor|hallway|駐車|走廊|電梯/i;
     var BAD_LANDMARK = /close.?up|column|pillar|wall only|近拍|柱子|牆壁/i;
-
+    var BAD_GENERIC = /plain|generic|empty street|sidewalk only|普通人行|一般街道/i;
     var HERO_LANDMARK = /radio kaikan|animate|gigo|central|electric town|秋葉原|akihabara|電氣|中央通|扭蛋|gachapon|broadway|中野/i;
 
     function photoAttrText(photo) {
@@ -23,17 +23,44 @@
         return w / h;
     }
 
+    function escapeRegExp(str) {
+        return String(str).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    function matchVisualKeywords(blob, keywords) {
+        var matched = [];
+        (keywords || []).forEach(function (kw) {
+            if (!kw) return;
+            try {
+                if (new RegExp(escapeRegExp(kw), 'i').test(blob)) matched.push(kw);
+            } catch (e) { /* skip */ }
+        });
+        return matched;
+    }
+
     function scorePhoto(photo, context) {
         var score = 50;
         var ratio = photoRatio(photo);
         var attr = photoAttrText(photo).toLowerCase();
         var place = String(context.placeName || '').toLowerCase();
-        var blob = (attr + ' ' + place).toLowerCase();
+        var query = String(context.mapsQuery || context.photoMapsQuery || '').toLowerCase();
+        var blob = (attr + ' ' + place + ' ' + query).toLowerCase();
         var role = context.role || 'section';
         var sectionType = context.sectionType || 'landmark';
         var idx = typeof photo._index === 'number' ? photo._index : 0;
+        var keywords = context.visualKeywords || [];
+        var matchedKeywords = matchVisualKeywords(blob, keywords);
 
         if (BAD_GLOBAL.test(blob)) score -= 80;
+        if (BAD_GENERIC.test(blob)) score -= 30;
+        score += matchedKeywords.length * 18;
+
+        if (keywords.length >= 2 && matchedKeywords.length === 0) {
+            score -= 22;
+            if (/neon|霓虹|招牌|animate|radio|central|中央通|扭蛋|動漫/.test(keywords.join(' '))) {
+                if (!HERO_LANDMARK.test(blob) && !matchedKeywords.length) score -= 15;
+            }
+        }
 
         if (role === 'hero') {
             if (HERO_LANDMARK.test(blob)) score += 35;
@@ -77,41 +104,38 @@
         return score;
     }
 
+    function photoContentGate(photo, context) {
+        var attr = photoAttrText(photo).toLowerCase();
+        var place = String(context.placeName || '').toLowerCase();
+        var query = String(context.mapsQuery || context.photoMapsQuery || '').toLowerCase();
+        var blob = attr + ' ' + place + ' ' + query;
+        var keywords = context.visualKeywords || [];
+        var matchedKeywords = matchVisualKeywords(blob, keywords);
+        var score = scorePhoto(photo, context);
+        var role = context.role || 'section';
+        var minScore = role === 'hero' ? 72 : 58;
+        var needsKeyword = keywords.length >= 2;
+        var keywordOk = !needsKeyword || matchedKeywords.length > 0 || HERO_LANDMARK.test(blob) || score >= minScore + 18;
+        var ok = score >= minScore && keywordOk && !BAD_GLOBAL.test(blob);
+
+        return { ok: ok, score: score, matchedKeywords: matchedKeywords, blob: blob };
+    }
+
     function rankPhotos(photos, context) {
         return (photos || []).map(function (photo, index) {
             var copy = Object.assign({}, photo, { _index: index });
-            return { photo: copy, score: scorePhoto(copy, context) };
+            var gate = photoContentGate(copy, context);
+            return { photo: copy, score: gate.score, gate: gate };
         }).sort(function (a, b) {
             return b.score - a.score;
         });
     }
 
-    function pickBestPhotoUrl(ranked, resolveUri, excludeUrls) {
-        var used = {};
-        (excludeUrls || []).forEach(function (u) {
-            if (u) used[u] = true;
-        });
-        var chain = ranked.reduce(function (acc, row) {
-            return acc.then(function (found) {
-                if (found) return found;
-                return resolveUri(row.photo).then(function (url) {
-                    if (!url || used[url]) return null;
-                    return {
-                        url: url,
-                        attribution: photoAttrText(row.photo) || 'Google Maps',
-                        score: row.score,
-                        photoIndex: row.photo._index
-                    };
-                });
-            });
-        }, Promise.resolve(null));
-        return chain;
-    }
-
     global.SOARVIBE_CJ_PHOTO_SCORING = {
         scorePhoto: scorePhoto,
         rankPhotos: rankPhotos,
-        pickBestPhotoUrl: pickBestPhotoUrl,
+        photoContentGate: photoContentGate,
+        matchVisualKeywords: matchVisualKeywords,
         photoAttrText: photoAttrText
     };
 })(typeof window !== 'undefined' ? window : this);

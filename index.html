@@ -675,8 +675,17 @@
             font-weight: 900;
             color: #37474F;
             line-height: 1.45;
-            margin: 1.15rem 0 0.85rem;
+            margin: 0 0 0.85rem;
             letter-spacing: 0.01em;
+        }
+        #cityJournal .cj-magazine-section .cj-editorial-meta {
+            margin: 0 0 1rem;
+        }
+        #cityJournal .cj-magazine-section .cj-section-content {
+            margin-bottom: 0;
+        }
+        #cityJournal .cj-magazine-section .cj-figure {
+            margin: 1.75rem 0 0;
         }
         #cityJournal .cj-section-content {
             font-size: 0.94rem;
@@ -845,7 +854,8 @@
             color: #607D8B;
         }
         #cityJournal .cj-cta-wrap {
-            padding: 0 1.25rem 1rem;
+            margin-top: 3.5rem;
+            padding: 0 1.25rem 1.5rem;
         }
         #cityJournal .cj-cta-btn {
             width: 100%;
@@ -3171,6 +3181,7 @@
     <script src="./city-journal-image-manifest.js"></script>
     <script src="./city-journal-photo-scoring.js"></script>
     <script src="./city-journal-image-library.js"></script>
+    <script src="./city-journal-caption.js"></script>
     <script src="./city-journal-data.js"></script>
     <script>
         (function () {
@@ -3955,7 +3966,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
-            const SOARVIBE_APP_BUILD = 'v108';
+            const SOARVIBE_APP_BUILD = 'v109';
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
@@ -14902,16 +14913,31 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 );
             }
 
+            function resolveSectionCaption(section, imageInfo) {
+                if (section.caption) return section.caption;
+                var capApi = window.SOARVIBE_CJ_CAPTION;
+                if (capApi && typeof capApi.generateCaption === 'function') {
+                    return capApi.generateCaption({
+                        placeName: section.subject,
+                        mapsQuery: section.mapsQuery,
+                        sectionType: section.sectionType,
+                        matchedKeywords: section.visualKeywords || []
+                    });
+                }
+                return '';
+            }
+
             function renderMagazineSection(section, article, heroUrl) {
                 if (!section) return '';
                 var imageInfo = resolveSectionImage(section, article, heroUrl);
+                var caption = resolveSectionCaption(section, imageInfo);
                 console.log('[CJ SECTION IMAGE]', section.sectionId, imageInfo.source, imageInfo.url);
                 return (
                     '<article class="cj-magazine-section">' +
-                    cjFigureBlock(imageInfo, section.caption || '') +
                     (section.heading ? '<h3 class="cj-section-heading">' + escapeHtml(section.heading) + '</h3>' : '') +
                     renderEditorialMetaHtml(section.editorialMeta) +
                     (section.content ? '<p class="cj-section-content">' + escapeHtml(section.content) + '</p>' : '') +
+                    cjFigureBlock(imageInfo, caption) +
                     '</article>'
                 );
             }
