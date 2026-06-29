@@ -3,6 +3,8 @@
  * 支援多把 Gemini 金鑰自動輪替 + Google Maps 金鑰發放
  */
 
+import { rankPhotos } from './cj-photo-scoring.js';
+
 const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta/models/';
 const DEFAULT_MODEL = 'gemini-2.5-flash';
 const CORS_HEADERS = {
@@ -332,7 +334,7 @@ async function getGooglePlaceById(mapsKey, placeId) {
   var response = await googlePlacesFetch(mapsKey, 'https://places.googleapis.com/v1/places/' + encodeURIComponent(id), {
     method: 'GET',
     headers: {
-      'X-Goog-FieldMask': 'id,displayName,formattedAddress,rating,photos,photos.authorAttributions'
+      'X-Goog-FieldMask': 'id,displayName,formattedAddress,rating,photos,photos.authorAttributions,photos.widthPx,photos.heightPx'
     }
   });
   if (!response.ok) return null;
@@ -344,7 +346,7 @@ async function searchGooglePlace(mapsKey, mapsQuery) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.rating,places.photos,places.photos.authorAttributions'
+      'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.rating,places.photos,places.photos.authorAttributions,places.photos.widthPx,places.photos.heightPx'
     },
     body: JSON.stringify({
       textQuery: mapsQuery,
@@ -366,6 +368,7 @@ function validatePlaceMatch(sectionId, place) {
   var addr = place && place.formattedAddress ? place.formattedAddress : '';
   var blob = (name + ' ' + addr).toLowerCase();
   var badHotel = /resort|pool|beach|island|spa resort|villa/.test(blob);
+  if (sectionId === 'hero-anime') return /radio|kaikan|animate|gigo|akihabara|秋葉原|central|電氣|electric/.test(blob);
   if (sectionId === 'akihabara') return /akihabara|秋葉原|electric town/.test(blob);
   if (sectionId === 'nakano') return /nakano|中野|broadway/.test(blob);
   if (sectionId === 'gachapon') return /gachapon|gashapon|capsule|扭蛋|ガチャ/.test(blob);
@@ -374,6 +377,30 @@ function validatePlaceMatch(sectionId, place) {
   if (sectionId === 'hotel-gracery') return /washington|ワシントン|華盛頓|hotel|ホテル/.test(blob) && /akihabara|秋葉原|佐久間|sakuma|千代田|sotokanda|kanda/.test(blob) && !/asakusa|浅草|kaminarimon|雷門|新宿|shinjuku|gracery|グレイスリー/.test(blob) && !badHotel;
   if (sectionId === 'nui-hostel') return /nui|hostel|ゲストハウス/.test(blob) && !badHotel;
   return true;
+}
+
+async function pickScoredPhoto(mapsKey, place, context, excludeUrls) {
+  var placeName = place.displayName && place.displayName.text ? place.displayName.text : '';
+  var ranked = rankPhotos(place.photos || [], Object.assign({ placeName: placeName }, context || {}));
+  var exclude = {};
+  (excludeUrls || []).forEach(function (u) {
+    if (u) exclude[u] = true;
+  });
+  for (var r = 0; r < ranked.length && r < 10; r++) {
+    var row = ranked[r];
+    if (row.score < 12) continue;
+    if (!row.photo || !row.photo.name) continue;
+    var url = await resolveGooglePhotoUri(mapsKey, row.photo.name);
+    if (url && !exclude[url]) {
+      return {
+        googlePhotoUrl: url,
+        googleAttribution: buildPhotoAttribution(row.photo),
+        photoScore: row.score,
+        photoIndex: row.photo._index
+      };
+    }
+  }
+  return null;
 }
 
 async function resolvePlaceSection(mapsKey, item) {
@@ -414,12 +441,15 @@ async function resolvePlaceSection(mapsKey, item) {
     };
   }
   var placeId = placeIdFromResource(chosen.id || chosen.name);
-  var photo = chosen.photos && chosen.photos[0] ? chosen.photos[0] : null;
-  var googlePhotoUrl = null;
-  var googleAttribution = photo ? buildPhotoAttribution(photo) : null;
+  var placeName = chosen.displayName && chosen.displayName.text ? chosen.displayName.text : null;
   var strictOk = item.placeId ? true : validatePlaceMatch(sectionId, chosen);
-  if (photo && photo.name && strictOk) {
-    googlePhotoUrl = await resolveGooglePhotoUri(mapsKey, photo.name);
+  var photoPick = null;
+  if (strictOk) {
+    photoPick = await pickScoredPhoto(mapsKey, chosen, {
+      role: item.role || (sectionId.indexOf('hero') === 0 ? 'hero' : 'section'),
+      sectionType: item.sectionType || 'landmark',
+      placeName: placeName
+    }, item.excludeUrls || []);
   }
   return {
     sectionId: sectionId,
@@ -428,11 +458,15 @@ async function resolvePlaceSection(mapsKey, item) {
     placeId: placeId,
     googleRating: chosen.rating != null ? chosen.rating : null,
     googleAddress: chosen.formattedAddress || null,
-    googlePhotoUrl: googlePhotoUrl || null,
-    googleAttribution: googleAttribution,
-    imageSource: googlePhotoUrl ? 'google_places' : null,
-    matched: !!(googlePhotoUrl && strictOk),
-    placeName: chosen.displayName && chosen.displayName.text ? chosen.displayName.text : null
+    googlePhotoUrl: photoPick ? photoPick.googlePhotoUrl : null,
+    googleAttribution: photoPick ? photoPick.googleAttribution : null,
+    imageSource: photoPick && photoPick.googlePhotoUrl ? 'google_places' : null,
+    matched: !!(photoPick && photoPick.googlePhotoUrl && strictOk),
+    placeName: placeName,
+    photoScore: photoPick ? photoPick.photoScore : null,
+    photoIndex: photoPick ? photoPick.photoIndex : null,
+    sectionType: item.sectionType || null,
+    role: item.role || null
   };
   } catch (err) {
     return {
@@ -467,10 +501,14 @@ async function handlePlacesResolve(request, env, auth) {
     return jsonResponse({ error: 'missing_sections' }, 400, auth.origin, env);
   }
   var results = [];
+  var excludeUrls = Array.isArray(body.excludeUrls) ? body.excludeUrls.slice() : [];
   for (var j = 0; j < sections.length; j++) {
-    results.push(await resolvePlaceSection(mapsKey, sections[j]));
+    var item = Object.assign({}, sections[j], { excludeUrls: excludeUrls });
+    var row = await resolvePlaceSection(mapsKey, item);
+    results.push(row);
+    if (row.googlePhotoUrl) excludeUrls.push(row.googlePhotoUrl);
   }
-  return jsonResponse({ results: results }, 200, auth.origin, env);
+  return jsonResponse({ results: results, excludeUrls: excludeUrls }, 200, auth.origin, env);
 }
 
 async function handleCoverImage(request, env, auth) {

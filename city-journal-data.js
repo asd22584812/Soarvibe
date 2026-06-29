@@ -55,112 +55,152 @@
                 heroImageKey: 'tokyo-anime-hero',
                 coverImageKey: 'tokyo-anime-cover',
                 heroSubject: '秋葉原電氣街',
-                heroMapsQuery: 'Akihabara Electric Town Tokyo Japan',
-                heroPlaceId: 'ChIJzdWdgh2MGGARh4kg2pVZL3c',
-                heroGooglePhotoUrl: 'https://lh3.googleusercontent.com/place-photos/AJRVUZO-_8kdgYH3Ad4ZXbj2VE5My2BTDK8FiRt44_QFJve-voltAy3AwlCwFlAbxZyo6yXjjgMfg4Kg1I0TFYl0aPOzSgZYRXPoxJyi-Dg2lBxibMtViFdd4iPKkXoWqnsYYS7ji6vqzFqe-wNd03ldz0fy=s4800-w1600-h1200',
-                heroGoogleAttribution: 'Alvin Leow',
+                heroMapsQuery: 'Radio Kaikan Akihabara Tokyo',
+                heroPlaceId: 'ChIJ__-AdayOGGAR6EGPwvcpzTA',
+                heroGooglePhotoUrl: 'https://lh3.googleusercontent.com/place-photos/AJRVUZPyMqYt48AlW5AkRwxgZ2eUX7mDX-3KcPNXK3YHDDBgnddWa6eabfz5Z1YUMAIahJTK5XYXKS_hmiCP2dyfpuRmcewSUTRBpr82pMIdljzEoBT4VcL44qfiJJcokcbrYHHG0A9yoRH2ADobTbMSU8mEUg=s4800-w1600-h1200',
+                heroGoogleAttribution: 'Giampaolo Mancinelli',
                 heroImageSource: 'google_places',
                 coverSubject: '秋葉原電氣街',
                 coverMapsQuery: 'Akihabara Electric Town Tokyo Japan',
-                coverPlaceId: 'ChIJzdWdgh2MGGARh4kg2pVZL3c',
-                coverGooglePhotoUrl: 'https://lh3.googleusercontent.com/place-photos/AJRVUZO-_8kdgYH3Ad4ZXbj2VE5My2BTDK8FiRt44_QFJve-voltAy3AwlCwFlAbxZyo6yXjjgMfg4Kg1I0TFYl0aPOzSgZYRXPoxJyi-Dg2lBxibMtViFdd4iPKkXoWqnsYYS7ji6vqzFqe-wNd03ldz0fy=s4800-w1600-h1200',
-                coverGoogleAttribution: 'Alvin Leow',
+                coverPlaceId: 'ChIJ__-AdayOGGAR6EGPwvcpzTA',
+                coverGooglePhotoUrl: 'https://lh3.googleusercontent.com/place-photos/AJRVUZPyMqYt48AlW5AkRwxgZ2eUX7mDX-3KcPNXK3YHDDBgnddWa6eabfz5Z1YUMAIahJTK5XYXKS_hmiCP2dyfpuRmcewSUTRBpr82pMIdljzEoBT4VcL44qfiJJcokcbrYHHG0A9yoRH2ADobTbMSU8mEUg=s4800-w1600-h1200',
+                coverGoogleAttribution: 'Giampaolo Mancinelli',
                 coverImageSource: 'google_places',
                 issueLabel: '2026 年 6 月號',
-                intro: '東京對動漫迷而言，從來不是「去幾個景點打卡」就能結束的旅程。這座城市把次文化藏進電氣街的霓虹裡、藏進中野百老匯的二手櫃位中，也藏進巷弄轉角那台你以為只是路過的扭蛋機。動漫系東京旅行的核心，不是趕場把清單劃掉，而是以 2 到 3 小時為單位做「塊狀掃街」：先鎖定一番賞現貨與期間限定，再慢慢挖中古公仔、模型與冷門周邊。你不需要成為資深藏家才能玩得盡興——但你需要一份把體力留給真正想逛的店的節奏。',
+                intro: '東京對動漫迷而言，從來不是把景點一個個打卡就能結束的旅行。真正吸引人的，是走進秋葉原的小巷、翻開中野百老匯一間不起眼的小店，在成排模型與漫畫之間，突然遇見那件找了很久的收藏。這座城市的樂趣，不只是買東西，而是在探索的過程中，不斷發現驚喜。',
                 sections: [
                     {
                         sectionId: 'akihabara',
+                        sectionType: 'landmark',
                         subject: '秋葉原電氣街',
                         mapsQuery: 'Akihabara Electric Town Tokyo Japan',
                         placeId: 'ChIJzdWdgh2MGGARh4kg2pVZL3c',
                         googleRating: null,
                         googleAddress: 'Akihabara Electric Town, Tokyo',
-                        googlePhotoUrl: 'https://lh3.googleusercontent.com/place-photos/AJRVUZO-_8kdgYH3Ad4ZXbj2VE5My2BTDK8FiRt44_QFJve-voltAy3AwlCwFlAbxZyo6yXjjgMfg4Kg1I0TFYl0aPOzSgZYRXPoxJyi-Dg2lBxibMtViFdd4iPKkXoWqnsYYS7ji6vqzFqe-wNd03ldz0fy=s4800-w1600-h1200',
+                        googlePhotoUrl: 'https://lh3.googleusercontent.com/place-photos/AJRVUZOFWNZmt37VN1egjDly1hNjhFLENGa4dQBG8FJ_qfT6njqO8yvB9h-9XlQBtesiaeP67O5IPSCMi8se2srZ6f-wA85x97YHz0wyuBfAu1hsFKEUfDqJYWqVvsT4UtxWOivmWyfzM1-PLcNPZGyLtC1l7g=s4800-w1600-h1200',
                         googleAttribution: 'Alvin Leow',
                         imageSource: 'google_places',
                         imageKey: 'tokyo-section-akihabara',
-                        caption: '秋葉原電氣街主幹道，電器行與動漫店櫥窗連成一片。',
+                        caption: '秋葉原電氣街，動漫招牌與霓虹交織。',
                         heading: '秋葉原電氣街 · 動漫朝聖的起點',
-                        content: '東京動漫朝聖的起點。高樓與巷弄交錯，從大型連鎖動漫店到地下卡牌、模型專賣應有盡有。建議從 JR 秋葉原站電氣街口出發，先逛 2 至 3 間主題明確的店，避免在第一眼就被拉進無限迴圈。📍 JR 秋葉原站（電氣街口）・千代田區・秋葉原'
+                        content: '從 JR 秋葉原站電氣街口走進去，視線很難不被櫥窗裡的模型與海報吸走。這裡不是單一景點，而是一整片可以迷路的地方：連鎖動漫店、卡牌專賣、地下樓層的復古遊戲機，每一轉角都可能是下一個驚喜。上午的人潮還算可控，先把最想逛的兩三間店鎖定，比漫無目的亂鑽更能保留體力。傍晚霓虹亮起，電氣街才真正進入它的主場。',
+                        editorialMeta: [
+                            { icon: '⭐', label: '推薦程度', value: '必訪' },
+                            { icon: '⏰', label: '建議停留', value: '2–3 小時' },
+                            { icon: '🚉', label: '最近車站', value: 'JR 秋葉原' },
+                            { icon: '📷', label: '最佳拍攝', value: '傍晚霓虹時分' }
+                        ]
                     },
                     {
                         sectionId: 'nakano',
+                        sectionType: 'landmark',
                         subject: '中野百老匯',
                         mapsQuery: 'Nakano Broadway Tokyo Japan',
                         placeId: 'ChIJg-7dspDyGGARvvDv4E5-tuE',
                         googleRating: 4.2,
                         googleAddress: '5-chōme-52-15 Nakano, Nakano City, Tokyo 164-0001',
-                        googlePhotoUrl: 'https://lh3.googleusercontent.com/place-photos/AJRVUZOlZ4_LVYqQB6QfmfbhOJJkyn70NasmNaSKlqh9i4CHUmXAj19B1ZJVi4in5zIfHIbSxwUSwczIUZ-EwwlH1R7_D2JDu0x0Yo1C0ATEIgln1f0-FF3BrfEHJF6boL-OUUo7cGr4HZJXHff7ing=s4800-w1600-h1200',
+                        googlePhotoUrl: 'https://lh3.googleusercontent.com/place-photos/AJRVUZOBV3tGQC66wLh_pvsFSuwilQMJcxhRGkoDJEaMoEwKOCaLUC20wPzGmevBgajSrcQ7jodwGcL877ec-QeWnFZx05mKOtQv-eF8348TF3LVDnIZSwCqXht3DrhRgkNRlUzX3-1OJUf1iMMC3_Y=s4800-w1600-h1200',
                         googleAttribution: '加藤展康',
                         imageSource: 'google_places',
                         imageKey: 'tokyo-section-nakano',
-                        caption: '中野百老匯樓層內，公仔與漫畫櫃位密集排列的尋寶空間。',
+                        caption: '中野百老匯樓層內，公仔櫃位一字排開。',
                         heading: '中野百老匯 · 老玩家公認的挖寶聖地',
-                        content: '被許多老玩家視為比秋葉原更好挖寶的聖地。多層樓匯集漫畫、公仔、卡牌與復古玩具，價格常有驚喜。適合下午進場，光線較暖，邊逛邊比價，預留至少 2 小時。📍 JR 中野站（北口）・中野区・中野'
+                        content: '老玩家口耳相傳的挖寶聖地。樓層裡擠滿漫畫、公仔、卡牌與復古玩具，價格常有意外驚喜。下午光線較暖，邊逛邊比價剛好；預留兩小時以上，才對得起這座寶庫。',
+                        editorialMeta: [
+                            { icon: '⭐', label: '推薦程度', value: '老玩家必訪' },
+                            { icon: '⏰', label: '建議停留', value: '2 小時以上' },
+                            { icon: '🚉', label: '最近車站', value: 'JR 中野（北口）' },
+                            { icon: '🛍', label: '必挖', value: '中古公仔・卡牌' }
+                        ]
                     },
                     {
                         sectionId: 'gachapon',
+                        sectionType: 'shopping',
                         subject: 'GACHAPON 扭蛋會館',
                         mapsQuery: 'Gachapon Kaikan Akihabara Tokyo',
                         placeId: 'ChIJBztW3x2MGGARadHYl5vTEK0',
                         googleRating: 4,
                         googleAddress: '〒101-0021 Tokyo, Chiyoda City, Sotokanda, 3-chōme−15−５ MNビル 1F',
-                        googlePhotoUrl: 'https://lh3.googleusercontent.com/place-photos/AJRVUZN3lw-sSmkEWz9OTLfx_VUg1Tus4Q81rPkEWRYPNjvdGkf-kQricmDMc6aA_EC0wBJ7d5eqhNInGQk9xYAKVLC-8mugCMu6bI0nP7UWSypT0cHEeFNg4kLfIqeskB3_kf8mJNVAW9e4SEd5eIA=s4800-w1600-h1200',
+                        googlePhotoUrl: 'https://lh3.googleusercontent.com/place-photos/AJRVUZPlQvzONpiVeCAp28cg3VBkHgSJHCaxxP9apCNXKuVhd3KUuiCDfOoWOGGEPWg-GSJAMcy6kp4Qehhl2arH5Cv8rw5TIsT8k-flonNABId5IMHBU5YP8-QrgqGvMwr-GA0bzAI7WJgiUUJTt2A=s4800-w1600-h1200',
                         googleAttribution: 'ブラウンチョコ',
                         imageSource: 'google_places',
                         imageKey: 'tokyo-section-gachapon',
-                        caption: '秋葉原扭蛋會館內，成排膠囊玩具機台組成的色彩牆。',
+                        caption: '扭蛋會館內，成排機台形成色彩牆。',
                         heading: 'GACHAPON 扭蛋會館 · 整面牆都是驚喜',
-                        content: '秋葉原周邊知名的扭蛋專門空間，整面牆的機台適合快速試手氣與收藏入門。建議先設定預算上限，避免不知不覺轉到行李箱爆滿——這是過來人的溫柔提醒。📍 JR 秋葉原站・千代田區・秋葉原'
+                        content: '整面牆的扭蛋機，轉一圈就可能入坑。先設定預算上限，再開始試手氣——這是過來人的溫柔提醒。',
+                        editorialMeta: [
+                            { icon: '⏰', label: '建議停留', value: '20–40 分鐘' },
+                            { icon: '💴', label: '預算', value: '¥300–2,000' },
+                            { icon: '🎁', label: '限定', value: '期間限定扭蛋' },
+                            { icon: '🔥', label: '小 Tips', value: '先逛後轉，避免衝動爆預算' }
+                        ]
                     },
                     {
                         sectionId: 'ichiran',
+                        sectionType: 'food',
                         subject: '田中そば店 秋葉原店',
                         mapsQuery: '田中そば店 秋葉原店',
                         placeId: 'ChIJXTeLYx6MGGARNivhJ55nYVw',
                         googleRating: 4.2,
                         googleAddress: 'Japan, 〒101-0021 Tokyo, Chiyoda City, Sotokanda, 3-chōme−8−３ 第一針谷ビル1Ｆ',
-                        googlePhotoUrl: 'https://lh3.googleusercontent.com/place-photos/AJRVUZMYsqeMfq-2pUSrN2z5RC4XuYyadXAcp_Z4rGIRHXuRI2UeTj8TaYhpqedrvY8WqTvR_4MCn-ALJBnyF7eJnUWsvGfVcveT1C3ONXldESiJ5a8rnc79v3H_imTmX3onCImIKflaGzgs8RgwoQ=s4800-w720-h405',
+                        googlePhotoUrl: 'https://lh3.googleusercontent.com/place-photos/AJRVUZMezYHoQ8zmj1SeJbRdwVoKJikdI6h6Iwll2eujipzB7gW2_xiiYOXz5SCYrI4XKHPI8i1S90iTR8DjXE6f0pzCQIRheRmUV_j9ojTqNF05bp9tL1241O33q8XGHpPsxNp7EHLMouupjk54XEhgwS-Vag=s4800-w1600-h1200',
                         googleAttribution: '田中そば店 秋葉原店',
                         imageSource: 'google_places',
                         imageKey: 'tokyo-section-ichiran',
-                        caption: '秋葉原電氣街步行圈內的醬油拉麵名店，適合掃街中途快速補給。',
+                        caption: '醬油湯頭拉麵，掃街中途的熱湯時刻。',
                         heading: '田中そば店 秋葉原店 · 掃街中途的熱湯補給',
-                        content: '秋葉原掃街到一半最需要熱湯補給的在地選擇。田中そば店以醬油湯頭與快速上菜聞名，適合把午餐控制在 30 至 45 分鐘內。建議避開 12:00–13:30 尖峰，或先排隊再回周邊逛一圈。📍 千代田區外神田・秋葉原電氣街步行圈'
+                        content: '醬油湯頭、出餐快，午餐控制在三十分鐘內剛好。尖峰時段先排隊，再回周邊繼續逛。',
+                        editorialMeta: [
+                            { icon: '🍜', label: '推薦餐點', value: '醬油拉麵' },
+                            { icon: '💴', label: '預算', value: '¥900–1,200' },
+                            { icon: '⏰', label: '建議停留', value: '30–45 分鐘' }
+                        ]
                     },
                     {
                         sectionId: 'maid-cafe',
+                        sectionType: 'cafe',
                         subject: '女僕咖啡廳 秋葉原',
                         mapsQuery: 'Maid Cafe Akihabara Tokyo',
                         placeId: 'ChIJvQtxBAaNGGARTiTMJ-Nzhvc',
                         googleRating: 4.9,
                         googleAddress: '〒101-0021 Tokyo, Chiyoda City, Sotokanda, 1-chōme−15−13 秋葉原 神田B&Vビル 10F',
-                        googlePhotoUrl: 'https://lh3.googleusercontent.com/place-photos/AJRVUZNEWaov5aHNNKnBj0J0Ya6RJD4QHqC2Ph1XQUNxFoqJaWoUB_rYzdOr8X0yM-Uytw9XTvc3eWE5hr4CMx1Y1DppyN6375CmIcKHT72qj-Pq-q8jpKO2T2LxLRx1u8S5BkhbKep7cj-BDQ67NFQ=s4800-w1365-h1200',
+                        googlePhotoUrl: 'https://lh3.googleusercontent.com/place-photos/AJRVUZMV7YbwCcqqGMS3-D5z5SOLl8geMQkJQtYOpZW-rSJ4sjjqv5DEQFWZlpbG5WunzooWgDIx9FJGqiQCVPQ5fI_GsVyO0JylfDDaFNmdvUiJpAyBUlItxrzzdxfhSLdiBRbUwi1H2PxNVkuseEw=s4800-w1365-h1200',
                         googleAttribution: 'MAID MADE 秋葉原駅前店',
                         imageSource: 'google_places',
                         imageKey: 'tokyo-section-maid-cafe',
-                        caption: '秋葉原巷弄內的主題咖啡廳，色彩與甜點是體驗重點。',
+                        caption: '秋葉原主題咖啡廳，甜點與色彩是主角。',
                         heading: '秋葉原女僕咖啡廳街 · 次文化體驗的一杯咖啡',
-                        content: '體驗東京次文化氛圍的經典方式之一。各家風格不同，從經典女僕到主題聯名皆有。若第一次嘗試，選評價穩定、規則說明清楚的分店，把時間控制在 60 分鐘內，留體力給下一間店。'
+                        content: '第一次體驗，選評價穩定、規則說明清楚的分店。把時間控制在六十分鐘內，留體力給下一間店。',
+                        editorialMeta: [
+                            { icon: '⏰', label: '建議停留', value: '45–60 分鐘' },
+                            { icon: '💴', label: '預算', value: '¥1,500–3,000' },
+                            { icon: '🔥', label: '小 Tips', value: '先確認低消與拍照規則' }
+                        ]
                     },
                     {
                         sectionId: 'nui-hostel',
+                        sectionType: 'hostel',
                         subject: 'Nui Hostel Tokyo',
                         mapsQuery: 'Nui Hostel & Bar Tokyo',
                         placeId: 'ChIJ4U-9KsiOGGARARhaBLZLqS0',
                         googleRating: 4.5,
                         googleAddress: '2-chōme-14-13 Kuramae, Taito City, Tokyo 111-0051',
-                        googlePhotoUrl: 'https://lh3.googleusercontent.com/place-photos/AJRVUZMO0KgiICCZV9dyfBhNT-71YuvcPBUsxIq58PyXwooJ0ouqKZ3nwYhN80T7QnlzlTVl52idH_dzoU_IM0q58zuUuZF56bBy3vhud-AqsRJwz-D65T0hyOXXSA1-jXXke-dkgYPDQqubYNWLhw=s4800-w1600-h1200',
+                        googlePhotoUrl: 'https://lh3.googleusercontent.com/place-photos/AJRVUZNCZo0z34QCyfrzNK4XjbnERETKf6UphmSp4csLPzE1l4y8DXHCKE8DkHOst2x9ss8DFbJPbzxvPCWCGfJxDUAXCMYVt_EyQBIK17GhfUy8kbKxbjlX37iT46b_hGe1EsMZ2chkuc01vF3enQ=s4800-w1600-h1200',
                         googleAttribution: 'Nui. HOSTEL & BAR LOUNGE',
                         imageSource: 'google_places',
                         imageKey: 'tokyo-section-nui-hostel',
-                        caption: '淺草橋附近的設計型青年旅館，公共交誼空間適合獨旅與背包客交流。',
+                        caption: '淺草橋青年旅館，公共吧台夜間仍熱鬧。',
                         heading: 'Nui Hostel Tokyo · 淺草橋的設計旅宿',
-                        content: '若想離電氣街稍遠、但仍能輕鬆搭 JR 往返，Nui Hostel 是動漫行程外的務實落腳選擇。公共吧台與交誼廳氣氛輕鬆，適合獨旅或預算控管。建議提早預訂週末床位。'
+                        content: '離電氣街稍遠，搭 JR 往返仍方便。公共吧台與交誼廳氣氛輕鬆，獨旅或預算控管都合適。週末床位記得提早訂。',
+                        editorialMeta: [
+                            { icon: '⭐', label: '推薦程度', value: '預算型首選' },
+                            { icon: '💴', label: '預算', value: '¥3,500–6,000／晚' },
+                            { icon: '🚉', label: '最近車站', value: '淺草橋・蔵前' }
+                        ]
                     },
                     {
                         sectionId: 'hotel-gracery',
+                        sectionType: 'hotel',
                         subject: '秋葉原ワシントンホテル',
                         mapsQuery: 'Akihabara Washington Hotel Tokyo',
                         placeId: 'ChIJnxZoFqiOGGAReYJ1ck2lXiw',
@@ -170,12 +210,17 @@
                         googleAttribution: '秋葉原ワシントンホテル',
                         imageSource: 'google_places',
                         imageKey: 'tokyo-section-hotel-gracery',
-                        caption: 'JR 秋葉原站步行約 1 分鐘的商務飯店，動漫一日掃街的理想落腳處。',
+                        caption: '秋葉原華盛頓飯店外觀，距車站步行約一分鐘。',
                         heading: '秋葉原ワシントンホテル · 步行可達電氣街',
-                        content: 'JR 秋葉原站中央改札口步行約 1 分鐘，是動漫迷把時間留給街上的務實選擇。客房機能完整、交通直覺，適合以秋葉原為基地、再搭山手線一站前往中野挖寶。週末與展期建議提早預訂。'
+                        content: 'JR 秋葉原站中央改札口步行約一分鐘，是把時間留給街上的務實落腳處。以秋葉原為基地、搭山手線一站前往中野，動線直覺。展期與週末記得提早訂房。',
+                        editorialMeta: [
+                            { icon: '⭐', label: '推薦程度', value: '交通首選' },
+                            { icon: '🚉', label: '最近車站', value: 'JR 秋葉原（1 分鐘）' },
+                            { icon: '💴', label: '預算', value: '¥10,000–16,000／晚' }
+                        ]
                     }
                 ],
-                outro: '秋葉原與中野皆在 JR 山手線沿線，動漫一日掃街建議以 Suica 或 Pasmo 為主。成田機場可搭 N\'EX 或 Skyliner 轉山手線至秋葉原；羽田則以京急線轉 JR 最為直覺。兩站僅一站、約 5 分鐘——建議上午秋葉原、下午中野，把體力留給真正想逛的店。帶上空行李箱的一格與行動電源，東京會在你以為已經逛完時，再送出一個驚喜。',
+                outro: '秋葉原與中野都在山手線上，Suica 或 Pasmo 就夠用。上午留給秋葉原，下午轉中野——兩站僅一站、約五分鐘。帶一行李箱的空格與行動電源，東京會在你以為逛完時，再送出一個驚喜。',
                 cta: {
                     buttonText: '用這種風格產生行程',
                     destinationLabel: '東京',

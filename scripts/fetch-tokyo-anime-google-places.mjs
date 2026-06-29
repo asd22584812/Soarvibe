@@ -1,8 +1,6 @@
 /**
- * One-time build: resolve Tokyo Anime Google Places photos via SOARVIBE Worker.
+ * Editorial build: Tokyo Anime Google Places with hero scoring + dedup.
  * Usage: node scripts/fetch-tokyo-anime-google-places.mjs
- *
- * Requires deployed /api/places/resolve on SOARVIBE_API_BASE (default production worker).
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -16,14 +14,23 @@ const OUT_JSON = path.join(__dirname, 'tokyo-anime-google-places.json');
 const API_BASE = String(process.env.SOARVIBE_API_BASE || 'https://soarvibe-api.soarvibe.workers.dev').replace(/\/$/, '');
 const ORIGIN = String(process.env.SOARVIBE_ORIGIN || 'https://asd22584812.github.io');
 
+/** Hero: landmark-first (Radio Kaikan / Animate), NOT generic Electric Town first photo */
+const HERO_QUERY = {
+  sectionId: 'hero-anime',
+  subject: '秋葉原電氣街',
+  mapsQuery: 'Radio Kaikan Akihabara Tokyo',
+  role: 'hero',
+  sectionType: 'landmark'
+};
+
 const SECTION_QUERIES = [
-  { sectionId: 'akihabara', subject: '秋葉原電氣街', mapsQuery: 'Akihabara Electric Town Tokyo Japan' },
-  { sectionId: 'nakano', subject: '中野百老匯', mapsQuery: 'Nakano Broadway Tokyo Japan' },
-  { sectionId: 'gachapon', subject: 'GACHAPON 扭蛋會館', mapsQuery: 'Gachapon Kaikan Akihabara Tokyo' },
-  { sectionId: 'ichiran', subject: '田中そば店 秋葉原店', mapsQuery: '田中そば店 秋葉原店', placeId: 'ChIJXTeLYx6MGGARNivhJ55nYVw' },
-  { sectionId: 'maid-cafe', subject: '女僕咖啡廳 秋葉原', mapsQuery: 'Maid Cafe Akihabara Tokyo' },
-  { sectionId: 'hotel-gracery', subject: '秋葉原ワシントンホテル', mapsQuery: 'Akihabara Washington Hotel Tokyo', placeId: 'ChIJnxZoFqiOGGAReYJ1ck2lXiw' },
-  { sectionId: 'nui-hostel', subject: 'Nui Hostel Tokyo', mapsQuery: 'Nui Hostel & Bar Tokyo' }
+  { sectionId: 'akihabara', subject: '秋葉原電氣街', mapsQuery: 'Akihabara Electric Town Tokyo Japan', sectionType: 'landmark', role: 'section' },
+  { sectionId: 'nakano', subject: '中野百老匯', mapsQuery: 'Nakano Broadway Tokyo Japan', sectionType: 'landmark', role: 'section' },
+  { sectionId: 'gachapon', subject: 'GACHAPON 扭蛋會館', mapsQuery: 'Gachapon Kaikan Akihabara Tokyo', sectionType: 'shopping', role: 'section' },
+  { sectionId: 'ichiran', subject: '田中そば店 秋葉原店', mapsQuery: '田中そば店 秋葉原店', placeId: 'ChIJXTeLYx6MGGARNivhJ55nYVw', sectionType: 'food', role: 'section' },
+  { sectionId: 'maid-cafe', subject: '女僕咖啡廳 秋葉原', mapsQuery: 'Maid Cafe Akihabara Tokyo', sectionType: 'cafe', role: 'section' },
+  { sectionId: 'hotel-gracery', subject: '秋葉原ワシントンホテル', mapsQuery: 'Akihabara Washington Hotel Tokyo', placeId: 'ChIJnxZoFqiOGGAReYJ1ck2lXiw', sectionType: 'hotel', role: 'section' },
+  { sectionId: 'nui-hostel', subject: 'Nui Hostel Tokyo', mapsQuery: 'Nui Hostel & Bar Tokyo', sectionType: 'hostel', role: 'section' }
 ];
 
 function jsString(value) {
@@ -32,53 +39,37 @@ function jsString(value) {
   return "'" + String(value).replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'";
 }
 
-function patchDataJs(results) {
-  let src = fs.readFileSync(DATA_PATH, 'utf8');
-  for (const row of results) {
-    const marker = "sectionId: '" + row.sectionId + "'";
-    const start = src.indexOf(marker);
-    if (start === -1) {
-      console.warn('[SKIP] section not found:', row.sectionId);
-      continue;
-    }
-    const blockEnd = src.indexOf('},', start);
-    if (blockEnd === -1) continue;
-    let block = src.slice(start, blockEnd);
-
-    const fields = [
-      'subject',
-      'mapsQuery',
-      'placeId',
-      'googleRating',
-      'googleAddress',
-      'googlePhotoUrl',
-      'googleAttribution',
-      'imageSource'
-    ];
-    for (const key of fields) {
-      const val = jsString(row[key]);
-      const fieldRe = new RegExp('(\\n\\s*' + key + ':\\s*)(null|\'(?:\\\\.|[^\'])*\')(,)?');
-      if (fieldRe.test(block)) {
-        block = block.replace(fieldRe, function (_match, prefix, _old, suffix) {
-          return prefix + val + (suffix || ',');
-        });
-      } else {
-        block = block.replace(
-          /sectionId:\s*'[^']+',/,
-          function (m) {
-            return m + replacement;
-          }
-        );
-      }
-    }
-    src = src.slice(0, start) + block + src.slice(blockEnd);
-  }
-  fs.writeFileSync(DATA_PATH, src, 'utf8');
+function patchField(src, key, val, withinStart, withinEnd) {
+  const block = src.slice(withinStart, withinEnd);
+  const fieldRe = new RegExp('(\\n\\s*' + key + ':\\s*)(null|\'(?:\\\\.|[^\'])*\')(,)?');
+  if (!fieldRe.test(block)) return src;
+  const next = block.replace(fieldRe, function (_m, prefix, _old, suffix) {
+    return prefix + val + (suffix || ',');
+  });
+  return src.slice(0, withinStart) + next + src.slice(withinEnd);
 }
 
-function patchHeroCoverFromAkihabara(row) {
-  let src = fs.readFileSync(DATA_PATH, 'utf8');
+function patchSectionRow(src, row) {
+  const marker = "sectionId: '" + row.sectionId + "'";
+  const start = src.indexOf(marker);
+  if (start === -1) {
+    console.warn('[SKIP] section not found:', row.sectionId);
+    return src;
+  }
+  const blockEnd = src.indexOf('},', start);
+  if (blockEnd === -1) return src;
+  const fields = ['subject', 'mapsQuery', 'placeId', 'googleRating', 'googleAddress', 'googlePhotoUrl', 'googleAttribution', 'imageSource'];
+  let out = src;
+  for (const key of fields) {
+    out = patchField(out, key, jsString(row[key]), start, blockEnd);
+  }
+  return out;
+}
+
+function patchHeroFields(src, row) {
   const heroFields = {
+    heroSubject: row.subject,
+    heroMapsQuery: row.mapsQuery,
     heroPlaceId: row.placeId,
     heroGooglePhotoUrl: row.googlePhotoUrl,
     heroGoogleAttribution: row.googleAttribution,
@@ -88,51 +79,49 @@ function patchHeroCoverFromAkihabara(row) {
     coverGoogleAttribution: row.googleAttribution,
     coverImageSource: row.imageSource
   };
+  let out = src;
   for (const [key, value] of Object.entries(heroFields)) {
     const val = jsString(value);
-    const fieldRe = new RegExp('\\n\\s*' + key + ':\\s*[^,\\n]+,?');
-    src = src.replace(fieldRe, '\n                ' + key + ': ' + val + ',');
+    const fieldRe = new RegExp('(\\n\\s*' + key + ':\\s*)(null|\'(?:\\\\.|[^\'])*\')(,)?');
+    out = out.replace(fieldRe, function (_m, prefix, _old, suffix) {
+      return prefix + val + (suffix || ',');
+    });
   }
-  fs.writeFileSync(DATA_PATH, src, 'utf8');
+  return out;
+}
+
+async function resolveAll() {
+  const payload = SECTION_QUERIES.concat([HERO_QUERY]);
+  const response = await fetch(API_BASE + '/api/places/resolve', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Origin: ORIGIN },
+    body: JSON.stringify({ sections: payload })
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error('Worker places resolve failed: ' + JSON.stringify(data));
+  return data.results || [];
 }
 
 async function main() {
-  const response = await fetch(API_BASE + '/api/places/resolve', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Origin: ORIGIN
-    },
-    body: JSON.stringify({ sections: SECTION_QUERIES.map(function (item) {
-      var row = {
-        sectionId: item.sectionId,
-        subject: item.subject,
-        mapsQuery: item.mapsQuery
-      };
-      if (item.placeId) row.placeId = item.placeId;
-      return row;
-    }) })
-  });
-  const payload = await response.json();
-  if (!response.ok) {
-    throw new Error('Worker places resolve failed: ' + JSON.stringify(payload));
-  }
-  const results = payload.results || [];
+  const results = await resolveAll();
   fs.writeFileSync(OUT_JSON, JSON.stringify(results, null, 2), 'utf8');
   console.log('[WROTE]', OUT_JSON);
-  for (const row of results) {
-    console.log(
-      row.sectionId,
-      row.matched ? 'OK' : 'PLACEHOLDER',
-      row.placeName || '',
-      row.googlePhotoUrl ? '(photo)' : ''
-    );
+
+  let src = fs.readFileSync(DATA_PATH, 'utf8');
+  const hero = results.find(function (r) { return r.sectionId === 'hero-anime'; });
+  const sections = results.filter(function (r) { return r.sectionId !== 'hero-anime'; });
+
+  for (const row of sections) {
+    console.log(row.sectionId, row.matched ? 'OK' : 'PLACEHOLDER', row.placeName || '', row.photoScore != null ? 'score:' + row.photoScore : '');
+    src = patchSectionRow(src, row);
   }
-  patchDataJs(results);
-  const akihabara = results.find(function (r) { return r.sectionId === 'akihabara'; });
-  if (akihabara && akihabara.googlePhotoUrl) {
-    patchHeroCoverFromAkihabara(akihabara);
+  if (hero && hero.googlePhotoUrl) {
+    console.log('hero-anime OK', hero.placeName, 'score:' + hero.photoScore);
+    src = patchHeroFields(src, hero);
+  } else {
+    console.warn('[HERO] no scored hero photo — keep existing hero or library fallback');
   }
+  fs.writeFileSync(DATA_PATH, src, 'utf8');
   console.log('[PATCHED]', DATA_PATH);
 }
 

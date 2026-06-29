@@ -1,8 +1,10 @@
-const CACHE_NAME = 'soarvibe-v107';
+const CACHE_NAME = 'soarvibe-v108';
 const STATIC_ASSETS = [
   './manifest.json',
   './city-journal-data.js',
   './city-journal-image-manifest.js',
+  './city-journal-photo-scoring.js',
+  './city-journal-image-library.js',
   './assets/city-journal/manifest.json',
   './assets/city-journal/placeholder-city-journal.jpg',
   './cover-photos/vietnam.jpg',
