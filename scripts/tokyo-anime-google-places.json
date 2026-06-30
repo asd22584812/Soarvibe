@@ -11,15 +11,18 @@
     "imageSource": "google_places",
     "matched": true,
     "placeName": "秋葉原電気街",
-    "photoScore": 85,
+    "photoScore": 139,
     "photoIndex": 0,
     "photoCaption": "秋葉原電氣街，動漫招牌與霓虹交織的街景。",
     "matchedKeywords": [
-      "秋葉原"
+      "秋葉原",
+      "Akihabara",
+      "電気",
+      "Electric"
     ],
     "searchUsed": "秋葉原電気街",
     "sectionType": "landmark",
-    "role": "section",
+    "role": null,
     "rejectReason": null
   },
   {
@@ -28,21 +31,23 @@
     "mapsQuery": "Nakano Broadway Tokyo Japan",
     "placeId": "ChIJg-7dspDyGGARvvDv4E5-tuE",
     "googleRating": 4.2,
-    "googleAddress": "5-chōme-52-15 Nakano, Nakano City, Tokyo 164-0001, Japan",
+    "googleAddress": "〒164-0001 東京都中野区中野５丁目５２−１５",
     "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZOBV3tGQC66wLh_pvsFSuwilQMJcxhRGkoDJEaMoEwKOCaLUC20wPzGmevBgajSrcQ7jodwGcL877ec-QeWnFZx05mKOtQv-eF8348TF3LVDnIZSwCqXht3DrhRgkNRlUzX3-1OJUf1iMMC3_Y=s4800-w1600-h1200",
     "googleAttribution": "加藤展康",
     "imageSource": "google_places",
     "matched": true,
-    "placeName": "Nakano Broadway",
-    "photoScore": 85,
+    "placeName": "中野ブロードウェイ",
+    "photoScore": 121,
     "photoIndex": 0,
     "photoCaption": "中野百老匯樓層內，公仔與復古玩具一字排開。",
     "matchedKeywords": [
-      "Nakano Broadway"
+      "中野",
+      "Nakano",
+      "Broadway"
     ],
-    "searchUsed": "placeId:ChIJg-7dspDyGGARvvDv4E5-tuE",
+    "searchUsed": "中野ブロードウェイ",
     "sectionType": "landmark",
-    "role": "section",
+    "role": null,
     "rejectReason": null
   },
   {
@@ -51,21 +56,22 @@
     "mapsQuery": "Gachapon Kaikan Akihabara Tokyo",
     "placeId": "ChIJBztW3x2MGGARadHYl5vTEK0",
     "googleRating": 4,
-    "googleAddress": "Japan, 〒101-0021 Tokyo, Chiyoda City, Sotokanda, 3-chōme−15−５ MNビル 1F",
+    "googleAddress": "〒101-0021 東京都千代田区外神田３丁目１５−５ MNビル 1F",
     "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZPlQvzONpiVeCAp28cg3VBkHgSJHCaxxP9apCNXKuVhd3KUuiCDfOoWOGGEPWg-GSJAMcy6kp4Qehhl2arH5Cv8rw5TIsT8k-flonNABId5IMHBU5YP8-QrgqGvMwr-GA0bzAI7WJgiUUJTt2A=s4800-w1600-h1200",
     "googleAttribution": "ブラウンチョコ",
     "imageSource": "google_places",
     "matched": true,
-    "placeName": "Akihabara Gachapon Hall",
-    "photoScore": 91,
+    "placeName": "秋葉原ガチャポン会館",
+    "photoScore": 109,
     "photoIndex": 0,
     "photoCaption": "扭蛋會館內，成排機台形成色彩繽紛的牆面。",
     "matchedKeywords": [
-      "GACHAPON"
+      "ガチャ",
+      "gachapon"
     ],
-    "searchUsed": "placeId:ChIJBztW3x2MGGARadHYl5vTEK0",
+    "searchUsed": "秋葉原ガチャポン会館",
     "sectionType": "shopping",
-    "role": "section",
+    "role": null,
     "rejectReason": null
   },
   {
@@ -84,13 +90,13 @@
     "photoIndex": 1,
     "photoCaption": "醬油湯頭拉麵，掃街中途最實用的熱湯補給。",
     "matchedKeywords": [
-      "田中そば",
+      "ramen",
       "soba",
-      "ramen"
+      "田中"
     ],
     "searchUsed": "placeId:ChIJXTeLYx6MGGARNivhJ55nYVw",
     "sectionType": "food",
-    "role": "section",
+    "role": null,
     "rejectReason": null
   },
   {
@@ -105,15 +111,17 @@
     "imageSource": "google_places",
     "matched": true,
     "placeName": "Maid Cafe MAID MADE Akihabara Electric Town-exit Store",
-    "photoScore": 91,
+    "photoScore": 127,
     "photoIndex": 0,
     "photoCaption": "秋葉原主題咖啡廳，甜點與繽紛內裝是視覺主角。",
     "matchedKeywords": [
-      "maid"
+      "maid",
+      "cafe",
+      "MAID MADE"
     ],
     "searchUsed": "placeId:ChIJvQtxBAaNGGARTiTMJ-Nzhvc",
     "sectionType": "cafe",
-    "role": "section",
+    "role": null,
     "rejectReason": null
   },
   {
@@ -128,17 +136,19 @@
     "imageSource": "google_places",
     "matched": true,
     "placeName": "Akihabara Washington Hotel",
-    "photoScore": 129,
+    "photoScore": 165,
     "photoIndex": 0,
     "photoCaption": "秋葉原華盛頓飯店外觀，距車站步行約一分鐘。",
     "matchedKeywords": [
-      "秋葉原",
-      "Washington Hotel",
-      "ワシントン"
+      "Washington",
+      "ワシントン",
+      "ホテル",
+      "hotel",
+      "秋葉原"
     ],
     "searchUsed": "placeId:ChIJnxZoFqiOGGAReYJ1ck2lXiw",
     "sectionType": "hotel",
-    "role": "section",
+    "role": null,
     "rejectReason": null
   },
   {
@@ -153,16 +163,19 @@
     "imageSource": "google_places",
     "matched": true,
     "placeName": "Nui. Hostel & Bar Lounge",
-    "photoScore": 107,
+    "photoScore": 161,
     "photoIndex": 0,
     "photoCaption": "淺草橋青年旅館，公共吧台夜間仍保有旅人交誼的溫度。",
     "matchedKeywords": [
+      "Nui",
       "hostel",
-      "Nui"
+      "HOSTEL",
+      "bar",
+      "lounge"
     ],
     "searchUsed": "placeId:ChIJ4U-9KsiOGGARARhaBLZLqS0",
     "sectionType": "hostel",
-    "role": "section",
+    "role": null,
     "rejectReason": null
   },
   {
@@ -177,11 +190,12 @@
     "imageSource": "google_places",
     "matched": true,
     "placeName": "Akihabara Radio Kaikan",
-    "photoScore": 156,
+    "photoScore": 174,
     "photoIndex": 1,
     "photoCaption": "Radio Kaikan 外觀，是秋葉原最具代表性的模型大樓。",
     "matchedKeywords": [
-      "Radio Kaikan"
+      "Radio Kaikan",
+      "Akihabara"
     ],
     "searchUsed": "placeId:ChIJ__-AdayOGGAR6EGPwvcpzTA",
     "sectionType": "landmark",

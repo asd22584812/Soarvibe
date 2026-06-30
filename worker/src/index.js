@@ -6,6 +6,7 @@
 import { rankPhotos } from './cj-photo-scoring.js';
 import { generateCaption } from './cj-caption.js';
 import { resolveOfficialPlace, validatePhotoAttribution, placeDisplayName } from './cj-place-resolve.js';
+import { runEditorialQA } from './cj-editorial-pipeline.js';
 
 const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta/models/';
 const DEFAULT_MODEL = 'gemini-2.5-flash';
@@ -383,7 +384,7 @@ function failedPlaceRow(sectionId, subject, mapsQuery, reason) {
 
 async function pickScoredPhoto(mapsKey, place, context, excludeUrls, item) {
   var placeName = placeDisplayName(place);
-  var ranked = rankPhotos(place.photos || [], Object.assign({ placeName: placeName }, context || {}));
+  var ranked = rankPhotos(place.photos || [], Object.assign({ placeName: placeName }, context || {}), item);
   var exclude = {};
   (excludeUrls || []).forEach(function (u) {
     if (u) exclude[u] = true;
@@ -440,10 +441,15 @@ async function resolvePlaceSection(mapsKey, item) {
       visualKeywords: Array.isArray(item.visualKeywords) ? item.visualKeywords : []
     };
     photoPick = await pickScoredPhoto(mapsKey, chosen, photoContext, item.excludeUrls || [], item);
+    var qa = runEditorialQA(item, photoPick ? Object.assign({}, photoPick, { placeName: placeName }) : null);
+    if (qa.usePlaceholder) {
+      photoPick = null;
+    }
     if (photoPick && photoPick.googlePhotoUrl) {
       photoCaption = generateCaption({
         placeName: placeName,
         photoPlaceName: placeName,
+        sectionId: sectionId,
         mapsQuery: mapsQuery,
         officialName: item.officialName || null,
         officialNameLocal: item.officialNameLocal || null,
@@ -472,7 +478,8 @@ async function resolvePlaceSection(mapsKey, item) {
       searchUsed: resolved.searchUsed || null,
       sectionType: item.sectionType || null,
       role: item.role || null,
-      rejectReason: photoPick ? null : 'no_valid_photo'
+      rejectReason: photoPick ? null : (qa.issues && qa.issues.length ? qa.issues.join(',') : 'no_valid_photo'),
+      editorialQA: qa
     };
   } catch (err) {
     return {

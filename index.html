@@ -3966,7 +3966,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
-            const SOARVIBE_APP_BUILD = 'v110';
+            const SOARVIBE_APP_BUILD = 'v111';
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
@@ -14918,10 +14918,12 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 var capApi = window.SOARVIBE_CJ_CAPTION;
                 if (capApi && typeof capApi.generateCaption === 'function') {
                     return capApi.generateCaption({
+                        sectionId: section.sectionId,
                         placeName: section.subject,
                         mapsQuery: section.mapsQuery,
                         sectionType: section.sectionType,
-                        matchedKeywords: section.visualKeywords || []
+                        officialName: section.officialName,
+                        officialNameLocal: section.officialNameLocal
                     });
                 }
                 return '';

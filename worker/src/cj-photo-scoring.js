@@ -1,3 +1,4 @@
+import { validatePhotoIntentGate, parsePhotoIntent } from './cj-editorial-pipeline.js';
 var BAD_GLOBAL = /tiger|white tiger|zoo|garden|residential|repair shop|garage|pool|beach|villa|白老虎|修車|住宅|花園|泳池/i;
 var BAD_HERO = /lobby|interior|indoor|entrance|door|reception|室内|入口|大廳|電梯|elevator|corridor|走廊|parking|駐車/i;
 var BAD_FOOD = /bathroom|toilet|restroom|washroom|洗手|廁所|空桌|empty table|counter only/i;
@@ -102,32 +103,34 @@ export function scorePhoto(photo, context) {
   return score;
 }
 
-export function photoContentGate(photo, context) {
+export function photoContentGate(photo, context, item) {
   var attr = photoAttrText(photo).toLowerCase();
   var place = String(context.placeName || '').toLowerCase();
-  var query = String(context.mapsQuery || context.photoMapsQuery || '').toLowerCase();
-  var blob = attr + ' ' + place + ' ' + query;
-  var keywords = context.visualKeywords || [];
+  var query = String(context.mapsQuery || '').toLowerCase();
+  var intent = parsePhotoIntent((item && item.photoIntent) || context.photoIntent || '').join(' ');
+  var blob = attr + ' ' + place + ' ' + query + ' ' + intent;
+  var keywords = (context.visualKeywords || []).concat(parsePhotoIntent((item && item.photoIntent) || ''));
   var matchedKeywords = matchVisualKeywords(blob, keywords);
-  var score = scorePhoto(photo, context);
+  var score = scorePhoto(photo, Object.assign({}, context, { visualKeywords: keywords }));
   var role = context.role || 'section';
   var minScore = role === 'hero' ? 72 : 58;
-  var needsKeyword = keywords.length >= 2;
-  var keywordOk = !needsKeyword || matchedKeywords.length > 0 || HERO_LANDMARK.test(blob) || score >= minScore + 18;
-  var ok = score >= minScore && keywordOk && !BAD_GLOBAL.test(blob);
+  var intentGate = validatePhotoIntentGate(blob, item || context, context);
+  var keywordOk = matchedKeywords.length > 0 || HERO_LANDMARK.test(blob) || score >= minScore + 15;
+  var ok = score >= minScore && intentGate.ok && keywordOk && !BAD_GLOBAL.test(blob);
 
   return {
     ok: ok,
     score: score,
-    matchedKeywords: matchedKeywords,
-    blob: blob
+    matchedKeywords: matchedKeywords.concat(intentGate.matchedChecklist || []),
+    blob: blob,
+    rejectReason: intentGate.ok ? null : intentGate.reason
   };
 }
 
-export function rankPhotos(photos, context) {
+export function rankPhotos(photos, context, item) {
   return (photos || []).map(function (photo, index) {
     var copy = Object.assign({}, photo, { _index: index });
-    var gate = photoContentGate(copy, context);
+    var gate = photoContentGate(copy, context, item || context);
     return { photo: copy, score: gate.score, gate: gate };
   }).sort(function (a, b) {
     return b.score - a.score;

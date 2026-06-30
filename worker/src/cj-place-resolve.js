@@ -1,6 +1,8 @@
 /**
- * Strict Google Places resolution — official names first, no fuzzy nearby matches.
+ * Strict Google Places resolution — official names + photoIntent search.
  */
+
+import { buildPhotoSearchSequence } from './cj-editorial-pipeline.js';
 
 function normalizeForMatch(text) {
   return String(text || '').toLowerCase().replace(/[\s　]+/g, '');
@@ -18,19 +20,7 @@ function containsAny(blob, terms) {
 }
 
 export function buildSearchSequence(item) {
-  var seen = {};
-  var out = [];
-  function push(query, lang) {
-    var q = String(query || '').trim();
-    if (!q || seen[q]) return;
-    seen[q] = true;
-    out.push({ query: q, lang: lang || 'ja' });
-  }
-  push(item.officialNameLocal, 'ja');
-  push(item.officialName, 'en');
-  push(item.subject, 'zh-TW');
-  push(item.mapsQuery, 'zh-TW');
-  return out;
+  return buildPhotoSearchSequence(item);
 }
 
 export function placeDisplayName(place) {
@@ -46,7 +36,9 @@ export function placeTypes(place) {
 }
 
 export function nameValidationTerms(item) {
-  return [item.officialNameLocal, item.officialName, item.subject].filter(Boolean);
+  var terms = [item.officialNameLocal, item.officialName, item.subject];
+  if (Array.isArray(item.aliases)) terms = terms.concat(item.aliases);
+  return terms.filter(Boolean);
 }
 
 export function validatePlaceResult(place, item) {
