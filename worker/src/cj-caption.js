@@ -31,6 +31,8 @@ function buildBlob(ctx) {
   return [
     ctx.placeName,
     ctx.photoPlaceName,
+    ctx.officialName,
+    ctx.officialNameLocal,
     ctx.mapsQuery,
     ctx.photoMapsQuery,
     (ctx.matchedKeywords || []).join(' '),

@@ -1,5 +1,5 @@
 /**
- * Editorial build: Tokyo Anime — article-first photo matching + dynamic captions.
+ * Editorial build: Tokyo Anime — strict official-name Places resolution.
  * Usage: node scripts/fetch-tokyo-anime-google-places.mjs
  */
 import fs from 'node:fs';
@@ -14,81 +14,130 @@ const OUT_JSON = path.join(__dirname, 'tokyo-anime-google-places.json');
 const API_BASE = String(process.env.SOARVIBE_API_BASE || 'https://soarvibe-api.soarvibe.workers.dev').replace(/\/$/, '');
 const ORIGIN = String(process.env.SOARVIBE_ORIGIN || 'https://asd22584812.github.io');
 
+const LANDMARK_TYPES = ['tourist_attraction', 'route', 'establishment', 'shopping_district', 'point_of_interest', 'neighborhood', 'locality'];
+const LANDMARK_DENIED = ['lodging', 'movie_theater', 'apartment', 'restaurant', 'cafe', 'bar', 'hostel'];
+const AKIHABARA_ATTR_DENY = ['cinema neon', 'シネマネオン', 'ポッド', 'pod', '映画館', 'movie theater'];
+
 const HERO_QUERY = {
   sectionId: 'hero-anime',
   subject: '秋葉原電氣街',
+  officialName: 'Radio Kaikan',
+  officialNameLocal: 'ラジオ会館',
   mapsQuery: 'Radio Kaikan Akihabara Tokyo',
+  placeId: 'ChIJ__-AdayOGGAR6EGPwvcpzTA',
   role: 'hero',
   sectionType: 'landmark',
-  visualKeywords: ['Radio Kaikan', 'Animate', '秋葉原', '霓虹', '中央通', '動漫', '電氣街'],
-  photoQueries: ['Radio Kaikan Akihabara Tokyo', 'Animate Akihabara Tokyo', 'Akihabara Chuo-dori Tokyo']
+  isSpecificVenue: true,
+  addressHints: ['秋葉原', 'Akihabara', 'Sotokanda'],
+  allowedPlaceTypes: LANDMARK_TYPES.concat(['shopping_mall', 'store']),
+  deniedPlaceTypes: ['lodging', 'movie_theater', 'apartment', 'hostel'],
+  visualKeywords: ['Radio Kaikan', 'ラジオ会館', '秋葉原', '霓虹', '中央通', '動漫']
 };
 
 const SECTION_QUERIES = [
   {
     sectionId: 'akihabara',
     subject: '秋葉原電氣街',
+    officialName: 'Akihabara Electric Town',
+    officialNameLocal: '秋葉原電気街',
     mapsQuery: 'Akihabara Electric Town Tokyo Japan',
+    placeId: 'ChIJzdWdgh2MGGARh4kg2pVZL3c',
     sectionType: 'landmark',
     role: 'section',
-    visualKeywords: ['動漫', '霓虹', 'Animate', 'Radio Kaikan', '中央通', '招牌', '秋葉原', '電氣街'],
-    photoQueries: ['Animate Akihabara Tokyo', 'Radio Kaikan Akihabara Tokyo', 'Akihabara Chuo-dori neon Tokyo']
+    addressHints: ['秋葉原', 'Akihabara', '秋葉原駅', 'Sotokanda', 'Chiyoda'],
+    allowedPlaceTypes: LANDMARK_TYPES,
+    deniedPlaceTypes: LANDMARK_DENIED,
+    deniedAttributionPatterns: AKIHABARA_ATTR_DENY,
+    visualKeywords: ['動漫', '霓虹', 'Animate', 'Radio Kaikan', '中央通', '招牌', '秋葉原', '電氣街']
   },
   {
     sectionId: 'nakano',
     subject: '中野百老匯',
+    officialName: 'Nakano Broadway',
+    officialNameLocal: '中野ブロードウェイ',
     mapsQuery: 'Nakano Broadway Tokyo Japan',
+    placeId: 'ChIJg-7dspDyGGARvvDv4E5-tuE',
     sectionType: 'landmark',
     role: 'section',
-    visualKeywords: ['中野百老匯', 'Nakano Broadway', '公仔', '模型', '復古玩具', '漫畫'],
-    photoQueries: ['Nakano Broadway Tokyo Japan']
+    addressHints: ['中野', 'Nakano', 'Nakano City'],
+    allowedPlaceTypes: LANDMARK_TYPES.concat(['shopping_mall', 'store']),
+    deniedPlaceTypes: LANDMARK_DENIED,
+    visualKeywords: ['中野百老匯', 'Nakano Broadway', '公仔', '模型', '復古玩具', '漫畫']
   },
   {
     sectionId: 'gachapon',
     subject: 'GACHAPON 扭蛋會館',
+    officialName: 'Akihabara Gachapon Hall',
+    officialNameLocal: '秋葉原ガチャポン会館',
     mapsQuery: 'Gachapon Kaikan Akihabara Tokyo',
+    placeId: 'ChIJBztW3x2MGGARadHYl5vTEK0',
     sectionType: 'shopping',
     role: 'section',
-    visualKeywords: ['扭蛋', 'GACHAPON', '轉蛋', '機台', 'capsule'],
-    photoQueries: ['Gachapon Kaikan Akihabara Tokyo']
+    isSpecificVenue: true,
+    addressHints: ['秋葉原', 'Akihabara', 'Sotokanda'],
+    allowedPlaceTypes: ['store', 'shopping_mall', 'point_of_interest', 'establishment'],
+    deniedPlaceTypes: ['lodging', 'movie_theater', 'restaurant', 'cafe'],
+    visualKeywords: ['扭蛋', 'GACHAPON', '轉蛋', '機台', 'capsule', 'ガチャ']
   },
   {
     sectionId: 'ichiran',
     subject: '田中そば店 秋葉原店',
+    officialName: 'Ramen Tanaka Soba Akihabara',
+    officialNameLocal: '田中そば店 秋葉原店',
     mapsQuery: '田中そば店 秋葉原店',
     placeId: 'ChIJXTeLYx6MGGARNivhJ55nYVw',
     sectionType: 'food',
     role: 'section',
-    visualKeywords: ['拉麵', '醬油', '湯頭', '田中そば', 'soba', 'ramen'],
-    photoQueries: ['田中そば店 秋葉原店']
+    isSpecificVenue: true,
+    addressHints: ['秋葉原', 'Akihabara', 'Sotokanda'],
+    allowedPlaceTypes: ['restaurant', 'food', 'meal_takeaway', 'ramen_restaurant', 'establishment'],
+    deniedPlaceTypes: ['lodging', 'movie_theater', 'hostel'],
+    visualKeywords: ['拉麵', '醬油', '湯頭', '田中そば', 'soba', 'ramen']
   },
   {
     sectionId: 'maid-cafe',
     subject: '女僕咖啡廳 秋葉原',
-    mapsQuery: 'Maid Cafe Akihabara Tokyo',
+    officialName: 'MAID MADE Akihabara',
+    officialNameLocal: 'メイドメイド秋葉原駅前店',
+    mapsQuery: 'MAID MADE Akihabara Tokyo',
+    placeId: 'ChIJvQtxBAaNGGARTiTMJ-Nzhvc',
     sectionType: 'cafe',
     role: 'section',
-    visualKeywords: ['女僕', '咖啡', '甜點', 'maid', '主題咖啡'],
-    photoQueries: ['MAID MADE Akihabara Tokyo']
+    isSpecificVenue: true,
+    addressHints: ['秋葉原', 'Akihabara'],
+    allowedPlaceTypes: ['cafe', 'restaurant', 'food', 'establishment', 'point_of_interest'],
+    deniedPlaceTypes: ['lodging', 'movie_theater', 'hostel'],
+    visualKeywords: ['女僕', '咖啡', '甜點', 'maid', '主題咖啡', 'メイド']
   },
   {
     sectionId: 'hotel-gracery',
     subject: '秋葉原ワシントンホテル',
+    officialName: 'Akihabara Washington Hotel',
+    officialNameLocal: '秋葉原ワシントンホテル',
     mapsQuery: 'Akihabara Washington Hotel Tokyo',
     placeId: 'ChIJnxZoFqiOGGAReYJ1ck2lXiw',
     sectionType: 'hotel',
     role: 'section',
-    visualKeywords: ['飯店', '外觀', '秋葉原', '華盛頓', 'Washington Hotel'],
-    photoQueries: ['Akihabara Washington Hotel Tokyo']
+    isSpecificVenue: true,
+    addressHints: ['秋葉原', 'Akihabara', 'Sakumacho'],
+    allowedPlaceTypes: ['lodging', 'hotel', 'establishment'],
+    deniedPlaceTypes: ['movie_theater', 'restaurant', 'cafe'],
+    visualKeywords: ['飯店', '外觀', '秋葉原', '華盛頓', 'Washington Hotel', 'ワシントン']
   },
   {
     sectionId: 'nui-hostel',
     subject: 'Nui Hostel Tokyo',
+    officialName: 'Nui. Hostel & Bar Lounge',
+    officialNameLocal: 'Nui. HOSTEL & BAR LOUNGE',
     mapsQuery: 'Nui Hostel & Bar Tokyo',
+    placeId: 'ChIJ4U-9KsiOGGARARhaBLZLqS0',
     sectionType: 'hostel',
     role: 'section',
-    visualKeywords: ['hostel', '旅館', '吧台', '交誼廳', 'Nui'],
-    photoQueries: ['Nui Hostel Bar Lounge Tokyo']
+    isSpecificVenue: true,
+    addressHints: ['蔵前', 'Kuramae', '淺草橋'],
+    allowedPlaceTypes: ['lodging', 'hostel', 'hotel', 'establishment'],
+    deniedPlaceTypes: ['movie_theater'],
+    visualKeywords: ['hostel', '旅館', '吧台', '交誼廳', 'Nui']
   }
 ];
 
@@ -117,10 +166,15 @@ function patchSectionRow(src, row) {
   }
   const blockEnd = src.indexOf('},', start);
   if (blockEnd === -1) return src;
-  const fields = ['subject', 'mapsQuery', 'placeId', 'googleRating', 'googleAddress', 'googlePhotoUrl', 'googleAttribution', 'imageSource', 'caption'];
+  const fields = ['officialName', 'officialNameLocal', 'subject', 'mapsQuery', 'placeId', 'googleRating', 'googleAddress', 'googlePhotoUrl', 'googleAttribution', 'imageSource', 'caption'];
   let out = src;
   for (const key of fields) {
-    const val = key === 'caption' && row.photoCaption ? jsString(row.photoCaption) : jsString(row[key]);
+    let val;
+    if (key === 'caption' && row.photoCaption) val = jsString(row.photoCaption);
+    else if (key === 'googlePhotoUrl' && !row.googlePhotoUrl) val = 'null';
+    else if (key === 'googleAttribution' && !row.googleAttribution) val = 'null';
+    else if (key === 'imageSource' && !row.imageSource) val = 'null';
+    else val = jsString(row[key]);
     out = patchField(out, key, val, start, blockEnd);
   }
   return out;
@@ -129,6 +183,8 @@ function patchSectionRow(src, row) {
 function patchHeroFields(src, row) {
   const heroFields = {
     heroSubject: row.subject,
+    heroOfficialName: row.officialName,
+    heroOfficialNameLocal: row.officialNameLocal,
     heroMapsQuery: row.mapsQuery,
     heroPlaceId: row.placeId,
     heroGooglePhotoUrl: row.googlePhotoUrl,
@@ -143,6 +199,7 @@ function patchHeroFields(src, row) {
   for (const [key, value] of Object.entries(heroFields)) {
     const val = jsString(value);
     const fieldRe = new RegExp('(\\n\\s*' + key + ':\\s*)(null|\'(?:\\\\.|[^\'])*\')(,)?');
+    if (!fieldRe.test(out)) continue;
     out = out.replace(fieldRe, function (_m, prefix, _old, suffix) {
       return prefix + val + (suffix || ',');
     });
@@ -172,15 +229,14 @@ async function main() {
   const sections = results.filter(function (r) { return r.sectionId !== 'hero-anime'; });
 
   for (const row of sections) {
-    const cap = row.photoCaption ? ' caption:' + row.photoCaption.slice(0, 28) + '…' : '';
-    console.log(row.sectionId, row.matched ? 'OK' : 'PLACEHOLDER', row.placeName || '', row.photoScore != null ? 'score:' + row.photoScore : '', cap);
+    const attr = row.googleAttribution ? ' attr:' + row.googleAttribution.slice(0, 24) : '';
+    const cap = row.photoCaption ? ' caption:' + row.photoCaption.slice(0, 24) + '…' : '';
+  console.log(row.sectionId, row.matched ? 'OK' : 'PLACEHOLDER', row.placeName || '', row.searchUsed || '', row.rejectReason || '', attr, cap);
     src = patchSectionRow(src, row);
   }
-  if (hero && hero.googlePhotoUrl) {
-    console.log('hero-anime OK', hero.placeName, 'score:' + hero.photoScore);
+  if (hero) {
+    console.log('hero-anime', hero.matched ? 'OK' : 'PLACEHOLDER', hero.placeName, hero.searchUsed || '', hero.rejectReason || '');
     src = patchHeroFields(src, hero);
-  } else {
-    console.warn('[HERO] no scored hero photo — keep existing hero or library fallback');
   }
   fs.writeFileSync(DATA_PATH, src, 'utf8');
   console.log('[PATCHED]', DATA_PATH);
