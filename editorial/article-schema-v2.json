@@ -1,0 +1,69 @@
+{
+  "$schema": "City Journal Editorial — generic article template (rule-based pipeline, zero AI tokens)",
+  "$pipeline": "POST /api/editorial/resolve — rules only, no Gemini Vision",
+  "articleId": "city-style-slug",
+  "articleTheme": "主題一句話，例如：東京動漫巡禮",
+  "editorialAngle": "編輯角度：這篇與其他攻略的差異",
+  "targetReader": "目標讀者：例如動漫迷、老玩家、初次朝聖",
+  "storyline": "故事線：讀者走完這篇後的旅程節奏",
+  "editorialPlan": {
+    "theme": "同 articleTheme",
+    "storyArc": "同 storyline",
+    "readingRhythm": "閱讀節奏"
+  },
+  "hero": {
+    "sectionId": "hero-{slug}",
+    "title": "段落標題",
+    "subject": "段落主題",
+    "sectionPurpose": "landmark | anime | food | hotel | shopping | cafe | transport | photospot | culture",
+    "sectionType": "landmark",
+    "editorialAngle": "這張 hero 要傳達什麼",
+    "photoIntent": "讀者看到這張圖應立刻理解什麼",
+    "photoPriority": {
+      "primary": ["第一優先畫面"],
+      "secondary": ["第二優先"],
+      "tertiary": ["第三優先，寧可不用"]
+    },
+    "searchKeywords": ["中", "英", "日", "類型", "photoIntent 關鍵字"],
+    "imageChecklist": ["AI 審圖必須看到的元素，至少命中 minChecklistHits 項"],
+    "imageRejectRules": ["必須拒絕的畫面類型"],
+    "minChecklistHits": 3,
+    "captionIntent": "Caption 要補充圖片中看到的細節，不可重複正文",
+    "officialName": "English place name",
+    "officialNameLocal": "當地語言名稱",
+    "aliases": [],
+    "mapsQuery": "Google Places 驗證用",
+    "placeId": "optional ChIJ...",
+    "maxCandidates": 18,
+    "maxAIReview": 10,
+    "minPassScore": 72,
+    "role": "hero"
+  },
+  "sections": [
+    {
+      "sectionId": "section-slug",
+      "title": "段落標題",
+      "sectionPurpose": "landmark",
+      "sectionType": "landmark",
+      "editorialAngle": "為什麼值得去、誰適合、最佳時間",
+      "photoIntent": "這張圖要讓讀者看到什麼",
+      "photoPriority": {
+        "primary": [],
+        "secondary": [],
+        "tertiary": []
+      },
+      "searchKeywords": [],
+      "imageChecklist": [],
+      "imageRejectRules": [],
+      "minChecklistHits": 3,
+      "captionIntent": "",
+      "content": "正文（build 時可從 city-journal-data.js 合併）",
+      "heading": "小標",
+      "officialName": "",
+      "officialNameLocal": "",
+      "aliases": [],
+      "mapsQuery": "",
+      "placeId": null
+    }
+  ]
+}

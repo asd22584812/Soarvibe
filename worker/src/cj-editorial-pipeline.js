@@ -1,5 +1,5 @@
 /**
- * City Journal Editorial Pipeline — photoIntent, checklist, QA.
+ * City Journal Editorial Pipeline — strict visual validation.
  */
 
 function escapeRegExp(str) {
@@ -26,6 +26,10 @@ export function buildPhotoSearchSequence(item) {
     out.push({ query: q, lang: lang || 'ja' });
   }
 
+  (item.photoPlaceQueries || []).forEach(function (q) {
+    push(q, /[\u3040-\u30ff\u4e00-\u9faf]/.test(q) ? 'ja' : 'en');
+  });
+
   if (item.officialNameLocal && intentSlice) {
     push(item.officialNameLocal + ' ' + intentSlice, 'ja');
   }
@@ -36,9 +40,9 @@ export function buildPhotoSearchSequence(item) {
   push(item.officialName, 'en');
   (item.aliases || []).forEach(function (alias) {
     if (intentSlice && intentKw.length) {
-      push(alias + ' ' + intentKw[0], alias.match(/[\u3040-\u30ff\u4e00-\u9faf]/) ? 'ja' : 'en');
+      push(alias + ' ' + intentKw[0], /[\u3040-\u30ff\u4e00-\u9faf]/.test(alias) ? 'ja' : 'en');
     }
-    push(alias, alias.match(/[\u3040-\u30ff\u4e00-\u9faf]/) ? 'ja' : 'en');
+    push(alias, /[\u3040-\u30ff\u4e00-\u9faf]/.test(alias) ? 'ja' : 'en');
   });
   push(item.subject, 'zh-TW');
   push(item.mapsQuery, 'zh-TW');
@@ -56,11 +60,81 @@ export function matchTerms(blob, terms) {
   return matched;
 }
 
+export function isAnchorPhotoPlace(placeName, anchorTerms) {
+  if (!anchorTerms || !anchorTerms.length) return false;
+  return matchTerms(String(placeName || ''), anchorTerms).length > 0;
+}
+
+export function countVisualGroups(blob, visualGroups) {
+  var hit = 0;
+  var matched = [];
+  (visualGroups || []).forEach(function (group) {
+    var m = matchTerms(blob, group);
+    if (m.length) {
+      hit += 1;
+      matched = matched.concat(m);
+    }
+  });
+  return { groupsHit: hit, matched: matched };
+}
+
+export function isExteriorOnlyBlob(blob, photo, item) {
+  var text = String(blob || '').toLowerCase();
+  if (/外観|facade|exterior|storefront|entrance only|招牌のみ|building only/i.test(text)) {
+    return true;
+  }
+  if (item && item.rejectExteriorPhoto && photo && photo._index === 0) {
+    var interiorSignals = /ガチャ|gachapon|gashapon|capsule|扭蛋|machine|機|wall|店内|interior/i.test(text);
+    if (!interiorSignals) return true;
+  }
+  return false;
+}
+
+function isGenericNakanoCorridor(blob, item) {
+  if (!item || item.sectionId !== 'nakano') return false;
+  if (/mandarake|まんだらけ|らしんばん|lashinbang/i.test(blob)) return false;
+  return /broadway|ブロードウェイ|nakano broadway|corridor|走道|廊下|entrance|入口|elevator|エレベーター/i.test(blob);
+}
+
+function supplementVisualGroups(blob, photo, item, vg) {
+  var supplemental = 0;
+  var extra = [];
+  if (!item || !photo) return { groupsHit: vg.groupsHit, matched: vg.matched };
+
+  if (item.sectionId === 'nakano' && isAnchorPhotoPlace(blob, item.photoAnchorTerms)) {
+    if (/figure|フィギュア|manga|漫画|漫畫|toy|玩具|hobby|ホビー|模型|公仔|figurine|comic/i.test(blob)) {
+      supplemental = 1;
+      extra.push('collectible_evidence');
+    } else if (photo._index >= 1 && !/corridor|走道|廊下|entrance|入口|lobby/i.test(blob)) {
+      supplemental = 1;
+      extra.push('anchor_interior');
+    }
+  }
+
+  if (item.sectionId === 'gachapon' && isAnchorPhotoPlace(blob, item.photoAnchorTerms)) {
+    if (photo._index >= 1 || /machine|機|interior|店内|wall|capsule/i.test(blob)) {
+      supplemental = 1;
+      extra.push('gachapon_interior');
+    }
+  }
+
+  if ((item.sectionId === 'akihabara' || item.sectionId === 'hero-anime') && isAnchorPhotoPlace(blob, item.photoAnchorTerms)) {
+    if (/radio|ラジオ|animate|アニメイト|gigo|ゲーセン|中央通|neon|霓虹|看板|sign/i.test(blob)) {
+      supplemental = Math.max(supplemental, 1);
+      extra.push('akihabara_landmark');
+    }
+  }
+
+  return {
+    groupsHit: vg.groupsHit + supplemental,
+    matched: vg.matched.concat(extra)
+  };
+}
+
 export function validatePhotoIntentGate(blob, item, context) {
   var rejectRules = Array.isArray(item.imageRejectRules) ? item.imageRejectRules : [];
-  var checklist = Array.isArray(item.imageChecklist) ? item.imageChecklist : [];
-  var intentTerms = parsePhotoIntent(item.photoIntent);
-  var role = (context && context.role) || 'section';
+  var photo = (context && context.photo) || null;
+  var placeName = (context && context.placeName) || '';
 
   for (var r = 0; r < rejectRules.length; r++) {
     try {
@@ -70,16 +144,57 @@ export function validatePhotoIntentGate(blob, item, context) {
     } catch (e) { /* skip */ }
   }
 
-  var allTerms = checklist.concat(intentTerms);
-  var matchedChecklist = matchTerms(blob, allTerms);
-  var minHits = role === 'hero' ? 1 : (checklist.length ? 1 : 0);
-  if (checklist.length && matchedChecklist.length < minHits) {
-    var placeOnly = matchTerms(blob, checklist.concat([
-      item.officialName, item.officialNameLocal, item.subject
-    ].filter(Boolean)));
-    if (placeOnly.length < minHits) {
-      return { ok: false, reason: 'checklist_miss', matchedChecklist: matchedChecklist };
+  if (isExteriorOnlyBlob(blob, photo, item)) {
+    return { ok: false, reason: 'exterior_only', matchedChecklist: [] };
+  }
+
+  if (isGenericNakanoCorridor(blob, item)) {
+    return { ok: false, reason: 'nakano_corridor', matchedChecklist: [] };
+  }
+
+  if (item.minPhotoIndex != null && photo && photo._index < item.minPhotoIndex) {
+    return { ok: false, reason: 'photo_index_low', matchedChecklist: [] };
+  }
+
+  var visualGroups = item.visualGroups || [];
+  var minGroups = item.requiredVisualMinGroups || 0;
+  if (visualGroups.length && minGroups > 0) {
+    var vg = supplementVisualGroups(blob, photo, item, countVisualGroups(blob, visualGroups));
+    var generic = matchTerms(blob, item.genericPlaceTerms || []);
+    if (vg.groupsHit < minGroups) {
+      return {
+        ok: false,
+        reason: 'visual_groups:' + vg.groupsHit + '/' + minGroups,
+        matchedChecklist: vg.matched
+      };
     }
+    if (generic.length >= 2 && !isAnchorPhotoPlace(blob, item.photoAnchorTerms)) {
+      return { ok: false, reason: 'generic_place_only', matchedChecklist: vg.matched };
+    }
+    return {
+      ok: true,
+      matchedChecklist: vg.matched,
+      anchorPlace: isAnchorPhotoPlace(blob, item.photoAnchorTerms)
+    };
+  }
+
+  if (isAnchorPhotoPlace(placeName, item.photoAnchorTerms)) {
+    if (item.requireInteriorPhoto && isExteriorOnlyBlob(blob, photo, item)) {
+      return { ok: false, reason: 'anchor_exterior', matchedChecklist: [] };
+    }
+    return {
+      ok: true,
+      matchedChecklist: matchTerms(blob, item.photoAnchorTerms || []),
+      anchorPlace: true
+    };
+  }
+
+  var checklist = Array.isArray(item.imageChecklist) ? item.imageChecklist : [];
+  var intentTerms = parsePhotoIntent(item.photoIntent);
+  var matchedChecklist = matchTerms(blob, checklist.concat(intentTerms));
+  var minHits = checklist.length ? 2 : 1;
+  if (matchedChecklist.length < minHits) {
+    return { ok: false, reason: 'checklist_miss', matchedChecklist: matchedChecklist };
   }
 
   return { ok: true, matchedChecklist: matchedChecklist };
@@ -94,21 +209,18 @@ export function trimCaption(text, minLen, maxLen) {
 
 export function runEditorialQA(section, photoResult) {
   var issues = [];
-  if (!section) return { ok: false, issues: ['missing_section'] };
+  if (!section) return { ok: false, issues: ['missing_section'], usePlaceholder: true };
   if (!photoResult || !photoResult.googlePhotoUrl) {
-    issues.push('no_photo');
-    return { ok: issues.length === 0, issues: issues, usePlaceholder: true };
-  }
-  if (photoResult.placeName && section.officialNameLocal) {
-    var blob = (photoResult.placeName + ' ' + (section.officialNameLocal || '') + ' ' + (section.officialName || '')).toLowerCase();
-    var nameOk = matchTerms(blob, [section.officialNameLocal, section.officialName, section.subject]).length > 0;
-    if (!nameOk) issues.push('place_name_drift');
+    return { ok: false, issues: ['no_photo'], usePlaceholder: true };
   }
   if (photoResult.googleAttribution && section.officialNameLocal) {
     var attr = photoResult.googleAttribution;
     var venueLike = /店|館|hotel|hostel|restaurant|cafe|ポッド|cinema|theater|映画/i.test(attr);
-    if (venueLike && !matchTerms(attr, [section.officialNameLocal, section.officialName, section.subject]).length) {
-      if (!matchTerms(attr, section.aliases || []).length) {
+    if (venueLike) {
+      var okVenue = matchTerms(attr, [section.officialNameLocal, section.officialName, section.subject])
+        .concat(matchTerms(attr, section.aliases || []))
+        .concat(matchTerms(attr, section.photoAnchorTerms || []));
+      if (!okVenue.length && section.sectionId !== 'nakano') {
         issues.push('attribution_drift');
       }
     }

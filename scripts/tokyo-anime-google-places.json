@@ -3,27 +3,45 @@
     "sectionId": "akihabara",
     "subject": "秋葉原電氣街",
     "mapsQuery": "Akihabara Electric Town Tokyo Japan",
-    "placeId": "ChIJZzSYoB2MGGARfBcicn7sx28",
-    "googleRating": 4.5,
-    "googleAddress": "〒101-0021 東京都千代田区外神田１丁目１２",
-    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZOH0F87_D1soeylSB5_P7sGkzKGOivPygTDbao_kBCyPOpPJ_IA5saP7LMIrhSptIWzANdTjFxZ2rsu9MXDXTPkG3j2wE_J2eOwaNf9nu5VIxGENCyY-NstHJPY7kt0DIp5tkE0GAmuH274zCo=s4800-w1600-h1200",
-    "googleAttribution": "Marta",
+    "placeId": "ChIJ__-AdayOGGAR6EGPwvcpzTA",
+    "googleRating": 4.3,
+    "googleAddress": "〒101-0021 東京都千代田区外神田１丁目１５−１６",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZPBhCe7ID8YhpkgYpjj7i3ft7MBO85EcaEJy48A8o9tplrjK28bV-k0DGBsuoglvDfeXYyx6M3Md7vkzOmYK2U32yaroLAJxl4WDxDzVyOicV-diOLxWqWuZaDhE2eM1_B8eKXjEYk2QGNDhrQOuAi29w=s4800-w1600-h1200",
+    "googleAttribution": "Giampaolo Mancinelli",
     "imageSource": "google_places",
     "matched": true,
-    "placeName": "秋葉原電気街",
-    "photoScore": 139,
-    "photoIndex": 0,
-    "photoCaption": "秋葉原電氣街，動漫招牌與霓虹交織的街景。",
+    "placeName": "秋葉原ラジオ会館",
+    "photoScore": 149,
+    "photoIndex": 1,
+    "photoCaption": "RadioKaikan前，電氣街霓虹亮起。",
     "matchedKeywords": [
-      "秋葉原",
-      "Akihabara",
-      "電気",
-      "Electric"
+      "ラジオ会館",
+      "ラジオ会館",
+      "ラジオ会館",
+      "akihabara_landmark"
     ],
-    "searchUsed": "秋葉原電気街",
+    "photoPlaceName": "秋葉原ラジオ会館",
+    "searchUsed": "ラジオ会館 秋葉原",
+    "photoSearchUsed": "ラジオ会館 秋葉原",
     "sectionType": "landmark",
     "role": null,
-    "rejectReason": null
+    "rejectReason": null,
+    "editorialQA": {
+      "ok": true,
+      "issues": [],
+      "usePlaceholder": false
+    },
+    "pipeline": {
+      "version": "rules",
+      "steps": [
+        "place_verify",
+        "keyword_search",
+        "rule_photo_pick",
+        "template_caption",
+        "rule_qa"
+      ],
+      "aiTokens": 0
+    }
   },
   {
     "sectionId": "nakano",
@@ -31,24 +49,43 @@
     "mapsQuery": "Nakano Broadway Tokyo Japan",
     "placeId": "ChIJg-7dspDyGGARvvDv4E5-tuE",
     "googleRating": 4.2,
-    "googleAddress": "〒164-0001 東京都中野区中野５丁目５２−１５",
-    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZOBV3tGQC66wLh_pvsFSuwilQMJcxhRGkoDJEaMoEwKOCaLUC20wPzGmevBgajSrcQ7jodwGcL877ec-QeWnFZx05mKOtQv-eF8348TF3LVDnIZSwCqXht3DrhRgkNRlUzX3-1OJUf1iMMC3_Y=s4800-w1600-h1200",
-    "googleAttribution": "加藤展康",
+    "googleAddress": "5-chōme-52-15 Nakano, Nakano City, Tokyo 164-0001, Japan",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZNAOy_7kERNJmtGUYvQgLCLCgb-RDqpAkzvQPNUTJtnF3UQiD3fNhYbhWkYi0d3nII7xYJs3R0tPfqfJnggGN8MFzRmRqmapqgkTs6qOXPt-uz__bLwuCxrtSyloOiheshaUZdD0FLEh-bzr7Ma0Mk9-g=s4800-w1600-h1200",
+    "googleAttribution": "Alejandro arruebo rello",
     "imageSource": "google_places",
     "matched": true,
-    "placeName": "中野ブロードウェイ",
-    "photoScore": 121,
-    "photoIndex": 0,
-    "photoCaption": "中野百老匯樓層內，公仔與復古玩具一字排開。",
+    "placeName": "Nakano Broadway",
+    "photoScore": 149,
+    "photoIndex": 1,
+    "photoCaption": "Mandarake櫥窗擺滿復古模型。",
     "matchedKeywords": [
-      "中野",
-      "Nakano",
-      "Broadway"
+      "まんだらけ",
+      "まんだらけ 中野",
+      "まんだらけ",
+      "anchor_interior"
     ],
-    "searchUsed": "中野ブロードウェイ",
+    "photoPlaceName": "まんだらけ 中野店",
+    "searchUsed": "placeId:ChIJg-7dspDyGGARvvDv4E5-tuE",
+    "photoSearchUsed": "まんだらけ 中野本店",
     "sectionType": "landmark",
     "role": null,
-    "rejectReason": null
+    "rejectReason": null,
+    "editorialQA": {
+      "ok": true,
+      "issues": [],
+      "usePlaceholder": false
+    },
+    "pipeline": {
+      "version": "rules",
+      "steps": [
+        "place_verify",
+        "keyword_search",
+        "rule_photo_pick",
+        "template_caption",
+        "rule_qa"
+      ],
+      "aiTokens": 0
+    }
   },
   {
     "sectionId": "gachapon",
@@ -56,23 +93,48 @@
     "mapsQuery": "Gachapon Kaikan Akihabara Tokyo",
     "placeId": "ChIJBztW3x2MGGARadHYl5vTEK0",
     "googleRating": 4,
-    "googleAddress": "〒101-0021 東京都千代田区外神田３丁目１５−５ MNビル 1F",
-    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZPlQvzONpiVeCAp28cg3VBkHgSJHCaxxP9apCNXKuVhd3KUuiCDfOoWOGGEPWg-GSJAMcy6kp4Qehhl2arH5Cv8rw5TIsT8k-flonNABId5IMHBU5YP8-QrgqGvMwr-GA0bzAI7WJgiUUJTt2A=s4800-w1600-h1200",
-    "googleAttribution": "ブラウンチョコ",
+    "googleAddress": "Japan, 〒101-0021 Tokyo, Chiyoda City, Sotokanda, 3-chōme−15−５ MNビル 1F",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZOM39L_gKxeukZKY6FOuRhy_XmTZ0TGqVFkTRGDzpfTK6uybViVzstbpOQWKZEIKAWaFRln0GIYh-qNr5c53EURn__O9qtV-sPf62Ft32yJ9WFBHxfcqr2AELVO85RnP77GlG0uRcXdCpAJsub0d5z5hw=s4800-w1600-h1200",
+    "googleAttribution": "Loki",
     "imageSource": "google_places",
     "matched": true,
-    "placeName": "秋葉原ガチャポン会館",
-    "photoScore": 109,
-    "photoIndex": 0,
-    "photoCaption": "扭蛋會館內，成排機台形成色彩繽紛的牆面。",
+    "placeName": "Akihabara Gachapon Hall",
+    "photoScore": 235,
+    "photoIndex": 1,
+    "photoCaption": "成排扭蛋機形成色彩繽紛的牆面。",
     "matchedKeywords": [
       "ガチャ",
-      "gachapon"
+      "ガチャポン",
+      "秋葉原ガチャポン会館",
+      "ガチャポン会館",
+      "ガチャ",
+      "ガチャポン",
+      "ガチャ",
+      "ガチャポン",
+      "gachapon_interior"
     ],
-    "searchUsed": "秋葉原ガチャポン会館",
+    "photoPlaceName": "秋葉原ガチャポン会館",
+    "searchUsed": "placeId:ChIJBztW3x2MGGARadHYl5vTEK0",
+    "photoSearchUsed": "秋葉原ガチャポン会館",
     "sectionType": "shopping",
     "role": null,
-    "rejectReason": null
+    "rejectReason": null,
+    "editorialQA": {
+      "ok": true,
+      "issues": [],
+      "usePlaceholder": false
+    },
+    "pipeline": {
+      "version": "rules",
+      "steps": [
+        "place_verify",
+        "keyword_search",
+        "rule_photo_pick",
+        "template_caption",
+        "rule_qa"
+      ],
+      "aiTokens": 0
+    }
   },
   {
     "sectionId": "ichiran",
@@ -86,18 +148,39 @@
     "imageSource": "google_places",
     "matched": true,
     "placeName": "Ramen Tanaka soba Akihabara",
-    "photoScore": 131,
+    "photoScore": 133,
     "photoIndex": 1,
-    "photoCaption": "醬油湯頭拉麵，掃街中途最實用的熱湯補給。",
+    "photoCaption": "醬油湯頭拉麵，熱氣補給剛好。",
     "matchedKeywords": [
-      "ramen",
-      "soba",
-      "田中"
+      "田中",
+      "田中そば店 秋葉原店",
+      "田中そば",
+      "田中",
+      "田中そば",
+      "そば"
     ],
+    "photoPlaceName": "田中そば店 秋葉原店",
     "searchUsed": "placeId:ChIJXTeLYx6MGGARNivhJ55nYVw",
+    "photoSearchUsed": "田中そば店 秋葉原店",
     "sectionType": "food",
     "role": null,
-    "rejectReason": null
+    "rejectReason": null,
+    "editorialQA": {
+      "ok": true,
+      "issues": [],
+      "usePlaceholder": false
+    },
+    "pipeline": {
+      "version": "rules",
+      "steps": [
+        "place_verify",
+        "keyword_search",
+        "rule_photo_pick",
+        "template_caption",
+        "rule_qa"
+      ],
+      "aiTokens": 0
+    }
   },
   {
     "sectionId": "maid-cafe",
@@ -106,23 +189,45 @@
     "placeId": "ChIJvQtxBAaNGGARTiTMJ-Nzhvc",
     "googleRating": 4.9,
     "googleAddress": "Japan, 〒101-0021 Tokyo, Chiyoda City, Sotokanda, 1-chōme−15−13 秋葉原 神田B&Vビル 10F",
-    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZMV7YbwCcqqGMS3-D5z5SOLl8geMQkJQtYOpZW-rSJ4sjjqv5DEQFWZlpbG5WunzooWgDIx9FJGqiQCVPQ5fI_GsVyO0JylfDDaFNmdvUiJpAyBUlItxrzzdxfhSLdiBRbUwi1H2PxNVkuseEw=s4800-w1365-h1200",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZOUyqgrwMTWl3lM7gnXTjGrq0OuwG8yLijBp-k410VbbmkroisVOrm5NILgikRmtlqjzAtG1pd8EyXECtZzlC_FpQcH22M_iV2Mmpgi9fCyWeO7q1GGLMRga64V2_BZRRlifLk4afANyDmmQDM=s4800-w1365-h1200",
     "googleAttribution": "MAID MADE 秋葉原駅前店",
     "imageSource": "google_places",
     "matched": true,
     "placeName": "Maid Cafe MAID MADE Akihabara Electric Town-exit Store",
-    "photoScore": 127,
+    "photoScore": 181,
     "photoIndex": 0,
-    "photoCaption": "秋葉原主題咖啡廳，甜點與繽紛內裝是視覺主角。",
+    "photoCaption": "繽紛甜點與主題內裝並陳。",
     "matchedKeywords": [
       "maid",
-      "cafe",
-      "MAID MADE"
+      "MAID MADE",
+      "MAID MADE 秋葉原駅前店",
+      "MAID MADE",
+      "maid",
+      "MAID MADE",
+      "maid"
     ],
+    "photoPlaceName": "MAID MADE 秋葉原駅前店",
     "searchUsed": "placeId:ChIJvQtxBAaNGGARTiTMJ-Nzhvc",
+    "photoSearchUsed": "MAID MADE 秋葉原駅前店",
     "sectionType": "cafe",
     "role": null,
-    "rejectReason": null
+    "rejectReason": null,
+    "editorialQA": {
+      "ok": true,
+      "issues": [],
+      "usePlaceholder": false
+    },
+    "pipeline": {
+      "version": "rules",
+      "steps": [
+        "place_verify",
+        "keyword_search",
+        "rule_photo_pick",
+        "template_caption",
+        "rule_qa"
+      ],
+      "aiTokens": 0
+    }
   },
   {
     "sectionId": "hotel-gracery",
@@ -136,20 +241,41 @@
     "imageSource": "google_places",
     "matched": true,
     "placeName": "Akihabara Washington Hotel",
-    "photoScore": 165,
+    "photoScore": 291,
     "photoIndex": 0,
-    "photoCaption": "秋葉原華盛頓飯店外觀，距車站步行約一分鐘。",
+    "photoCaption": "華盛頓飯店外觀，距車站一分鐘。",
     "matchedKeywords": [
-      "Washington",
       "ワシントン",
       "ホテル",
-      "hotel",
-      "秋葉原"
+      "秋葉原",
+      "秋葉原ワシントンホテル",
+      "ホテル",
+      "ワシントン",
+      "秋葉原",
+      "ワシントン"
     ],
+    "photoPlaceName": "秋葉原ワシントンホテル",
     "searchUsed": "placeId:ChIJnxZoFqiOGGAReYJ1ck2lXiw",
+    "photoSearchUsed": "秋葉原ワシントンホテル",
     "sectionType": "hotel",
     "role": null,
-    "rejectReason": null
+    "rejectReason": null,
+    "editorialQA": {
+      "ok": true,
+      "issues": [],
+      "usePlaceholder": false
+    },
+    "pipeline": {
+      "version": "rules",
+      "steps": [
+        "place_verify",
+        "keyword_search",
+        "rule_photo_pick",
+        "template_caption",
+        "rule_qa"
+      ],
+      "aiTokens": 0
+    }
   },
   {
     "sectionId": "nui-hostel",
@@ -158,25 +284,50 @@
     "placeId": "ChIJ4U-9KsiOGGARARhaBLZLqS0",
     "googleRating": 4.5,
     "googleAddress": "2-chōme-14-13 Kuramae, Taito City, Tokyo 111-0051, Japan",
-    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZNCZo0z34QCyfrzNK4XjbnERETKf6UphmSp4csLPzE1l4y8DXHCKE8DkHOst2x9ss8DFbJPbzxvPCWCGfJxDUAXCMYVt_EyQBIK17GhfUy8kbKxbjlX37iT46b_hGe1EsMZ2chkuc01vF3enQ=s4800-w1600-h1200",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZOu858-3Yk_8-FhzQ3ULs0mcZtYOUffv2kFSFje8jYX-jwVsPVL5gST0ngIQV0CrilJzD0BoKVMmQTA1RnG0Ke2fbDR8DmvHSf6lzsszFUeVtxta_sDe4uc5wMQX306ZfVazHkjxE6zUtH5tg=s4800-w1600-h1200",
     "googleAttribution": "Nui. HOSTEL & BAR LOUNGE",
     "imageSource": "google_places",
     "matched": true,
     "placeName": "Nui. Hostel & Bar Lounge",
-    "photoScore": 161,
+    "photoScore": 251,
     "photoIndex": 0,
-    "photoCaption": "淺草橋青年旅館，公共吧台夜間仍保有旅人交誼的溫度。",
+    "photoCaption": "公共吧台夜間仍有旅人交談。",
     "matchedKeywords": [
       "Nui",
       "hostel",
       "HOSTEL",
       "bar",
-      "lounge"
+      "lounge",
+      "Nui. HOSTEL & BAR LOUNGE",
+      "Nui",
+      "hostel",
+      "bar",
+      "lounge",
+      "Nui",
+      "HOSTEL"
     ],
+    "photoPlaceName": "Nui. Hostel & Bar Lounge",
     "searchUsed": "placeId:ChIJ4U-9KsiOGGARARhaBLZLqS0",
+    "photoSearchUsed": "Nui. HOSTEL & BAR LOUNGE Tokyo",
     "sectionType": "hostel",
     "role": null,
-    "rejectReason": null
+    "rejectReason": null,
+    "editorialQA": {
+      "ok": true,
+      "issues": [],
+      "usePlaceholder": false
+    },
+    "pipeline": {
+      "version": "rules",
+      "steps": [
+        "place_verify",
+        "keyword_search",
+        "rule_photo_pick",
+        "template_caption",
+        "rule_qa"
+      ],
+      "aiTokens": 0
+    }
   },
   {
     "sectionId": "hero-anime",
@@ -185,21 +336,41 @@
     "placeId": "ChIJ__-AdayOGGAR6EGPwvcpzTA",
     "googleRating": 4.3,
     "googleAddress": "1-chōme-15-16 Sotokanda, Chiyoda City, Tokyo 101-0021, Japan",
-    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZPyMqYt48AlW5AkRwxgZ2eUX7mDX-3KcPNXK3YHDDBgnddWa6eabfz5Z1YUMAIahJTK5XYXKS_hmiCP2dyfpuRmcewSUTRBpr82pMIdljzEoBT4VcL44qfiJJcokcbrYHHG0A9yoRH2ADobTbMSU8mEUg=s4800-w1600-h1200",
-    "googleAttribution": "Giampaolo Mancinelli",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZMe_u7MHUCtlmxvi13hLlj_FIl2RMOOCKW3CCVYv3Cp4EWxCPX4UQxR5qNsCctYBZrL5atHBIA5y_7KDn6C2PlvdKqP63yXJmRvc9VHvN58W52s3N6NPDZHw2gBhhGcE2epbscAsfwIaTkEV9c=s4800-w1600-h1200",
+    "googleAttribution": "David Di",
     "imageSource": "google_places",
     "matched": true,
     "placeName": "Akihabara Radio Kaikan",
-    "photoScore": 174,
-    "photoIndex": 1,
-    "photoCaption": "Radio Kaikan 外觀，是秋葉原最具代表性的模型大樓。",
+    "photoScore": 250,
+    "photoIndex": 5,
+    "photoCaption": "RadioKaikan前，電氣街霓虹亮起。",
     "matchedKeywords": [
-      "Radio Kaikan",
-      "Akihabara"
+      "ラジオ会館",
+      "ラジオ会館",
+      "ラジオ会館",
+      "akihabara_landmark"
     ],
+    "photoPlaceName": "秋葉原ラジオ会館",
     "searchUsed": "placeId:ChIJ__-AdayOGGAR6EGPwvcpzTA",
+    "photoSearchUsed": "ラジオ会館 秋葉原",
     "sectionType": "landmark",
     "role": "hero",
-    "rejectReason": null
+    "rejectReason": null,
+    "editorialQA": {
+      "ok": true,
+      "issues": [],
+      "usePlaceholder": false
+    },
+    "pipeline": {
+      "version": "rules",
+      "steps": [
+        "place_verify",
+        "keyword_search",
+        "rule_photo_pick",
+        "template_caption",
+        "rule_qa"
+      ],
+      "aiTokens": 0
+    }
   }
 ]

@@ -1,4 +1,4 @@
-import { validatePhotoIntentGate, parsePhotoIntent } from './cj-editorial-pipeline.js';
+import { validatePhotoIntentGate } from './cj-editorial-pipeline.js';
 var BAD_GLOBAL = /tiger|white tiger|zoo|garden|residential|repair shop|garage|pool|beach|villa|白老虎|修車|住宅|花園|泳池/i;
 var BAD_HERO = /lobby|interior|indoor|entrance|door|reception|室内|入口|大廳|電梯|elevator|corridor|走廊|parking|駐車/i;
 var BAD_FOOD = /bathroom|toilet|restroom|washroom|洗手|廁所|空桌|empty table|counter only/i;
@@ -12,6 +12,13 @@ export function photoAttrText(photo) {
   return photo.authorAttributions.map(function (a) {
     return a.displayName || '';
   }).join(' ');
+}
+
+/** Metadata-only blob — never include editorial photoIntent / checklist. */
+export function buildPhotoEvidenceBlob(photo, context) {
+  var attr = photoAttrText(photo).toLowerCase();
+  var place = String((context && context.placeName) || '').toLowerCase();
+  return (attr + ' ' + place).trim();
 }
 
 function photoRatio(photo) {
@@ -45,6 +52,7 @@ export function scorePhoto(photo, context) {
   var blob = (attr + ' ' + place + ' ' + query).toLowerCase();
   var role = context.role || 'section';
   var sectionType = context.sectionType || 'landmark';
+  var purpose = context.sectionPurpose || sectionType;
   var idx = typeof photo._index === 'number' ? photo._index : 0;
   var keywords = context.visualKeywords || [];
   var matchedKeywords = matchVisualKeywords(blob, keywords);
@@ -77,8 +85,15 @@ export function scorePhoto(photo, context) {
     if (BAD_LANDMARK.test(blob)) score -= 25;
     if (BAD_HERO.test(blob) && role !== 'hero') score -= 12;
   }
-  if (sectionType === 'food') {
+  if (purpose === 'anime' || sectionType === 'landmark' && /anime|動漫|mandarake|animate|gigo|radio/i.test(blob + keywords.join(' '))) {
+    if (/mandarake|まんだらけ|animate|アニメイト|gigo|radio|ラジオ|ガチャ|gachapon/i.test(blob)) score += 20;
+    if (idx >= 1) score += 8;
+    if (/broadway|corridor|走道|廊下/i.test(blob) && !/mandarake|まんだらけ/i.test(blob)) score -= 35;
+  }
+  if (sectionType === 'food' || purpose === 'food') {
     if (/ramen|noodle|food|料理|ラーメン|麺|soba|拉麵|dish|meal/.test(blob)) score += 22;
+    if (idx === 0 && /facade|exterior|外観|storefront|entrance/i.test(blob)) score -= 25;
+    if (idx >= 1) score += 6;
     if (BAD_FOOD.test(blob)) score -= 45;
   }
   if (sectionType === 'cafe') {
@@ -104,33 +119,32 @@ export function scorePhoto(photo, context) {
 }
 
 export function photoContentGate(photo, context, item) {
-  var attr = photoAttrText(photo).toLowerCase();
-  var place = String(context.placeName || '').toLowerCase();
-  var query = String(context.mapsQuery || '').toLowerCase();
-  var intent = parsePhotoIntent((item && item.photoIntent) || context.photoIntent || '').join(' ');
-  var blob = attr + ' ' + place + ' ' + query + ' ' + intent;
-  var keywords = (context.visualKeywords || []).concat(parsePhotoIntent((item && item.photoIntent) || ''));
-  var matchedKeywords = matchVisualKeywords(blob, keywords);
+  var evidenceBlob = buildPhotoEvidenceBlob(photo, context);
+  var scoreBlob = evidenceBlob + ' ' + String(context.mapsQuery || '').toLowerCase();
+  var keywords = context.visualKeywords || [];
+  var matchedKeywords = matchVisualKeywords(evidenceBlob, keywords);
   var score = scorePhoto(photo, Object.assign({}, context, { visualKeywords: keywords }));
   var role = context.role || 'section';
-  var minScore = role === 'hero' ? 72 : 58;
-  var intentGate = validatePhotoIntentGate(blob, item || context, context);
-  var keywordOk = matchedKeywords.length > 0 || HERO_LANDMARK.test(blob) || score >= minScore + 15;
-  var ok = score >= minScore && intentGate.ok && keywordOk && !BAD_GLOBAL.test(blob);
+  var minScore = role === 'hero' ? 75 : 62;
+  var gateCtx = Object.assign({}, context || {}, { photo: photo, placeName: context.placeName || '' });
+  var intentGate = validatePhotoIntentGate(evidenceBlob, item || context, gateCtx);
+  var ok = score >= minScore && intentGate.ok && !BAD_GLOBAL.test(evidenceBlob);
 
   return {
     ok: ok,
     score: score,
     matchedKeywords: matchedKeywords.concat(intentGate.matchedChecklist || []),
-    blob: blob,
-    rejectReason: intentGate.ok ? null : intentGate.reason
+    blob: evidenceBlob,
+    rejectReason: intentGate.ok ? null : intentGate.reason,
+    anchorPlace: intentGate.anchorPlace || false
   };
 }
 
 export function rankPhotos(photos, context, item) {
   return (photos || []).map(function (photo, index) {
     var copy = Object.assign({}, photo, { _index: index });
-    var gate = photoContentGate(copy, context, item || context);
+    var gateCtx = Object.assign({}, context || {}, { photo: copy, placeName: (context && context.placeName) || '' });
+    var gate = photoContentGate(copy, gateCtx, item || context);
     return { photo: copy, score: gate.score, gate: gate };
   }).sort(function (a, b) {
     return b.score - a.score;

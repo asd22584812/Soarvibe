@@ -3966,7 +3966,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
-            const SOARVIBE_APP_BUILD = 'v111';
+            const SOARVIBE_APP_BUILD = 'v115';
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
@@ -14720,7 +14720,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             function getEditionCoverImage(cityId, editionKey, article) {
                 if (article) {
                     var googleCover = resolveArticleCoverImage(article);
-                    if (googleCover && googleCover.url && googleCover.source === 'google_places') {
+                    if (googleCover && googleCover.url && (googleCover.source === 'google_places' || googleCover.source === 'editorial_ai')) {
                         return googleCover.url;
                     }
                 }
@@ -14766,25 +14766,26 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
             function resolveJournalGoogleImage(item) {
                 if (!item) return null;
-                if (item.googlePhotoUrl && item.imageSource === 'google_places') {
+                var editorialSources = { google_places: true, editorial_ai: true };
+                if (item.googlePhotoUrl && editorialSources[item.imageSource]) {
                     return {
                         url: item.googlePhotoUrl,
                         attribution: item.googleAttribution || 'Google Maps',
-                        source: 'google_places'
+                        source: item.imageSource
                     };
                 }
-                if (item.heroGooglePhotoUrl && item.heroImageSource === 'google_places') {
+                if (item.heroGooglePhotoUrl && editorialSources[item.heroImageSource]) {
                     return {
                         url: item.heroGooglePhotoUrl,
                         attribution: item.heroGoogleAttribution || 'Google Maps',
-                        source: 'google_places'
+                        source: item.heroImageSource
                     };
                 }
-                if (item.coverGooglePhotoUrl && item.coverImageSource === 'google_places') {
+                if (item.coverGooglePhotoUrl && editorialSources[item.coverImageSource]) {
                     return {
                         url: item.coverGooglePhotoUrl,
                         attribution: item.coverGoogleAttribution || 'Google Maps',
-                        source: 'google_places'
+                        source: item.coverImageSource
                     };
                 }
                 return null;
@@ -14794,11 +14795,11 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 return window.SOARVIBE_CJ_IMAGE_LIBRARY || { resolveEditorialFallback: function () { return null; } };
             }
 
-            function resolveEditorialFallback(cityId, sectionType) {
+            function resolveEditorialFallback(cityId, sectionType, sectionId) {
                 var lib = getImageLibraryApi();
                 if (typeof lib.resolveEditorialFallback !== 'function') return null;
                 var category = sectionType || 'landmark';
-                return lib.resolveEditorialFallback(cityId, category);
+                return lib.resolveEditorialFallback(cityId, category, sectionId);
             }
 
             function resolveSectionImage(section, article, heroUrl) {
@@ -14818,7 +14819,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     allowedFor: ['section']
                 });
                 var placeholder = getJournalPlaceholder();
-                var editorialUrl = resolveEditorialFallback(article.cityId, section.sectionType);
+                var editorialUrl = resolveEditorialFallback(article.cityId, section.sectionType, section.sectionId);
                 if (editorialUrl && (!heroUrl || editorialUrl !== heroUrl)) {
                     return { url: editorialUrl, attribution: null, source: 'editorial_library' };
                 }
@@ -14874,7 +14875,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
             function cjAttributionHtml(attribution, source) {
                 if (!attribution || source === 'editorial_library' || source === 'manifest' || source === 'placeholder') return '';
-                if (source !== 'google_places') return '';
+                if (source !== 'google_places' && source !== 'editorial_ai') return '';
                 return '<p class="cj-photo-attribution">© ' + escapeHtml(attribution) + ' · Google Maps</p>';
             }
 
@@ -14914,19 +14915,17 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             function resolveSectionCaption(section, imageInfo) {
-                if (section.caption) return section.caption;
                 var capApi = window.SOARVIBE_CJ_CAPTION;
                 if (capApi && typeof capApi.generateCaption === 'function') {
-                    return capApi.generateCaption({
+                    var dynamic = capApi.generateCaption({
                         sectionId: section.sectionId,
                         placeName: section.subject,
-                        mapsQuery: section.mapsQuery,
-                        sectionType: section.sectionType,
-                        officialName: section.officialName,
-                        officialNameLocal: section.officialNameLocal
+                        photoPlaceName: section.photoPlaceName || imageInfo.photoPlaceName || section.subject,
+                        googleAttribution: imageInfo && imageInfo.attribution
                     });
+                    if (dynamic) return dynamic;
                 }
-                return '';
+                return section.caption || '';
             }
 
             function renderMagazineSection(section, article, heroUrl) {

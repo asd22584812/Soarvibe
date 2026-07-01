@@ -1,67 +1,56 @@
 /**
- * Editorial captions — image only, 15–25 chars.
+ * Caption from actual photo context — no section presets.
  */
-import { trimCaption } from './cj-editorial-pipeline.js';
+import { trimCaption, matchTerms } from './cj-editorial-pipeline.js';
 
-var CAPTION_BY_SECTION = {
-  'hero-anime': 'Radio Kaikan 前，電氣街霓虹亮起。',
-  akihabara: '傍晚的中央通開始亮起霓虹。',
-  nakano: 'Mandarake 櫥窗擺滿復古模型。',
-  gachapon: '成排扭蛋機讓人停不下來。',
-  ichiran: '醬油湯頭拉麵，熱氣補給剛好。',
-  'maid-cafe': '繽紛甜點與主題內裝並陳。',
-  'hotel-gracery': '華盛頓飯店外觀，距車站一分鐘。',
-  'nui-hostel': '公共吧台夜間仍有旅人交談。'
-};
-
-var LANDMARK_CAPTIONS = [
-  { re: /radio kaikan|ラジオ会館/i, caption: 'Radio Kaikan 前，電氣街霓虹亮起。' },
-  { re: /animate|アニメイト/i, caption: 'Animate 本館前，人潮與招牌交織。' },
-  { re: /gigo|ゲーセン/i, caption: 'GIGO 大型看板，是電氣街地標。' },
-  { re: /mandarake|まんだらけ/i, caption: 'Mandarake 櫥窗擺滿復古模型。' },
-  { re: /gachapon|ガチャ|扭蛋/i, caption: '成排扭蛋機讓人停不下來。' },
-  { re: /tanaka|田中|そば|ramen|ラーメン/i, caption: '醬油湯頭拉麵，熱氣補給剛好。' },
-  { re: /maid|メイド/i, caption: '繽紛甜點與主題內裝並陳。' },
-  { re: /washington|ワシントン/i, caption: '華盛頓飯店外觀，距車站一分鐘。' },
-  { re: /nui|hostel/i, caption: '公共吧台夜間仍有旅人交談。' },
-  { re: /chuo|central|中央通/i, caption: '傍晚的中央通開始亮起霓虹。' },
-  { re: /electric|電気|akihabara|秋葉原/i, types: ['landmark'], caption: '傍晚的中央通開始亮起霓虹。' }
+var CAPTION_RULES = [
+  { terms: ['animate', 'アニメイト'], caption: 'Animate 本館前，人潮與招牌交織。' },
+  { terms: ['radio kaikan', 'ラジオ会館'], caption: 'Radio Kaikan 前，電氣街霓虹亮起。' },
+  { terms: ['gigo', 'ゲーセン'], caption: 'GIGO 大型看板，是電氣街地標。' },
+  { terms: ['mandarake', 'まんだらけ'], caption: 'Mandarake 櫥窗擺滿復古模型。' },
+  { terms: ['らしんばん', 'lashinbang'], caption: 'らしんばん 架上擠滿中古漫畫。' },
+  { terms: ['フィギュア', 'figure', 'figurine', '公仔'], caption: '玻璃櫥窗內公仔與模型一字排開。' },
+  { terms: ['漫画', '漫畫', 'manga', 'comic'], caption: '架上漫畫與復古刊物層層堆疊。' },
+  { terms: ['ガチャ', 'gachapon', 'gashapon', 'capsule', '扭蛋'], caption: '成排扭蛋機形成色彩繽紛的牆面。' },
+  { terms: ['tanaka', '田中', 'そば', 'ramen', 'ラーメン'], caption: '醬油湯頭拉麵，熱氣補給剛好。' },
+  { terms: ['maid', 'メイド', 'maid made'], caption: '繽紛甜點與主題內裝並陳。' },
+  { terms: ['washington', 'ワシントン'], caption: '華盛頓飯店外觀，距車站一分鐘。' },
+  { terms: ['nui', 'hostel', 'ゲスト'], caption: '公共吧台夜間仍有旅人交談。' },
+  { terms: ['中央通', 'chuo', 'central'], caption: '傍晚的中央通開始亮起霓虹。' }
 ];
 
-function buildBlob(ctx) {
+function buildPhotoBlob(ctx) {
   return [
-    ctx.placeName,
     ctx.photoPlaceName,
-    ctx.officialName,
-    ctx.officialNameLocal,
-    ctx.sectionId,
-    ctx.mapsQuery
+    ctx.photoAttribution || '',
+    ctx.placeName
   ].join(' ').toLowerCase();
 }
 
-function matchesType(entry, sectionType) {
-  if (!entry.types || !entry.types.length) return true;
-  return entry.types.indexOf(sectionType) !== -1;
-}
-
 export function generateCaption(ctx) {
-  var sectionId = ctx.sectionId || '';
-  if (CAPTION_BY_SECTION[sectionId]) {
-    return trimCaption(CAPTION_BY_SECTION[sectionId], 12, 25);
-  }
-  var blob = buildBlob(ctx || {});
-  var sectionType = ctx.sectionType || 'landmark';
+  var blob = buildPhotoBlob(ctx || {});
   var i;
-  for (i = 0; i < LANDMARK_CAPTIONS.length; i++) {
-    if (!matchesType(LANDMARK_CAPTIONS[i], sectionType)) continue;
-    if (LANDMARK_CAPTIONS[i].re.test(blob)) {
-      return trimCaption(LANDMARK_CAPTIONS[i].caption, 12, 25);
+  for (i = 0; i < CAPTION_RULES.length; i++) {
+    if (matchTerms(blob, CAPTION_RULES[i].terms).length) {
+      return trimCaption(CAPTION_RULES[i].caption, 12, 25);
     }
   }
-  var place = ctx.placeName || ctx.officialNameLocal || ctx.subject || '';
-  if (sectionType === 'food') return trimCaption('熱騰騰的拉麵，湯頭與麵條清晰可見。', 12, 25);
-  if (sectionType === 'hotel' || sectionType === 'hostel') return trimCaption(place + ' 外觀，可對照上文的交通資訊。', 12, 25);
-  if (sectionType === 'cafe') return trimCaption('店內甜點與主題內裝，色彩清晰可見。', 12, 25);
-  if (sectionType === 'shopping') return trimCaption('店內商品陳列，呼應上文的選購重點。', 12, 25);
-  return trimCaption('代表性街景，呼應上文的探索動線。', 12, 25);
+  var sectionType = ctx.sectionType || 'landmark';
+  if (sectionType === 'food' && /ramen|ラーメン|拉麵|soba|麺/.test(blob)) {
+    return trimCaption('醬油湯頭拉麵，熱氣補給剛好。', 12, 25);
+  }
+  if ((sectionType === 'hotel' || sectionType === 'hostel') && /hotel|ホテル|hostel/.test(blob)) {
+    var place = ctx.photoPlaceName || ctx.placeName || '';
+    return trimCaption(place ? place.slice(0, 12) + ' 外觀。' : '飯店外觀與入口清晰可見。', 12, 25);
+  }
+  var purpose = ctx.sectionPurpose || sectionType;
+  var intent = String(ctx.photoIntent || '').split(/[、,，\/\|]+/)[0] || '';
+  var venue = ctx.photoPlaceName || ctx.placeName || '';
+  if (venue && intent) {
+    return trimCaption(venue.slice(0, 10) + '，' + intent.slice(0, 12) + '。', 12, 25);
+  }
+  if (venue) {
+    return trimCaption(venue.slice(0, 14) + '一景。', 12, 25);
+  }
+  return null;
 }

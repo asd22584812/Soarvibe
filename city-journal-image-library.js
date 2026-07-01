@@ -5,6 +5,15 @@
      * Editorial Image Library — city-scoped fallbacks when Google Places has no suitable photo.
      * Keys: hero, food, cafe, shopping, hotel, street, landmark, night
      */
+    var SECTION_FALLBACK = {
+        tokyo: {
+            nakano: './assets/city-journal/tokyo/nakano-broadway.jpg',
+            akihabara: './assets/city-journal/tokyo/akihabara-electric-town.jpg',
+            'hero-anime': './assets/city-journal/tokyo/tokyo-anime-hero.jpg',
+            gachapon: './assets/city-journal/tokyo/gachapon-hall.jpg'
+        }
+    };
+
     var LIBRARY = {
         tokyo: {
             hero: './assets/city-journal/tokyo/tokyo-anime-hero.jpg',
@@ -18,7 +27,11 @@
         }
     };
 
-    function resolveEditorialFallback(cityId, category) {
+    function resolveEditorialFallback(cityId, category, sectionId) {
+        var bySection = SECTION_FALLBACK[cityId];
+        if (sectionId && bySection && bySection[sectionId]) {
+            return bySection[sectionId];
+        }
         var city = LIBRARY[cityId];
         if (!city) return null;
         return city[category] || city.landmark || null;
