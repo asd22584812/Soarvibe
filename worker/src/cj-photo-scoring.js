@@ -1,11 +1,13 @@
 import { validatePhotoIntentGate } from './cj-editorial-pipeline.js';
+import { resolveSectionRole } from './cj-editorial-engine.js';
+
 var BAD_GLOBAL = /tiger|white tiger|zoo|garden|residential|repair shop|garage|pool|beach|villa|白老虎|修車|住宅|花園|泳池/i;
 var BAD_HERO = /lobby|interior|indoor|entrance|door|reception|室内|入口|大廳|電梯|elevator|corridor|走廊|parking|駐車/i;
 var BAD_FOOD = /bathroom|toilet|restroom|washroom|洗手|廁所|空桌|empty table|counter only/i;
 var BAD_HOTEL = /parking|garage|elevator|corridor|hallway|駐車|走廊|電梯/i;
 var BAD_LANDMARK = /close.?up|column|pillar|wall only|近拍|柱子|牆壁/i;
 var BAD_GENERIC = /plain|generic|empty street|sidewalk only|普通人行|一般街道/i;
-var HERO_LANDMARK = /radio kaikan|animate|gigo|central|electric town|秋葉原|akihabara|電氣|中央通|扭蛋|gachapon|broadway|中野/i;
+var STREET_LANDMARK = /radio kaikan|animate|gigo|central|chuo|electric town|neon|霓虹|中央通|街景|street view|akihabara|電氣/i;
 
 export function photoAttrText(photo) {
   if (!photo || !photo.authorAttributions) return '';
@@ -51,65 +53,84 @@ export function scorePhoto(photo, context) {
   var query = String(context.mapsQuery || context.photoMapsQuery || '').toLowerCase();
   var blob = (attr + ' ' + place + ' ' + query).toLowerCase();
   var role = context.role || 'section';
+  var sectionRole = context.sectionRole || resolveSectionRole(context);
   var sectionType = context.sectionType || 'landmark';
-  var purpose = context.sectionPurpose || sectionType;
   var idx = typeof photo._index === 'number' ? photo._index : 0;
   var keywords = context.visualKeywords || [];
   var matchedKeywords = matchVisualKeywords(blob, keywords);
 
   if (BAD_GLOBAL.test(blob)) score -= 80;
   if (BAD_GENERIC.test(blob)) score -= 30;
-
   score += matchedKeywords.length * 18;
 
   if (keywords.length >= 2 && matchedKeywords.length === 0) {
     score -= 22;
-    if (/neon|霓虹|招牌|animate|radio|central|中央通|扭蛋|動漫/.test(keywords.join(' '))) {
-      if (!HERO_LANDMARK.test(blob) && !matchedKeywords.length) score -= 15;
-    }
   }
 
-  if (role === 'hero') {
-    if (HERO_LANDMARK.test(blob)) score += 35;
+  if (role === 'hero' || sectionRole === 'opening') {
+    if (STREET_LANDMARK.test(blob)) score += 35;
     if (ratio >= 1.35) score += 22;
     if (ratio >= 1.6) score += 8;
     if (ratio < 0.95) score -= 28;
     if (BAD_HERO.test(blob)) score -= 30;
-    if (idx === 0) score -= 4;
     if (idx === 1) score += 6;
     if (idx === 2) score += 4;
   }
 
-  if (sectionType === 'landmark') {
-    if (ratio >= 1.15) score += 12;
+  if (sectionRole === 'landmark' || sectionRole === 'explore') {
+    if (STREET_LANDMARK.test(blob)) score += 28;
+    if (ratio >= 1.15) score += 14;
     if (BAD_LANDMARK.test(blob)) score -= 25;
-    if (BAD_HERO.test(blob) && role !== 'hero') score -= 12;
+    if (/figure|フィギュア|hobby|ホビー|模型|mandarake|まんだらけ/i.test(blob) && !STREET_LANDMARK.test(blob)) {
+      score -= 42;
+    }
+    if (/crowd|人潮|neon|霓虹|看板|signage/i.test(blob)) score += 12;
   }
-  if (purpose === 'anime' || sectionType === 'landmark' && /anime|動漫|mandarake|animate|gigo|radio/i.test(blob + keywords.join(' '))) {
-    if (/mandarake|まんだらけ|animate|アニメイト|gigo|radio|ラジオ|ガチャ|gachapon/i.test(blob)) score += 20;
-    if (idx >= 1) score += 8;
-    if (/broadway|corridor|走道|廊下/i.test(blob) && !/mandarake|まんだらけ/i.test(blob)) score -= 35;
+
+  if (sectionRole === 'anime') {
+    if (/mandarake|まんだらけ|figure|フィギュア|公仔|figurine|manga|漫画|collectible/i.test(blob)) score += 24;
+    if (/sun mall|サンモール|atrium|中庭|broadway/i.test(blob)) score += 16;
+    if (/ガチャ|gachapon|gashapon|capsule|扭蛋/i.test(blob)) score += 22;
+    if (/corridor|走道|廊下|empty mall/i.test(blob) && !/mandarake|figure|フィギュア|ガチャ|gachapon/i.test(blob)) score -= 38;
+    if (idx >= 1) score += 6;
   }
-  if (sectionType === 'food' || purpose === 'food') {
+
+  if (sectionRole === 'shopping') {
+    if (/product|merchandise|display|商品|展示|shop interior|店内/i.test(blob)) score += 20;
+    if (/gachapon|capsule|figure|扭蛋|公仔|shop|store/i.test(blob)) score += 18;
+    if (/facade|exterior|外観|storefront/i.test(blob) && context.rejectExteriorPhoto) score -= 35;
+  }
+
+  if (sectionRole === 'food' || sectionType === 'food') {
     if (/ramen|noodle|food|料理|ラーメン|麺|soba|拉麵|dish|meal/.test(blob)) score += 22;
     if (idx === 0 && /facade|exterior|外観|storefront|entrance/i.test(blob)) score -= 25;
     if (idx >= 1) score += 6;
     if (BAD_FOOD.test(blob)) score -= 45;
   }
-  if (sectionType === 'cafe') {
-    if (/cafe|coffee|dessert|maid|甜點|咖啡|カフェ/.test(blob)) score += 18;
+
+  if (sectionRole === 'cafe' || sectionType === 'cafe') {
+    if (/dessert|甜點|パフェ|cake|drink|飲|plate|料理/i.test(blob)) score += 28;
+    if (/cafe|coffee|maid|カフェ|interior|内装|店内/i.test(blob)) score += 16;
+    if (/logo|sign only|招牌のみ/i.test(blob) && !/dessert|甜點|drink/i.test(blob)) score -= 32;
     if (BAD_FOOD.test(blob)) score -= 30;
   }
-  if (sectionType === 'hotel') {
-    if (/lobby|room|hotel|exterior|facade|外觀|客房|ホテル/.test(blob)) score += 20;
+
+  if (sectionRole === 'hotel' || sectionType === 'hotel') {
+    if (/room|suite|客房|bed/i.test(blob)) score += 34;
+    if (/lobby|lounge|lounge|大廳/i.test(blob)) score += 30;
+    if (/facade|exterior|外観|building/i.test(blob)) score -= 18;
+    if (idx === 0 && /facade|exterior|外観/i.test(blob)) score -= 35;
+    if (idx >= 1) score += 10;
     if (BAD_HOTEL.test(blob)) score -= 40;
   }
-  if (sectionType === 'hostel') {
-    if (/hostel|lounge|bar|交誼|ゲスト/.test(blob)) score += 16;
+
+  if (sectionRole === 'hostel' || sectionType === 'hostel') {
+    if (/room|dorm|客房|bed/i.test(blob)) score += 30;
+    if (/lobby|bar|lounge|吧台|交誼|公共/i.test(blob)) score += 28;
+    if (/facade|exterior|外観/i.test(blob)) score -= 22;
+    if (idx === 0 && /facade|exterior|外観/i.test(blob)) score -= 38;
+    if (idx >= 1) score += 12;
     if (BAD_HOTEL.test(blob)) score -= 25;
-  }
-  if (sectionType === 'shopping') {
-    if (/gachapon|capsule|figure|扭蛋|公仔|shop|store/.test(blob)) score += 18;
   }
 
   if ((photo.widthPx || 0) >= 1200) score += 5;
@@ -120,7 +141,6 @@ export function scorePhoto(photo, context) {
 
 export function photoContentGate(photo, context, item) {
   var evidenceBlob = buildPhotoEvidenceBlob(photo, context);
-  var scoreBlob = evidenceBlob + ' ' + String(context.mapsQuery || '').toLowerCase();
   var keywords = context.visualKeywords || [];
   var matchedKeywords = matchVisualKeywords(evidenceBlob, keywords);
   var score = scorePhoto(photo, Object.assign({}, context, { visualKeywords: keywords }));

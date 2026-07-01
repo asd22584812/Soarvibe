@@ -2,8 +2,13 @@
   "articleId": "tokyo-anime",
   "articleTheme": "東京動漫聖地巡禮——電氣街與中野的挖寶節奏",
   "editorialAngle": "不是購物清單，而是動漫迷的朝聖路線：從 Radio Kaikan 到 Mandarake 深處",
+  "readerPersona": "動漫迷、老玩家、想深度逛秋葉原與中野的旅人",
+  "travelStyle": "步行掃街、深度挖寶、夜宿交通樞紐",
+  "emotion": "興奮、懷舊、驚喜挖到寶",
+  "articleGoal": "讓讀者感受到「這就是動漫聖地巡禮」的節奏，而非景點清單",
   "targetReader": "動漫迷、老玩家、想深度逛秋葉原與中野的旅人",
   "storyline": "上午電氣街朝聖 → 午後中野挖寶 → 傍晚扭蛋補給 → 夜宿交通樞紐",
+  "readingRhythm": ["opening", "explore", "experience", "food", "shopping", "stay", "ending"],
   "editorialPlan": {
     "theme": "東京玩具動漫",
     "storyArc": "用 1～2 天把秋葉原、中野、扭蛋、拉麵與住宿串成一條有節奏的動漫巡禮路線",
@@ -11,6 +16,7 @@
   },
   "hero": {
     "sectionId": "hero-anime",
+    "sectionRole": "opening",
     "title": "秋葉原電氣街",
     "subject": "秋葉原電氣街",
     "sectionPurpose": "anime",
@@ -63,6 +69,7 @@
   "sections": [
     {
       "sectionId": "akihabara",
+      "sectionRole": "landmark",
       "title": "秋葉原電氣街",
       "sectionPurpose": "anime",
       "editorialAngle": "電氣街不是單一景點，而是一整片會讓人自然放慢步調的動漫街區",
@@ -111,13 +118,14 @@
     },
     {
       "sectionId": "nakano",
+      "sectionRole": "anime",
       "title": "中野百老匯",
       "sectionPurpose": "anime",
       "editorialAngle": "老玩家公認挖寶聖地，不是普通商場",
       "photoIntent": "動漫收藏天堂：Mandarake、らしんばん、公仔、模型、漫畫牆、收藏櫃、玩具，至少 3 項；普通商場走道直接淘汰",
       "photoPriority": {
         "primary": ["Mandarake 櫥窗", "公仔模型牆", "漫畫收藏架"],
-        "secondary": ["らしんばん", "動漫商店內景"],
+        "secondary": ["Sun Mall 中庭", "らしんばん", "動漫商店內景"],
         "tertiary": ["百老匯走道"]
       },
       "searchKeywords": [
@@ -158,6 +166,7 @@
     },
     {
       "sectionId": "gachapon",
+      "sectionRole": "anime",
       "title": "GACHAPON 扭蛋會館",
       "sectionPurpose": "shopping",
       "editorialAngle": "整面牆都是驚喜，不是黃色招牌外觀",
@@ -202,6 +211,7 @@
     },
     {
       "sectionId": "ichiran",
+      "sectionRole": "food",
       "title": "田中そば店 秋葉原店",
       "sectionType": "food",
       "officialName": "Ramen Tanaka Soba Akihabara",
@@ -222,6 +232,7 @@
     },
     {
       "sectionId": "maid-cafe",
+      "sectionRole": "cafe",
       "title": "女僕咖啡廳 秋葉原",
       "sectionType": "cafe",
       "officialName": "MAID MADE Akihabara",
@@ -232,8 +243,8 @@
       "photoPlaceQueries": ["MAID MADE 秋葉原駅前店", "メイドメイド 秋葉原"],
       "photoAnchorTerms": ["MAID MADE", "メイドメイド", "maid"],
       "allowGenericPhotoFallback": false,
-      "photoIntent": "女僕咖啡、甜點、繽紛內裝、主題咖啡廳、メイド",
-      "imageChecklist": ["maid", "メイド", "cafe", "カフェ", "MAID MADE"],
+      "photoIntent": "甜點、飲品、店內氛圍、主題內裝，不要只有 Logo",
+      "imageChecklist": ["dessert", "甜點", "drink", "maid", "メイド", "cafe", "カフェ"],
       "imageRejectRules": ["走廊", "hotel", "hostel", "empty table"],
       "isSpecificVenue": true,
       "addressHints": ["秋葉原", "Akihabara"],
@@ -242,6 +253,7 @@
     },
     {
       "sectionId": "hotel-gracery",
+      "sectionRole": "hotel",
       "title": "秋葉原ワシントンホテル",
       "sectionType": "hotel",
       "officialName": "Akihabara Washington Hotel",
@@ -251,8 +263,8 @@
       "placeId": "ChIJnxZoFqiOGGAReYJ1ck2lXiw",
       "photoPlaceQueries": ["秋葉原ワシントンホテル"],
       "photoAnchorTerms": ["Washington", "ワシントン", "華盛頓"],
-      "photoIntent": "飯店外觀、Lobby、客房、步行可達車站、ホテル",
-      "imageChecklist": ["Washington", "ワシントン", "ホテル", "hotel", "秋葉原"],
+      "photoIntent": "客房、Lobby、公共空間優先，外觀次之",
+      "imageChecklist": ["room", "lobby", "Washington", "ワシントン", "ホテル", "hotel"],
       "imageRejectRules": ["parking", "garage", "restaurant only", "resort", "pool"],
       "isSpecificVenue": true,
       "addressHints": ["秋葉原", "Akihabara", "Sakumacho"],
@@ -261,6 +273,7 @@
     },
     {
       "sectionId": "nui-hostel",
+      "sectionRole": "hostel",
       "title": "Nui Hostel Tokyo",
       "sectionType": "hostel",
       "officialName": "Nui. Hostel & Bar Lounge",
@@ -270,8 +283,8 @@
       "placeId": "ChIJ4U-9KsiOGGARARhaBLZLqS0",
       "photoPlaceQueries": ["Nui. HOSTEL & BAR LOUNGE Tokyo"],
       "photoAnchorTerms": ["Nui", "HOSTEL", "ゲスト"],
-      "photoIntent": "青年旅館、公共吧台、交誼廳、Lobby、ゲストハウス",
-      "imageChecklist": ["Nui", "hostel", "HOSTEL", "ゲスト", "bar", "lounge"],
+      "photoIntent": "客房、公共吧台、交誼廳、Lobby 優先，外觀次之",
+      "imageChecklist": ["room", "dorm", "bar", "lounge", "Nui", "hostel", "ゲスト"],
       "imageRejectRules": ["parking", "restaurant only", "resort", "pool"],
       "isSpecificVenue": true,
       "addressHints": ["蔵前", "Kuramae", "浅草橋"],

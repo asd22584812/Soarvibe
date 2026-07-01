@@ -2,7 +2,7 @@
  * Rule-based Editorial Pipeline — zero AI tokens.
  * Google Places = place verify + photo metadata scoring only.
  */
-import { normalizeSection } from './cj-editorial-schema.js';
+import { normalizeSection, normalizeArticle, runEngineQA } from './cj-editorial-engine.js';
 import { buildKeywordSearchPlan } from './cj-keyword-planning.js';
 import { rankPhotos, photoAttrText } from './cj-photo-scoring.js';
 import { generateCaption } from './cj-caption.js';
@@ -54,7 +54,9 @@ async function pickScoredPhoto(mapsKey, place, context, excludeUrls, item, deps)
     Object.assign({}, context, {
       placeName: placeName,
       visualKeywords: visualKeywords,
-      sectionPurpose: item.sectionPurpose || item.sectionType
+      sectionPurpose: item.sectionPurpose || item.sectionType,
+      sectionRole: item.sectionRole || item.sectionPurpose || item.sectionType,
+      rejectExteriorPhoto: item.rejectExteriorPhoto
     }),
     item
   );
@@ -89,7 +91,8 @@ async function resolvePhotoForSection(mapsKey, item, contentPlace, excludeUrls, 
   var photoContext = {
     role: item.role || (String(item.sectionId || '').indexOf('hero') === 0 ? 'hero' : 'section'),
     sectionType: item.sectionType || 'landmark',
-    sectionPurpose: item.sectionPurpose || item.sectionType || 'landmark',
+    sectionRole: item.sectionRole || item.sectionPurpose || 'landmark',
+    sectionPurpose: item.sectionPurpose || item.sectionRole || 'landmark',
     mapsQuery: item.mapsQuery,
     officialName: item.officialName || null,
     officialNameLocal: item.officialNameLocal || null,
@@ -161,7 +164,7 @@ export async function resolveSectionRules(mapsKey, item, articleCtx, deps) {
   var sectionId = String(section.sectionId || '').trim();
   var subject = String(section.subject || section.title || '').trim();
   var mapsQuery = String(section.mapsQuery || '').trim();
-  var pipelineLog = { version: 'rules', steps: [], aiTokens: 0 };
+  var pipelineLog = { version: 'engine-rules', steps: [], aiTokens: 0 };
 
   if (!sectionId) {
     return { sectionId: sectionId, error: 'missing_section_id' };
@@ -200,9 +203,11 @@ export async function resolveSectionRules(mapsKey, item, articleCtx, deps) {
         photoAttribution: photoPick.googleAttribution,
         sectionId: sectionId,
         sectionType: section.sectionType || 'landmark',
+        sectionRole: section.sectionRole,
         sectionPurpose: section.sectionPurpose,
         photoIntent: section.photoIntent,
-        subject: subject
+        subject: subject,
+        matchedKeywords: photoPick.matchedKeywords || []
       });
       if (!photoCaption) {
         photoPick = null;
@@ -211,6 +216,10 @@ export async function resolveSectionRules(mapsKey, item, articleCtx, deps) {
 
     pipelineLog.steps.push('template_caption');
     var qa = runEditorialQA(section, photoPick);
+    var engineQa = runEngineQA(section, photoPick, photoCaption);
+    if (engineQa.usePlaceholder) {
+      qa = Object.assign({}, qa, engineQa);
+    }
     if (qa.usePlaceholder) {
       photoPick = null;
       photoCaption = null;
@@ -263,5 +272,5 @@ export async function resolveArticleRules(mapsKey, payload, deps) {
     if (row.googlePhotoUrl) excludeUrls.push(row.googlePhotoUrl);
   }
 
-  return { results: results, excludeUrls: excludeUrls, pipelineVersion: 'rules' };
+  return { results: results, excludeUrls: excludeUrls, pipelineVersion: 'engine-rules' };
 }

@@ -90,19 +90,23 @@ export function isExteriorOnlyBlob(blob, photo, item) {
   return false;
 }
 
-function isGenericNakanoCorridor(blob, item) {
-  if (!item || item.sectionId !== 'nakano') return false;
-  if (/mandarake|まんだらけ|らしんばん|lashinbang/i.test(blob)) return false;
-  return /broadway|ブロードウェイ|nakano broadway|corridor|走道|廊下|entrance|入口|elevator|エレベーター/i.test(blob);
+import { resolveSectionRole } from './cj-editorial-engine.js';
+
+function isGenericAnimeCorridor(blob, item) {
+  var role = resolveSectionRole(item || {});
+  if (role !== 'anime') return false;
+  if (/mandarake|まんだらけ|らしんばん|lashinbang|figure|フィギュア|ガチャ|gachapon/i.test(blob)) return false;
+  return /corridor|走道|廊下|entrance|入口|elevator|エレベーター|empty mall/i.test(blob);
 }
 
 function supplementVisualGroups(blob, photo, item, vg) {
   var supplemental = 0;
   var extra = [];
   if (!item || !photo) return { groupsHit: vg.groupsHit, matched: vg.matched };
+  var role = resolveSectionRole(item);
 
-  if (item.sectionId === 'nakano' && isAnchorPhotoPlace(blob, item.photoAnchorTerms)) {
-    if (/figure|フィギュア|manga|漫画|漫畫|toy|玩具|hobby|ホビー|模型|公仔|figurine|comic/i.test(blob)) {
+  if (role === 'anime' && isAnchorPhotoPlace(blob, item.photoAnchorTerms)) {
+    if (/figure|フィギュア|manga|漫画|漫畫|toy|玩具|hobby|ホビー|模型|公仔|figurine|comic|ガチャ|gachapon/i.test(blob)) {
       supplemental = 1;
       extra.push('collectible_evidence');
     } else if (photo._index >= 1 && !/corridor|走道|廊下|entrance|入口|lobby/i.test(blob)) {
@@ -111,17 +115,17 @@ function supplementVisualGroups(blob, photo, item, vg) {
     }
   }
 
-  if (item.sectionId === 'gachapon' && isAnchorPhotoPlace(blob, item.photoAnchorTerms)) {
-    if (photo._index >= 1 || /machine|機|interior|店内|wall|capsule/i.test(blob)) {
-      supplemental = 1;
-      extra.push('gachapon_interior');
+  if ((role === 'shopping' || role === 'anime') && item.rejectExteriorPhoto && isAnchorPhotoPlace(blob, item.photoAnchorTerms)) {
+    if (photo._index >= 1 || /machine|機|interior|店内|wall|capsule|ガチャ/i.test(blob)) {
+      supplemental = Math.max(supplemental, 1);
+      extra.push('interior_evidence');
     }
   }
 
-  if ((item.sectionId === 'akihabara' || item.sectionId === 'hero-anime') && isAnchorPhotoPlace(blob, item.photoAnchorTerms)) {
-    if (/radio|ラジオ|animate|アニメイト|gigo|ゲーセン|中央通|neon|霓虹|看板|sign/i.test(blob)) {
+  if ((role === 'landmark' || role === 'opening') && isAnchorPhotoPlace(blob, item.photoAnchorTerms)) {
+    if (/radio|ラジオ|animate|アニメイト|gigo|ゲーセン|中央通|neon|霓虹|看板|sign|street|街/i.test(blob)) {
       supplemental = Math.max(supplemental, 1);
-      extra.push('akihabara_landmark');
+      extra.push('landmark_street');
     }
   }
 
@@ -148,8 +152,8 @@ export function validatePhotoIntentGate(blob, item, context) {
     return { ok: false, reason: 'exterior_only', matchedChecklist: [] };
   }
 
-  if (isGenericNakanoCorridor(blob, item)) {
-    return { ok: false, reason: 'nakano_corridor', matchedChecklist: [] };
+  if (isGenericAnimeCorridor(blob, item)) {
+    return { ok: false, reason: 'anime_corridor', matchedChecklist: [] };
   }
 
   if (item.minPhotoIndex != null && photo && photo._index < item.minPhotoIndex) {
@@ -220,7 +224,7 @@ export function runEditorialQA(section, photoResult) {
       var okVenue = matchTerms(attr, [section.officialNameLocal, section.officialName, section.subject])
         .concat(matchTerms(attr, section.aliases || []))
         .concat(matchTerms(attr, section.photoAnchorTerms || []));
-      if (!okVenue.length && section.sectionId !== 'nakano') {
+      if (!okVenue.length && resolveSectionRole(section) !== 'anime') {
         issues.push('attribution_drift');
       }
     }

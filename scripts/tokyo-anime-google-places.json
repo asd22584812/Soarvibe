@@ -11,14 +11,14 @@
     "imageSource": "google_places",
     "matched": true,
     "placeName": "秋葉原ラジオ会館",
-    "photoScore": 149,
+    "photoScore": 151,
     "photoIndex": 1,
-    "photoCaption": "RadioKaikan前，電氣街霓虹亮起。",
+    "photoCaption": "RadioKaikan外牆滿版動漫廣告，是秋葉原最醒目的地標之一。",
     "matchedKeywords": [
       "ラジオ会館",
       "ラジオ会館",
       "ラジオ会館",
-      "akihabara_landmark"
+      "landmark_street"
     ],
     "photoPlaceName": "秋葉原ラジオ会館",
     "searchUsed": "ラジオ会館 秋葉原",
@@ -32,7 +32,7 @@
       "usePlaceholder": false
     },
     "pipeline": {
-      "version": "rules",
+      "version": "engine-rules",
       "steps": [
         "place_verify",
         "keyword_search",
@@ -55,9 +55,9 @@
     "imageSource": "google_places",
     "matched": true,
     "placeName": "Nakano Broadway",
-    "photoScore": 149,
+    "photoScore": 155,
     "photoIndex": 1,
-    "photoCaption": "Mandarake櫥窗擺滿復古模型。",
+    "photoCaption": "Mandarake櫥窗擺滿模型與收藏品，是動漫迷最容易停下腳步的地方。",
     "matchedKeywords": [
       "まんだらけ",
       "まんだらけ 中野",
@@ -76,7 +76,7 @@
       "usePlaceholder": false
     },
     "pipeline": {
-      "version": "rules",
+      "version": "engine-rules",
       "steps": [
         "place_verify",
         "keyword_search",
@@ -99,19 +99,19 @@
     "imageSource": "google_places",
     "matched": true,
     "placeName": "Akihabara Gachapon Hall",
-    "photoScore": 235,
+    "photoScore": 227,
     "photoIndex": 1,
-    "photoCaption": "成排扭蛋機形成色彩繽紛的牆面。",
+    "photoCaption": "整排扭蛋機一路延伸，形成動漫迷最熟悉的風景。",
     "matchedKeywords": [
       "ガチャ",
       "ガチャポン",
       "秋葉原ガチャポン会館",
       "ガチャポン会館",
       "ガチャ",
-      "ガチャポン",
       "ガチャ",
       "ガチャポン",
-      "gachapon_interior"
+      "collectible_evidence",
+      "interior_evidence"
     ],
     "photoPlaceName": "秋葉原ガチャポン会館",
     "searchUsed": "placeId:ChIJBztW3x2MGGARadHYl5vTEK0",
@@ -125,7 +125,7 @@
       "usePlaceholder": false
     },
     "pipeline": {
-      "version": "rules",
+      "version": "engine-rules",
       "steps": [
         "place_verify",
         "keyword_search",
@@ -150,7 +150,7 @@
     "placeName": "Ramen Tanaka soba Akihabara",
     "photoScore": 133,
     "photoIndex": 1,
-    "photoCaption": "醬油湯頭拉麵，熱氣補給剛好。",
+    "photoCaption": "醬油湯頭與熱氣一同上桌，掃街中途最剛好的補給。",
     "matchedKeywords": [
       "田中",
       "田中そば店 秋葉原店",
@@ -171,7 +171,7 @@
       "usePlaceholder": false
     },
     "pipeline": {
-      "version": "rules",
+      "version": "engine-rules",
       "steps": [
         "place_verify",
         "keyword_search",
@@ -194,15 +194,13 @@
     "imageSource": "google_places",
     "matched": true,
     "placeName": "Maid Cafe MAID MADE Akihabara Electric Town-exit Store",
-    "photoScore": 181,
+    "photoScore": 143,
     "photoIndex": 0,
-    "photoCaption": "繽紛甜點與主題內裝並陳。",
+    "photoCaption": "繽紛甜點與主題內裝並陳，把次文化體驗留在味蕾裡。",
     "matchedKeywords": [
       "maid",
       "MAID MADE",
       "MAID MADE 秋葉原駅前店",
-      "MAID MADE",
-      "maid",
       "MAID MADE",
       "maid"
     ],
@@ -218,7 +216,7 @@
       "usePlaceholder": false
     },
     "pipeline": {
-      "version": "rules",
+      "version": "engine-rules",
       "steps": [
         "place_verify",
         "keyword_search",
@@ -236,22 +234,20 @@
     "placeId": "ChIJnxZoFqiOGGAReYJ1ck2lXiw",
     "googleRating": 4.2,
     "googleAddress": "Japan, 〒101-0025 Tokyo, Chiyoda City, Kanda Sakumachō, 1-chōme−８−３",
-    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZMfZAmFkUjLUwz2RvL4JUZIJoJ-ahqlMesU9IA13AepSHMLAVE1wlmrwWi3rn5SBZ9_oplMX9Qoj_PgFwrufs5hnjpHTOrKkNLVzTmmisLatFZ7CYKNltT5AR5kG4FnfJsNYUH3vorEclWlDg=s4800-w1280-h900",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZO5mjU060YMfaX123P9xa7rDCN-4bHqGwEr0YStpDQkeTyLQwmXir8w3mcubMptYWGSI0GuQZ4if38Wr6X9AN1IxFP4BuRNVz1ESlu6TBxM7eda3t9_XM1QunWjjbICJ-nGD694I-bkg5cvy3Q=s4800-w1600-h1200",
     "googleAttribution": "秋葉原ワシントンホテル",
     "imageSource": "google_places",
     "matched": true,
     "placeName": "Akihabara Washington Hotel",
-    "photoScore": 291,
-    "photoIndex": 0,
-    "photoCaption": "華盛頓飯店外觀，距車站一分鐘。",
+    "photoScore": 245,
+    "photoIndex": 1,
+    "photoCaption": "木質吧台夜間仍聚集旅人，交換著下一站的行程。",
     "matchedKeywords": [
       "ワシントン",
       "ホテル",
-      "秋葉原",
       "秋葉原ワシントンホテル",
-      "ホテル",
       "ワシントン",
-      "秋葉原",
+      "ホテル",
       "ワシントン"
     ],
     "photoPlaceName": "秋葉原ワシントンホテル",
@@ -266,7 +262,7 @@
       "usePlaceholder": false
     },
     "pipeline": {
-      "version": "rules",
+      "version": "engine-rules",
       "steps": [
         "place_verify",
         "keyword_search",
@@ -284,25 +280,24 @@
     "placeId": "ChIJ4U-9KsiOGGARARhaBLZLqS0",
     "googleRating": 4.5,
     "googleAddress": "2-chōme-14-13 Kuramae, Taito City, Tokyo 111-0051, Japan",
-    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZOu858-3Yk_8-FhzQ3ULs0mcZtYOUffv2kFSFje8jYX-jwVsPVL5gST0ngIQV0CrilJzD0BoKVMmQTA1RnG0Ke2fbDR8DmvHSf6lzsszFUeVtxta_sDe4uc5wMQX306ZfVazHkjxE6zUtH5tg=s4800-w1600-h1200",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZOg1D6WHfL76qkS3u8ZK4ZR8yjf4PbugRRaJ8bEYBjm_SHD15dCuMOHPD6S-xnMoWruo7mp8q-OuZsIcdTeoQhhbFbjaDsk5d2RvaKbI7C-CHqTPUgWSyjZj8PX7ieI7x3ljXCjmeUZEvxJTWc=s4800-w1600-h1200",
     "googleAttribution": "Nui. HOSTEL & BAR LOUNGE",
     "imageSource": "google_places",
     "matched": true,
     "placeName": "Nui. Hostel & Bar Lounge",
-    "photoScore": 251,
-    "photoIndex": 0,
-    "photoCaption": "公共吧台夜間仍有旅人交談。",
+    "photoScore": 257,
+    "photoIndex": 1,
+    "photoCaption": "木質吧台夜間仍聚集旅人，交換著下一站的行程。",
     "matchedKeywords": [
+      "bar",
+      "lounge",
       "Nui",
       "hostel",
-      "HOSTEL",
       "bar",
       "lounge",
       "Nui. HOSTEL & BAR LOUNGE",
       "Nui",
       "hostel",
-      "bar",
-      "lounge",
       "Nui",
       "HOSTEL"
     ],
@@ -318,7 +313,7 @@
       "usePlaceholder": false
     },
     "pipeline": {
-      "version": "rules",
+      "version": "engine-rules",
       "steps": [
         "place_verify",
         "keyword_search",
@@ -341,14 +336,14 @@
     "imageSource": "google_places",
     "matched": true,
     "placeName": "Akihabara Radio Kaikan",
-    "photoScore": 250,
+    "photoScore": 210,
     "photoIndex": 5,
-    "photoCaption": "RadioKaikan前，電氣街霓虹亮起。",
+    "photoCaption": "RadioKaikan外牆滿版動漫廣告，是秋葉原最醒目的地標之一。",
     "matchedKeywords": [
       "ラジオ会館",
       "ラジオ会館",
       "ラジオ会館",
-      "akihabara_landmark"
+      "landmark_street"
     ],
     "photoPlaceName": "秋葉原ラジオ会館",
     "searchUsed": "placeId:ChIJ__-AdayOGGAR6EGPwvcpzTA",
@@ -362,7 +357,7 @@
       "usePlaceholder": false
     },
     "pipeline": {
-      "version": "rules",
+      "version": "engine-rules",
       "steps": [
         "place_verify",
         "keyword_search",

@@ -1,0 +1,43 @@
+{
+  "$name": "SoarVibe Editorial Engine",
+  "$version": "1.1",
+  "$principle": "Google Places = data only. Editorial Engine = quality decisions.",
+  "pipeline": [
+    "topic",
+    "editorial_planning",
+    "story_planning",
+    "section_planning",
+    "content_planning",
+    "photo_planning",
+    "keyword_planning",
+    "google_places_validation",
+    "candidate_images",
+    "editorial_image_selection",
+    "caption_generation",
+    "editorial_qa",
+    "render"
+  ],
+  "article": {
+    "articleTheme": "主題一句話",
+    "editorialAngle": "編輯角度",
+    "storyline": "故事線",
+    "readerPersona": "讀者 persona",
+    "travelStyle": "旅行風格",
+    "emotion": "想傳達的情緒",
+    "articleGoal": "文章目標",
+    "readingRhythm": ["opening", "explore", "experience", "food", "shopping", "stay", "ending"]
+  },
+  "section": {
+    "sectionRole": "opening | landmark | explore | experience | shopping | anime | food | cafe | hotel | hostel | night | ending",
+    "photoIntent": "這張圖要讓讀者看到什麼",
+    "photoPriority": { "primary": [], "secondary": [], "tertiary": [] },
+    "searchKeywords": [],
+    "metadataRole": "決定 metadata capsule 欄位組 — 見 METADATA_BY_ROLE",
+    "metadataValues": "各欄位實際內容（依角色不同，例如 anime 無 budget）",
+    "captionIntent": "Caption 故事方向"
+  },
+  "googlePlaces": {
+    "provides": ["placeId", "address", "rating", "openingHours", "attribution", "photos_as_candidates"],
+    "doesNot": ["final_image_decision"]
+  }
+}

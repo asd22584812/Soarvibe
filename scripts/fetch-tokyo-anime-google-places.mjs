@@ -125,7 +125,12 @@ function buildPayload(editorial, dataSrc) {
       articleTheme: editorial.articleTheme,
       editorialAngle: editorial.editorialAngle,
       targetReader: editorial.targetReader,
+      readerPersona: editorial.readerPersona,
+      travelStyle: editorial.travelStyle,
+      emotion: editorial.emotion,
+      articleGoal: editorial.articleGoal,
       storyline: editorial.storyline,
+      readingRhythm: editorial.readingRhythm,
       editorialPlan: editorial.editorialPlan
     },
     sections: sections.concat([hero])
@@ -171,7 +176,7 @@ async function main() {
   const dataSrc = fs.readFileSync(DATA_PATH, 'utf8');
   const payload = buildPayload(editorial, dataSrc);
 
-  console.log('[PIPELINE]', USE_LEGACY_PLACES ? 'legacy-places' : 'rules-zero-token');
+  console.log('[PIPELINE]', USE_LEGACY_PLACES ? 'legacy-places' : 'engine-rules');
   const results = await resolveAll(payload);
   fs.writeFileSync(OUT_JSON, JSON.stringify(results, null, 2), 'utf8');
   console.log('[WROTE]', OUT_JSON);
