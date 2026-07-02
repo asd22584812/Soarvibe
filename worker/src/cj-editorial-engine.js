@@ -232,20 +232,29 @@ export function buildSearchKeywords(section) {
 export function normalizeSection(section, articleContext) {
   var role = resolveSectionRole(section);
   var priority = resolvePhotoPriority(section);
+  var subjectType = section.subjectType || (section.isSpecificVenue === true ? 'venue' : (section.isSpecificVenue === false ? 'district' : (role === 'landmark' || role === 'opening' ? 'district' : 'venue')));
   var minChecklistHits = section.minChecklistHits != null
     ? section.minChecklistHits
     : (section.requiredVisualMinGroups != null ? section.requiredVisualMinGroups : 2);
 
+  var districtRejects = subjectType === 'district' ? [
+    'hobby', 'ホビー', 'figure shop', '模型店', '店内', 'shop interior', 'mandarake', 'まんだらけ'
+  ] : [];
+
   return Object.assign({}, section, {
     sectionRole: role,
     sectionPurpose: section.sectionPurpose || role,
+    subjectType: subjectType,
     photoPriority: priority,
     minChecklistHits: minChecklistHits,
     searchKeywords: buildSearchKeywords(section),
     imageChecklist: Array.isArray(section.imageChecklist) ? section.imageChecklist : [],
-    imageRejectRules: Array.isArray(section.imageRejectRules) ? section.imageRejectRules : [],
+    imageRejectRules: Array.isArray(section.imageRejectRules)
+      ? section.imageRejectRules.concat(districtRejects)
+      : districtRejects.slice(),
     metadataRole: section.metadataRole || role,
-    captionIntent: section.captionIntent || 'Describe what the reader sees in the photo as a short story beat.',
+    captionIntent: section.captionIntent || 'Describe only what is visible in the photo.',
+    photoFirst: section.photoFirst !== false,
     articleTheme: section.articleTheme || (articleContext && articleContext.articleTheme) || null,
     editorialAngle: section.editorialAngle || (articleContext && articleContext.editorialAngle) || null,
     readerPersona: section.readerPersona || (articleContext && articleContext.readerPersona) || null
@@ -268,6 +277,13 @@ export function buildMetadataCapsule(section) {
   }).filter(function (row) { return row && row.value; });
 }
 
+import {
+  classifyPhotoEvidence,
+  evidenceAllowedForSection,
+  validateCaptionMatchesEvidence,
+  validateLodgingVenueAttribution
+} from './cj-photo-evidence.js';
+
 export function runEngineQA(section, photoResult, caption) {
   var issues = [];
   if (!section) return { pass: false, issues: ['missing_section'], usePlaceholder: true };
@@ -275,43 +291,33 @@ export function runEngineQA(section, photoResult, caption) {
     return { pass: false, issues: ['no_photo'], usePlaceholder: true, recommendation: 'use_placeholder' };
   }
 
-  var role = resolveSectionRole(section);
   var blob = [
     photoResult.photoPlaceName,
     photoResult.googleAttribution,
     (photoResult.matchedKeywords || []).join(' ')
   ].join(' ').toLowerCase();
 
-  var streetSignals = false;
-  if (role === 'landmark' || role === 'opening' || role === 'explore') {
-    streetSignals = /中央通|chuo|central|neon|霓虹|radio|ラジオ|animate|gigo|街|street|electric/i.test(blob);
-    var shopOnly = /hobby|ホビー|figure only|模型店|mandarake interior|フィギュア店/i.test(blob) && !streetSignals;
-    if (shopOnly) issues.push('landmark_shop_only');
-  }
+  var evidence = photoResult.photoEvidence || classifyPhotoEvidence(blob, section);
+  var evidenceOk = evidenceAllowedForSection(evidence, section);
+  if (!evidenceOk.ok) issues.push(evidenceOk.reason);
 
-  if (role === 'anime' && /corridor|走道|廊下|empty mall/i.test(blob) && !/mandarake|figure|フィギュア|公仔|ガチャ|gachapon/i.test(blob)) {
-    issues.push('anime_corridor_only');
-  }
-
-  if ((role === 'hotel' || role === 'hostel')) {
-    if (/facade|exterior|外観|building only/i.test(blob) && !/lobby|room|bar|lounge|客房|dorm/i.test(blob)) {
-      issues.push('hotel_exterior_only');
-    }
-  }
-
-  if (role === 'cafe' && /logo|sign only|招牌のみ/i.test(blob) && !/dessert|甜點|drink|飲|パフェ/i.test(blob)) {
-    issues.push('cafe_logo_only');
-  }
+  var lodging = validateLodgingVenueAttribution(photoResult.googleAttribution, section);
+  if (!lodging.ok) issues.push(lodging.reason);
 
   if (!caption || caption.length < 8) issues.push('caption_missing');
-  if (caption && /一景。?$/.test(caption)) issues.push('caption_generic');
+  var capOk = validateCaptionMatchesEvidence(caption, evidence);
+  if (!capOk.ok) issues.push(capOk.reason);
+
+  var rejectEvidence = [
+    'district_shop_interior', 'district_no_street', 'cafe_no_experience',
+    'food_no_dish', 'logo_only', 'lodging_venue_mismatch', 'unknown_evidence'
+  ];
 
   return {
     pass: issues.length === 0,
     issues: issues,
-    usePlaceholder: issues.some(function (i) {
-      return i === 'landmark_shop_only' || i === 'hotel_exterior_only' || i === 'anime_corridor_only' || i === 'cafe_logo_only';
-    }),
+    photoEvidence: evidence,
+    usePlaceholder: issues.some(function (i) { return rejectEvidence.indexOf(i) !== -1; }),
     recommendation: issues.length ? 'swap_image' : 'approve'
   };
 }

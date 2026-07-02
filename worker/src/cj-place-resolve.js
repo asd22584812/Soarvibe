@@ -100,6 +100,16 @@ export function validatePhotoAttribution(attribution, item) {
   }
 
   var looksLikeVenue = /店|館|hotel|hostel|restaurant|cafe|咖啡|旅館|ホテル|カフェ|pod|ポッド|cinema|theater|theatre|映画|メイド|maid/i.test(attr);
+  var role = item.sectionRole || item.sectionType;
+  var strictLodging = role === 'hotel' || role === 'hostel' || item.sectionType === 'hotel' || item.sectionType === 'hostel';
+
+  if (strictLodging) {
+    if (!containsAny(attr, terms)) {
+      return { ok: false, reason: 'lodging_attribution_strict_mismatch', attribution: attr };
+    }
+    return { ok: true };
+  }
+
   if (looksLikeVenue) {
     if (!containsAny(attr, terms)) {
       var hints = Array.isArray(item.addressHints) ? item.addressHints : [];

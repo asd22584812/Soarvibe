@@ -1,5 +1,9 @@
 import { validatePhotoIntentGate } from './cj-editorial-pipeline.js';
 import { resolveSectionRole } from './cj-editorial-engine.js';
+import {
+  classifyPhotoEvidence,
+  evidenceAllowedForSection
+} from './cj-photo-evidence.js';
 
 var BAD_GLOBAL = /tiger|white tiger|zoo|garden|residential|repair shop|garage|pool|beach|villa|白老虎|修車|住宅|花園|泳池/i;
 var BAD_HERO = /lobby|interior|indoor|entrance|door|reception|室内|入口|大廳|電梯|elevator|corridor|走廊|parking|駐車/i;
@@ -77,14 +81,15 @@ export function scorePhoto(photo, context) {
     if (idx === 2) score += 4;
   }
 
-  if (sectionRole === 'landmark' || sectionRole === 'explore') {
-    if (STREET_LANDMARK.test(blob)) score += 28;
-    if (ratio >= 1.15) score += 14;
+  if (sectionRole === 'landmark' || sectionRole === 'explore' || sectionRole === 'opening') {
+    if (STREET_LANDMARK.test(blob)) score += 32;
+    if (ratio >= 1.15) score += 16;
     if (BAD_LANDMARK.test(blob)) score -= 25;
-    if (/figure|フィギュア|hobby|ホビー|模型|mandarake|まんだらけ/i.test(blob) && !STREET_LANDMARK.test(blob)) {
-      score -= 42;
+    if (/figure|フィギュア|hobby|ホビー|模型|mandarake|まんだらけ|shop interior|店内|toy shop/i.test(blob) && !STREET_LANDMARK.test(blob)) {
+      score -= 55;
     }
-    if (/crowd|人潮|neon|霓虹|看板|signage/i.test(blob)) score += 12;
+    if (/crowd|人潮|neon|霓虹|看板|signage/i.test(blob)) score += 14;
+    if (idx === 0 && /hobby|ホビー|figure|模型|店内/i.test(blob)) score -= 40;
   }
 
   if (sectionRole === 'anime') {
@@ -109,9 +114,10 @@ export function scorePhoto(photo, context) {
   }
 
   if (sectionRole === 'cafe' || sectionType === 'cafe') {
-    if (/dessert|甜點|パフェ|cake|drink|飲|plate|料理/i.test(blob)) score += 28;
-    if (/cafe|coffee|maid|カフェ|interior|内装|店内/i.test(blob)) score += 16;
-    if (/logo|sign only|招牌のみ/i.test(blob) && !/dessert|甜點|drink/i.test(blob)) score -= 32;
+    if (/dessert|甜點|パフェ|cake|drink|飲|plate|料理/i.test(blob)) score += 32;
+    if (/cafe|coffee|maid|カフェ|interior|内装|店内|seating/i.test(blob)) score += 18;
+    if (/logo|sign only|招牌のみ/i.test(blob) && !/dessert|甜點|drink|interior/i.test(blob)) score -= 50;
+    if (!/dessert|甜點|drink|interior|maid|メイド|カフェ/i.test(blob) && /店|shop|made/i.test(blob)) score -= 35;
     if (BAD_FOOD.test(blob)) score -= 30;
   }
 
@@ -140,22 +146,31 @@ export function scorePhoto(photo, context) {
 }
 
 export function photoContentGate(photo, context, item) {
+  var attrOnly = photoAttrText(photo).toLowerCase();
   var evidenceBlob = buildPhotoEvidenceBlob(photo, context);
   var keywords = context.visualKeywords || [];
   var matchedKeywords = matchVisualKeywords(evidenceBlob, keywords);
   var score = scorePhoto(photo, Object.assign({}, context, { visualKeywords: keywords }));
   var role = context.role || 'section';
-  var minScore = role === 'hero' ? 75 : 62;
+  var sectionRole = (item && item.sectionRole) || context.sectionRole || resolveSectionRole(item || context);
+  var minScore = role === 'hero' ? 78 : 65;
   var gateCtx = Object.assign({}, context || {}, { photo: photo, placeName: context.placeName || '' });
   var intentGate = validatePhotoIntentGate(evidenceBlob, item || context, gateCtx);
-  var ok = score >= minScore && intentGate.ok && !BAD_GLOBAL.test(evidenceBlob);
+  var classifyBlob = evidenceBlob + ' ' + matchedKeywords.join(' ');
+  if (sectionRole === 'hotel' || sectionRole === 'hostel' || sectionRole === 'cafe' || sectionRole === 'food') {
+    classifyBlob = attrOnly + ' ' + matchedKeywords.join(' ');
+  }
+  var evidence = classifyPhotoEvidence(classifyBlob, item || context);
+  var evidenceGate = evidenceAllowedForSection(evidence, item || context);
+  var ok = score >= minScore && intentGate.ok && evidenceGate.ok && !BAD_GLOBAL.test(evidenceBlob);
 
   return {
     ok: ok,
     score: score,
     matchedKeywords: matchedKeywords.concat(intentGate.matchedChecklist || []),
     blob: evidenceBlob,
-    rejectReason: intentGate.ok ? null : intentGate.reason,
+    photoEvidence: evidence,
+    rejectReason: !evidenceGate.ok ? evidenceGate.reason : (intentGate.ok ? null : intentGate.reason),
     anchorPlace: intentGate.anchorPlace || false
   };
 }

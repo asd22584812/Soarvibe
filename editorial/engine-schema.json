@@ -1,6 +1,16 @@
 {
   "$name": "SoarVibe Editorial Engine",
-  "$version": "1.1",
+  "$version": "1.2",
+  "photoFirst": {
+    "principle": "先決定圖片 → 分類 evidence → 再寫 caption → QA",
+    "rules": [
+      "文案介紹什麼，圖片就展示什麼",
+      "Caption 只能描述圖片真正出現的內容",
+      "圖片與文案不得互相腦補",
+      "不允許文不對圖",
+      "住宿圖片必須與介紹的飯店/旅宿完全一致"
+    ]
+  },
   "$principle": "Google Places = data only. Editorial Engine = quality decisions.",
   "pipeline": [
     "topic",
@@ -28,7 +38,8 @@
     "readingRhythm": ["opening", "explore", "experience", "food", "shopping", "stay", "ending"]
   },
   "section": {
-    "sectionRole": "opening | landmark | explore | experience | shopping | anime | food | cafe | hotel | hostel | night | ending",
+    "sectionRole": "opening | landmark | ...",
+    "subjectType": "district | venue",
     "photoIntent": "這張圖要讓讀者看到什麼",
     "photoPriority": { "primary": [], "secondary": [], "tertiary": [] },
     "searchKeywords": [],

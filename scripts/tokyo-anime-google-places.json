@@ -6,23 +6,39 @@
     "placeId": "ChIJ__-AdayOGGAR6EGPwvcpzTA",
     "googleRating": 4.3,
     "googleAddress": "〒101-0021 東京都千代田区外神田１丁目１５−１６",
-    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZPBhCe7ID8YhpkgYpjj7i3ft7MBO85EcaEJy48A8o9tplrjK28bV-k0DGBsuoglvDfeXYyx6M3Md7vkzOmYK2U32yaroLAJxl4WDxDzVyOicV-diOLxWqWuZaDhE2eM1_B8eKXjEYk2QGNDhrQOuAi29w=s4800-w1600-h1200",
-    "googleAttribution": "Giampaolo Mancinelli",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZOHYO_SgGBRMcVmv9ecXnmYruO5k1p6rko_pTx0oDpoUlEGab5lFQRxO-wGQKh6dVbuBFUKopXPEmXfkbzx6XVbzxdX07xpq1GwFhnsrR6KmNzRcKXhjA2tiujK22MR4vKJxZ22bDnnDNNjSw=s4800-w1600-h1200",
+    "googleAttribution": "t s",
     "imageSource": "google_places",
     "matched": true,
     "placeName": "秋葉原ラジオ会館",
-    "photoScore": 151,
-    "photoIndex": 1,
-    "photoCaption": "RadioKaikan外牆滿版動漫廣告，是秋葉原最醒目的地標之一。",
+    "photoScore": 157,
+    "photoIndex": 0,
+    "photoCaption": "Animate本館前人潮與招牌交織，電氣街節奏從這裡開始。",
+    "photoEvidence": {
+      "primary": "street_landmark",
+      "types": [
+        "landmark_building",
+        "street_landmark"
+      ],
+      "signals": [
+        "street",
+        "アニメイト",
+        "landmark",
+        "アニメイト"
+      ],
+      "subjectType": "district",
+      "role": "landmark",
+      "blob": "アニメイト秋葉原 t s アニメイト秋葉原 アニメイト アニメイト秋葉原 アニメイト landmark_street"
+    },
     "matchedKeywords": [
-      "ラジオ会館",
-      "ラジオ会館",
-      "ラジオ会館",
+      "アニメイト",
+      "アニメイト秋葉原",
+      "アニメイト",
       "landmark_street"
     ],
-    "photoPlaceName": "秋葉原ラジオ会館",
+    "photoPlaceName": "アニメイト秋葉原",
     "searchUsed": "ラジオ会館 秋葉原",
-    "photoSearchUsed": "ラジオ会館 秋葉原",
+    "photoSearchUsed": "アニメイト 秋葉原本店",
     "sectionType": "landmark",
     "role": null,
     "rejectReason": null,
@@ -32,12 +48,12 @@
       "usePlaceholder": false
     },
     "pipeline": {
-      "version": "engine-rules",
+      "version": "photo-first",
       "steps": [
         "place_verify",
         "keyword_search",
-        "rule_photo_pick",
-        "template_caption",
+        "photo_first_pick",
+        "evidence_caption",
         "rule_qa"
       ],
       "aiTokens": 0
@@ -58,6 +74,22 @@
     "photoScore": 155,
     "photoIndex": 1,
     "photoCaption": "Mandarake櫥窗擺滿模型與收藏品，是動漫迷最容易停下腳步的地方。",
+    "photoEvidence": {
+      "primary": "anime_collectible",
+      "types": [
+        "shop_interior",
+        "anime_collectible",
+        "cafe_interior"
+      ],
+      "signals": [
+        "まんだらけ",
+        "まんだらけ",
+        "interior"
+      ],
+      "subjectType": "venue",
+      "role": "anime",
+      "blob": "まんだらけ 中野店 alejandro arruebo rello まんだらけ 中野店 まんだらけ まんだらけ 中野 まんだらけ anchor_interior"
+    },
     "matchedKeywords": [
       "まんだらけ",
       "まんだらけ 中野",
@@ -76,12 +108,12 @@
       "usePlaceholder": false
     },
     "pipeline": {
-      "version": "engine-rules",
+      "version": "photo-first",
       "steps": [
         "place_verify",
         "keyword_search",
-        "rule_photo_pick",
-        "template_caption",
+        "photo_first_pick",
+        "evidence_caption",
         "rule_qa"
       ],
       "aiTokens": 0
@@ -101,7 +133,25 @@
     "placeName": "Akihabara Gachapon Hall",
     "photoScore": 227,
     "photoIndex": 1,
-    "photoCaption": "整排扭蛋機一路延伸，形成動漫迷最熟悉的風景。",
+    "photoCaption": "整排扭蛋機一路延伸，色彩與機台本身就是風景。",
+    "photoEvidence": {
+      "primary": "gachapon_wall",
+      "types": [
+        "shop_interior",
+        "gachapon_wall",
+        "anime_collectible",
+        "cafe_interior"
+      ],
+      "signals": [
+        "collectible",
+        "ガチャ",
+        "collectible",
+        "interior"
+      ],
+      "subjectType": "venue",
+      "role": "anime",
+      "blob": "秋葉原ガチャポン会館 loki 秋葉原ガチャポン会館 ガチャ ガチャポン 秋葉原ガチャポン会館 ガチャポン会館 ガチャ ガチャ ガチャポン collectible_evidence interior_evidence"
+    },
     "matchedKeywords": [
       "ガチャ",
       "ガチャポン",
@@ -125,12 +175,12 @@
       "usePlaceholder": false
     },
     "pipeline": {
-      "version": "engine-rules",
+      "version": "photo-first",
       "steps": [
         "place_verify",
         "keyword_search",
-        "rule_photo_pick",
-        "template_caption",
+        "photo_first_pick",
+        "evidence_caption",
         "rule_qa"
       ],
       "aiTokens": 0
@@ -148,20 +198,40 @@
     "imageSource": "google_places",
     "matched": true,
     "placeName": "Ramen Tanaka soba Akihabara",
-    "photoScore": 133,
+    "photoScore": 263,
     "photoIndex": 1,
-    "photoCaption": "醬油湯頭與熱氣一同上桌，掃街中途最剛好的補給。",
+    "photoCaption": "醬油湯頭與麵一同上桌，熱氣與香氣先於店名被記住。",
+    "photoEvidence": {
+      "primary": "food_dish",
+      "types": [
+        "food_dish"
+      ],
+      "signals": [
+        "ramen",
+        "soba"
+      ],
+      "subjectType": "venue",
+      "role": "food",
+      "blob": "ramen tanaka soba akihabara ramen tanaka soba akihabara ramen soba 田中 ramen tanaka soba akihabara 田中そば tanaka soba akihabara ramen soba 田中 田中そば tanaka そば"
+    },
     "matchedKeywords": [
+      "ramen",
+      "soba",
       "田中",
       "田中そば店 秋葉原店",
+      "Ramen Tanaka Soba Akihabara",
       "田中そば",
+      "Tanaka Soba Akihabara",
+      "ramen",
+      "soba",
       "田中",
       "田中そば",
+      "Tanaka",
       "そば"
     ],
-    "photoPlaceName": "田中そば店 秋葉原店",
+    "photoPlaceName": "Ramen Tanaka soba Akihabara",
     "searchUsed": "placeId:ChIJXTeLYx6MGGARNivhJ55nYVw",
-    "photoSearchUsed": "田中そば店 秋葉原店",
+    "photoSearchUsed": "Ramen Tanaka Soba Akihabara",
     "sectionType": "food",
     "role": null,
     "rejectReason": null,
@@ -171,12 +241,12 @@
       "usePlaceholder": false
     },
     "pipeline": {
-      "version": "engine-rules",
+      "version": "photo-first",
       "steps": [
         "place_verify",
         "keyword_search",
-        "rule_photo_pick",
-        "template_caption",
+        "photo_first_pick",
+        "evidence_caption",
         "rule_qa"
       ],
       "aiTokens": 0
@@ -189,39 +259,38 @@
     "placeId": "ChIJvQtxBAaNGGARTiTMJ-Nzhvc",
     "googleRating": 4.9,
     "googleAddress": "Japan, 〒101-0021 Tokyo, Chiyoda City, Sotokanda, 1-chōme−15−13 秋葉原 神田B&Vビル 10F",
-    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZOUyqgrwMTWl3lM7gnXTjGrq0OuwG8yLijBp-k410VbbmkroisVOrm5NILgikRmtlqjzAtG1pd8EyXECtZzlC_FpQcH22M_iV2Mmpgi9fCyWeO7q1GGLMRga64V2_BZRRlifLk4afANyDmmQDM=s4800-w1365-h1200",
-    "googleAttribution": "MAID MADE 秋葉原駅前店",
-    "imageSource": "google_places",
-    "matched": true,
+    "googlePhotoUrl": null,
+    "googleAttribution": null,
+    "imageSource": null,
+    "matched": false,
     "placeName": "Maid Cafe MAID MADE Akihabara Electric Town-exit Store",
-    "photoScore": 143,
-    "photoIndex": 0,
-    "photoCaption": "繽紛甜點與主題內裝並陳，把次文化體驗留在味蕾裡。",
-    "matchedKeywords": [
-      "maid",
-      "MAID MADE",
-      "MAID MADE 秋葉原駅前店",
-      "MAID MADE",
-      "maid"
-    ],
-    "photoPlaceName": "MAID MADE 秋葉原駅前店",
+    "photoScore": null,
+    "photoIndex": null,
+    "photoCaption": null,
+    "photoEvidence": null,
+    "matchedKeywords": [],
+    "photoPlaceName": null,
     "searchUsed": "placeId:ChIJvQtxBAaNGGARTiTMJ-Nzhvc",
-    "photoSearchUsed": "MAID MADE 秋葉原駅前店",
+    "photoSearchUsed": null,
     "sectionType": "cafe",
     "role": null,
-    "rejectReason": null,
+    "rejectReason": "no_photo",
     "editorialQA": {
-      "ok": true,
-      "issues": [],
-      "usePlaceholder": false
+      "ok": false,
+      "issues": [
+        "no_photo"
+      ],
+      "usePlaceholder": true,
+      "pass": false,
+      "recommendation": "use_placeholder"
     },
     "pipeline": {
-      "version": "engine-rules",
+      "version": "photo-first",
       "steps": [
         "place_verify",
         "keyword_search",
-        "rule_photo_pick",
-        "template_caption",
+        "photo_first_pick",
+        "evidence_caption",
         "rule_qa"
       ],
       "aiTokens": 0
@@ -234,40 +303,38 @@
     "placeId": "ChIJnxZoFqiOGGAReYJ1ck2lXiw",
     "googleRating": 4.2,
     "googleAddress": "Japan, 〒101-0025 Tokyo, Chiyoda City, Kanda Sakumachō, 1-chōme−８−３",
-    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZO5mjU060YMfaX123P9xa7rDCN-4bHqGwEr0YStpDQkeTyLQwmXir8w3mcubMptYWGSI0GuQZ4if38Wr6X9AN1IxFP4BuRNVz1ESlu6TBxM7eda3t9_XM1QunWjjbICJ-nGD694I-bkg5cvy3Q=s4800-w1600-h1200",
-    "googleAttribution": "秋葉原ワシントンホテル",
-    "imageSource": "google_places",
-    "matched": true,
+    "googlePhotoUrl": null,
+    "googleAttribution": null,
+    "imageSource": null,
+    "matched": false,
     "placeName": "Akihabara Washington Hotel",
-    "photoScore": 245,
-    "photoIndex": 1,
-    "photoCaption": "木質吧台夜間仍聚集旅人，交換著下一站的行程。",
-    "matchedKeywords": [
-      "ワシントン",
-      "ホテル",
-      "秋葉原ワシントンホテル",
-      "ワシントン",
-      "ホテル",
-      "ワシントン"
-    ],
-    "photoPlaceName": "秋葉原ワシントンホテル",
+    "photoScore": null,
+    "photoIndex": null,
+    "photoCaption": null,
+    "photoEvidence": null,
+    "matchedKeywords": [],
+    "photoPlaceName": null,
     "searchUsed": "placeId:ChIJnxZoFqiOGGAReYJ1ck2lXiw",
-    "photoSearchUsed": "秋葉原ワシントンホテル",
+    "photoSearchUsed": null,
     "sectionType": "hotel",
     "role": null,
-    "rejectReason": null,
+    "rejectReason": "no_photo",
     "editorialQA": {
-      "ok": true,
-      "issues": [],
-      "usePlaceholder": false
+      "ok": false,
+      "issues": [
+        "no_photo"
+      ],
+      "usePlaceholder": true,
+      "pass": false,
+      "recommendation": "use_placeholder"
     },
     "pipeline": {
-      "version": "engine-rules",
+      "version": "photo-first",
       "steps": [
         "place_verify",
         "keyword_search",
-        "rule_photo_pick",
-        "template_caption",
+        "photo_first_pick",
+        "evidence_caption",
         "rule_qa"
       ],
       "aiTokens": 0
@@ -287,7 +354,25 @@
     "placeName": "Nui. Hostel & Bar Lounge",
     "photoScore": 257,
     "photoIndex": 1,
-    "photoCaption": "木質吧台夜間仍聚集旅人，交換著下一站的行程。",
+    "photoCaption": "公共吧台與交誼空間，是旅人交流最頻繁的角落。",
+    "photoEvidence": {
+      "primary": "lobby_bar",
+      "types": [
+        "lobby_bar",
+        "lobby_bar",
+        "lobby_bar"
+      ],
+      "signals": [
+        "lounge",
+        "bar lounge",
+        "hostel bar",
+        "hostel",
+        "lounge"
+      ],
+      "subjectType": "venue",
+      "role": "hostel",
+      "blob": "nui. hostel & bar lounge nui. hostel & bar lounge nui. hostel & bar lounge bar lounge nui hostel bar lounge nui. hostel & bar lounge nui hostel nui hostel"
+    },
     "matchedKeywords": [
       "bar",
       "lounge",
@@ -313,12 +398,12 @@
       "usePlaceholder": false
     },
     "pipeline": {
-      "version": "engine-rules",
+      "version": "photo-first",
       "steps": [
         "place_verify",
         "keyword_search",
-        "rule_photo_pick",
-        "template_caption",
+        "photo_first_pick",
+        "evidence_caption",
         "rule_qa"
       ],
       "aiTokens": 0
@@ -331,23 +416,41 @@
     "placeId": "ChIJ__-AdayOGGAR6EGPwvcpzTA",
     "googleRating": 4.3,
     "googleAddress": "1-chōme-15-16 Sotokanda, Chiyoda City, Tokyo 101-0021, Japan",
-    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZMe_u7MHUCtlmxvi13hLlj_FIl2RMOOCKW3CCVYv3Cp4EWxCPX4UQxR5qNsCctYBZrL5atHBIA5y_7KDn6C2PlvdKqP63yXJmRvc9VHvN58W52s3N6NPDZHw2gBhhGcE2epbscAsfwIaTkEV9c=s4800-w1600-h1200",
-    "googleAttribution": "David Di",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZMrg4lrJ4GyhyfYfM4EL9lOvQVl26MHzCGJ4JpAs_T5wc8J_eoaKfTmlq12gn0hZp69U-9s7iwDWaX0xnkuYBEehTJuBL0mAN4ealzHkN_FHyZ62NzILcu81JRudNzxfIPh0yhtlE-21x7l=s4800-w1600-h1200",
+    "googleAttribution": "Blake Bishop",
     "imageSource": "google_places",
     "matched": true,
     "placeName": "Akihabara Radio Kaikan",
-    "photoScore": 210,
-    "photoIndex": 5,
-    "photoCaption": "RadioKaikan外牆滿版動漫廣告，是秋葉原最醒目的地標之一。",
+    "photoScore": 252,
+    "photoIndex": 1,
+    "photoCaption": "GIGO大型看板矗立街頭，是電氣街一眼辨識的地標。",
+    "photoEvidence": {
+      "primary": "street_landmark",
+      "types": [
+        "landmark_building",
+        "street_landmark"
+      ],
+      "signals": [
+        "street",
+        "gigo",
+        "landmark",
+        "gigo"
+      ],
+      "subjectType": "district",
+      "role": "opening",
+      "blob": "gigo秋葉原3号館 blake bishop gigo秋葉原3号館 gigo gigo gigo秋葉原 gigo gigo landmark_street"
+    },
     "matchedKeywords": [
-      "ラジオ会館",
-      "ラジオ会館",
-      "ラジオ会館",
+      "GIGO",
+      "GIGO",
+      "GIGO秋葉原",
+      "GIGO",
+      "gigo",
       "landmark_street"
     ],
-    "photoPlaceName": "秋葉原ラジオ会館",
+    "photoPlaceName": "GiGO秋葉原3号館",
     "searchUsed": "placeId:ChIJ__-AdayOGGAR6EGPwvcpzTA",
-    "photoSearchUsed": "ラジオ会館 秋葉原",
+    "photoSearchUsed": "GIGO 秋葉原",
     "sectionType": "landmark",
     "role": "hero",
     "rejectReason": null,
@@ -357,12 +460,12 @@
       "usePlaceholder": false
     },
     "pipeline": {
-      "version": "engine-rules",
+      "version": "photo-first",
       "steps": [
         "place_verify",
         "keyword_search",
-        "rule_photo_pick",
-        "template_caption",
+        "photo_first_pick",
+        "evidence_caption",
         "rule_qa"
       ],
       "aiTokens": 0
