@@ -109,10 +109,11 @@ async function pickScoredPhoto(mapsKey, place, context, excludeUrls, item, deps)
         photoPlaceName: placeName,
         photoEvidence: capPack.photoEvidence,
         photoCaption: capPack.caption,
+        placeId: item.placeId || null,
         anchorPlace: row.gate.anchorPlace || false,
         rejectReason: null
       };
-      var preQa = runEngineQA(item, candidate, capPack.caption);
+      var preQa = runEngineQA(item, candidate, capPack.caption, item.placeId);
       if (preQa.usePlaceholder) continue;
       return candidate;
     }
@@ -197,13 +198,15 @@ export async function resolveSectionRules(mapsKey, item, articleCtx, deps) {
   var sectionId = String(section.sectionId || '').trim();
   var subject = String(section.subject || section.title || '').trim();
   var mapsQuery = String(section.mapsQuery || '').trim();
-  var pipelineLog = { version: 'photo-first', steps: [], aiTokens: 0 };
+  var pipelineLog = { version: 'semantic-match', steps: [], aiTokens: 0 };
 
   if (!sectionId) {
     return { sectionId: sectionId, error: 'missing_section_id' };
   }
 
   try {
+    pipelineLog.steps.push('copy_semantic_analysis');
+    pipelineLog.steps.push('derive_photo_intent');
     pipelineLog.steps.push('place_verify');
     var resolved = await resolveOfficialPlace(mapsKey, section, {
       getGooglePlaceById: deps.getGooglePlaceById,
@@ -235,7 +238,7 @@ export async function resolveSectionRules(mapsKey, item, articleCtx, deps) {
 
     pipelineLog.steps.push('evidence_caption');
     var qa = runEditorialQA(section, photoPick);
-    var engineQa = runEngineQA(section, photoPick, photoCaption);
+    var engineQa = runEngineQA(section, photoPick, photoCaption, placeId);
     if (engineQa.usePlaceholder) {
       qa = Object.assign({}, qa, engineQa);
     }
@@ -262,6 +265,8 @@ export async function resolveSectionRules(mapsKey, item, articleCtx, deps) {
       photoIndex: photoPick ? photoPick.photoIndex : null,
       photoCaption: photoCaption,
       photoEvidence: photoPick ? photoPick.photoEvidence : null,
+      copySemantics: section.copySemantics || null,
+      copyDerivedPhotoIntent: section.copyDerivedPhotoIntent || null,
       matchedKeywords: photoPick ? photoPick.matchedKeywords : [],
       photoPlaceName: photoPick ? photoPick.photoPlaceName : null,
       searchUsed: resolved.searchUsed || null,
@@ -292,5 +297,5 @@ export async function resolveArticleRules(mapsKey, payload, deps) {
     if (row.googlePhotoUrl) excludeUrls.push(row.googlePhotoUrl);
   }
 
-  return { results: results, excludeUrls: excludeUrls, pipelineVersion: 'photo-first' };
+  return { results: results, excludeUrls: excludeUrls, pipelineVersion: 'semantic-match' };
 }

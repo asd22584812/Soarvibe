@@ -15,5 +15,14 @@ export {
   buildSearchKeywords,
   matchTerms,
   buildMetadataCapsule,
-  runEngineQA
+  runEngineQA,
+  EDITORIAL_GOLDEN_RULE,
+  analyzeCopySemantics,
+  derivePhotoIntentFromSemantics
 } from './cj-editorial-engine.js';
+
+export {
+  runGoldenRuleQA,
+  evidenceMatchesCopySemantics,
+  SEMANTIC_CATEGORIES
+} from './cj-editorial-semantic.js';

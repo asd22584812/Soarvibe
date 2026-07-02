@@ -241,13 +241,23 @@ export function normalizeSection(section, articleContext) {
     'hobby', 'ホビー', 'figure shop', '模型店', '店内', 'shop interior', 'mandarake', 'まんだらけ'
   ] : [];
 
+  var copySemantics = analyzeCopySemantics(section);
+  var derivedIntent = derivePhotoIntentFromSemantics(copySemantics);
+  var mergedKeywords = buildSearchKeywords(section);
+  (derivedIntent.keywords || []).forEach(function (kw) {
+    if (mergedKeywords.indexOf(kw) === -1) mergedKeywords.push(kw);
+  });
+
   return Object.assign({}, section, {
     sectionRole: role,
     sectionPurpose: section.sectionPurpose || role,
     subjectType: subjectType,
     photoPriority: priority,
     minChecklistHits: minChecklistHits,
-    searchKeywords: buildSearchKeywords(section),
+    searchKeywords: mergedKeywords.slice(0, 48),
+    copySemantics: copySemantics,
+    copyDerivedPhotoIntent: derivedIntent.text,
+    photoIntent: section.photoIntent || derivedIntent.text,
     imageChecklist: Array.isArray(section.imageChecklist) ? section.imageChecklist : [],
     imageRejectRules: Array.isArray(section.imageRejectRules)
       ? section.imageRejectRules.concat(districtRejects)
@@ -283,41 +293,15 @@ import {
   validateCaptionMatchesEvidence,
   validateLodgingVenueAttribution
 } from './cj-photo-evidence.js';
+import {
+  analyzeCopySemantics,
+  derivePhotoIntentFromSemantics,
+  runGoldenRuleQA,
+  EDITORIAL_GOLDEN_RULE
+} from './cj-editorial-semantic.js';
 
-export function runEngineQA(section, photoResult, caption) {
-  var issues = [];
-  if (!section) return { pass: false, issues: ['missing_section'], usePlaceholder: true };
-  if (!photoResult || !photoResult.googlePhotoUrl) {
-    return { pass: false, issues: ['no_photo'], usePlaceholder: true, recommendation: 'use_placeholder' };
-  }
-
-  var blob = [
-    photoResult.photoPlaceName,
-    photoResult.googleAttribution,
-    (photoResult.matchedKeywords || []).join(' ')
-  ].join(' ').toLowerCase();
-
-  var evidence = photoResult.photoEvidence || classifyPhotoEvidence(blob, section);
-  var evidenceOk = evidenceAllowedForSection(evidence, section);
-  if (!evidenceOk.ok) issues.push(evidenceOk.reason);
-
-  var lodging = validateLodgingVenueAttribution(photoResult.googleAttribution, section);
-  if (!lodging.ok) issues.push(lodging.reason);
-
-  if (!caption || caption.length < 8) issues.push('caption_missing');
-  var capOk = validateCaptionMatchesEvidence(caption, evidence);
-  if (!capOk.ok) issues.push(capOk.reason);
-
-  var rejectEvidence = [
-    'district_shop_interior', 'district_no_street', 'cafe_no_experience',
-    'food_no_dish', 'logo_only', 'lodging_venue_mismatch', 'unknown_evidence'
-  ];
-
-  return {
-    pass: issues.length === 0,
-    issues: issues,
-    photoEvidence: evidence,
-    usePlaceholder: issues.some(function (i) { return rejectEvidence.indexOf(i) !== -1; }),
-    recommendation: issues.length ? 'swap_image' : 'approve'
-  };
+export function runEngineQA(section, photoResult, caption, resolvedPlaceId) {
+  return runGoldenRuleQA(section, photoResult, caption, section && section.copySemantics, resolvedPlaceId);
 }
+
+export { EDITORIAL_GOLDEN_RULE, analyzeCopySemantics, derivePhotoIntentFromSemantics };

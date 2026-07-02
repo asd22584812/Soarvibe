@@ -68,6 +68,17 @@
         SECTION_ROLES: SECTION_ROLES,
         METADATA_BY_ROLE: METADATA_BY_ROLE,
         METADATA_LABELS: METADATA_LABELS,
+        EDITORIAL_GOLDEN_RULE: {
+            principle: '圖片永遠服務文案，不是文案去配合圖片。',
+            rules: [
+                '圖片無法支撐文案 → 重新搜圖',
+                '不得修改文案迎合圖片',
+                '找不到 → placeholder',
+                'Caption 只描述圖片可見內容',
+                '住宿驗證 Hotel Name + Place ID',
+                '景點驗證 Landmark、美食驗證 Dish、體驗驗證 Activity'
+            ]
+        },
         resolveSectionRole: resolveSectionRole,
         buildMetadataTemplate: buildMetadataTemplate
     };

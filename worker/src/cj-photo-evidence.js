@@ -3,15 +3,13 @@
  * Caption and QA must follow evidence, never section wishful thinking.
  */
 import { matchTerms, resolveSectionRole } from './cj-editorial-engine.js';
-
 export var PHOTO_FIRST_RULES = {
-  principle: 'Pick photo → classify evidence → write caption from evidence → QA',
+  principle: 'Copy → semantic intent → pick photo → evidence caption → triple QA',
+  supersededBy: 'EDITORIAL_GOLDEN_RULE — 圖片服務文案',
   global: [
-    '文案介紹什麼，圖片就展示什麼',
-    'Caption 只能描述圖片真正出現的內容',
-    '圖片與文案不得互相腦補',
-    '不允許文不對圖',
-    '不允許使用與文章介紹不同地點、不同店家、不同飯店的圖片'
+    '圖片永遠服務文案',
+    'Caption 只描述圖片可見內容',
+    '找不到合格圖 → placeholder'
   ]
 };
 

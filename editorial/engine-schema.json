@@ -1,14 +1,36 @@
 {
   "$name": "SoarVibe Editorial Engine",
-  "$version": "1.2",
-  "photoFirst": {
-    "principle": "先決定圖片 → 分類 evidence → 再寫 caption → QA",
+  "$version": "1.3",
+  "editorialGoldenRule": {
+    "principle": "圖片永遠服務文案，不是文案去配合圖片。",
     "rules": [
-      "文案介紹什麼，圖片就展示什麼",
-      "Caption 只能描述圖片真正出現的內容",
-      "圖片與文案不得互相腦補",
-      "不允許文不對圖",
-      "住宿圖片必須與介紹的飯店/旅宿完全一致"
+      "如果圖片無法支撐文案，請重新搜尋圖片",
+      "不要修改文案來迎合找到的圖片",
+      "如果仍找不到，寧可 placeholder，也不要放錯圖",
+      "Caption 只能描述圖片中真正看得到的內容",
+      "住宿：驗證 Hotel Name + Place ID",
+      "景點：驗證 Landmark",
+      "美食：驗證 Dish",
+      "體驗：驗證 Activity",
+      "否則 Editorial QA 一律 FAIL"
+    ]
+  },
+  "semanticMatching": {
+    "flow": [
+      "copy_authoring",
+      "copy_semantic_analysis",
+      "derive_photo_intent",
+      "keyword_planning",
+      "google_places_validation",
+      "candidate_images",
+      "editorial_image_selection",
+      "evidence_caption",
+      "triple_qa_copy_image_caption",
+      "render"
+    ],
+    "semanticCategories": [
+      "street_scene", "landmark", "storefront", "shop_collectible",
+      "gachapon", "dish", "dessert", "cafe_experience", "lobby", "room", "night", "activity"
     ]
   },
   "$principle": "Google Places = data only. Editorial Engine = quality decisions.",
@@ -18,6 +40,7 @@
     "story_planning",
     "section_planning",
     "content_planning",
+    "copy_semantic_analysis",
     "photo_planning",
     "keyword_planning",
     "google_places_validation",
@@ -38,17 +61,19 @@
     "readingRhythm": ["opening", "explore", "experience", "food", "shopping", "stay", "ending"]
   },
   "section": {
-    "sectionRole": "opening | landmark | ...",
+    "sectionRole": "opening | landmark | explore | experience | shopping | anime | food | cafe | hotel | hostel | night | ending",
     "subjectType": "district | venue",
-    "photoIntent": "這張圖要讓讀者看到什麼",
+    "content": "文案（Golden Rule 源頭，pipeline 不得修改）",
+    "copySemantics": "analyzeCopySemantics() 輸出",
+    "copyDerivedPhotoIntent": "由文案語意推導的 Photo Intent",
+    "photoIntent": "搜圖意圖（優先來自文案語意）",
     "photoPriority": { "primary": [], "secondary": [], "tertiary": [] },
     "searchKeywords": [],
-    "metadataRole": "決定 metadata capsule 欄位組 — 見 METADATA_BY_ROLE",
-    "metadataValues": "各欄位實際內容（依角色不同，例如 anime 無 budget）",
-    "captionIntent": "Caption 故事方向"
+    "metadataRole": "決定 metadata capsule 欄位組",
+    "captionIntent": "Caption 僅描述圖片可見內容"
   },
   "googlePlaces": {
     "provides": ["placeId", "address", "rating", "openingHours", "attribution", "photos_as_candidates"],
-    "doesNot": ["final_image_decision"]
+    "doesNot": ["final_image_decision", "modify_copy"]
   }
 }

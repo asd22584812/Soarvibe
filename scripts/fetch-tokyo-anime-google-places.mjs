@@ -176,7 +176,7 @@ async function main() {
   const dataSrc = fs.readFileSync(DATA_PATH, 'utf8');
   const payload = buildPayload(editorial, dataSrc);
 
-  console.log('[PIPELINE]', USE_LEGACY_PLACES ? 'legacy-places' : 'photo-first');
+  console.log('[PIPELINE]', USE_LEGACY_PLACES ? 'legacy-places' : 'semantic-match');
   const results = await resolveAll(payload);
   fs.writeFileSync(OUT_JSON, JSON.stringify(results, null, 2), 'utf8');
   console.log('[WROTE]', OUT_JSON);

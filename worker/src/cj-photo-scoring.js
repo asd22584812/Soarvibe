@@ -4,6 +4,7 @@ import {
   classifyPhotoEvidence,
   evidenceAllowedForSection
 } from './cj-photo-evidence.js';
+import { evidenceMatchesCopySemantics } from './cj-editorial-semantic.js';
 
 var BAD_GLOBAL = /tiger|white tiger|zoo|garden|residential|repair shop|garage|pool|beach|villa|白老虎|修車|住宅|花園|泳池/i;
 var BAD_HERO = /lobby|interior|indoor|entrance|door|reception|室内|入口|大廳|電梯|elevator|corridor|走廊|parking|駐車/i;
@@ -162,7 +163,11 @@ export function photoContentGate(photo, context, item) {
   }
   var evidence = classifyPhotoEvidence(classifyBlob, item || context);
   var evidenceGate = evidenceAllowedForSection(evidence, item || context);
-  var ok = score >= minScore && intentGate.ok && evidenceGate.ok && !BAD_GLOBAL.test(evidenceBlob);
+  var semanticGate = { ok: true };
+  if (item && item.copySemantics) {
+    semanticGate = evidenceMatchesCopySemantics(evidence, item.copySemantics);
+  }
+  var ok = score >= minScore && intentGate.ok && evidenceGate.ok && semanticGate.ok && !BAD_GLOBAL.test(evidenceBlob);
 
   return {
     ok: ok,
@@ -170,7 +175,7 @@ export function photoContentGate(photo, context, item) {
     matchedKeywords: matchedKeywords.concat(intentGate.matchedChecklist || []),
     blob: evidenceBlob,
     photoEvidence: evidence,
-    rejectReason: !evidenceGate.ok ? evidenceGate.reason : (intentGate.ok ? null : intentGate.reason),
+    rejectReason: !semanticGate.ok ? semanticGate.reason : (!evidenceGate.ok ? evidenceGate.reason : (intentGate.ok ? null : intentGate.reason)),
     anchorPlace: intentGate.anchorPlace || false
   };
 }
