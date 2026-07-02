@@ -14,6 +14,10 @@
     "storyArc": "用 1～2 天把秋葉原、中野、扭蛋、拉麵與住宿串成一條有節奏的動漫巡禮路線",
     "readingRhythm": "上午電氣街朝聖 → 午後中野挖寶 → 傍晚扭蛋與補給 → 夜宿交通樞紐"
   },
+  "destination": {
+    "countryCode": "JP",
+    "label": "東京"
+  },
   "hero": {
     "sectionId": "hero-anime",
     "sectionRole": "opening",
@@ -245,11 +249,47 @@
       "mapsQuery": "MAID MADE Akihabara Tokyo",
       "placeId": "ChIJvQtxBAaNGGARTiTMJ-Nzhvc",
       "photoPlaceQueries": [
-        "MAID MADE 秋葉原駅前店 デザート",
+        "メイドメイド秋葉原駅前店",
         "メイドメイド 秋葉原 パフェ",
-        "MAID MADE Akihabara dessert"
+        "MAID MADE 秋葉原駅前店 デザート"
       ],
       "photoAnchorTerms": ["MAID MADE", "メイドメイド", "maid"],
+      "allowVenueSwap": true,
+      "venueSwapIntent": "動漫聯名甜點、主題內裝、店內氛圍",
+      "venueAlternatives": [
+        {
+          "id": "ufotable-cafe-tokyo",
+          "officialName": "ufotable Cafe TOKYO",
+          "officialNameLocal": "ufotableカフェTOKYO",
+          "aliases": ["ufotable cafe", "ufotable", "ウフotableカフェ", "ufotable Cafe Tokyo"],
+          "mapsQuery": "ufotable Cafe TOKYO Nakano Nogata",
+          "photoPlaceQueries": [
+            "ufotableカフェTOKYO",
+            "ufotable cafe TOKYO デザート",
+            "ufotable cafe Nakano"
+          ],
+          "photoAnchorTerms": ["ufotable", "ufotable"],
+          "addressHints": ["中野", "Nakano", "野方", "Nogata", "Tokyo", "東京"],
+          "swapCopyAngle": "動漫聯名甜點與角色主題內裝",
+          "imageChecklist": ["dessert", "甜點", "drink", "cafe", "カフェ", "interior", "ufotable"]
+        },
+        {
+          "id": "animate-cafe-ikebukuro",
+          "officialName": "アニメイトカフェ 池袋店",
+          "officialNameLocal": "アニメイトカフェ 池袋店",
+          "aliases": ["Animate Cafe Ikebukuro", "アニメイトカフェ", "animate cafe"],
+          "placeId": "ChIJAQDM4leNGGAR5EwBApXG03Y",
+          "mapsQuery": "アニメイトカフェ 池袋 Animate Annex",
+          "photoPlaceQueries": [
+            "アニメイトカフェ 池袋 デザート",
+            "Animate Cafe Ikebukuro dessert"
+          ],
+          "photoAnchorTerms": ["Animate Cafe", "アニメイトカフェ", "アニメイト"],
+          "addressHints": ["池袋", "Ikebukuro", "豊島", "Toshima"],
+          "swapCopyAngle": "動漫聯名期間限定甜點與主題內裝",
+          "imageChecklist": ["dessert", "甜點", "cafe", "カフェ", "interior", "animate"]
+        }
+      ],
       "allowGenericPhotoFallback": false,
       "photoIntent": "甜點、飲品、店內氛圍、主題內裝，不要只有 Logo",
       "imageChecklist": ["dessert", "甜點", "drink", "maid", "メイド", "cafe", "カフェ"],
@@ -269,8 +309,45 @@
       "aliases": ["Washington Hotel Akihabara", "アキハバラワシントンホテル"],
       "mapsQuery": "Akihabara Washington Hotel Tokyo",
       "placeId": "ChIJnxZoFqiOGGAReYJ1ck2lXiw",
-      "photoPlaceQueries": ["秋葉原ワシントンホテル"],
+      "photoPlaceQueries": [
+        "秋葉原ワシントンホテル 客室",
+        "秋葉原ワシントンホテル"
+      ],
       "photoAnchorTerms": ["Washington", "ワシントン", "華盛頓"],
+      "allowVenueSwap": true,
+      "venueSwapIntent": "步行可達秋葉原站、客房實用、交通方便",
+      "venueAlternatives": [
+        {
+          "id": "remm-akihabara",
+          "officialName": "remm Akihabara",
+          "officialNameLocal": "レム秋葉原",
+          "aliases": ["remm Akihabara", "レム秋葉原", "remm 秋葉原"],
+          "mapsQuery": "remm Akihabara Tokyo",
+          "photoPlaceQueries": [
+            "レム秋葉原 客室",
+            "remm Akihabara room"
+          ],
+          "photoAnchorTerms": ["remm", "レム", "Akihabara"],
+          "addressHints": ["秋葉原", "Akihabara", "Sotokanda", "Chiyoda"],
+          "swapCopyAngle": "秋葉原站直結、客房緊湊實用",
+          "imageChecklist": ["room", "lobby", "remm", "レム", "ホテル", "hotel"]
+        },
+        {
+          "id": "dormy-inn-akihabara",
+          "officialName": "Dormy Inn Premium Akihabara",
+          "officialNameLocal": "ドーミーインPREMIUM秋葉原",
+          "aliases": ["Dormy Inn Akihabara", "ドーミーイン 秋葉原"],
+          "mapsQuery": "Dormy Inn Premium Akihabara Tokyo",
+          "photoPlaceQueries": [
+            "ドーミーインPREMIUM秋葉原 客室",
+            "Dormy Inn Akihabara room"
+          ],
+          "photoAnchorTerms": ["Dormy", "ドーミー", "Akihabara"],
+          "addressHints": ["秋葉原", "Akihabara", "Chiyoda"],
+          "swapCopyAngle": "近電氣街、附設大浴場的商務旅館",
+          "imageChecklist": ["room", "lobby", "hotel", "ホテル", "Dormy", "ドーミー"]
+        }
+      ],
       "photoIntent": "客房、Lobby、公共空間優先，外觀次之",
       "imageChecklist": ["room", "lobby", "Washington", "ワシントン", "ホテル", "hotel"],
       "imageRejectRules": ["parking", "garage", "restaurant only", "resort", "pool"],
@@ -289,8 +366,61 @@
       "aliases": ["Nui Hostel Tokyo", "Nui Hostel Kuramae"],
       "mapsQuery": "Nui Hostel & Bar Tokyo",
       "placeId": "ChIJ4U-9KsiOGGARARhaBLZLqS0",
-      "photoPlaceQueries": ["Nui. HOSTEL & BAR LOUNGE Tokyo"],
+      "photoPlaceQueries": [
+        "Nui. HOSTEL & BAR LOUNGE",
+        "Nui. HOSTEL & BAR LOUNGE 客室"
+      ],
       "photoAnchorTerms": ["Nui", "HOSTEL", "ゲスト"],
+      "allowVenueSwap": true,
+      "venueSwapIntent": "簡潔客房、公共吧台、交誼空間",
+      "venueAlternatives": [
+        {
+          "id": "grids-asakusabashi",
+          "officialName": "Grids Tokyo Asakusabashi",
+          "officialNameLocal": "グリッドホテル浅草橋",
+          "aliases": ["Grids Tokyo Asakusabashi", "Grids Hostel Asakusabashi", "グリッドホテル"],
+          "mapsQuery": "Grids Tokyo Asakusabashi Hotel Hostel",
+          "photoPlaceQueries": [
+            "グリッドホテル浅草橋 客室",
+            "Grids Tokyo Asakusabashi lounge"
+          ],
+          "photoAnchorTerms": ["Grids", "グリッド", "グリッズ", "Asakusabashi"],
+          "addressHints": ["浅草橋", "Asakusabashi", "蔵前", "Kuramae", "Taito"],
+          "swapCopyAngle": "淺草橋一帶的設計旅宿與交誼空間",
+          "imageChecklist": ["room", "dorm", "lounge", "Grids", "hostel", "ホテル"]
+        },
+        {
+          "id": "citan-hostel",
+          "officialName": "CITAN Hostel",
+          "officialNameLocal": "シータンホステル",
+          "aliases": ["CITAN Hostel Tokyo", "CITAN", "シータン"],
+          "mapsQuery": "CITAN Hostel Nihonbashi Tokyo",
+          "photoPlaceQueries": [
+            "CITAN Hostel Tokyo bar",
+            "シータンホステル ラウンジ"
+          ],
+          "photoAnchorTerms": ["CITAN", "シータン", "CITAN Hostel"],
+          "addressHints": ["日本橋", "Nihonbashi", "人形町", "Chuo", "Tokyo"],
+          "swapCopyAngle": "附設咖啡酒吧的設計型旅宿",
+          "imageChecklist": ["room", "dorm", "bar", "lounge", "CITAN", "hostel"]
+        },
+        {
+          "id": "bunka-hostel",
+          "officialName": "Bunka Hostel Tokyo",
+          "officialNameLocal": "ブンカホステル東京",
+          "aliases": ["Bunka Hostel Tokyo", "Bunka Hostel", "ブンカホステル"],
+          "mapsQuery": "Bunka Hostel Tokyo hostel",
+          "deniedPlaceTypes": ["restaurant", "bar", "meal_takeaway", "food"],
+          "photoPlaceQueries": [
+            "Bunka Hostel Tokyo room",
+            "ブンカホステル東京 客室"
+          ],
+          "photoAnchorTerms": ["Bunka", "ブンカ", "Bunka Hostel"],
+          "addressHints": ["浅草", "Asakusa", "Taito", "Tokyo"],
+          "swapCopyAngle": "浅草區的設計旅宿與交誼空間",
+          "imageChecklist": ["room", "dorm", "lounge", "Bunka", "hostel", "ゲスト"]
+        }
+      ],
       "photoIntent": "客房、公共吧台、交誼廳、Lobby 優先，外觀次之",
       "imageChecklist": ["room", "dorm", "bar", "lounge", "Nui", "hostel", "ゲスト"],
       "imageRejectRules": ["parking", "restaurant only", "resort", "pool"],

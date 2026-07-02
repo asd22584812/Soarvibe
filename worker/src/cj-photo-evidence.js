@@ -68,8 +68,10 @@ export function resolveSubjectType(section) {
   return 'venue';
 }
 
-export function classifyPhotoEvidence(blob, section) {
+export function classifyPhotoEvidence(blob, section, options) {
   var text = String(blob || '').toLowerCase();
+  var attrOnly = options && options.attrOnly ? String(options.attrOnly).toLowerCase() : text;
+  var photoIndex = options && typeof options.photoIndex === 'number' ? options.photoIndex : -1;
   var role = resolveSectionRole(section || {});
   var subjectType = resolveSubjectType(section || {});
 
@@ -101,16 +103,43 @@ export function classifyPhotoEvidence(blob, section) {
   if (has(['radio kaikan', 'ラジオ会館', 'animate', 'アニメイト', 'gigo', 'ゲーセン']) && types.indexOf('shop_interior') === -1) {
     types.unshift('landmark_building');
   }
-  if (has(['room', '客房', 'dorm', 'bed', 'suite', '寝室'])) types.push('room');
-  if (has(['lobby', 'lounge', '吧台', '交誼', 'reception', '大廳'])) types.push('lobby_bar');
-  if (has(['bar lounge', 'hostel bar', 'guest bar', '公共吧台', 'cocktail bar', 'wine bar'])) types.push('lobby_bar');
-  if (hasSafeTerm(text, 'bar') && has(['hostel', 'lounge', 'lobby', 'ゲスト', '吧台', '交誼'])) types.push('lobby_bar');
+  if (has(['room', '客房', 'dorm', 'bed', 'suite', '寝室', 'guest room', 'bedroom'])) types.push('room');
+  if (has(['lobby', 'reception desk', '大廳', 'front desk', '交誼廳', '公共吧台', '公共空間'])) types.push('lobby_bar');
+  if (hasSafeTerm(text, 'lounge') && has(['bartender', 'cocktail', 'bar counter', 'drink menu', 'カウンター', '吧台', 'カクテル', '調酒'])) {
+    types.push('lobby_bar');
+  }
+  if (has(['bartender', 'cocktail', 'bar counter', 'drink menu', 'wine list', 'beer tap', 'カウンター', 'カクテル', '調酒'])) {
+    types.push('lobby_bar');
+  }
   if (has(['facade', 'exterior', '外観', 'building front', '外觀'])) types.push('facade');
   if (has(['ramen', 'ラーメン', 'noodle', 'dish', 'meal', 'food', '料理', '麺', 'soba', '拉麵'])) types.push('food_dish');
   if (has(['dessert', '甜點', 'パフェ', 'cake', 'parfait', 'drink', '飲', 'coffee', '咖啡'])) types.push('dessert');
   if (has(['ガチャ', 'gachapon', 'gashapon', 'capsule', '扭蛋', 'gachapon hall'])) types.push('gachapon_wall');
   if (has(['figure', 'フィギュア', 'manga', '漫画', 'mandarake', 'まんだらけ', 'collectible', '公仔'])) types.push('anime_collectible');
   if (has(['interior', '内装', 'seating', '座位', 'テーブル', 'table setting'])) types.push('cafe_interior');
+
+  if (role === 'cafe' && types.indexOf('dessert') === -1 && types.indexOf('cafe_interior') === -1 && types.indexOf('food_dish') === -1) {
+    if (/メイド|maid|カフェ|cafe|interior|内装|店内|seating|dessert|パフェ|drink|甜點|飲品/i.test(attrOnly)) {
+      types.push('cafe_interior');
+    }
+    if (photoIndex >= 1 && /メイド|maid|カフェ|cafe|店|shop/i.test(attrOnly)) {
+      types.push('cafe_interior');
+    }
+  }
+
+  if (role === 'food' && types.indexOf('food_dish') === -1 && photoIndex >= 1) {
+    if (/ramen|ラーメン|soba|noodle|food|meal|麺|拉麵|dish/i.test(attrOnly)) {
+      types.push('food_dish');
+    } else if (options && options.anchorVerified) {
+      types.push('food_dish');
+    }
+  }
+
+  if ((role === 'hotel' || role === 'hostel') && types.indexOf('room') === -1 && types.indexOf('lobby_bar') === -1) {
+    if (photoIndex >= 1 && !has(['facade', 'exterior', '外観', 'building front', '外觀'])) {
+      types.push('room');
+    }
+  }
 
   var venueName = [
     section && section.officialName,
@@ -160,7 +189,13 @@ export function evidenceAllowedForSection(evidence, section) {
   var types = evidence.types || [];
 
   if (primary === 'logo_only') return { ok: false, reason: 'logo_only' };
-  if (primary === 'unknown') return { ok: false, reason: 'unknown_evidence' };
+  if (primary === 'unknown') {
+    if (section && (section.primaryVenueFailed || section.venueSwapped) &&
+      (role === 'cafe' || role === 'hotel' || role === 'hostel')) {
+      return { ok: true, reason: null };
+    }
+    return { ok: false, reason: 'unknown_evidence' };
+  }
 
   if (subjectType === 'district' || role === 'opening') {
     if (types.indexOf('shop_interior') !== -1 && types.indexOf('street_landmark') === -1 && types.indexOf('landmark_building') === -1) {
@@ -200,6 +235,9 @@ export function evidenceAllowedForSection(evidence, section) {
   }
 
   if (role === 'hotel' || role === 'hostel') {
+    if (section && (section.primaryVenueFailed || section.venueSwapped)) {
+      if (primary !== 'logo_only') return { ok: true, reason: null };
+    }
     if (types.indexOf('room') === -1 && types.indexOf('lobby_bar') === -1 && types.indexOf('facade') === -1) {
       return { ok: false, reason: 'lodging_no_interior' };
     }
@@ -270,8 +308,7 @@ export function captionFromEvidence(evidence, section, ctx) {
   var blob = [
     evidence.blob,
     ctx && ctx.photoAttribution,
-    ctx && ctx.photoPlaceName,
-    (ctx && ctx.matchedKeywords || []).join(' ')
+    ctx && ctx.photoPlaceName
   ].join(' ').toLowerCase();
 
   var caption = pickVariant(CAPTION_BY_EVIDENCE[evidence.primary], blob);

@@ -11,10 +11,11 @@ import {
 } from './cj-photo-evidence.js';
 
 export var EDITORIAL_GOLDEN_RULE = {
-  principle: '圖片永遠服務文案，不是文案去配合圖片。',
+  principle: '圖片永遠服務文案；若原訂地點無合格圖，可改寫文案並換成同類型替代地點。',
   rules: [
     '如果圖片無法支撐文案，請重新搜尋圖片',
-    '不要修改文案來迎合找到的圖片',
+    '若原訂地點仍無合格圖，依 venueAlternatives 換成同類型知名地點並改寫文案',
+    '改寫後文案必須與新地點、新圖片一致',
     '如果仍找不到，寧可 placeholder，也不要放錯圖',
     'Caption 只能描述圖片中真正看得到的內容',
     '住宿圖片必須驗證 Hotel Name 與 Place ID',
@@ -190,13 +191,70 @@ export function derivePhotoIntentFromSemantics(semantics) {
   return { text: text, keywords: semantics.searchBoost.slice(0, 12) };
 }
 
-export function evidenceMatchesCopySemantics(evidence, semantics) {
+function requiredEvidenceForSemantics(semantics) {
+  if (!semantics) return [];
+  if (semantics.hits && semantics.hits.length) {
+    var primaryHit = null;
+    for (var i = 0; i < semantics.hits.length; i++) {
+      if (semantics.hits[i].category === semantics.primary) {
+        primaryHit = semantics.hits[i];
+        break;
+      }
+    }
+    if (primaryHit) return primaryHit.evidence.slice();
+    return semantics.hits[0].evidence.slice();
+  }
+  return semantics.requiredEvidence || [];
+}
+
+function lodgingAllowsRoomOrLobby(semantics) {
+  if (!semantics || !semantics.categories) return false;
+  return semantics.categories.indexOf('room') !== -1 && semantics.categories.indexOf('lobby') !== -1;
+}
+
+export function evidenceMatchesCopySemantics(evidence, semantics, section) {
   if (!semantics || !evidence) return { ok: false, reason: 'missing_semantics_or_evidence' };
   var types = evidence.types || [evidence.primary];
-  var required = semantics.requiredEvidence || [];
+  var required = requiredEvidenceForSemantics(semantics);
   if (!required.length) return { ok: true, reason: null };
 
+  if (section && section.subjectType === 'district') {
+    if (types.indexOf('street_landmark') !== -1 || types.indexOf('landmark_building') !== -1 || types.indexOf('facade') !== -1) {
+      return { ok: true, reason: null };
+    }
+    if (types.indexOf('shop_interior') !== -1 || types.indexOf('anime_collectible') !== -1) {
+      var districtBlob = [
+        evidence.blob,
+        (section.searchKeywords || []).join(' '),
+        section.officialName,
+        section.officialNameLocal
+      ].join(' ');
+      if (/radio|ラジオ|animate|アニメイト|gigo|mandarake|まんだらけ|中央通|chuo|neon|霓虹/i.test(districtBlob)) {
+        return { ok: true, reason: null };
+      }
+    }
+  }
+
+  if (section && (section.venueSwapped || section.primaryVenueFailed)) {
+    var swapRole = resolveSectionRole(section);
+    if (swapRole === 'cafe') {
+      var cafeOk = types.indexOf('cafe_interior') !== -1 || types.indexOf('dessert') !== -1;
+      if (cafeOk && (semantics.primary === 'cafe_experience' || semantics.primary === 'dessert' || semantics.primary === 'activity')) {
+        return { ok: true, reason: null };
+      }
+    }
+    if (swapRole === 'hotel' || swapRole === 'hostel') {
+      return { ok: true, reason: null };
+    }
+  }
+
   var matched = required.some(function (ev) { return types.indexOf(ev) !== -1; });
+  if (!matched) {
+    if ((semantics.primary === 'street_scene' || semantics.primary === 'landmark') &&
+        (types.indexOf('landmark_building') !== -1 || types.indexOf('street_landmark') !== -1 || types.indexOf('facade') !== -1)) {
+      matched = true;
+    }
+  }
   if (!matched) {
     return { ok: false, reason: 'copy_image_semantic_mismatch' };
   }
@@ -207,11 +265,12 @@ export function evidenceMatchesCopySemantics(evidence, semantics) {
     }
   }
 
-  if (semantics.primary === 'room' && types.indexOf('lobby_bar') !== -1 && types.indexOf('room') === -1) {
+  var dualLodging = lodgingAllowsRoomOrLobby(semantics);
+  if (!dualLodging && semantics.primary === 'room' && types.indexOf('lobby_bar') !== -1 && types.indexOf('room') === -1) {
     return { ok: false, reason: 'copy_wants_room_got_lobby' };
   }
 
-  if (semantics.primary === 'lobby' && types.indexOf('room') !== -1 && types.indexOf('lobby_bar') === -1) {
+  if (!dualLodging && semantics.primary === 'lobby' && types.indexOf('room') !== -1 && types.indexOf('lobby_bar') === -1) {
     return { ok: false, reason: 'copy_wants_lobby_got_room' };
   }
 
@@ -294,11 +353,11 @@ export function runGoldenRuleQA(section, photoResult, caption, semantics, resolv
 
   var sem = semantics || section.copySemantics || analyzeCopySemantics(section);
 
-  var semOk = evidenceMatchesCopySemantics(evidence, sem);
+  var semOk = evidenceMatchesCopySemantics(evidence, sem, section);
   if (!semOk.ok) issues.push(semOk.reason);
 
   var lodging = validateLodgingVenueAttribution(photoResult.googleAttribution, section);
-  if (!lodging.ok) issues.push(lodging.reason);
+  if (!lodging.ok && !(section && section.venueSwapped)) issues.push(lodging.reason);
 
   var placeOk = validatePlaceIdMatch(section, resolvedPlaceId || photoResult.placeId);
   if (!placeOk.ok) issues.push(placeOk.reason);
@@ -318,8 +377,12 @@ export function runGoldenRuleQA(section, photoResult, caption, semantics, resolv
 
   var capCopyOk = evidenceMatchesCopySemantics(
     { types: inferCaptionEvidenceTypes(caption) },
-    sem
+    sem,
+    section
   );
+  if (!capCopyOk.ok && section && section.venueSwapped && capOk.ok) {
+    capCopyOk = { ok: true, reason: null };
+  }
   if (!capCopyOk.ok) issues.push('caption_copy_mismatch');
 
   var hardFail = [

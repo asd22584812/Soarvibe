@@ -1,4 +1,4 @@
-import { validatePhotoIntentGate } from './cj-editorial-pipeline.js';
+import { validatePhotoIntentGate, isAnchorPhotoPlace } from './cj-editorial-pipeline.js';
 import { resolveSectionRole } from './cj-editorial-engine.js';
 import {
   classifyPhotoEvidence,
@@ -140,6 +140,10 @@ export function scorePhoto(photo, context) {
     if (BAD_HOTEL.test(blob)) score -= 25;
   }
 
+  if (isAnchorPhotoPlace(place, context.photoAnchorTerms || [])) {
+    score += 12;
+  }
+
   if ((photo.widthPx || 0) >= 1200) score += 5;
   if ((photo.heightPx || 0) < 400) score -= 10;
 
@@ -151,23 +155,44 @@ export function photoContentGate(photo, context, item) {
   var evidenceBlob = buildPhotoEvidenceBlob(photo, context);
   var keywords = context.visualKeywords || [];
   var matchedKeywords = matchVisualKeywords(evidenceBlob, keywords);
-  var score = scorePhoto(photo, Object.assign({}, context, { visualKeywords: keywords }));
+  var score = scorePhoto(photo, Object.assign({}, context, {
+    visualKeywords: keywords,
+    photoAnchorTerms: (item && item.photoAnchorTerms) || context.photoAnchorTerms || []
+  }));
   var role = context.role || 'section';
   var sectionRole = (item && item.sectionRole) || context.sectionRole || resolveSectionRole(item || context);
-  var minScore = role === 'hero' ? 78 : 65;
   var gateCtx = Object.assign({}, context || {}, { photo: photo, placeName: context.placeName || '' });
   var intentGate = validatePhotoIntentGate(evidenceBlob, item || context, gateCtx);
-  var classifyBlob = evidenceBlob + ' ' + matchedKeywords.join(' ');
-  if (sectionRole === 'hotel' || sectionRole === 'hostel' || sectionRole === 'cafe' || sectionRole === 'food') {
-    classifyBlob = attrOnly + ' ' + matchedKeywords.join(' ');
+  var anchorVerified = isAnchorPhotoPlace(context.placeName || '', (item && item.photoAnchorTerms) || []);
+  var classifyBlob = attrOnly;
+  if (sectionRole !== 'hotel' && sectionRole !== 'hostel' && sectionRole !== 'cafe' && sectionRole !== 'food') {
+    classifyBlob = evidenceBlob + ' ' + matchedKeywords.join(' ');
   }
-  var evidence = classifyPhotoEvidence(classifyBlob, item || context);
+  var evidence = classifyPhotoEvidence(classifyBlob, item || context, {
+    attrOnly: attrOnly,
+    photoIndex: typeof photo._index === 'number' ? photo._index : -1,
+    anchorVerified: anchorVerified
+  });
   var evidenceGate = evidenceAllowedForSection(evidence, item || context);
   var semanticGate = { ok: true };
-  if (item && item.copySemantics) {
-    semanticGate = evidenceMatchesCopySemantics(evidence, item.copySemantics);
+  if (item && (item.primaryVenueFailed || item.venueSwapped)) {
+    semanticGate = { ok: true, reason: null };
+  } else if (item && item.copySemantics) {
+    semanticGate = evidenceMatchesCopySemantics(evidence, item.copySemantics, item);
+  }
+  var minScore = role === 'hero' ? 78 : 65;
+  if (anchorVerified) {
+    minScore = role === 'hero' ? 68 : 58;
+  }
+  if (item && (item.primaryVenueFailed || item.venueSwapped)) {
+    minScore = role === 'hero' ? 58 : 45;
   }
   var ok = score >= minScore && intentGate.ok && evidenceGate.ok && semanticGate.ok && !BAD_GLOBAL.test(evidenceBlob);
+  if (item && (item.primaryVenueFailed || item.venueSwapped) &&
+    (sectionRole === 'hotel' || sectionRole === 'hostel' || sectionRole === 'cafe')) {
+    ok = score >= 40 && !BAD_GLOBAL.test(evidenceBlob);
+    if (!evidenceGate.ok && evidenceGate.reason === 'logo_only') ok = false;
+  }
 
   return {
     ok: ok,

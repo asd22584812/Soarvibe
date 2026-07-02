@@ -1,6 +1,7 @@
 /**
  * City Journal Editorial Pipeline — strict visual validation.
  */
+import { buildLocaleSearchQueries, assignQueryLang, resolveCountryCode } from './cj-locale-search.js';
 
 function escapeRegExp(str) {
   return String(str).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -13,40 +14,40 @@ export function parsePhotoIntent(photoIntent) {
     .filter(Boolean);
 }
 
-export function buildPhotoSearchSequence(item) {
-  var seen = {};
-  var out = [];
+export function buildPhotoSearchSequence(item, articleCtx) {
+  var countryCode = resolveCountryCode(articleCtx, item);
   var intentKw = parsePhotoIntent(item.photoIntent);
   var intentSlice = intentKw.slice(0, 4).join(' ');
-
-  function push(query, lang) {
-    var q = String(query || '').trim();
-    if (!q || seen[q]) return;
-    seen[q] = true;
-    out.push({ query: q, lang: lang || 'ja' });
-  }
-
-  (item.photoPlaceQueries || []).forEach(function (q) {
-    push(q, /[\u3040-\u30ff\u4e00-\u9faf]/.test(q) ? 'ja' : 'en');
-  });
+  var extra = [];
 
   if (item.officialNameLocal && intentSlice) {
-    push(item.officialNameLocal + ' ' + intentSlice, 'ja');
+    extra.push({
+      query: item.officialNameLocal + ' ' + intentSlice,
+      lang: assignQueryLang(item.officialNameLocal, countryCode),
+      source: 'photoIntentLocal'
+    });
   }
-  push(item.officialNameLocal, 'ja');
-  if (item.officialName && intentSlice) {
-    push(item.officialName + ' ' + intentSlice, 'en');
+  if (item.officialName && intentSlice && item.officialName !== item.officialNameLocal) {
+    extra.push({
+      query: item.officialName + ' ' + intentSlice,
+      lang: 'en',
+      source: 'photoIntentEn'
+    });
   }
-  push(item.officialName, 'en');
   (item.aliases || []).forEach(function (alias) {
     if (intentSlice && intentKw.length) {
-      push(alias + ' ' + intentKw[0], /[\u3040-\u30ff\u4e00-\u9faf]/.test(alias) ? 'ja' : 'en');
+      extra.push({
+        query: alias + ' ' + intentKw[0],
+        lang: assignQueryLang(alias, countryCode),
+        source: 'aliasIntent'
+      });
     }
-    push(alias, /[\u3040-\u30ff\u4e00-\u9faf]/.test(alias) ? 'ja' : 'en');
   });
-  push(item.subject, 'zh-TW');
-  push(item.mapsQuery, 'zh-TW');
-  return out;
+
+  return buildLocaleSearchQueries(item, articleCtx, {
+    maxQueries: 16,
+    extraQueries: extra
+  }).queries;
 }
 
 export function matchTerms(blob, terms) {
@@ -160,6 +161,17 @@ export function validatePhotoIntentGate(blob, item, context) {
     return { ok: false, reason: 'photo_index_low', matchedChecklist: [] };
   }
 
+  if (isAnchorPhotoPlace(placeName, item.photoAnchorTerms)) {
+    if (item.requireInteriorPhoto && isExteriorOnlyBlob(blob, photo, item)) {
+      return { ok: false, reason: 'anchor_exterior', matchedChecklist: [] };
+    }
+    return {
+      ok: true,
+      matchedChecklist: matchTerms(blob, item.photoAnchorTerms || []),
+      anchorPlace: true
+    };
+  }
+
   var visualGroups = item.visualGroups || [];
   var minGroups = item.requiredVisualMinGroups || 0;
   if (visualGroups.length && minGroups > 0) {
@@ -179,17 +191,6 @@ export function validatePhotoIntentGate(blob, item, context) {
       ok: true,
       matchedChecklist: vg.matched,
       anchorPlace: isAnchorPhotoPlace(blob, item.photoAnchorTerms)
-    };
-  }
-
-  if (isAnchorPhotoPlace(placeName, item.photoAnchorTerms)) {
-    if (item.requireInteriorPhoto && isExteriorOnlyBlob(blob, photo, item)) {
-      return { ok: false, reason: 'anchor_exterior', matchedChecklist: [] };
-    }
-    return {
-      ok: true,
-      matchedChecklist: matchTerms(blob, item.photoAnchorTerms || []),
-      anchorPlace: true
     };
   }
 

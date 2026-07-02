@@ -2,42 +2,25 @@
  * Keyword Planning — expand multilingual search queries from section config.
  */
 import { buildSearchKeywords } from './cj-editorial-schema.js';
+import { buildLocaleSearchQueries, assignQueryLang, resolveCountryCode } from './cj-locale-search.js';
 
 export function buildKeywordSearchPlan(section, options) {
   var keywords = buildSearchKeywords(section);
-  var maxQueries = (options && options.maxQueries) || 12;
-  var seen = {};
-  var queries = [];
-
-  function pushQuery(q, lang) {
-    var s = String(q || '').trim();
-    if (!s || s.length < 2 || seen[s.toLowerCase()]) return;
-    seen[s.toLowerCase()] = true;
-    queries.push({ query: s, lang: lang || detectLang(s) });
-  }
-
-  (section.searchKeywords || []).forEach(function (kw) {
-    pushQuery(kw, detectLang(kw));
+  var articleCtx = (options && options.articleCtx) || null;
+  var countryCode = resolveCountryCode(articleCtx, section);
+  var localePlan = buildLocaleSearchQueries(section, articleCtx, {
+    maxQueries: (options && options.maxQueries) || 12,
+    extraQueries: keywords.map(function (kw) {
+      return { query: kw, lang: assignQueryLang(kw, countryCode), source: 'derivedKeywords' };
+    })
   });
-
-  keywords.forEach(function (kw) {
-    pushQuery(kw, detectLang(kw));
-  });
-
-  if (section.mapsQuery) {
-    pushQuery(section.mapsQuery, 'en');
-  }
 
   return {
     keywords: keywords,
-    queries: queries.slice(0, maxQueries)
+    queries: localePlan.queries,
+    countryCode: localePlan.countryCode,
+    regionCode: localePlan.regionCode
   };
-}
-
-function detectLang(text) {
-  if (/[\u3040-\u30ff]/.test(text)) return 'ja';
-  if (/[\u4e00-\u9fff]/.test(text)) return 'zh-TW';
-  return 'en';
 }
 
 export function buildImageReviewPromptContext(section, articleCtx) {

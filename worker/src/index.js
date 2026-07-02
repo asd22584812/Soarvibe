@@ -8,6 +8,7 @@ import { generateCaption } from './cj-caption.js';
 import { resolveOfficialPlace, validatePhotoAttribution, placeDisplayName } from './cj-place-resolve.js';
 import { runEditorialQA } from './cj-editorial-pipeline.js';
 import { resolveArticleRules } from './cj-pipeline-rules.js';
+import { resolveRegionCode } from './cj-locale-search.js';
 
 const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta/models/';
 const DEFAULT_MODEL = 'gemini-2.5-flash';
@@ -345,7 +346,7 @@ async function getGooglePlaceById(mapsKey, placeId) {
   return await response.json();
 }
 
-async function searchGooglePlace(mapsKey, mapsQuery, languageCode) {
+async function searchGooglePlace(mapsKey, mapsQuery, languageCode, regionCode) {
   var response = await googlePlacesFetch(mapsKey, 'https://places.googleapis.com/v1/places:searchText', {
     method: 'POST',
     headers: {
@@ -355,7 +356,7 @@ async function searchGooglePlace(mapsKey, mapsQuery, languageCode) {
     body: JSON.stringify({
       textQuery: mapsQuery,
       languageCode: languageCode || 'ja',
-      regionCode: 'JP',
+      regionCode: regionCode || 'JP',
       maxResultCount: 5
     })
   });
@@ -471,8 +472,9 @@ async function resolvePlaceSection(mapsKey, item) {
   try {
     var resolved = await resolveOfficialPlace(mapsKey, item, {
       getGooglePlaceById: getGooglePlaceById,
-      searchGooglePlace: searchGooglePlace
-    });
+      searchGooglePlace: searchGooglePlace,
+      regionCode: 'JP'
+    }, null);
     if (!resolved || !resolved.place) {
       return failedPlaceRow(sectionId, subject, mapsQuery, 'no_valid_place');
     }
@@ -565,7 +567,8 @@ async function handleEditorialResolve(request, env, auth) {
   var deps = {
     getGooglePlaceById: getGooglePlaceById,
     searchGooglePlace: searchGooglePlace,
-    resolveGooglePhotoUri: resolveGooglePhotoUri
+    resolveGooglePhotoUri: resolveGooglePhotoUri,
+    regionCode: resolveRegionCode(body.article || {}, body.sections && body.sections[0] || {})
   };
 
   var output = await resolveArticleRules(mapsKey, body, deps);

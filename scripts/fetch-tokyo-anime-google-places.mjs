@@ -61,7 +61,8 @@ function patchSectionRow(src, row) {
   const fields = [
     'officialName', 'officialNameLocal', 'aliases', 'photoIntent', 'imageChecklist', 'imageRejectRules',
     'subject', 'mapsQuery', 'placeId', 'googleRating', 'googleAddress',
-    'googlePhotoUrl', 'googleAttribution', 'imageSource', 'caption', 'photoPlaceName', 'matchedKeywords'
+    'googlePhotoUrl', 'googleAttribution', 'imageSource', 'caption', 'photoPlaceName', 'matchedKeywords',
+    'heading', 'content'
   ];
   let out = src;
   for (const key of fields) {
@@ -72,8 +73,14 @@ function patchSectionRow(src, row) {
     else if (key === 'imageSource' && !row.imageSource) val = 'null';
     else if (key === 'aliases' || key === 'imageChecklist' || key === 'imageRejectRules' || key === 'matchedKeywords') {
       val = jsString(row[key] || []);
-    } else if (key === 'photoPlaceName') {
+    }     else if (key === 'photoPlaceName') {
       val = jsString(row.photoPlaceName || null);
+    } else if (key === 'heading') {
+      if (!row.venueSwapped || !row.heading) continue;
+      val = jsString(row.heading);
+    } else if (key === 'content') {
+      if (!row.venueSwapped || !row.content) continue;
+      val = jsString(row.content);
     } else val = jsString(row[key]);
     out = patchField(out, key, val, start, blockEnd);
   }
@@ -131,7 +138,11 @@ function buildPayload(editorial, dataSrc) {
       articleGoal: editorial.articleGoal,
       storyline: editorial.storyline,
       readingRhythm: editorial.readingRhythm,
-      editorialPlan: editorial.editorialPlan
+      editorialPlan: editorial.editorialPlan,
+      destination: editorial.destination || null,
+      countryCode: editorial.destination && editorial.destination.countryCode
+        ? editorial.destination.countryCode
+        : null
     },
     sections: sections.concat([hero])
   };
@@ -188,12 +199,12 @@ async function main() {
   for (const row of sections) {
     const editorialRow = editorial.sections.find(function (s) { return s.sectionId === row.sectionId; }) || {};
     Object.assign(row, {
-      aliases: editorialRow.aliases,
+      aliases: row.venueSwapped ? (row.aliases || editorialRow.aliases) : editorialRow.aliases,
       photoIntent: editorialRow.photoIntent,
       imageChecklist: editorialRow.imageChecklist,
       imageRejectRules: editorialRow.imageRejectRules,
-      officialName: editorialRow.officialName,
-      officialNameLocal: editorialRow.officialNameLocal,
+      officialName: row.venueSwapped ? (row.officialName || editorialRow.officialName) : editorialRow.officialName,
+      officialNameLocal: row.venueSwapped ? (row.officialNameLocal || editorialRow.officialNameLocal) : editorialRow.officialNameLocal,
       photoPlaceName: row.photoPlaceName || null,
       matchedKeywords: row.matchedKeywords || row.aiReview && row.aiReview.matchedElements || []
     });
@@ -205,6 +216,7 @@ async function main() {
       row.imageSource || '',
       'score:' + (row.photoScore || ai.score || '-'),
       'candidates:' + (row.candidatesReviewed || '-'),
+      row.venueSwapped ? 'SWAPPED→' + (row.swappedTo || '') : '',
       qa.recommendation || row.rejectReason || '',
       row.photoCaption ? row.photoCaption.slice(0, 28) : '(no caption)'
     );

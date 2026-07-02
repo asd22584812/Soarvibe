@@ -35,8 +35,9 @@ export async function resolveSectionV2(mapsKey, env, item, articleCtx, deps) {
     pipelineLog.steps.push('place_verify');
     var resolved = await resolveOfficialPlace(mapsKey, section, {
       getGooglePlaceById: deps.getGooglePlaceById,
-      searchGooglePlace: deps.searchGooglePlace
-    });
+      searchGooglePlace: deps.searchGooglePlace,
+      regionCode: deps.regionCode
+    }, articleCtx);
 
     if (!resolved || !resolved.place) {
       return failedRow(sectionId, subject, mapsQuery, 'no_valid_place', pipelineLog);

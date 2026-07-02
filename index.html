@@ -3967,7 +3967,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
-            const SOARVIBE_APP_BUILD = 'v119';
+            const SOARVIBE_APP_BUILD = 'v121';
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
@@ -14820,10 +14820,6 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     allowedFor: ['section']
                 });
                 var placeholder = getJournalPlaceholder();
-                var editorialUrl = resolveEditorialFallback(article.cityId, section.sectionType, section.sectionId);
-                if (editorialUrl && (!heroUrl || editorialUrl !== heroUrl)) {
-                    return { url: editorialUrl, attribution: null, source: 'editorial_library' };
-                }
                 if (manifestUrl && manifestUrl !== placeholder && !isPlaceholderJournalImage(manifestUrl) && manifestUrl !== heroUrl) {
                     return { url: manifestUrl, attribution: null, source: 'manifest' };
                 }
@@ -14837,10 +14833,6 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     imageSource: article.heroImageSource
                 });
                 if (googleImage && googleImage.url) return googleImage;
-                var editorialHero = resolveEditorialFallback(article.cityId, 'hero');
-                if (editorialHero) {
-                    return { url: editorialHero, attribution: null, source: 'editorial_library' };
-                }
                 var manifestUrl = resolveJournalImageKey(article.heroImageKey, {
                     cityId: article.cityId,
                     styleKey: article.styleKey,

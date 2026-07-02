@@ -19,12 +19,56 @@ function containsAny(blob, terms) {
   });
 }
 
-export function buildSearchSequence(item) {
-  return buildPhotoSearchSequence(item);
+export function buildSearchSequence(item, articleCtx) {
+  return buildPhotoSearchSequence(item, articleCtx);
 }
 
 export function placeDisplayName(place) {
   return place && place.displayName && place.displayName.text ? place.displayName.text : '';
+}
+
+var FOREIGN_REGION_DENY = /台北|Taipei|Taichung|台中|高雄|Kaohsiung|Taiwan|台灣|Hong Kong|香港|Seoul|서울|Korea|新加坡|Singapore|Bangkok|曼谷/i;
+var JP_REGION_OK = /Japan|日本|〒|Tokyo|東京|Chiyoda|Taito|Shibuya|Shinjuku|Akihabara|秋葉原|Odaiba|台場|Nakano|中野|Ikebukuro|池袋|豊島|Minato|港区|Shibuya|渋谷/i;
+
+function isCityOnlyHint(hint) {
+  return /^(東京|Tokyo|Japan|日本)$/i.test(String(hint || '').trim());
+}
+
+export function blobInTargetRegion(blob, regionCode, addressHints) {
+  var text = String(blob || '');
+  if (FOREIGN_REGION_DENY.test(text)) return false;
+  if (regionCode === 'JP' && !JP_REGION_OK.test(text)) return false;
+  var hints = Array.isArray(addressHints) ? addressHints.filter(Boolean) : [];
+  if (!hints.length) return true;
+  var hintHit = hints.some(function (hint) {
+    return text.indexOf(hint) !== -1;
+  });
+  if (hintHit) return true;
+  var districtHints = hints.filter(function (hint) {
+    return !isCityOnlyHint(hint);
+  });
+  if (districtHints.length) return false;
+  return JP_REGION_OK.test(text);
+}
+
+export function placeInTargetRegion(place, item, regionCode) {
+  var addr = String(place && place.formattedAddress || '');
+  var name = placeDisplayName(place);
+  var hints = Array.isArray(item && item.addressHints) ? item.addressHints : [];
+  return blobInTargetRegion(name + ' ' + addr, regionCode, hints);
+}
+
+export function attributionInTargetRegion(attribution, item, regionCode) {
+  var text = String(attribution || '');
+  if (FOREIGN_REGION_DENY.test(text)) return false;
+  var hints = Array.isArray(item && item.addressHints) ? item.addressHints.filter(Boolean) : [];
+  var districtHints = hints.filter(function (hint) {
+    return !isCityOnlyHint(hint);
+  });
+  if (!districtHints.length) return true;
+  var looksLocated = /店|caf[eé]|カフェ|咖啡|hotel|hostel|ホテル|旅館|restaurant|餐廳|館/i.test(text);
+  if (!looksLocated) return true;
+  return blobInTargetRegion(text, regionCode, hints);
 }
 
 export function placeTypes(place) {
@@ -51,10 +95,24 @@ export function validatePlaceResult(place, item) {
 
   var nameOk = containsAny(name, terms);
   if (!nameOk && addressHints.length) {
-    nameOk = containsAny(addr, addressHints);
+    var role = item.sectionRole || item.sectionType;
+    var strictLodging = item.isSpecificVenue && (role === 'hotel' || role === 'hostel' || item.sectionType === 'hotel' || item.sectionType === 'hostel');
+    if (!strictLodging) {
+      nameOk = containsAny(addr, addressHints);
+    }
+  }
+  if (!nameOk && addressHints.length && containsAny(addr, addressHints)) {
+    nameOk = containsAny(name, terms) || containsAny(name, item.photoAnchorTerms || []);
   }
   if (!nameOk) {
     return { ok: false, reason: 'name_mismatch', name: name, address: addr };
+  }
+
+  var role = item.sectionRole || item.sectionType;
+  var strictLodging = item.isSpecificVenue && (role === 'hotel' || role === 'hostel' || item.sectionType === 'hotel' || item.sectionType === 'hostel');
+  if (strictLodging && /居酒屋|restaurant|ramen|ラーメン|カフェ|cafe|coffee shop/i.test(name) &&
+    !/hostel|hotel|ホテル|ホステル|inn|旅館|レム|ドーミー|dormy|grids|グリッド|グリッズ|citan|シータン/i.test(name)) {
+    return { ok: false, reason: 'lodging_nearby_business', name: name };
   }
 
   var deniedTypes = Array.isArray(item.deniedPlaceTypes) ? item.deniedPlaceTypes : [];
@@ -122,9 +180,10 @@ export function validatePhotoAttribution(attribution, item) {
   return { ok: true };
 }
 
-export async function resolveOfficialPlace(mapsKey, item, deps) {
+export async function resolveOfficialPlace(mapsKey, item, deps, articleCtx) {
   var getById = deps.getGooglePlaceById;
   var search = deps.searchGooglePlace;
+  var regionCode = deps.regionCode || null;
 
   if (item.placeId) {
     var byId = await getById(mapsKey, item.placeId);
@@ -136,11 +195,12 @@ export async function resolveOfficialPlace(mapsKey, item, deps) {
     }
   }
 
-  var sequence = buildSearchSequence(item);
+  var sequence = buildSearchSequence(item, articleCtx);
   for (var s = 0; s < sequence.length; s++) {
     var step = sequence[s];
-    var places = await search(mapsKey, step.query, step.lang);
+    var places = await search(mapsKey, step.query, step.lang, regionCode);
     for (var p = 0; p < places.length; p++) {
+      if (!placeInTargetRegion(places[p], item, regionCode || 'JP')) continue;
       var val = validatePlaceResult(places[p], item);
       if (val.ok) {
         return { place: places[p], searchUsed: step.query, validation: val };

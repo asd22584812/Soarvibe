@@ -3,15 +3,15 @@
     "sectionId": "akihabara",
     "subject": "秋葉原電氣街",
     "mapsQuery": "Akihabara Electric Town Tokyo Japan",
-    "placeId": "ChIJ__-AdayOGGAR6EGPwvcpzTA",
-    "googleRating": 4.3,
-    "googleAddress": "〒101-0021 東京都千代田区外神田１丁目１５−１６",
+    "placeId": "ChIJZzSYoB2MGGARfBcicn7sx28",
+    "googleRating": 4.5,
+    "googleAddress": "〒101-0021 東京都千代田区外神田１丁目１２",
     "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZOHYO_SgGBRMcVmv9ecXnmYruO5k1p6rko_pTx0oDpoUlEGab5lFQRxO-wGQKh6dVbuBFUKopXPEmXfkbzx6XVbzxdX07xpq1GwFhnsrR6KmNzRcKXhjA2tiujK22MR4vKJxZ22bDnnDNNjSw=s4800-w1600-h1200",
     "googleAttribution": "t s",
     "imageSource": "google_places",
     "matched": true,
-    "placeName": "秋葉原ラジオ会館",
-    "photoScore": 157,
+    "placeName": "秋葉原電気街",
+    "photoScore": 169,
     "photoIndex": 0,
     "photoCaption": "Animate本館前人潮與招牌交織，電氣街節奏從這裡開始。",
     "photoEvidence": {
@@ -21,24 +21,129 @@
         "street_landmark"
       ],
       "signals": [
-        "street",
         "アニメイト",
-        "landmark",
         "アニメイト"
       ],
       "subjectType": "district",
       "role": "landmark",
-      "blob": "アニメイト秋葉原 t s アニメイト秋葉原 アニメイト アニメイト秋葉原 アニメイト landmark_street"
+      "blob": "アニメイト秋葉原 t s アニメイト秋葉原 アニメイト アニメイト秋葉原 アニメイト"
     },
+    "copySemantics": {
+      "primary": "street_scene",
+      "categories": [
+        "street_scene",
+        "landmark",
+        "night",
+        "shop_collectible",
+        "storefront"
+      ],
+      "hits": [
+        {
+          "category": "street_scene",
+          "score": 9,
+          "matched": [
+            "電氣街",
+            "中央通",
+            "霓虹",
+            "人潮",
+            "街區",
+            "一整片",
+            "兩側",
+            "招牌",
+            "廣角"
+          ],
+          "evidence": [
+            "street_landmark",
+            "landmark_building"
+          ]
+        },
+        {
+          "category": "landmark",
+          "score": 4,
+          "matched": [
+            "radio kaikan",
+            "animate",
+            "gigo",
+            "朝聖"
+          ],
+          "evidence": [
+            "landmark_building",
+            "street_landmark"
+          ]
+        },
+        {
+          "category": "night",
+          "score": 2,
+          "matched": [
+            "霓虹亮起",
+            "傍晚"
+          ],
+          "evidence": [
+            "street_landmark",
+            "landmark_building"
+          ]
+        },
+        {
+          "category": "shop_collectible",
+          "score": 2,
+          "matched": [
+            "模型",
+            "櫥窗"
+          ],
+          "evidence": [
+            "anime_collectible",
+            "shop_interior"
+          ]
+        },
+        {
+          "category": "storefront",
+          "score": 1,
+          "matched": [
+            "招牌"
+          ],
+          "evidence": [
+            "facade",
+            "landmark_building"
+          ]
+        }
+      ],
+      "requiredEvidence": [
+        "street_landmark",
+        "landmark_building",
+        "anime_collectible",
+        "shop_interior",
+        "facade"
+      ],
+      "searchBoost": [
+        "電氣街",
+        "中央通",
+        "霓虹",
+        "人潮",
+        "街區",
+        "一整片",
+        "兩側",
+        "招牌",
+        "廣角",
+        "radio kaikan",
+        "animate",
+        "gigo",
+        "朝聖",
+        "霓虹亮起",
+        "傍晚",
+        "模型",
+        "櫥窗"
+      ],
+      "copyExcerpt": "秋葉原電氣街 · 動漫朝聖的起點 從 JR 秋葉原站電氣街口跨出去，中央通兩側的動漫招牌幾乎不給人思考的時間。Radio Kaikan 的模型櫥窗、Animate 本館的人潮、GIGO 大型看板——這裡不是單一景點，而是一整片會讓人自然放慢步調的街區。上午十點前人潮還算溫和，先把 Animate 與最想逛的兩間店鎖定；午後再鑽進卡牌專賣與地下復古遊戲機。傍晚霓虹亮起，電氣街才進入主場，廣角拍中央通最剛好。帶現金與行動電源，這條路線通常比預期多留兩小時。 電氣街不是單一景點，而是一整片會讓人自然放慢步調的動漫街區 秋葉原電氣街 秋葉原電氣街"
+    },
+    "copyDerivedPhotoIntent": "街景、霓虹、人潮、地標建築外觀、地標建築、代表性招牌、街區辨識點",
     "matchedKeywords": [
       "アニメイト",
       "アニメイト秋葉原",
-      "アニメイト",
-      "landmark_street"
+      "アニメイト"
     ],
     "photoPlaceName": "アニメイト秋葉原",
-    "searchUsed": "ラジオ会館 秋葉原",
-    "photoSearchUsed": "アニメイト 秋葉原本店",
+    "searchUsed": "Akihabara anime street",
+    "photoSearchUsed": "Akihabara anime street",
     "sectionType": "landmark",
     "role": null,
     "rejectReason": null,
@@ -47,9 +152,19 @@
       "issues": [],
       "usePlaceholder": false
     },
+    "venueSwapped": false,
+    "swappedFrom": null,
+    "swappedTo": null,
+    "alternativeId": null,
+    "heading": "秋葉原電氣街 · 動漫朝聖的起點",
+    "content": "從 JR 秋葉原站電氣街口跨出去，中央通兩側的動漫招牌幾乎不給人思考的時間。Radio Kaikan 的模型櫥窗、Animate 本館的人潮、GIGO 大型看板——這裡不是單一景點，而是一整片會讓人自然放慢步調的街區。上午十點前人潮還算溫和，先把 Animate 與最想逛的兩間店鎖定；午後再鑽進卡牌專賣與地下復古遊戲機。傍晚霓虹亮起，電氣街才進入主場，廣角拍中央通最剛好。帶現金與行動電源，這條路線通常比預期多留兩小時。",
+    "officialName": "Akihabara Electric Town",
+    "officialNameLocal": "秋葉原電気街",
     "pipeline": {
-      "version": "photo-first",
+      "version": "venue-fallback",
       "steps": [
+        "copy_semantic_analysis",
+        "derive_photo_intent",
         "place_verify",
         "keyword_search",
         "photo_first_pick",
@@ -71,34 +186,69 @@
     "imageSource": "google_places",
     "matched": true,
     "placeName": "Nakano Broadway",
-    "photoScore": 155,
+    "photoScore": 167,
     "photoIndex": 1,
     "photoCaption": "Mandarake櫥窗擺滿模型與收藏品，是動漫迷最容易停下腳步的地方。",
     "photoEvidence": {
       "primary": "anime_collectible",
       "types": [
         "shop_interior",
-        "anime_collectible",
-        "cafe_interior"
+        "anime_collectible"
       ],
       "signals": [
         "まんだらけ",
-        "まんだらけ",
-        "interior"
+        "まんだらけ"
       ],
       "subjectType": "venue",
       "role": "anime",
-      "blob": "まんだらけ 中野店 alejandro arruebo rello まんだらけ 中野店 まんだらけ まんだらけ 中野 まんだらけ anchor_interior"
+      "blob": "まんだらけ 中野店 alejandro arruebo rello まんだらけ 中野店 まんだらけ まんだらけ 中野 まんだらけ"
     },
+    "copySemantics": {
+      "primary": "shop_collectible",
+      "categories": [
+        "shop_collectible"
+      ],
+      "hits": [
+        {
+          "category": "shop_collectible",
+          "score": 6,
+          "matched": [
+            "mandarake",
+            "公仔",
+            "模型",
+            "挖寶",
+            "漫畫",
+            "中古"
+          ],
+          "evidence": [
+            "anime_collectible",
+            "shop_interior"
+          ]
+        }
+      ],
+      "requiredEvidence": [
+        "anime_collectible",
+        "shop_interior"
+      ],
+      "searchBoost": [
+        "mandarake",
+        "公仔",
+        "模型",
+        "挖寶",
+        "漫畫",
+        "中古"
+      ],
+      "copyExcerpt": "中野百老匯 · 老玩家公認的挖寶聖地 JR 中野站北口走五分鐘，中野百老匯的電梯一開就是另一種東京。Mandarake 各樓層擠滿中古公仔、模型、卡牌與復古漫畫，價格常有意外驚喜；らしんばん 等店也適合比價。下午光線較暖，邊逛邊翻櫃剛好。預留兩小時以上，這座寶庫很少讓人空手而回。 老玩家公認挖寶聖地，不是普通商場 中野百老匯 中野百老匯"
+    },
+    "copyDerivedPhotoIntent": "商品陳列、公仔模型、收藏櫥窗",
     "matchedKeywords": [
       "まんだらけ",
       "まんだらけ 中野",
-      "まんだらけ",
-      "anchor_interior"
+      "まんだらけ"
     ],
     "photoPlaceName": "まんだらけ 中野店",
     "searchUsed": "placeId:ChIJg-7dspDyGGARvvDv4E5-tuE",
-    "photoSearchUsed": "まんだらけ 中野本店",
+    "photoSearchUsed": "Nakano Broadway Mandarake",
     "sectionType": "landmark",
     "role": null,
     "rejectReason": null,
@@ -107,9 +257,19 @@
       "issues": [],
       "usePlaceholder": false
     },
+    "venueSwapped": false,
+    "swappedFrom": null,
+    "swappedTo": null,
+    "alternativeId": null,
+    "heading": "中野百老匯 · 老玩家公認的挖寶聖地",
+    "content": "JR 中野站北口走五分鐘，中野百老匯的電梯一開就是另一種東京。Mandarake 各樓層擠滿中古公仔、模型、卡牌與復古漫畫，價格常有意外驚喜；らしんばん 等店也適合比價。下午光線較暖，邊逛邊翻櫃剛好。預留兩小時以上，這座寶庫很少讓人空手而回。",
+    "officialName": "Nakano Broadway",
+    "officialNameLocal": "中野ブロードウェイ",
     "pipeline": {
-      "version": "photo-first",
+      "version": "venue-fallback",
       "steps": [
+        "copy_semantic_analysis",
+        "derive_photo_intent",
         "place_verify",
         "keyword_search",
         "photo_first_pick",
@@ -131,41 +291,89 @@
     "imageSource": "google_places",
     "matched": true,
     "placeName": "Akihabara Gachapon Hall",
-    "photoScore": 227,
+    "photoScore": 167,
     "photoIndex": 1,
     "photoCaption": "整排扭蛋機一路延伸，色彩與機台本身就是風景。",
     "photoEvidence": {
       "primary": "gachapon_wall",
       "types": [
-        "shop_interior",
-        "gachapon_wall",
-        "anime_collectible",
-        "cafe_interior"
+        "gachapon_wall"
       ],
       "signals": [
-        "collectible",
-        "ガチャ",
-        "collectible",
-        "interior"
+        "gachapon",
+        "gachapon hall"
       ],
       "subjectType": "venue",
       "role": "anime",
-      "blob": "秋葉原ガチャポン会館 loki 秋葉原ガチャポン会館 ガチャ ガチャポン 秋葉原ガチャポン会館 ガチャポン会館 ガチャ ガチャ ガチャポン collectible_evidence interior_evidence"
+      "blob": "akihabara gachapon hall loki akihabara gachapon hall gachapon akihabara gachapon hall gachapon gachapon hall"
     },
+    "copySemantics": {
+      "primary": "gachapon",
+      "categories": [
+        "gachapon",
+        "storefront",
+        "street_scene"
+      ],
+      "hits": [
+        {
+          "category": "gachapon",
+          "score": 2,
+          "matched": [
+            "扭蛋",
+            "gachapon"
+          ],
+          "evidence": [
+            "gachapon_wall"
+          ]
+        },
+        {
+          "category": "storefront",
+          "score": 2,
+          "matched": [
+            "外觀",
+            "招牌"
+          ],
+          "evidence": [
+            "facade",
+            "landmark_building"
+          ]
+        },
+        {
+          "category": "street_scene",
+          "score": 1,
+          "matched": [
+            "招牌"
+          ],
+          "evidence": [
+            "street_landmark",
+            "landmark_building"
+          ]
+        }
+      ],
+      "requiredEvidence": [
+        "street_landmark",
+        "landmark_building",
+        "gachapon_wall",
+        "facade"
+      ],
+      "searchBoost": [
+        "招牌",
+        "扭蛋",
+        "gachapon",
+        "外觀"
+      ],
+      "copyExcerpt": "GACHAPON 扭蛋會館 · 整面牆都是驚喜 整面牆的扭蛋機，轉一圈就可能入坑。先設定預算上限，再開始試手氣——這是過來人的溫柔提醒。 整面牆都是驚喜，不是黃色招牌外觀 GACHAPON 扭蛋會館 GACHAPON 扭蛋會館"
+    },
+    "copyDerivedPhotoIntent": "整排扭蛋機、扭蛋牆、店面外觀",
     "matchedKeywords": [
-      "ガチャ",
-      "ガチャポン",
-      "秋葉原ガチャポン会館",
-      "ガチャポン会館",
-      "ガチャ",
-      "ガチャ",
-      "ガチャポン",
-      "collectible_evidence",
-      "interior_evidence"
+      "gachapon",
+      "Akihabara Gachapon Hall",
+      "gachapon",
+      "Gachapon Hall"
     ],
-    "photoPlaceName": "秋葉原ガチャポン会館",
+    "photoPlaceName": "Akihabara Gachapon Hall",
     "searchUsed": "placeId:ChIJBztW3x2MGGARadHYl5vTEK0",
-    "photoSearchUsed": "秋葉原ガチャポン会館",
+    "photoSearchUsed": "content_place",
     "sectionType": "shopping",
     "role": null,
     "rejectReason": null,
@@ -174,9 +382,19 @@
       "issues": [],
       "usePlaceholder": false
     },
+    "venueSwapped": false,
+    "swappedFrom": null,
+    "swappedTo": null,
+    "alternativeId": null,
+    "heading": "GACHAPON 扭蛋會館 · 整面牆都是驚喜",
+    "content": "整面牆的扭蛋機，轉一圈就可能入坑。先設定預算上限，再開始試手氣——這是過來人的溫柔提醒。",
+    "officialName": "Akihabara Gachapon Hall",
+    "officialNameLocal": "秋葉原ガチャポン会館",
     "pipeline": {
-      "version": "photo-first",
+      "version": "venue-fallback",
       "steps": [
+        "copy_semantic_analysis",
+        "derive_photo_intent",
         "place_verify",
         "keyword_search",
         "photo_first_pick",
@@ -193,12 +411,12 @@
     "placeId": "ChIJXTeLYx6MGGARNivhJ55nYVw",
     "googleRating": 4.2,
     "googleAddress": "Japan, 〒101-0021 Tokyo, Chiyoda City, Sotokanda, 3-chōme−8−３ 第一針谷ビル1Ｆ",
-    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZOGemMyCtJtY4ox-MzrD_2Fp17Y0I5GL86Zm9pQurcbB-bI0PQv_Q4EUDaZ8DmGg7H1Y90XGFKR-PYoKGIV96H9sdSyy4qaU3nuj2ojgnhZyayXtho9WyL-SeBLUw9kOyTsK1tTLVudpfkUsbivMY7b9A=s4800-w1600-h1200",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZNRDx_vA680pblNvw8COOTJrEd8dWzorYWuqj_MGtLgJ5Hd8B2PBxowZlkhB6guGfagHGc48is7pev-cDi_05PWNKEdZ5vuZ-pO5BYMkXcdkkEOgnAZvOwcvd5NiKaIE0_ri79pDAFpWpsdaJcsZUrH_g=s4800-w1600-h1200",
     "googleAttribution": "田中そば店 秋葉原店",
     "imageSource": "google_places",
     "matched": true,
     "placeName": "Ramen Tanaka soba Akihabara",
-    "photoScore": 263,
+    "photoScore": 275,
     "photoIndex": 1,
     "photoCaption": "醬油湯頭與麵一同上桌，熱氣與香氣先於店名被記住。",
     "photoEvidence": {
@@ -214,6 +432,53 @@
       "role": "food",
       "blob": "ramen tanaka soba akihabara ramen tanaka soba akihabara ramen soba 田中 ramen tanaka soba akihabara 田中そば tanaka soba akihabara ramen soba 田中 田中そば tanaka そば"
     },
+    "copySemantics": {
+      "primary": "dish",
+      "categories": [
+        "dish",
+        "street_scene"
+      ],
+      "hits": [
+        {
+          "category": "dish",
+          "score": 4,
+          "matched": [
+            "湯頭",
+            "醬油",
+            "熱湯",
+            "補給"
+          ],
+          "evidence": [
+            "food_dish"
+          ]
+        },
+        {
+          "category": "street_scene",
+          "score": 1,
+          "matched": [
+            "掃街"
+          ],
+          "evidence": [
+            "street_landmark",
+            "landmark_building"
+          ]
+        }
+      ],
+      "requiredEvidence": [
+        "street_landmark",
+        "landmark_building",
+        "food_dish"
+      ],
+      "searchBoost": [
+        "掃街",
+        "湯頭",
+        "醬油",
+        "熱湯",
+        "補給"
+      ],
+      "copyExcerpt": "田中そば店 秋葉原店 · 掃街中途的熱湯補給 醬油湯頭、出餐快，午餐控制在三十分鐘內剛好。尖峰時段先排隊，再回周邊繼續逛。 田中そば店 秋葉原店 田中そば店 秋葉原店"
+    },
+    "copyDerivedPhotoIntent": "成品料理、餐點本體、街景、霓虹、人潮、地標建築外觀",
     "matchedKeywords": [
       "ramen",
       "soba",
@@ -231,7 +496,7 @@
     ],
     "photoPlaceName": "Ramen Tanaka soba Akihabara",
     "searchUsed": "placeId:ChIJXTeLYx6MGGARNivhJ55nYVw",
-    "photoSearchUsed": "Ramen Tanaka Soba Akihabara",
+    "photoSearchUsed": "content_place",
     "sectionType": "food",
     "role": null,
     "rejectReason": null,
@@ -240,9 +505,19 @@
       "issues": [],
       "usePlaceholder": false
     },
+    "venueSwapped": false,
+    "swappedFrom": null,
+    "swappedTo": null,
+    "alternativeId": null,
+    "heading": "田中そば店 秋葉原店 · 掃街中途的熱湯補給",
+    "content": "醬油湯頭、出餐快，午餐控制在三十分鐘內剛好。尖峰時段先排隊，再回周邊繼續逛。",
+    "officialName": "Ramen Tanaka Soba Akihabara",
+    "officialNameLocal": "田中そば店 秋葉原店",
     "pipeline": {
-      "version": "photo-first",
+      "version": "venue-fallback",
       "steps": [
+        "copy_semantic_analysis",
+        "derive_photo_intent",
         "place_verify",
         "keyword_search",
         "photo_first_pick",
@@ -254,43 +529,336 @@
   },
   {
     "sectionId": "maid-cafe",
-    "subject": "女僕咖啡廳 秋葉原",
-    "mapsQuery": "MAID MADE Akihabara Tokyo",
+    "subject": "MAID MADE 秋葉原駅前店",
+    "mapsQuery": "ufotable Cafe TOKYO Nakano Nogata",
     "placeId": "ChIJvQtxBAaNGGARTiTMJ-Nzhvc",
     "googleRating": 4.9,
-    "googleAddress": "Japan, 〒101-0021 Tokyo, Chiyoda City, Sotokanda, 1-chōme−15−13 秋葉原 神田B&Vビル 10F",
-    "googlePhotoUrl": null,
-    "googleAttribution": null,
-    "imageSource": null,
-    "matched": false,
-    "placeName": "Maid Cafe MAID MADE Akihabara Electric Town-exit Store",
-    "photoScore": null,
-    "photoIndex": null,
-    "photoCaption": null,
-    "photoEvidence": null,
-    "matchedKeywords": [],
-    "photoPlaceName": null,
+    "googleAddress": "〒101-0021 東京都千代田区外神田１丁目１５−13 秋葉原 神田B&Vビル 10F",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZOUyqgrwMTWl3lM7gnXTjGrq0OuwG8yLijBp-k410VbbmkroisVOrm5NILgikRmtlqjzAtG1pd8EyXECtZzlC_FpQcH22M_iV2Mmpgi9fCyWeO7q1GGLMRga64V2_BZRRlifLk4afANyDmmQDM=s4800-w1365-h1200",
+    "googleAttribution": "MAID MADE 秋葉原駅前店",
+    "imageSource": "google_places",
+    "matched": true,
+    "placeName": "MAID MADE 秋葉原駅前店",
+    "photoScore": 127,
+    "photoIndex": 0,
+    "photoCaption": "主題內裝與座位區呈現店內氛圍，一眼就知道這是主題咖啡廳。",
+    "photoEvidence": {
+      "primary": "cafe_interior",
+      "types": [
+        "cafe_interior"
+      ],
+      "signals": [],
+      "subjectType": "venue",
+      "role": "cafe",
+      "blob": "maid made 秋葉原駅前店 maid made 秋葉原駅前店 maid made 秋葉原駅前店 maid made"
+    },
+    "copySemantics": {
+      "primary": "cafe_experience",
+      "categories": [
+        "cafe_experience",
+        "landmark",
+        "shop_collectible",
+        "activity",
+        "street_scene",
+        "dish",
+        "dessert"
+      ],
+      "hits": [
+        {
+          "category": "cafe_experience",
+          "score": 5,
+          "matched": [
+            "咖啡",
+            "主題內裝",
+            "maid",
+            "カフェ",
+            "體驗"
+          ],
+          "evidence": [
+            "dessert",
+            "cafe_interior"
+          ]
+        },
+        {
+          "category": "landmark",
+          "score": 2,
+          "matched": [
+            "radio kaikan",
+            "朝聖"
+          ],
+          "evidence": [
+            "landmark_building",
+            "street_landmark"
+          ]
+        },
+        {
+          "category": "shop_collectible",
+          "score": 2,
+          "matched": [
+            "mandarake",
+            "挖寶"
+          ],
+          "evidence": [
+            "anime_collectible",
+            "shop_interior"
+          ]
+        },
+        {
+          "category": "activity",
+          "score": 2,
+          "matched": [
+            "體驗",
+            "巡禮"
+          ],
+          "evidence": [
+            "cafe_interior",
+            "anime_collectible",
+            "shop_interior"
+          ]
+        },
+        {
+          "category": "street_scene",
+          "score": 1,
+          "matched": [
+            "電氣街"
+          ],
+          "evidence": [
+            "street_landmark",
+            "landmark_building"
+          ]
+        },
+        {
+          "category": "dish",
+          "score": 1,
+          "matched": [
+            "補給"
+          ],
+          "evidence": [
+            "food_dish"
+          ]
+        },
+        {
+          "category": "dessert",
+          "score": 1,
+          "matched": [
+            "甜點"
+          ],
+          "evidence": [
+            "dessert",
+            "cafe_interior"
+          ]
+        }
+      ],
+      "requiredEvidence": [
+        "street_landmark",
+        "landmark_building",
+        "anime_collectible",
+        "shop_interior",
+        "food_dish",
+        "dessert",
+        "cafe_interior"
+      ],
+      "searchBoost": [
+        "電氣街",
+        "radio kaikan",
+        "朝聖",
+        "mandarake",
+        "挖寶",
+        "補給",
+        "甜點",
+        "咖啡",
+        "主題內裝",
+        "maid",
+        "カフェ",
+        "體驗",
+        "巡禮"
+      ],
+      "copyExcerpt": "MAID MADE 秋葉原駅前店 · 次文化體驗的一杯咖啡 秋葉原的MAID MADE 秋葉原駅前店，以動漫聯名甜點與角色主題內裝著稱，是東京動漫聖地巡禮——電氣街與中野的挖寶節奏途中常見的咖啡補給點。把時間控制在六十分鐘內，邊吃甜點邊整理剛買的戰利品，剛好留體力給下一間店。 不是購物清單，而是動漫迷的朝聖路線：從 Radio Kaikan 到 Mandarake 深處 MAID MADE 秋葉原駅前店 ufotableカフェTOKYO"
+    },
+    "copyDerivedPhotoIntent": "店內氛圍、甜點、主題內裝、地標建築、代表性招牌、街區辨識點",
+    "matchedKeywords": [
+      "MAID MADE"
+    ],
+    "photoPlaceName": "MAID MADE 秋葉原駅前店",
     "searchUsed": "placeId:ChIJvQtxBAaNGGARTiTMJ-Nzhvc",
-    "photoSearchUsed": null,
+    "photoSearchUsed": "venue_chosen_place",
     "sectionType": "cafe",
     "role": null,
-    "rejectReason": "no_photo",
+    "rejectReason": null,
     "editorialQA": {
-      "ok": false,
-      "issues": [
-        "no_photo"
-      ],
-      "usePlaceholder": true,
-      "pass": false,
-      "recommendation": "use_placeholder"
+      "ok": true,
+      "issues": [],
+      "usePlaceholder": false,
+      "pass": true,
+      "photoEvidence": {
+        "primary": "cafe_interior",
+        "types": [
+          "cafe_interior"
+        ],
+        "signals": [],
+        "subjectType": "venue",
+        "role": "cafe",
+        "blob": "maid made 秋葉原駅前店 maid made 秋葉原駅前店 maid made 秋葉原駅前店 maid made"
+      },
+      "copySemantics": {
+        "primary": "cafe_experience",
+        "categories": [
+          "cafe_experience",
+          "landmark",
+          "shop_collectible",
+          "activity",
+          "street_scene",
+          "dish",
+          "dessert"
+        ],
+        "hits": [
+          {
+            "category": "cafe_experience",
+            "score": 5,
+            "matched": [
+              "咖啡",
+              "主題內裝",
+              "maid",
+              "カフェ",
+              "體驗"
+            ],
+            "evidence": [
+              "dessert",
+              "cafe_interior"
+            ]
+          },
+          {
+            "category": "landmark",
+            "score": 2,
+            "matched": [
+              "radio kaikan",
+              "朝聖"
+            ],
+            "evidence": [
+              "landmark_building",
+              "street_landmark"
+            ]
+          },
+          {
+            "category": "shop_collectible",
+            "score": 2,
+            "matched": [
+              "mandarake",
+              "挖寶"
+            ],
+            "evidence": [
+              "anime_collectible",
+              "shop_interior"
+            ]
+          },
+          {
+            "category": "activity",
+            "score": 2,
+            "matched": [
+              "體驗",
+              "巡禮"
+            ],
+            "evidence": [
+              "cafe_interior",
+              "anime_collectible",
+              "shop_interior"
+            ]
+          },
+          {
+            "category": "street_scene",
+            "score": 1,
+            "matched": [
+              "電氣街"
+            ],
+            "evidence": [
+              "street_landmark",
+              "landmark_building"
+            ]
+          },
+          {
+            "category": "dish",
+            "score": 1,
+            "matched": [
+              "補給"
+            ],
+            "evidence": [
+              "food_dish"
+            ]
+          },
+          {
+            "category": "dessert",
+            "score": 1,
+            "matched": [
+              "甜點"
+            ],
+            "evidence": [
+              "dessert",
+              "cafe_interior"
+            ]
+          }
+        ],
+        "requiredEvidence": [
+          "street_landmark",
+          "landmark_building",
+          "anime_collectible",
+          "shop_interior",
+          "food_dish",
+          "dessert",
+          "cafe_interior"
+        ],
+        "searchBoost": [
+          "電氣街",
+          "radio kaikan",
+          "朝聖",
+          "mandarake",
+          "挖寶",
+          "補給",
+          "甜點",
+          "咖啡",
+          "主題內裝",
+          "maid",
+          "カフェ",
+          "體驗",
+          "巡禮"
+        ],
+        "copyExcerpt": "MAID MADE 秋葉原駅前店 · 次文化體驗的一杯咖啡 秋葉原的MAID MADE 秋葉原駅前店，以動漫聯名甜點與角色主題內裝著稱，是東京動漫聖地巡禮——電氣街與中野的挖寶節奏途中常見的咖啡補給點。把時間控制在六十分鐘內，邊吃甜點邊整理剛買的戰利品，剛好留體力給下一間店。 不是購物清單，而是動漫迷的朝聖路線：從 Radio Kaikan 到 Mandarake 深處 MAID MADE 秋葉原駅前店 ufotableカフェTOKYO"
+      },
+      "recommendation": "approve",
+      "goldenRule": {
+        "principle": "圖片永遠服務文案；若原訂地點無合格圖，可改寫文案並換成同類型替代地點。",
+        "rules": [
+          "如果圖片無法支撐文案，請重新搜尋圖片",
+          "若原訂地點仍無合格圖，依 venueAlternatives 換成同類型知名地點並改寫文案",
+          "改寫後文案必須與新地點、新圖片一致",
+          "如果仍找不到，寧可 placeholder，也不要放錯圖",
+          "Caption 只能描述圖片中真正看得到的內容",
+          "住宿圖片必須驗證 Hotel Name 與 Place ID",
+          "景點圖片必須驗證 Landmark",
+          "美食圖片必須驗證 Dish",
+          "體驗圖片必須驗證 Activity",
+          "否則 Editorial QA 一律 FAIL"
+        ]
+      },
+      "modifyCopy": true
     },
+    "venueSwapped": true,
+    "swappedFrom": "MAID MADE Akihabara",
+    "swappedTo": "MAID MADE 秋葉原駅前店",
+    "alternativeId": "ufotable-cafe-tokyo",
+    "heading": "MAID MADE 秋葉原駅前店 · 次文化體驗的一杯咖啡",
+    "content": "秋葉原的MAID MADE 秋葉原駅前店，以動漫聯名甜點與角色主題內裝著稱，是東京動漫聖地巡禮——電氣街與中野的挖寶節奏途中常見的咖啡補給點。把時間控制在六十分鐘內，邊吃甜點邊整理剛買的戰利品，剛好留體力給下一間店。",
+    "officialName": "MAID MADE 秋葉原駅前店",
+    "officialNameLocal": "ufotableカフェTOKYO",
     "pipeline": {
-      "version": "photo-first",
+      "version": "venue-fallback",
       "steps": [
+        "copy_semantic_analysis",
+        "derive_photo_intent",
         "place_verify",
         "keyword_search",
         "photo_first_pick",
         "evidence_caption",
+        "venue_fallback",
         "rule_qa"
       ],
       "aiTokens": 0
@@ -298,43 +866,226 @@
   },
   {
     "sectionId": "hotel-gracery",
-    "subject": "秋葉原ワシントンホテル",
-    "mapsQuery": "Akihabara Washington Hotel Tokyo",
-    "placeId": "ChIJnxZoFqiOGGAReYJ1ck2lXiw",
-    "googleRating": 4.2,
-    "googleAddress": "Japan, 〒101-0025 Tokyo, Chiyoda City, Kanda Sakumachō, 1-chōme−８−３",
-    "googlePhotoUrl": null,
-    "googleAttribution": null,
-    "imageSource": null,
-    "matched": false,
-    "placeName": "Akihabara Washington Hotel",
-    "photoScore": null,
-    "photoIndex": null,
-    "photoCaption": null,
-    "photoEvidence": null,
-    "matchedKeywords": [],
-    "photoPlaceName": null,
+    "subject": "レム秋葉原",
+    "mapsQuery": "remm Akihabara Tokyo",
+    "placeId": "ChIJH8hUDqiOGGARKbhUAocHMfs",
+    "googleRating": 4.3,
+    "googleAddress": "〒101-0025 東京都千代田区神田佐久間町１丁目６−５",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZPwdW0KUtInMwwt5MmtYAGA7XTxRg3Ljti8W_NAI_OeiiFPL6FB_BW0xQ-K6QceesMaHXDROvF5XnPdjC5XoMqij6luC_DVeUyJjCbou1ghhxQBu5bUZhoXsY6RiKpQ0_-lKxGW77tMqx93G1w=s4800-w1600-h1200",
+    "googleAttribution": "レム秋葉原",
+    "imageSource": "google_places",
+    "matched": true,
+    "placeName": "レム秋葉原",
+    "photoScore": 131,
+    "photoIndex": 1,
+    "photoCaption": "客房採簡約設計，採光充足，作為秋葉原巡禮的落腳處剛好。",
+    "photoEvidence": {
+      "primary": "room",
+      "types": [
+        "room"
+      ],
+      "blob": "レム秋葉原"
+    },
+    "copySemantics": {
+      "primary": "landmark",
+      "categories": [
+        "landmark",
+        "street_scene",
+        "shop_collectible",
+        "room"
+      ],
+      "hits": [
+        {
+          "category": "landmark",
+          "score": 2,
+          "matched": [
+            "radio kaikan",
+            "朝聖"
+          ],
+          "evidence": [
+            "landmark_building",
+            "street_landmark"
+          ]
+        },
+        {
+          "category": "street_scene",
+          "score": 1,
+          "matched": [
+            "電氣街"
+          ],
+          "evidence": [
+            "street_landmark",
+            "landmark_building"
+          ]
+        },
+        {
+          "category": "shop_collectible",
+          "score": 1,
+          "matched": [
+            "mandarake"
+          ],
+          "evidence": [
+            "anime_collectible",
+            "shop_interior"
+          ]
+        },
+        {
+          "category": "room",
+          "score": 1,
+          "matched": [
+            "客房"
+          ],
+          "evidence": [
+            "room"
+          ]
+        }
+      ],
+      "requiredEvidence": [
+        "street_landmark",
+        "landmark_building",
+        "anime_collectible",
+        "shop_interior",
+        "room"
+      ],
+      "searchBoost": [
+        "電氣街",
+        "radio kaikan",
+        "朝聖",
+        "mandarake",
+        "客房"
+      ],
+      "copyExcerpt": "レム秋葉原 · 步行可達電氣街 レム秋葉原落在千代田區，秋葉原站直結、客房緊湊實用，是把時間留給街上的務實落腳處。以秋葉原為基地、搭山手線往返各區，動線直覺。展期與週末記得提早訂房。 不是購物清單，而是動漫迷的朝聖路線：從 Radio Kaikan 到 Mandarake 深處 レム秋葉原 レム秋葉原"
+    },
+    "copyDerivedPhotoIntent": "地標建築、代表性招牌、街區辨識點、街景、霓虹、人潮、地標建築外觀",
+    "matchedKeywords": [
+      "レム",
+      "レム秋葉原",
+      "レム"
+    ],
+    "photoPlaceName": "レム秋葉原",
     "searchUsed": "placeId:ChIJnxZoFqiOGGAReYJ1ck2lXiw",
-    "photoSearchUsed": null,
+    "photoSearchUsed": "venue_chosen_place",
     "sectionType": "hotel",
     "role": null,
-    "rejectReason": "no_photo",
+    "rejectReason": null,
     "editorialQA": {
-      "ok": false,
-      "issues": [
-        "no_photo"
-      ],
-      "usePlaceholder": true,
-      "pass": false,
-      "recommendation": "use_placeholder"
+      "ok": true,
+      "issues": [],
+      "usePlaceholder": false,
+      "pass": true,
+      "photoEvidence": {
+        "primary": "room",
+        "types": [
+          "room"
+        ],
+        "blob": "レム秋葉原"
+      },
+      "copySemantics": {
+        "primary": "landmark",
+        "categories": [
+          "landmark",
+          "street_scene",
+          "shop_collectible",
+          "room"
+        ],
+        "hits": [
+          {
+            "category": "landmark",
+            "score": 2,
+            "matched": [
+              "radio kaikan",
+              "朝聖"
+            ],
+            "evidence": [
+              "landmark_building",
+              "street_landmark"
+            ]
+          },
+          {
+            "category": "street_scene",
+            "score": 1,
+            "matched": [
+              "電氣街"
+            ],
+            "evidence": [
+              "street_landmark",
+              "landmark_building"
+            ]
+          },
+          {
+            "category": "shop_collectible",
+            "score": 1,
+            "matched": [
+              "mandarake"
+            ],
+            "evidence": [
+              "anime_collectible",
+              "shop_interior"
+            ]
+          },
+          {
+            "category": "room",
+            "score": 1,
+            "matched": [
+              "客房"
+            ],
+            "evidence": [
+              "room"
+            ]
+          }
+        ],
+        "requiredEvidence": [
+          "street_landmark",
+          "landmark_building",
+          "anime_collectible",
+          "shop_interior",
+          "room"
+        ],
+        "searchBoost": [
+          "電氣街",
+          "radio kaikan",
+          "朝聖",
+          "mandarake",
+          "客房"
+        ],
+        "copyExcerpt": "レム秋葉原 · 步行可達電氣街 レム秋葉原落在千代田區，秋葉原站直結、客房緊湊實用，是把時間留給街上的務實落腳處。以秋葉原為基地、搭山手線往返各區，動線直覺。展期與週末記得提早訂房。 不是購物清單，而是動漫迷的朝聖路線：從 Radio Kaikan 到 Mandarake 深處 レム秋葉原 レム秋葉原"
+      },
+      "recommendation": "approve",
+      "goldenRule": {
+        "principle": "圖片永遠服務文案；若原訂地點無合格圖，可改寫文案並換成同類型替代地點。",
+        "rules": [
+          "如果圖片無法支撐文案，請重新搜尋圖片",
+          "若原訂地點仍無合格圖，依 venueAlternatives 換成同類型知名地點並改寫文案",
+          "改寫後文案必須與新地點、新圖片一致",
+          "如果仍找不到，寧可 placeholder，也不要放錯圖",
+          "Caption 只能描述圖片中真正看得到的內容",
+          "住宿圖片必須驗證 Hotel Name 與 Place ID",
+          "景點圖片必須驗證 Landmark",
+          "美食圖片必須驗證 Dish",
+          "體驗圖片必須驗證 Activity",
+          "否則 Editorial QA 一律 FAIL"
+        ]
+      },
+      "modifyCopy": true
     },
+    "venueSwapped": true,
+    "swappedFrom": "Akihabara Washington Hotel",
+    "swappedTo": "レム秋葉原",
+    "alternativeId": "remm-akihabara",
+    "heading": "レム秋葉原 · 步行可達電氣街",
+    "content": "レム秋葉原落在千代田區，秋葉原站直結、客房緊湊實用，是把時間留給街上的務實落腳處。以秋葉原為基地、搭山手線往返各區，動線直覺。展期與週末記得提早訂房。",
+    "officialName": "レム秋葉原",
+    "officialNameLocal": "レム秋葉原",
     "pipeline": {
-      "version": "photo-first",
+      "version": "venue-fallback",
       "steps": [
+        "copy_semantic_analysis",
+        "derive_photo_intent",
         "place_verify",
         "keyword_search",
         "photo_first_pick",
         "evidence_caption",
+        "venue_fallback",
         "rule_qa"
       ],
       "aiTokens": 0
@@ -342,68 +1093,265 @@
   },
   {
     "sectionId": "nui-hostel",
-    "subject": "Nui Hostel Tokyo",
-    "mapsQuery": "Nui Hostel & Bar Tokyo",
-    "placeId": "ChIJ4U-9KsiOGGARARhaBLZLqS0",
-    "googleRating": 4.5,
-    "googleAddress": "2-chōme-14-13 Kuramae, Taito City, Tokyo 111-0051, Japan",
-    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZOg1D6WHfL76qkS3u8ZK4ZR8yjf4PbugRRaJ8bEYBjm_SHD15dCuMOHPD6S-xnMoWruo7mp8q-OuZsIcdTeoQhhbFbjaDsk5d2RvaKbI7C-CHqTPUgWSyjZj8PX7ieI7x3ljXCjmeUZEvxJTWc=s4800-w1600-h1200",
-    "googleAttribution": "Nui. HOSTEL & BAR LOUNGE",
+    "subject": "グリッズ 東京 浅草橋 ホテル & ホステル",
+    "mapsQuery": "Grids Tokyo Asakusabashi Hotel Hostel",
+    "placeId": "ChIJjTWKIa6OGGAR6kmG9UpLIIU",
+    "googleRating": 4.2,
+    "googleAddress": "〒111-0053 東京都台東区浅草橋４丁目１１−６",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZONnM3_tmTOL8qNze3UCkddE98g3lKzmlAAt5DddafjBMXSrhEcLxYsR-wqUjo5oZhg6IF7EuuQr_RfgLZYP41TOKTcPbiHyfJyb5_Y5OIe87ATwAJF1YlCtoRlOSoGba6ykhUfGRvvY8FTjko=s4800-w1600-h1200",
+    "googleAttribution": "Gou Nishi",
     "imageSource": "google_places",
     "matched": true,
-    "placeName": "Nui. Hostel & Bar Lounge",
-    "photoScore": 257,
+    "placeName": "グリッズ 東京 浅草橋 ホテル & ホステル",
+    "photoScore": 151,
     "photoIndex": 1,
-    "photoCaption": "公共吧台與交誼空間，是旅人交流最頻繁的角落。",
+    "photoCaption": "交誼空間與床位區維持簡潔，適合獨旅或預算旅人。",
     "photoEvidence": {
       "primary": "lobby_bar",
       "types": [
         "lobby_bar",
-        "lobby_bar",
-        "lobby_bar"
+        "room"
       ],
-      "signals": [
-        "lounge",
-        "bar lounge",
-        "hostel bar",
-        "hostel",
-        "lounge"
-      ],
-      "subjectType": "venue",
-      "role": "hostel",
-      "blob": "nui. hostel & bar lounge nui. hostel & bar lounge nui. hostel & bar lounge bar lounge nui hostel bar lounge nui. hostel & bar lounge nui hostel nui hostel"
+      "blob": "グリッズ 東京 浅草橋 ホテル & ホステル"
     },
+    "copySemantics": {
+      "primary": "lobby",
+      "categories": [
+        "lobby",
+        "landmark",
+        "night",
+        "shop_collectible",
+        "room"
+      ],
+      "hits": [
+        {
+          "category": "lobby",
+          "score": 4,
+          "matched": [
+            "交誼",
+            "公共空間",
+            "交流",
+            "聚集"
+          ],
+          "evidence": [
+            "lobby_bar"
+          ]
+        },
+        {
+          "category": "landmark",
+          "score": 2,
+          "matched": [
+            "radio kaikan",
+            "朝聖"
+          ],
+          "evidence": [
+            "landmark_building",
+            "street_landmark"
+          ]
+        },
+        {
+          "category": "night",
+          "score": 1,
+          "matched": [
+            "傍晚"
+          ],
+          "evidence": [
+            "street_landmark",
+            "landmark_building"
+          ]
+        },
+        {
+          "category": "shop_collectible",
+          "score": 1,
+          "matched": [
+            "mandarake"
+          ],
+          "evidence": [
+            "anime_collectible",
+            "shop_interior"
+          ]
+        },
+        {
+          "category": "room",
+          "score": 1,
+          "matched": [
+            "床位"
+          ],
+          "evidence": [
+            "room"
+          ]
+        }
+      ],
+      "requiredEvidence": [
+        "landmark_building",
+        "street_landmark",
+        "anime_collectible",
+        "shop_interior",
+        "lobby_bar",
+        "room"
+      ],
+      "searchBoost": [
+        "radio kaikan",
+        "朝聖",
+        "傍晚",
+        "mandarake",
+        "交誼",
+        "公共空間",
+        "交流",
+        "聚集",
+        "床位"
+      ],
+      "copyExcerpt": "グリッズ 東京 浅草橋 ホテル & ホステル · 設計感旅宿落腳 淺草橋一帶的グリッズ 東京 浅草橋 ホテル & ホステル，淺草橋一帶的設計旅宿與交誼空間，適合獨旅或預算控管。若喜歡交流，公共空間傍晚仍常有旅人聚集。週末床位記得提早訂。 不是購物清單，而是動漫迷的朝聖路線：從 Radio Kaikan 到 Mandarake 深處 グリッズ 東京 浅草橋 ホテル & ホステル グリッドホテル浅草橋"
+    },
+    "copyDerivedPhotoIntent": "Lobby、公共吧台、交誼空間、地標建築、代表性招牌、街區辨識點",
     "matchedKeywords": [
-      "bar",
-      "lounge",
-      "Nui",
-      "hostel",
-      "bar",
-      "lounge",
-      "Nui. HOSTEL & BAR LOUNGE",
-      "Nui",
-      "hostel",
-      "Nui",
-      "HOSTEL"
+      "ホテル",
+      "グリッズ"
     ],
-    "photoPlaceName": "Nui. Hostel & Bar Lounge",
+    "photoPlaceName": "グリッズ 東京 浅草橋 ホテル & ホステル",
     "searchUsed": "placeId:ChIJ4U-9KsiOGGARARhaBLZLqS0",
-    "photoSearchUsed": "Nui. HOSTEL & BAR LOUNGE Tokyo",
+    "photoSearchUsed": "venue_chosen_place",
     "sectionType": "hostel",
     "role": null,
     "rejectReason": null,
     "editorialQA": {
       "ok": true,
       "issues": [],
-      "usePlaceholder": false
+      "usePlaceholder": false,
+      "pass": true,
+      "photoEvidence": {
+        "primary": "lobby_bar",
+        "types": [
+          "lobby_bar",
+          "room"
+        ],
+        "blob": "グリッズ 東京 浅草橋 ホテル & ホステル"
+      },
+      "copySemantics": {
+        "primary": "lobby",
+        "categories": [
+          "lobby",
+          "landmark",
+          "night",
+          "shop_collectible",
+          "room"
+        ],
+        "hits": [
+          {
+            "category": "lobby",
+            "score": 4,
+            "matched": [
+              "交誼",
+              "公共空間",
+              "交流",
+              "聚集"
+            ],
+            "evidence": [
+              "lobby_bar"
+            ]
+          },
+          {
+            "category": "landmark",
+            "score": 2,
+            "matched": [
+              "radio kaikan",
+              "朝聖"
+            ],
+            "evidence": [
+              "landmark_building",
+              "street_landmark"
+            ]
+          },
+          {
+            "category": "night",
+            "score": 1,
+            "matched": [
+              "傍晚"
+            ],
+            "evidence": [
+              "street_landmark",
+              "landmark_building"
+            ]
+          },
+          {
+            "category": "shop_collectible",
+            "score": 1,
+            "matched": [
+              "mandarake"
+            ],
+            "evidence": [
+              "anime_collectible",
+              "shop_interior"
+            ]
+          },
+          {
+            "category": "room",
+            "score": 1,
+            "matched": [
+              "床位"
+            ],
+            "evidence": [
+              "room"
+            ]
+          }
+        ],
+        "requiredEvidence": [
+          "landmark_building",
+          "street_landmark",
+          "anime_collectible",
+          "shop_interior",
+          "lobby_bar",
+          "room"
+        ],
+        "searchBoost": [
+          "radio kaikan",
+          "朝聖",
+          "傍晚",
+          "mandarake",
+          "交誼",
+          "公共空間",
+          "交流",
+          "聚集",
+          "床位"
+        ],
+        "copyExcerpt": "グリッズ 東京 浅草橋 ホテル & ホステル · 設計感旅宿落腳 淺草橋一帶的グリッズ 東京 浅草橋 ホテル & ホステル，淺草橋一帶的設計旅宿與交誼空間，適合獨旅或預算控管。若喜歡交流，公共空間傍晚仍常有旅人聚集。週末床位記得提早訂。 不是購物清單，而是動漫迷的朝聖路線：從 Radio Kaikan 到 Mandarake 深處 グリッズ 東京 浅草橋 ホテル & ホステル グリッドホテル浅草橋"
+      },
+      "recommendation": "approve",
+      "goldenRule": {
+        "principle": "圖片永遠服務文案；若原訂地點無合格圖，可改寫文案並換成同類型替代地點。",
+        "rules": [
+          "如果圖片無法支撐文案，請重新搜尋圖片",
+          "若原訂地點仍無合格圖，依 venueAlternatives 換成同類型知名地點並改寫文案",
+          "改寫後文案必須與新地點、新圖片一致",
+          "如果仍找不到，寧可 placeholder，也不要放錯圖",
+          "Caption 只能描述圖片中真正看得到的內容",
+          "住宿圖片必須驗證 Hotel Name 與 Place ID",
+          "景點圖片必須驗證 Landmark",
+          "美食圖片必須驗證 Dish",
+          "體驗圖片必須驗證 Activity",
+          "否則 Editorial QA 一律 FAIL"
+        ]
+      },
+      "modifyCopy": true
     },
+    "venueSwapped": true,
+    "swappedFrom": "Nui. Hostel & Bar Lounge",
+    "swappedTo": "グリッズ 東京 浅草橋 ホテル & ホステル",
+    "alternativeId": "grids-asakusabashi",
+    "heading": "グリッズ 東京 浅草橋 ホテル & ホステル · 設計感旅宿落腳",
+    "content": "淺草橋一帶的グリッズ 東京 浅草橋 ホテル & ホステル，淺草橋一帶的設計旅宿與交誼空間，適合獨旅或預算控管。若喜歡交流，公共空間傍晚仍常有旅人聚集。週末床位記得提早訂。",
+    "officialName": "グリッズ 東京 浅草橋 ホテル & ホステル",
+    "officialNameLocal": "グリッドホテル浅草橋",
     "pipeline": {
-      "version": "photo-first",
+      "version": "venue-fallback",
       "steps": [
+        "copy_semantic_analysis",
+        "derive_photo_intent",
         "place_verify",
         "keyword_search",
         "photo_first_pick",
         "evidence_caption",
+        "venue_fallback",
         "rule_qa"
       ],
       "aiTokens": 0
@@ -416,52 +1364,100 @@
     "placeId": "ChIJ__-AdayOGGAR6EGPwvcpzTA",
     "googleRating": 4.3,
     "googleAddress": "1-chōme-15-16 Sotokanda, Chiyoda City, Tokyo 101-0021, Japan",
-    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZMrg4lrJ4GyhyfYfM4EL9lOvQVl26MHzCGJ4JpAs_T5wc8J_eoaKfTmlq12gn0hZp69U-9s7iwDWaX0xnkuYBEehTJuBL0mAN4ealzHkN_FHyZ62NzILcu81JRudNzxfIPh0yhtlE-21x7l=s4800-w1600-h1200",
-    "googleAttribution": "Blake Bishop",
-    "imageSource": "google_places",
-    "matched": true,
+    "googlePhotoUrl": null,
+    "googleAttribution": null,
+    "imageSource": null,
+    "matched": false,
     "placeName": "Akihabara Radio Kaikan",
-    "photoScore": 252,
-    "photoIndex": 1,
-    "photoCaption": "GIGO大型看板矗立街頭，是電氣街一眼辨識的地標。",
-    "photoEvidence": {
-      "primary": "street_landmark",
-      "types": [
-        "landmark_building",
-        "street_landmark"
+    "photoScore": null,
+    "photoIndex": null,
+    "photoCaption": null,
+    "photoEvidence": null,
+    "copySemantics": {
+      "primary": "street_scene",
+      "categories": [
+        "street_scene",
+        "landmark"
       ],
-      "signals": [
-        "street",
-        "gigo",
-        "landmark",
-        "gigo"
+      "hits": [
+        {
+          "category": "street_scene",
+          "score": 1,
+          "matched": [
+            "電氣街"
+          ],
+          "evidence": [
+            "street_landmark",
+            "landmark_building"
+          ]
+        },
+        {
+          "category": "landmark",
+          "score": 1,
+          "matched": [
+            "一眼"
+          ],
+          "evidence": [
+            "landmark_building",
+            "street_landmark"
+          ]
+        }
       ],
-      "subjectType": "district",
-      "role": "opening",
-      "blob": "gigo秋葉原3号館 blake bishop gigo秋葉原3号館 gigo gigo gigo秋葉原 gigo gigo landmark_street"
+      "requiredEvidence": [
+        "street_landmark",
+        "landmark_building"
+      ],
+      "searchBoost": [
+        "電氣街",
+        "一眼"
+      ],
+      "copyExcerpt": "Hero 要一眼辨識「這就是秋葉原電氣街」 秋葉原電氣街 秋葉原電氣街"
     },
-    "matchedKeywords": [
-      "GIGO",
-      "GIGO",
-      "GIGO秋葉原",
-      "GIGO",
-      "gigo",
-      "landmark_street"
-    ],
-    "photoPlaceName": "GiGO秋葉原3号館",
+    "copyDerivedPhotoIntent": "街景、霓虹、人潮、地標建築外觀、地標建築、代表性招牌、街區辨識點",
+    "matchedKeywords": [],
+    "photoPlaceName": null,
     "searchUsed": "placeId:ChIJ__-AdayOGGAR6EGPwvcpzTA",
-    "photoSearchUsed": "GIGO 秋葉原",
+    "photoSearchUsed": null,
     "sectionType": "landmark",
     "role": "hero",
-    "rejectReason": null,
+    "rejectReason": "copy_image_semantic_mismatch|copy_image_semantic_mismatch|copy_image_semantic_mismatch|copy_image_semantic_mismatch|copy_image_semantic_mismatch",
     "editorialQA": {
-      "ok": true,
-      "issues": [],
-      "usePlaceholder": false
+      "ok": false,
+      "issues": [
+        "no_photo"
+      ],
+      "usePlaceholder": true,
+      "pass": false,
+      "recommendation": "use_placeholder",
+      "goldenRule": {
+        "principle": "圖片永遠服務文案；若原訂地點無合格圖，可改寫文案並換成同類型替代地點。",
+        "rules": [
+          "如果圖片無法支撐文案，請重新搜尋圖片",
+          "若原訂地點仍無合格圖，依 venueAlternatives 換成同類型知名地點並改寫文案",
+          "改寫後文案必須與新地點、新圖片一致",
+          "如果仍找不到，寧可 placeholder，也不要放錯圖",
+          "Caption 只能描述圖片中真正看得到的內容",
+          "住宿圖片必須驗證 Hotel Name 與 Place ID",
+          "景點圖片必須驗證 Landmark",
+          "美食圖片必須驗證 Dish",
+          "體驗圖片必須驗證 Activity",
+          "否則 Editorial QA 一律 FAIL"
+        ]
+      }
     },
+    "venueSwapped": false,
+    "swappedFrom": null,
+    "swappedTo": null,
+    "alternativeId": null,
+    "heading": null,
+    "content": null,
+    "officialName": "Radio Kaikan",
+    "officialNameLocal": "ラジオ会館",
     "pipeline": {
-      "version": "photo-first",
+      "version": "venue-fallback",
       "steps": [
+        "copy_semantic_analysis",
+        "derive_photo_intent",
         "place_verify",
         "keyword_search",
         "photo_first_pick",
