@@ -4,12 +4,12 @@
  */
 import { matchTerms, resolveSectionRole } from './cj-editorial-engine.js';
 export var PHOTO_FIRST_RULES = {
-  principle: 'Copy → semantic intent → pick photo → evidence caption → triple QA',
-  supersededBy: 'EDITORIAL_GOLDEN_RULE — 圖片服務文案',
+  principle: 'Copy → semantic intent → travel photo slot → evidence caption → triple QA',
+  supersededBy: 'TRAVEL_PHOTO_RULES + EDITORIAL_GOLDEN_RULE',
   global: [
-    '圖片永遠服務文案',
+    '旅遊導覽優先：外觀/街景 → 室內/體驗 → 細節',
     'Caption 只描述圖片可見內容',
-    '找不到合格圖 → placeholder'
+    '找不到合格圖 → placeholder，禁止隨機 fallback'
   ]
 };
 
@@ -30,12 +30,12 @@ var ROLE_EVIDENCE_PRIORITY = {
   opening: ['street_landmark', 'landmark_building', 'facade'],
   landmark: ['street_landmark', 'landmark_building', 'facade'],
   explore: ['street_landmark', 'landmark_building', 'facade'],
-  anime: ['gachapon_wall', 'anime_collectible', 'shop_interior', 'street_landmark'],
-  shopping: ['gachapon_wall', 'anime_collectible', 'shop_interior'],
-  food: ['food_dish', 'dessert'],
-  cafe: ['dessert', 'cafe_interior', 'food_dish'],
-  hotel: ['room', 'lobby_bar', 'facade'],
-  hostel: ['room', 'lobby_bar', 'facade']
+  anime: ['facade', 'street_landmark', 'gachapon_wall', 'anime_collectible', 'shop_interior'],
+  shopping: ['facade', 'gachapon_wall', 'anime_collectible', 'shop_interior'],
+  food: ['facade', 'food_dish'],
+  cafe: ['facade', 'cafe_interior', 'dessert'],
+  hotel: ['facade', 'lobby_bar', 'room'],
+  hostel: ['facade', 'lobby_bar', 'room']
 };
 
 function escapeRegExp(str) {
@@ -210,21 +210,24 @@ export function evidenceAllowedForSection(evidence, section) {
   }
 
   if (role === 'cafe') {
-    if (types.indexOf('dessert') === -1 && types.indexOf('cafe_interior') === -1 && types.indexOf('food_dish') === -1) {
+    if (types.indexOf('facade') === -1 && types.indexOf('dessert') === -1 &&
+        types.indexOf('cafe_interior') === -1 && types.indexOf('food_dish') === -1) {
       return { ok: false, reason: 'cafe_no_experience' };
     }
   }
 
   if (role === 'food') {
-    if (types.indexOf('food_dish') === -1) {
-      return { ok: false, reason: 'food_no_dish' };
+    if (types.indexOf('facade') === -1 && types.indexOf('food_dish') === -1) {
+      return { ok: false, reason: 'food_no_valid' };
     }
   }
 
   if (role === 'anime') {
-    var animeOk = types.indexOf('anime_collectible') !== -1 ||
+    var animeOk = types.indexOf('facade') !== -1 ||
+      types.indexOf('anime_collectible') !== -1 ||
       types.indexOf('gachapon_wall') !== -1 ||
-      types.indexOf('shop_interior') !== -1;
+      types.indexOf('shop_interior') !== -1 ||
+      types.indexOf('street_landmark') !== -1;
     if (!animeOk) {
       return { ok: false, reason: 'anime_no_collectible' };
     }

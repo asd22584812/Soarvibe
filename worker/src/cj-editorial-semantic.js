@@ -9,21 +9,21 @@ import {
   validateCaptionMatchesEvidence,
   validateLodgingVenueAttribution
 } from './cj-photo-evidence.js';
+import {
+  validateTravelPhotoSelection,
+  validateCopyTravelAlignment,
+  TRAVEL_PHOTO_RULES
+} from './cj-travel-photo-rules.js';
 
 export var EDITORIAL_GOLDEN_RULE = {
-  principle: '圖片永遠服務文案；若原訂地點無合格圖，可改寫文案並換成同類型替代地點。',
-  rules: [
-    '如果圖片無法支撐文案，請重新搜尋圖片',
-    '若原訂地點仍無合格圖，依 venueAlternatives 換成同類型知名地點並改寫文案',
+  principle: '圖片永遠服務文案；優先選旅遊者最想看到的照片（外觀/街景優先）。',
+  rules: TRAVEL_PHOTO_RULES.rules.concat([
+    '若原訂地點無合格圖，依 venueAlternatives 換成同類型知名地點並改寫文案',
     '改寫後文案必須與新地點、新圖片一致',
     '如果仍找不到，寧可 placeholder，也不要放錯圖',
     'Caption 只能描述圖片中真正看得到的內容',
-    '住宿圖片必須驗證 Hotel Name 與 Place ID',
-    '景點圖片必須驗證 Landmark',
-    '美食圖片必須驗證 Dish',
-    '體驗圖片必須驗證 Activity',
     '否則 Editorial QA 一律 FAIL'
-  ]
+  ])
 };
 
 /** Semantic categories editors care about */
@@ -307,8 +307,8 @@ export function validateLandmarkForCopy(section, evidence, semantics) {
 
 export function validateDishForCopy(section, evidence) {
   if (resolveSectionRole(section) !== 'food') return { ok: true };
-  var types = (evidence && evidence.types) || [];
-  if (types.indexOf('food_dish') === -1) return { ok: false, reason: 'dish_not_verified' };
+  var travelOk = validateTravelPhotoSelection(section, evidence, 0);
+  if (!travelOk.ok) return { ok: false, reason: travelOk.reason || 'dish_not_verified' };
   return { ok: true };
 }
 
@@ -371,6 +371,12 @@ export function runGoldenRuleQA(section, photoResult, caption, semantics, resolv
   var activityOk = validateActivityForCopy(section, evidence, sem);
   if (!activityOk.ok) issues.push(activityOk.reason);
 
+  var travelOk = validateTravelPhotoSelection(section, evidence, photoResult.photoIndex, photoResult);
+  if (!travelOk.ok && !(section && section.venueSwapped)) issues.push(travelOk.reason);
+
+  var copyTravelOk = validateCopyTravelAlignment(section, evidence, caption);
+  if (!copyTravelOk.ok && !(section && section.venueSwapped)) issues.push(copyTravelOk.reason);
+
   if (!caption || caption.length < 8) issues.push('caption_missing');
   var capOk = validateCaptionMatchesEvidence(caption, evidence);
   if (!capOk.ok) issues.push(capOk.reason);
@@ -389,7 +395,12 @@ export function runGoldenRuleQA(section, photoResult, caption, semantics, resolv
     'copy_image_semantic_mismatch', 'copy_wants_street_got_shop', 'copy_wants_room_got_lobby',
     'copy_wants_lobby_got_room', 'copy_wants_dish', 'lodging_venue_mismatch', 'lodging_place_id_mismatch',
     'landmark_not_verified', 'dish_not_verified', 'activity_not_verified', 'caption_copy_mismatch',
-    'logo_only', 'unknown_evidence'
+    'logo_only', 'unknown_evidence',
+    'travel_reject_primary_food_dish', 'travel_reject_primary_room', 'travel_reject_primary_shop_interior',
+    'travel_slot_type_mismatch', 'travel_district_shop_only', 'travel_primary_slot_fail',
+    'travel_copy_claims_lobby_bar', 'travel_copy_claims_street_landmark', 'travel_copy_claims_facade',
+    'travel_copy_claims_room', 'travel_copy_claims_cafe_interior', 'travel_copy_claims_food_dish',
+    'travel_hotel_room_only', 'travel_food_dish_only', 'district_shop_interior', 'district_no_street'
   ];
 
   return {

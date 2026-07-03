@@ -1,6 +1,7 @@
 /**
  * Locale-aware Google Places search — primary local language, English fallback.
  */
+import { travelSearchHints } from './cj-travel-photo-rules.js';
 
 export var COUNTRY_LANG_PRIORITY = {
   JP: ['ja', 'en'],
@@ -127,6 +128,17 @@ export function buildLocaleSearchQueries(item, articleCtx, options) {
   if (item.subject) push(item.subject, priorities[0], 'subject');
   if (item.mapsQuery) push(item.mapsQuery, 'en', 'mapsQuery');
 
+  var travelHints = travelSearchHints(item);
+  travelHints.forEach(function (hint) {
+    push(hint, priorities[0], 'travelHints');
+  });
+  if (item.officialNameLocal) {
+    if (countryCode === 'JP') {
+      push(item.officialNameLocal + ' 外観', 'ja', 'travelHints');
+      push(item.officialNameLocal + ' 店舗', 'ja', 'travelHints');
+    }
+  }
+
   if (options && Array.isArray(options.extraQueries)) {
     options.extraQueries.forEach(function (row) {
       push(row.query, row.lang, row.source || 'extra');
@@ -141,10 +153,11 @@ export function buildLocaleSearchQueries(item, articleCtx, options) {
       searchKeywords: 2,
       officialName: 3,
       aliases: 4,
-      subject: 5,
-      mapsQuery: 6,
-      extra: 7,
-      generic: 8
+      travelHints: 5,
+      subject: 6,
+      mapsQuery: 7,
+      extra: 8,
+      generic: 9
     };
     return (sourceOrder[a.source] || 9) - (sourceOrder[b.source] || 9);
   });

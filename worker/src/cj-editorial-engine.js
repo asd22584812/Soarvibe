@@ -12,59 +12,58 @@ export var READING_RHYTHM = [
   'opening', 'explore', 'experience', 'food', 'shopping', 'stay', 'ending'
 ];
 
-/** Global photo priority by section role — all cities share */
+/** Global photo priority by section role — travel guide order (exterior/street first) */
 export var PHOTO_PRIORITY_BY_ROLE = {
   opening: {
-    primary: ['城市代表景觀', 'iconic skyline', 'landmark panorama', 'hero view'],
-    secondary: ['地標建築', 'signature building'],
-    tertiary: ['街景', 'street atmosphere']
+    primary: ['城市代表景觀', 'iconic skyline', 'landmark panorama', 'hero view', 'street view'],
+    secondary: ['地標建築', 'signature building', '街景', 'main street'],
+    tertiary: ['入口', 'entrance']
   },
   landmark: {
-    primary: ['城市代表景觀', 'landmark panorama', 'iconic district', '中央通', 'main street'],
+    primary: ['街區全景', 'landmark panorama', 'main street', '中央通', 'street view', 'panorama'],
     secondary: ['地標建築', 'signature building', 'neon', '霓虹', 'crowd'],
-    tertiary: ['街景', 'street scene', 'entrance']
+    tertiary: ['入口', 'entrance']
   },
   explore: {
-    primary: ['街區全景', 'district street', 'neighborhood'],
+    primary: ['街區全景', 'district street', 'neighborhood', 'street view'],
     secondary: ['招牌霓虹', 'signage', 'crowd'],
     tertiary: ['入口', 'entrance']
   },
   experience: {
-    primary: ['體驗場景', 'activity', 'immersive interior'],
-    secondary: ['參與者', 'audience', 'atmosphere'],
-    tertiary: ['店面', 'venue front']
+    primary: ['店面', 'venue front', 'storefront', 'exterior', '外觀'],
+    secondary: ['體驗場景', 'activity', 'immersive interior'],
+    tertiary: ['參與者', 'audience', 'atmosphere']
   },
   shopping: {
-    primary: ['商品展示', 'product display', 'merchandise wall'],
-    secondary: ['店內空間', 'shop interior'],
-    tertiary: ['店面招牌', 'storefront']
+    primary: ['店面招牌', 'storefront', 'exterior', '外觀', 'facade'],
+    secondary: ['商品展示', 'product display', 'merchandise wall'],
+    tertiary: ['店內空間', 'shop interior']
   },
   anime: {
-    primary: ['動漫展示', 'anime display', 'figure wall', 'signage wall'],
-    secondary: ['公仔展示', 'model shelf', 'manga wall', 'collectible', 'Sun Mall', '中庭', 'atrium'],
-    tertiary: ['店面', 'storefront', 'district street']
+    primary: ['店面', 'storefront', 'district street', '外觀'],
+    secondary: ['動漫展示', 'anime display', 'figure wall', 'signage wall'],
+    tertiary: ['公仔展示', 'model shelf', 'manga wall', 'collectible']
   },
   food: {
-    primary: ['成品料理', 'finished dish', 'food close-up'],
-    secondary: ['店內吧台', 'dining counter', 'interior'],
-    tertiary: ['店門口', 'storefront']
+    primary: ['店門口', 'storefront', 'exterior', '招牌', 'entrance', '外觀'],
+    secondary: ['成品料理', 'finished dish', 'food close-up'],
+    tertiary: ['店內吧台', 'dining counter', 'interior']
   },
   cafe: {
-    primary: ['飲品甜點', 'dessert', 'drink', 'plate'],
+    primary: ['店外', 'storefront', 'exterior', '外觀', 'facade'],
     secondary: ['店內氛圍', 'cafe interior', 'seating'],
-    tertiary: ['店外', 'storefront', 'logo only']
+    tertiary: ['飲品甜點', 'dessert', 'drink', 'plate']
   },
   hotel: {
-    primary: ['客房', 'room', 'suite'],
+    primary: ['外觀', 'facade', 'exterior', 'building', '入口'],
     secondary: ['Lobby', 'lobby', 'lounge'],
-    tertiary: ['公共空間', '公共區域'],
-    quaternary: ['外觀', 'facade', 'exterior']
+    tertiary: ['客房', 'room', 'suite'],
+    quaternary: ['公共空間', '公共區域']
   },
   hostel: {
-    primary: ['客房', 'dorm', 'room'],
-    secondary: ['Lobby', 'bar', 'lounge', '公共吧台'],
-    tertiary: ['交誼廳', 'common space'],
-    quaternary: ['外觀', 'facade']
+    primary: ['外觀', 'facade', 'exterior', 'building', '入口'],
+    secondary: ['Lobby', 'bar', 'lounge', '公共吧台', '交誼廳'],
+    tertiary: ['客房', 'dorm', 'room']
   },
   night: {
     primary: ['夜景霓虹', 'night neon', 'illuminated street'],
@@ -226,6 +225,8 @@ export function buildSearchKeywords(section) {
     push('main street');
   }
 
+  travelSearchHints(section).forEach(push);
+
   return out.slice(0, 40);
 }
 
@@ -299,9 +300,11 @@ import {
   runGoldenRuleQA,
   EDITORIAL_GOLDEN_RULE
 } from './cj-editorial-semantic.js';
+import { travelSearchHints } from './cj-travel-photo-rules.js';
 
 export function runEngineQA(section, photoResult, caption, resolvedPlaceId) {
   return runGoldenRuleQA(section, photoResult, caption, section && section.copySemantics, resolvedPlaceId);
 }
 
 export { EDITORIAL_GOLDEN_RULE, analyzeCopySemantics, derivePhotoIntentFromSemantics };
+export { TRAVEL_PHOTO_RULES, resolveTravelProfile, getTravelPhotoSlots } from './cj-travel-photo-rules.js';

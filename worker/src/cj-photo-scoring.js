@@ -5,6 +5,7 @@ import {
   evidenceAllowedForSection
 } from './cj-photo-evidence.js';
 import { evidenceMatchesCopySemantics } from './cj-editorial-semantic.js';
+import { applyTravelScoreBonus } from './cj-travel-photo-rules.js';
 
 var BAD_GLOBAL = /tiger|white tiger|zoo|garden|residential|repair shop|garage|pool|beach|villa|白老虎|修車|住宅|花園|泳池/i;
 var BAD_HERO = /lobby|interior|indoor|entrance|door|reception|室内|入口|大廳|電梯|elevator|corridor|走廊|parking|駐車/i;
@@ -102,41 +103,50 @@ export function scorePhoto(photo, context) {
   }
 
   if (sectionRole === 'shopping') {
-    if (/product|merchandise|display|商品|展示|shop interior|店内/i.test(blob)) score += 20;
-    if (/gachapon|capsule|figure|扭蛋|公仔|shop|store/i.test(blob)) score += 18;
-    if (/facade|exterior|外観|storefront/i.test(blob) && context.rejectExteriorPhoto) score -= 35;
+    if (/facade|exterior|外観|storefront|外觀|entrance/i.test(blob)) score += 28;
+    if (/product|merchandise|display|商品|展示|shop interior|店内/i.test(blob)) score += 12;
+    if (/gachapon|capsule|figure|扭蛋|公仔|shop|store/i.test(blob)) score += 10;
+    if (idx === 0 && /shop interior|店内|product|display/i.test(blob) && !/facade|exterior|外観|storefront/i.test(blob)) score -= 35;
+    if (context.rejectExteriorPhoto && /facade|exterior|外観|storefront/i.test(blob)) score -= 35;
   }
 
   if (sectionRole === 'food' || sectionType === 'food') {
-    if (/ramen|noodle|food|料理|ラーメン|麺|soba|拉麵|dish|meal/.test(blob)) score += 22;
-    if (idx === 0 && /facade|exterior|外観|storefront|entrance/i.test(blob)) score -= 25;
-    if (idx >= 1) score += 6;
+    if (/facade|exterior|外観|storefront|entrance|招牌/i.test(blob)) score += 32;
+    if (idx === 0 && /facade|exterior|外観|storefront|entrance/i.test(blob)) score += 18;
+    if (/ramen|noodle|food|料理|ラーメン|麺|soba|拉麵|dish|meal/.test(blob)) score += 10;
+    if (idx === 0 && /ramen|noodle|food|dish|meal|拉麵/i.test(blob) && !/facade|exterior|外観|storefront/i.test(blob)) score -= 40;
+    if (idx >= 1 && /ramen|noodle|food|dish|meal/i.test(blob)) score += 14;
     if (BAD_FOOD.test(blob)) score -= 45;
   }
 
   if (sectionRole === 'cafe' || sectionType === 'cafe') {
-    if (/dessert|甜點|パフェ|cake|drink|飲|plate|料理/i.test(blob)) score += 32;
-    if (/cafe|coffee|maid|カフェ|interior|内装|店内|seating/i.test(blob)) score += 18;
-    if (/logo|sign only|招牌のみ/i.test(blob) && !/dessert|甜點|drink|interior/i.test(blob)) score -= 50;
-    if (!/dessert|甜點|drink|interior|maid|メイド|カフェ/i.test(blob) && /店|shop|made/i.test(blob)) score -= 35;
+    if (/facade|exterior|外観|storefront|entrance/i.test(blob)) score += 34;
+    if (idx === 0 && /facade|exterior|外観|storefront/i.test(blob)) score += 20;
+    if (/dessert|甜點|パフェ|cake|drink|飲|plate|料理/i.test(blob)) score += 12;
+    if (/cafe|coffee|maid|カフェ|interior|内装|店内|seating/i.test(blob)) score += 10;
+    if (idx === 0 && /dessert|甜點|drink|interior|maid/i.test(blob) && !/facade|exterior|外観|storefront/i.test(blob)) score -= 38;
+    if (/logo|sign only|招牌のみ/i.test(blob) && !/facade|exterior|dessert|甜點|drink|interior/i.test(blob)) score -= 50;
     if (BAD_FOOD.test(blob)) score -= 30;
   }
 
   if (sectionRole === 'hotel' || sectionType === 'hotel') {
-    if (/room|suite|客房|bed/i.test(blob)) score += 34;
-    if (/lobby|lounge|lounge|大廳/i.test(blob)) score += 30;
-    if (/facade|exterior|外観|building/i.test(blob)) score -= 18;
-    if (idx === 0 && /facade|exterior|外観/i.test(blob)) score -= 35;
-    if (idx >= 1) score += 10;
+    if (/facade|exterior|外観|building|入口/i.test(blob)) score += 38;
+    if (idx === 0 && /facade|exterior|外観|building/i.test(blob)) score += 22;
+    if (/lobby|lounge|大廳/i.test(blob)) score += 18;
+    if (/room|suite|客房|bed/i.test(blob)) score += 8;
+    if (idx === 0 && /room|suite|客房|bed/i.test(blob) && !/facade|exterior|外観/i.test(blob)) score -= 45;
+    if (idx >= 1 && /lobby|lounge|大廳/i.test(blob)) score += 12;
+    if (idx >= 2 && /room|suite|客房/i.test(blob)) score += 10;
     if (BAD_HOTEL.test(blob)) score -= 40;
   }
 
   if (sectionRole === 'hostel' || sectionType === 'hostel') {
-    if (/room|dorm|客房|bed/i.test(blob)) score += 30;
-    if (/lobby|bar|lounge|吧台|交誼|公共/i.test(blob)) score += 28;
-    if (/facade|exterior|外観/i.test(blob)) score -= 22;
-    if (idx === 0 && /facade|exterior|外観/i.test(blob)) score -= 38;
-    if (idx >= 1) score += 12;
+    if (/facade|exterior|外観|building|入口/i.test(blob)) score += 36;
+    if (idx === 0 && /facade|exterior|外観|building/i.test(blob)) score += 22;
+    if (/lobby|bar|lounge|吧台|交誼|公共/i.test(blob)) score += 16;
+    if (/room|dorm|客房|bed/i.test(blob)) score += 8;
+    if (idx === 0 && /room|dorm|客房|bed/i.test(blob) && !/facade|exterior|外観/i.test(blob)) score -= 45;
+    if (idx >= 1 && /lobby|bar|lounge|吧台|交誼/i.test(blob)) score += 12;
     if (BAD_HOTEL.test(blob)) score -= 25;
   }
 
@@ -180,6 +190,7 @@ export function photoContentGate(photo, context, item) {
   } else if (item && item.copySemantics) {
     semanticGate = evidenceMatchesCopySemantics(evidence, item.copySemantics, item);
   }
+  score = applyTravelScoreBonus(score, photo, evidence, item || context);
   var minScore = role === 'hero' ? 78 : 65;
   if (anchorVerified) {
     minScore = role === 'hero' ? 68 : 58;

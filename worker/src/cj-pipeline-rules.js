@@ -19,6 +19,11 @@ import {
   attributionInTargetRegion
 } from './cj-place-resolve.js';
 import { resolveVenueFallback } from './cj-venue-fallback.js';
+import {
+  getTravelPhotoSlots,
+  validateTravelSlotGate,
+  validateCopyTravelAlignment
+} from './cj-travel-photo-rules.js';
 
 function placeIdFromResource(id) {
   return String(id || '').replace(/^places\//, '').trim();
@@ -59,67 +64,77 @@ async function pickScoredPhoto(mapsKey, place, context, excludeUrls, item, deps)
   var exclude = {};
   (excludeUrls || []).forEach(function (u) { if (u) exclude[u] = true; });
   var debugRejects = [];
+  var travelSlots = getTravelPhotoSlots(item, { primaryOnly: true });
 
-  for (var r = 0; r < ranked.length && r < 10; r++) {
-    var row = ranked[r];
-    if (!row.photo || !row.photo.name) continue;
-    if (!row.gate || !row.gate.ok) {
-      if (debugRejects.length < 5) debugRejects.push(row.gate && row.gate.rejectReason || 'gate_fail');
-      continue;
-    }
-    var attribution = buildPhotoAttribution(row.photo);
-    var attrVal = validatePhotoAttribution(attribution, item || {});
-    if (!attrVal.ok && !(item && (item.primaryVenueFailed || item.venueSwapped))) continue;
-    var lodgingVal = validateLodgingVenueAttribution(attribution, item || {});
-    if (!lodgingVal.ok && !(item && (item.primaryVenueFailed || item.venueSwapped))) continue;
+  for (var si = 0; si < travelSlots.length; si++) {
+    var slot = travelSlots[si];
+    for (var r = 0; r < ranked.length && r < 15; r++) {
+      var row = ranked[r];
+      if (!row.photo || !row.photo.name) continue;
+      if (!row.gate || !row.gate.ok) {
+        if (debugRejects.length < 8) debugRejects.push(row.gate && row.gate.rejectReason || 'gate_fail');
+        continue;
+      }
+      var slotGate = validateTravelSlotGate(row.gate.photoEvidence, row.photo._index, slot, item, row.photo);
+      if (!slotGate.ok) {
+        if (debugRejects.length < 8) debugRejects.push(slotGate.reason || 'travel_slot_fail');
+        continue;
+      }
+      var attribution = buildPhotoAttribution(row.photo);
+      var attrVal = validatePhotoAttribution(attribution, item || {});
+      if (!attrVal.ok && !(item && (item.primaryVenueFailed || item.venueSwapped))) continue;
+      var lodgingVal = validateLodgingVenueAttribution(attribution, item || {});
+      if (!lodgingVal.ok && !(item && (item.primaryVenueFailed || item.venueSwapped))) continue;
 
-    var captionCtx = {
-      placeName: placeName,
-      photoPlaceName: placeName,
-      photoAttribution: attribution,
-      sectionId: item.sectionId,
-      sectionType: item.sectionType,
-      sectionRole: item.sectionRole,
-      sectionPurpose: item.sectionPurpose,
-      subjectType: item.subjectType,
-      photoIntent: item.photoIntent,
-      subject: item.subject || item.title,
-      matchedKeywords: row.gate.matchedKeywords || [],
-      photoEvidence: row.gate.photoEvidence
-    };
-    var capPack = generateCaptionWithEvidence(captionCtx);
-    if (!capPack.caption && item && (item.primaryVenueFailed || item.venueSwapped)) {
-      var swapRole = item.sectionRole || item.sectionType;
-      if (swapRole === 'hotel') {
-        capPack = {
-          caption: trimCaption('客房採簡約設計，採光充足，作為秋葉原巡禮的落腳處剛好。', 12, 48),
-          photoEvidence: { primary: 'room', types: ['room'], blob: placeName }
-        };
-      } else if (swapRole === 'hostel') {
-        capPack = {
-          caption: trimCaption('交誼空間與床位區維持簡潔，適合獨旅或預算旅人。', 12, 48),
-          photoEvidence: { primary: 'lobby_bar', types: ['lobby_bar', 'room'], blob: placeName }
+      var captionCtx = {
+        placeName: placeName,
+        photoPlaceName: placeName,
+        photoAttribution: attribution,
+        sectionId: item.sectionId,
+        sectionType: item.sectionType,
+        sectionRole: item.sectionRole,
+        sectionPurpose: item.sectionPurpose,
+        subjectType: item.subjectType,
+        photoIntent: item.photoIntent,
+        subject: item.subject || item.title,
+        matchedKeywords: row.gate.matchedKeywords || [],
+        photoEvidence: row.gate.photoEvidence
+      };
+      var capPack = generateCaptionWithEvidence(captionCtx);
+      if (!capPack.caption && item && (item.primaryVenueFailed || item.venueSwapped)) {
+        var swapRole = item.sectionRole || item.sectionType;
+        if (swapRole === 'hotel' || swapRole === 'hostel') {
+          capPack = {
+            caption: trimCaption('旅宿外觀與入口清楚可見，方便確認是否抵達正確地點。', 12, 48),
+            photoEvidence: { primary: 'facade', types: ['facade'], blob: placeName }
+          };
+        }
+      }
+      if (!capPack.caption) continue;
+
+      var copyAlign = validateCopyTravelAlignment(item, capPack.photoEvidence || row.gate.photoEvidence, capPack.caption);
+      if (!copyAlign.ok && !(item && (item.primaryVenueFailed || item.venueSwapped))) {
+        if (debugRejects.length < 8) debugRejects.push(copyAlign.reason || 'travel_copy_mismatch');
+        continue;
+      }
+
+      var url = await deps.resolveGooglePhotoUri(mapsKey, row.photo.name);
+      if (url && !exclude[url]) {
+        return {
+          googlePhotoUrl: url,
+          googleAttribution: attribution,
+          photoScore: row.score,
+          photoIndex: row.photo._index,
+          matchedKeywords: row.gate.matchedKeywords || [],
+          photoPlaceName: placeName,
+          photoEvidence: capPack.photoEvidence,
+          photoCaption: capPack.caption,
+          placeId: item.placeId || null,
+          anchorPlace: row.gate.anchorPlace || false,
+          travelPhotoSlot: slot.id,
+          rejectReason: null
         };
       }
-    }
-    if (!capPack.caption) continue;
-
-    var url = await deps.resolveGooglePhotoUri(mapsKey, row.photo.name);
-    if (url && !exclude[url]) {
-      var candidate = {
-        googlePhotoUrl: url,
-        googleAttribution: attribution,
-        photoScore: row.score,
-        photoIndex: row.photo._index,
-        matchedKeywords: row.gate.matchedKeywords || [],
-        photoPlaceName: placeName,
-        photoEvidence: capPack.photoEvidence,
-        photoCaption: capPack.caption,
-        placeId: item.placeId || null,
-        anchorPlace: row.gate.anchorPlace || false,
-        rejectReason: null
-      };
-      return candidate;
     }
   }
   if (debugRejects.length) {
@@ -233,7 +248,7 @@ export async function resolveSectionRules(mapsKey, item, articleCtx, deps) {
   var sectionId = String(section.sectionId || '').trim();
   var subject = String(section.subject || section.title || '').trim();
   var mapsQuery = String(section.mapsQuery || '').trim();
-  var pipelineLog = { version: 'venue-fallback', steps: [], aiTokens: 0 };
+  var pipelineLog = { version: 'travel-photo-rules', steps: [], aiTokens: 0 };
 
   if (!sectionId) {
     return { sectionId: sectionId, error: 'missing_section_id' };
@@ -395,5 +410,5 @@ export async function resolveArticleRules(mapsKey, payload, deps) {
     if (row.googlePhotoUrl) excludeUrls.push(row.googlePhotoUrl);
   }
 
-  return { results: results, excludeUrls: excludeUrls, pipelineVersion: 'venue-fallback' };
+  return { results: results, excludeUrls: excludeUrls, pipelineVersion: 'travel-photo-rules' };
 }
