@@ -127,7 +127,7 @@ export function classifyPhotoEvidence(blob, section, options) {
     }
   }
 
-  if (role === 'food' && types.indexOf('food_dish') === -1 && photoIndex >= 1) {
+  if (role === 'food' && types.indexOf('food_dish') === -1) {
     if (/ramen|ラーメン|soba|noodle|food|meal|麺|拉麵|dish/i.test(attrOnly)) {
       types.push('food_dish');
     } else if (options && options.anchorVerified) {

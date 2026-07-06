@@ -128,6 +128,15 @@ export function buildLocaleSearchQueries(item, articleCtx, options) {
   if (item.subject) push(item.subject, priorities[0], 'subject');
   if (item.mapsQuery) push(item.mapsQuery, 'en', 'mapsQuery');
 
+  if (item.subjectType === 'district') {
+    if (countryCode === 'JP') {
+      push((item.officialNameLocal || item.subject || '') + ' 中央通', 'ja', 'travelHints');
+      push((item.officialNameLocal || item.subject || '') + ' 街並み', 'ja', 'travelHints');
+      push((item.officialNameLocal || item.subject || '') + ' ラジオ会館', 'ja', 'travelHints');
+    }
+    push((item.officialName || item.mapsQuery || '') + ' street view', 'en', 'travelHints');
+  }
+
   var travelHints = travelSearchHints(item);
   travelHints.forEach(function (hint) {
     push(hint, priorities[0], 'travelHints');

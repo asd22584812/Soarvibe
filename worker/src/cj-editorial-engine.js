@@ -225,7 +225,14 @@ export function buildSearchKeywords(section) {
     push('main street');
   }
 
-  travelSearchHints(section).forEach(push);
+  var subjectType = section.subjectType || (section.isSpecificVenue === false ? 'district' : 'venue');
+  if (subjectType === 'district' || role === 'landmark' || role === 'opening' || role === 'explore') {
+    ['street view', 'panorama', '街景', '全景'].forEach(push);
+  } else if (role === 'food' || role === 'cafe' || role === 'hotel' || role === 'hostel') {
+    ['exterior', 'storefront', 'facade', '外観'].forEach(push);
+  } else {
+    ['exterior', 'storefront', '外観'].forEach(push);
+  }
 
   return out.slice(0, 40);
 }
@@ -300,7 +307,6 @@ import {
   runGoldenRuleQA,
   EDITORIAL_GOLDEN_RULE
 } from './cj-editorial-semantic.js';
-import { travelSearchHints } from './cj-travel-photo-rules.js';
 
 export function runEngineQA(section, photoResult, caption, resolvedPlaceId) {
   return runGoldenRuleQA(section, photoResult, caption, section && section.copySemantics, resolvedPlaceId);

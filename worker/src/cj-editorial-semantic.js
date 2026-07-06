@@ -11,9 +11,9 @@ import {
 } from './cj-photo-evidence.js';
 import {
   validateTravelPhotoSelection,
-  validateCopyTravelAlignment,
-  TRAVEL_PHOTO_RULES
+  validateCopyTravelAlignment
 } from './cj-travel-photo-rules.js';
+import { TRAVEL_PHOTO_RULES } from './cj-travel-rules-data.js';
 
 export var EDITORIAL_GOLDEN_RULE = {
   principle: '圖片永遠服務文案；優先選旅遊者最想看到的照片（外觀/街景優先）。',
@@ -238,12 +238,34 @@ export function evidenceMatchesCopySemantics(evidence, semantics, section) {
   if (section && (section.venueSwapped || section.primaryVenueFailed)) {
     var swapRole = resolveSectionRole(section);
     if (swapRole === 'cafe') {
-      var cafeOk = types.indexOf('cafe_interior') !== -1 || types.indexOf('dessert') !== -1;
-      if (cafeOk && (semantics.primary === 'cafe_experience' || semantics.primary === 'dessert' || semantics.primary === 'activity')) {
+      var cafeOk = types.indexOf('facade') !== -1 || types.indexOf('cafe_interior') !== -1 || types.indexOf('dessert') !== -1;
+      if (cafeOk) return { ok: true, reason: null };
+    }
+    if (swapRole === 'hotel' || swapRole === 'hostel') {
+      if (types.indexOf('facade') !== -1 || types.indexOf('lobby_bar') !== -1 || types.indexOf('room') !== -1) {
         return { ok: true, reason: null };
       }
     }
-    if (swapRole === 'hotel' || swapRole === 'hostel') {
+  }
+
+  if (semantics.primary === 'shop_collectible' || semantics.primary === 'gachapon') {
+    if (types.indexOf('facade') !== -1 || types.indexOf('shop_interior') !== -1 ||
+        types.indexOf('gachapon_wall') !== -1 || types.indexOf('anime_collectible') !== -1) {
+      return { ok: true, reason: null };
+    }
+  }
+  if (semantics.primary === 'dish') {
+    if (types.indexOf('facade') !== -1 || types.indexOf('food_dish') !== -1) {
+      return { ok: true, reason: null };
+    }
+  }
+  if (semantics.primary === 'cafe_experience' || semantics.primary === 'dessert') {
+    if (types.indexOf('facade') !== -1 || types.indexOf('cafe_interior') !== -1 || types.indexOf('dessert') !== -1) {
+      return { ok: true, reason: null };
+    }
+  }
+  if (semantics.primary === 'room' || semantics.primary === 'lobby') {
+    if (types.indexOf('facade') !== -1 || types.indexOf('lobby_bar') !== -1 || types.indexOf('room') !== -1) {
       return { ok: true, reason: null };
     }
   }
@@ -371,7 +393,9 @@ export function runGoldenRuleQA(section, photoResult, caption, semantics, resolv
   var activityOk = validateActivityForCopy(section, evidence, sem);
   if (!activityOk.ok) issues.push(activityOk.reason);
 
-  var travelOk = validateTravelPhotoSelection(section, evidence, photoResult.photoIndex, photoResult);
+  var travelOk = validateTravelPhotoSelection(section, evidence, photoResult.photoIndex, photoResult, {
+    travelPhotoSlot: photoResult.travelPhotoSlot
+  });
   if (!travelOk.ok && !(section && section.venueSwapped)) issues.push(travelOk.reason);
 
   var copyTravelOk = validateCopyTravelAlignment(section, evidence, caption);

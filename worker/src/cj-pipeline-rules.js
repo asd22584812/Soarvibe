@@ -22,7 +22,8 @@ import { resolveVenueFallback } from './cj-venue-fallback.js';
 import {
   getTravelPhotoSlots,
   validateTravelSlotGate,
-  validateCopyTravelAlignment
+  validateCopyTravelAlignment,
+  validateDistrictPhotoQuality
 } from './cj-travel-photo-rules.js';
 
 function placeIdFromResource(id) {
@@ -46,6 +47,23 @@ function buildPhotoSearchQueries(section, articleCtx) {
   return plan.queries;
 }
 
+function isSingleStorePlaceForDistrict(place, item) {
+  if (!place || item.subjectType !== 'district') return false;
+  var name = placeDisplayName(place).toLowerCase();
+  var districtTerms = [
+    item.officialName,
+    item.officialNameLocal,
+    item.subject,
+    'electric town',
+    '電気街',
+    'akihabara'
+  ].filter(Boolean).map(function (t) { return String(t).toLowerCase(); });
+  for (var i = 0; i < districtTerms.length; i++) {
+    if (name.indexOf(districtTerms[i]) !== -1) return false;
+  }
+  return /animate|アニメイト|mandarake|まんだらけ|gigo|ゲーセン|cafe|カフェ|hotel|ホテル|ramen|ラーメン/i.test(name);
+}
+
 async function pickScoredPhoto(mapsKey, place, context, excludeUrls, item, deps) {
   var placeName = placeDisplayName(place);
   var visualKeywords = (item.imageChecklist || []).concat(item.searchKeywords || []).slice(0, 24);
@@ -64,20 +82,31 @@ async function pickScoredPhoto(mapsKey, place, context, excludeUrls, item, deps)
   var exclude = {};
   (excludeUrls || []).forEach(function (u) { if (u) exclude[u] = true; });
   var debugRejects = [];
-  var travelSlots = getTravelPhotoSlots(item, { primaryOnly: true });
+  var travelSlots = getTravelPhotoSlots(item, { primaryOnly: false });
 
   for (var si = 0; si < travelSlots.length; si++) {
     var slot = travelSlots[si];
     for (var r = 0; r < ranked.length && r < 15; r++) {
       var row = ranked[r];
       if (!row.photo || !row.photo.name) continue;
-      if (!row.gate || !row.gate.ok) {
+      if (!row.gate || row.gate.score < 40 || !row.gate.photoEvidence) {
         if (debugRejects.length < 8) debugRejects.push(row.gate && row.gate.rejectReason || 'gate_fail');
         continue;
       }
-      var slotGate = validateTravelSlotGate(row.gate.photoEvidence, row.photo._index, slot, item, row.photo);
+      if (row.gate.rejectReason === 'logo_only' || row.gate.rejectReason === 'unknown_evidence') {
+        if (debugRejects.length < 8) debugRejects.push(row.gate.rejectReason);
+        continue;
+      }
+      var slotGate = validateTravelSlotGate(row.gate.photoEvidence, row.photo._index, slot, item, row.photo, {
+        fallbackSlot: si > 0
+      });
       if (!slotGate.ok) {
         if (debugRejects.length < 8) debugRejects.push(slotGate.reason || 'travel_slot_fail');
+        continue;
+      }
+      var districtOk = validateDistrictPhotoQuality(row.gate.photoEvidence, item, placeName);
+      if (!districtOk.ok) {
+        if (debugRejects.length < 8) debugRejects.push(districtOk.reason || 'travel_district_fail');
         continue;
       }
       var attribution = buildPhotoAttribution(row.photo);
@@ -156,7 +185,8 @@ async function resolvePhotoForSection(mapsKey, item, contentPlace, excludeUrls, 
   };
 
   var contentPlaceName = contentPlace ? placeDisplayName(contentPlace) : '';
-  var tryContentPlaceFirst = contentPlace && isAnchorPhotoPlace(contentPlaceName, item.photoAnchorTerms || []);
+  var isDistrict = item.subjectType === 'district';
+  var tryContentPlaceFirst = contentPlace && (isDistrict || isAnchorPhotoPlace(contentPlaceName, item.photoAnchorTerms || []));
 
   if (tryContentPlaceFirst) {
     var primaryName = placeDisplayName(contentPlace);
@@ -177,7 +207,7 @@ async function resolvePhotoForSection(mapsKey, item, contentPlace, excludeUrls, 
     }
   }
 
-  var maxQueries = tryContentPlaceFirst ? 4 : 10;
+  var maxQueries = tryContentPlaceFirst ? 6 : 10;
   var queries = buildPhotoSearchQueries(item, articleCtx).slice(0, maxQueries);
   var q;
   for (q = 0; q < queries.length; q++) {
@@ -185,6 +215,7 @@ async function resolvePhotoForSection(mapsKey, item, contentPlace, excludeUrls, 
     var p;
     for (p = 0; p < places.length; p++) {
       if (!placeInTargetRegion(places[p], item, deps.regionCode || 'JP')) continue;
+      if (isDistrict && isSingleStorePlaceForDistrict(places[p], item)) continue;
       var placeVal = validatePlaceResult(places[p], item);
       if (!placeVal.ok) continue;
       var pn = placeDisplayName(places[p]);
@@ -219,6 +250,29 @@ async function resolvePhotoForSection(mapsKey, item, contentPlace, excludeUrls, 
     }
     if (fallbackPick && fallbackPick.photoDebugRejects) {
       item._photoDebugRejects = fallbackPick.photoDebugRejects;
+    }
+  }
+
+  if (isDistrict && item.photoAnchorTerms && item.photoAnchorTerms.length) {
+    var anchorQueries = ['Radio Kaikan Akihabara', 'ラジオ会館 秋葉原', '秋葉原 中央通'];
+    for (var aq = 0; aq < anchorQueries.length; aq++) {
+      var anchorPlaces = await deps.searchGooglePlace(mapsKey, anchorQueries[aq], 'ja', deps.regionCode);
+      for (var ap = 0; ap < anchorPlaces.length; ap++) {
+        if (!placeInTargetRegion(anchorPlaces[ap], item, deps.regionCode || 'JP')) continue;
+        var apn = placeDisplayName(anchorPlaces[ap]);
+        var anchorPick = await pickScoredPhoto(
+          mapsKey,
+          anchorPlaces[ap],
+          Object.assign({}, photoContext, { placeName: apn }),
+          excludeUrls,
+          item,
+          deps
+        );
+        if (anchorPick && anchorPick.googlePhotoUrl) {
+          anchorPick.photoSearchUsed = anchorQueries[aq];
+          return anchorPick;
+        }
+      }
     }
   }
 

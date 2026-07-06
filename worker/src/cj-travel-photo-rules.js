@@ -4,20 +4,9 @@
  */
 import { resolveSectionRole } from './cj-editorial-engine.js';
 import { resolveSubjectType } from './cj-photo-evidence.js';
+import { TRAVEL_PHOTO_RULES, TRAVEL_SEARCH_HINTS } from './cj-travel-rules-data.js';
 
-export var TRAVEL_PHOTO_RULES = {
-  version: 'travel-v1',
-  principle: '選擇旅遊者最想看到的照片，不是隨機地點圖。',
-  rules: [
-    '街區/商圈/景點：第一張必須是代表整個區域的廣角街景、地標或全景',
-    '商店：第一張優先店門口或外觀，第二張才是店內',
-    '餐廳：第一張優先店門口、招牌、外觀，第二張才是餐點',
-    '住宿：第一張優先外觀/入口，第二張 Lobby，第三張房型',
-    '街區介紹必須至少有一張街景',
-    '圖片必須直接對應文案描述',
-    '搜尋優先當地語言，驗證不符則重新搜尋，禁止隨機 fallback'
-  ]
-};
+export { TRAVEL_PHOTO_RULES };
 
 /** Tourist viewing priority — slot order per profile */
 var PHOTO_SLOTS = {
@@ -28,7 +17,7 @@ var PHOTO_SLOTS = {
       alsoAccept: ['facade'],
       rejectPrimary: ['shop_interior', 'food_dish', 'room', 'dessert', 'logo_only', 'gachapon_wall', 'anime_collectible'],
       preferIndexMax: 4,
-      minRatio: 1.05
+      minRatio: 1.0
     }
   ],
   shop: [
@@ -126,6 +115,7 @@ export function resolveTravelProfile(section) {
   var role = resolveSectionRole(section || {});
 
   if (subjectType === 'district' || role === 'opening') return 'district';
+  if (section.sectionType === 'landmark' && section.isSpecificVenue !== true) return 'district';
   if (role === 'landmark' || role === 'explore') {
     if (subjectType === 'venue') return 'shop';
     return 'district';
@@ -162,11 +152,12 @@ function typesMatchSlot(types, primary, slot) {
   return false;
 }
 
-export function validateTravelSlotGate(evidence, photoIndex, slot, section, photo) {
+export function validateTravelSlotGate(evidence, photoIndex, slot, section, photo, options) {
   if (!evidence || !slot) return { ok: false, reason: 'travel_no_evidence' };
   var types = evidence.types || [];
   var primary = evidence.primary;
   var idx = typeof photoIndex === 'number' ? photoIndex : 0;
+  var fallbackSlot = options && options.fallbackSlot;
 
   if (slot.rejectPrimary && slot.rejectPrimary.indexOf(primary) !== -1) {
     return { ok: false, reason: 'travel_reject_primary_' + primary };
@@ -179,7 +170,7 @@ export function validateTravelSlotGate(evidence, photoIndex, slot, section, phot
   if (slot.preferIndexMax != null && idx > slot.preferIndexMax) {
     return { ok: false, reason: 'travel_index_too_late' };
   }
-  if (slot.minIndex != null && idx < slot.minIndex) {
+  if (slot.minIndex != null && idx < slot.minIndex && !fallbackSlot) {
     return { ok: false, reason: 'travel_index_too_early' };
   }
 
@@ -209,14 +200,38 @@ export function applyTravelScoreBonus(score, photo, evidence, section) {
   return score;
 }
 
-export function validateTravelPhotoSelection(section, evidence, photoIndex, photo) {
-  var slots = getTravelPhotoSlots(section, { primaryOnly: true });
-  if (!slots.length) return { ok: true, reason: null };
-  var gate = validateTravelSlotGate(evidence, photoIndex, slots[0], section, photo);
-  if (!gate.ok) {
-    return { ok: false, reason: gate.reason || 'travel_primary_slot_fail' };
+export function validateDistrictPhotoQuality(evidence, section, placeName) {
+  if (resolveTravelProfile(section || {}) !== 'district') return { ok: true, reason: null };
+  var meta = [
+    evidence && evidence.blob,
+    (evidence && evidence.signals || []).join(' '),
+    (evidence && evidence.types || []).join(' ')
+  ].filter(Boolean).join(' ').toLowerCase();
+  var multiLandmark = /radio|ラジオ|gigo|ゲーセン|chuo|中央通|street view|street scene|neon|霓虹|crowd|人潮|panorama|kaikan|会館|signage|看板|electric town/i.test(meta);
+  var animateOnly = (/animate|アニメイト/i.test(meta) || /animate|アニメイト/i.test(String(placeName || '').toLowerCase())) && !multiLandmark;
+  if (animateOnly) {
+    return { ok: false, reason: 'travel_district_single_store' };
   }
-  return { ok: true, reason: null, slotId: slots[0].id };
+  return { ok: true, reason: null };
+}
+
+export function validateTravelPhotoSelection(section, evidence, photoIndex, photo, options) {
+  var slots = getTravelPhotoSlots(section, { primaryOnly: false });
+  if (!slots.length) return { ok: true, reason: null };
+  var slotId = options && options.travelPhotoSlot;
+  if (slotId) {
+    for (var i = 0; i < slots.length; i++) {
+      if (slots[i].id !== slotId) continue;
+      var picked = validateTravelSlotGate(evidence, photoIndex, slots[i], section, photo);
+      if (!picked.ok) return { ok: false, reason: picked.reason || 'travel_slot_fail' };
+      return { ok: true, reason: null, slotId: slotId };
+    }
+  }
+  for (var j = 0; j < slots.length; j++) {
+    var gate = validateTravelSlotGate(evidence, photoIndex, slots[j], section, photo);
+    if (gate.ok) return { ok: true, reason: null, slotId: slots[j].id };
+  }
+  return { ok: false, reason: 'travel_primary_slot_fail' };
 }
 
 export function validateCopyTravelAlignment(section, evidence, caption) {
@@ -257,13 +272,5 @@ export function validateCopyTravelAlignment(section, evidence, caption) {
 
 export function travelSearchHints(section) {
   var profile = resolveTravelProfile(section);
-  var hints = {
-    district: ['street view', 'panorama', 'main street', '街景', '全景'],
-    shop: ['exterior', 'storefront', 'facade', '外観', '店門口'],
-    restaurant: ['exterior', 'storefront', 'entrance', '外観', '招牌'],
-    cafe: ['exterior', 'storefront', 'cafe entrance', '外観'],
-    hotel: ['exterior', 'building', 'facade', '外観', '入口'],
-    hostel: ['exterior', 'building', 'facade', '外観', '入口']
-  };
-  return hints[profile] || hints.shop;
+  return TRAVEL_SEARCH_HINTS[profile] || TRAVEL_SEARCH_HINTS.shop;
 }

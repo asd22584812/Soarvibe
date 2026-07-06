@@ -6,28 +6,15 @@
     "placeId": "ChIJZzSYoB2MGGARfBcicn7sx28",
     "googleRating": 4.5,
     "googleAddress": "〒101-0021 東京都千代田区外神田１丁目１２",
-    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZOHYO_SgGBRMcVmv9ecXnmYruO5k1p6rko_pTx0oDpoUlEGab5lFQRxO-wGQKh6dVbuBFUKopXPEmXfkbzx6XVbzxdX07xpq1GwFhnsrR6KmNzRcKXhjA2tiujK22MR4vKJxZ22bDnnDNNjSw=s4800-w1600-h1200",
-    "googleAttribution": "t s",
-    "imageSource": "google_places",
-    "matched": true,
+    "googlePhotoUrl": null,
+    "googleAttribution": null,
+    "imageSource": null,
+    "matched": false,
     "placeName": "秋葉原電気街",
-    "photoScore": 169,
-    "photoIndex": 0,
-    "photoCaption": "Animate本館前人潮與招牌交織，電氣街節奏從這裡開始。",
-    "photoEvidence": {
-      "primary": "street_landmark",
-      "types": [
-        "landmark_building",
-        "street_landmark"
-      ],
-      "signals": [
-        "アニメイト",
-        "アニメイト"
-      ],
-      "subjectType": "district",
-      "role": "landmark",
-      "blob": "アニメイト秋葉原 t s アニメイト秋葉原 アニメイト アニメイト秋葉原 アニメイト"
-    },
+    "photoScore": null,
+    "photoIndex": null,
+    "photoCaption": null,
+    "photoEvidence": null,
     "copySemantics": {
       "primary": "street_scene",
       "categories": [
@@ -136,21 +123,38 @@
       "copyExcerpt": "秋葉原電氣街 · 動漫朝聖的起點 從 JR 秋葉原站電氣街口跨出去，中央通兩側的動漫招牌幾乎不給人思考的時間。Radio Kaikan 的模型櫥窗、Animate 本館的人潮、GIGO 大型看板——這裡不是單一景點，而是一整片會讓人自然放慢步調的街區。上午十點前人潮還算溫和，先把 Animate 與最想逛的兩間店鎖定；午後再鑽進卡牌專賣與地下復古遊戲機。傍晚霓虹亮起，電氣街才進入主場，廣角拍中央通最剛好。帶現金與行動電源，這條路線通常比預期多留兩小時。 電氣街不是單一景點，而是一整片會讓人自然放慢步調的動漫街區 秋葉原電氣街 秋葉原電氣街"
     },
     "copyDerivedPhotoIntent": "街景、霓虹、人潮、地標建築外觀、地標建築、代表性招牌、街區辨識點",
-    "matchedKeywords": [
-      "アニメイト",
-      "アニメイト秋葉原",
-      "アニメイト"
-    ],
-    "photoPlaceName": "アニメイト秋葉原",
+    "matchedKeywords": [],
+    "photoPlaceName": null,
     "searchUsed": "Akihabara anime street",
-    "photoSearchUsed": "Akihabara anime street",
+    "photoSearchUsed": null,
     "sectionType": "landmark",
     "role": null,
-    "rejectReason": null,
+    "rejectReason": "travel_slot_type_mismatch|travel_slot_type_mismatch|travel_slot_type_mismatch|travel_slot_type_mismatch|travel_slot_type_mismatch|travel_slot_type_mismatch|travel_slot_type_mismatch|travel_slot_type_mismatch",
     "editorialQA": {
-      "ok": true,
-      "issues": [],
-      "usePlaceholder": false
+      "ok": false,
+      "issues": [
+        "no_photo"
+      ],
+      "usePlaceholder": true,
+      "pass": false,
+      "recommendation": "use_placeholder",
+      "goldenRule": {
+        "principle": "圖片永遠服務文案；優先選旅遊者最想看到的照片（外觀/街景優先）。",
+        "rules": [
+          "街區/商圈/景點：第一張必須是代表整個區域的廣角街景、地標或全景",
+          "商店：第一張優先店門口或外觀，第二張才是店內",
+          "餐廳：第一張優先店門口、招牌、外觀，第二張才是餐點",
+          "住宿：第一張優先外觀/入口，第二張 Lobby，第三張房型",
+          "街區介紹必須至少有一張街景",
+          "圖片必須直接對應文案描述",
+          "搜尋優先當地語言，驗證不符則重新搜尋，禁止隨機 fallback",
+          "若原訂地點無合格圖，依 venueAlternatives 換成同類型知名地點並改寫文案",
+          "改寫後文案必須與新地點、新圖片一致",
+          "如果仍找不到，寧可 placeholder，也不要放錯圖",
+          "Caption 只能描述圖片中真正看得到的內容",
+          "否則 Editorial QA 一律 FAIL"
+        ]
+      }
     },
     "venueSwapped": false,
     "swappedFrom": null,
@@ -161,7 +165,7 @@
     "officialName": "Akihabara Electric Town",
     "officialNameLocal": "秋葉原電気街",
     "pipeline": {
-      "version": "venue-fallback",
+      "version": "travel-photo-rules",
       "steps": [
         "copy_semantic_analysis",
         "derive_photo_intent",
@@ -181,28 +185,15 @@
     "placeId": "ChIJg-7dspDyGGARvvDv4E5-tuE",
     "googleRating": 4.2,
     "googleAddress": "5-chōme-52-15 Nakano, Nakano City, Tokyo 164-0001, Japan",
-    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZNAOy_7kERNJmtGUYvQgLCLCgb-RDqpAkzvQPNUTJtnF3UQiD3fNhYbhWkYi0d3nII7xYJs3R0tPfqfJnggGN8MFzRmRqmapqgkTs6qOXPt-uz__bLwuCxrtSyloOiheshaUZdD0FLEh-bzr7Ma0Mk9-g=s4800-w1600-h1200",
-    "googleAttribution": "Alejandro arruebo rello",
-    "imageSource": "google_places",
-    "matched": true,
+    "googlePhotoUrl": null,
+    "googleAttribution": null,
+    "imageSource": null,
+    "matched": false,
     "placeName": "Nakano Broadway",
-    "photoScore": 167,
-    "photoIndex": 1,
-    "photoCaption": "Mandarake櫥窗擺滿模型與收藏品，是動漫迷最容易停下腳步的地方。",
-    "photoEvidence": {
-      "primary": "anime_collectible",
-      "types": [
-        "shop_interior",
-        "anime_collectible"
-      ],
-      "signals": [
-        "まんだらけ",
-        "まんだらけ"
-      ],
-      "subjectType": "venue",
-      "role": "anime",
-      "blob": "まんだらけ 中野店 alejandro arruebo rello まんだらけ 中野店 まんだらけ まんだらけ 中野 まんだらけ"
-    },
+    "photoScore": null,
+    "photoIndex": null,
+    "photoCaption": null,
+    "photoEvidence": null,
     "copySemantics": {
       "primary": "shop_collectible",
       "categories": [
@@ -241,21 +232,38 @@
       "copyExcerpt": "中野百老匯 · 老玩家公認的挖寶聖地 JR 中野站北口走五分鐘，中野百老匯的電梯一開就是另一種東京。Mandarake 各樓層擠滿中古公仔、模型、卡牌與復古漫畫，價格常有意外驚喜；らしんばん 等店也適合比價。下午光線較暖，邊逛邊翻櫃剛好。預留兩小時以上，這座寶庫很少讓人空手而回。 老玩家公認挖寶聖地，不是普通商場 中野百老匯 中野百老匯"
     },
     "copyDerivedPhotoIntent": "商品陳列、公仔模型、收藏櫥窗",
-    "matchedKeywords": [
-      "まんだらけ",
-      "まんだらけ 中野",
-      "まんだらけ"
-    ],
-    "photoPlaceName": "まんだらけ 中野店",
+    "matchedKeywords": [],
+    "photoPlaceName": null,
     "searchUsed": "placeId:ChIJg-7dspDyGGARvvDv4E5-tuE",
-    "photoSearchUsed": "Nakano Broadway Mandarake",
+    "photoSearchUsed": null,
     "sectionType": "landmark",
     "role": null,
-    "rejectReason": null,
+    "rejectReason": "travel_slot_type_mismatch|travel_slot_type_mismatch|travel_slot_type_mismatch|travel_slot_type_mismatch|travel_slot_type_mismatch|travel_slot_type_mismatch|travel_slot_type_mismatch|travel_slot_type_mismatch",
     "editorialQA": {
-      "ok": true,
-      "issues": [],
-      "usePlaceholder": false
+      "ok": false,
+      "issues": [
+        "no_photo"
+      ],
+      "usePlaceholder": true,
+      "pass": false,
+      "recommendation": "use_placeholder",
+      "goldenRule": {
+        "principle": "圖片永遠服務文案；優先選旅遊者最想看到的照片（外觀/街景優先）。",
+        "rules": [
+          "街區/商圈/景點：第一張必須是代表整個區域的廣角街景、地標或全景",
+          "商店：第一張優先店門口或外觀，第二張才是店內",
+          "餐廳：第一張優先店門口、招牌、外觀，第二張才是餐點",
+          "住宿：第一張優先外觀/入口，第二張 Lobby，第三張房型",
+          "街區介紹必須至少有一張街景",
+          "圖片必須直接對應文案描述",
+          "搜尋優先當地語言，驗證不符則重新搜尋，禁止隨機 fallback",
+          "若原訂地點無合格圖，依 venueAlternatives 換成同類型知名地點並改寫文案",
+          "改寫後文案必須與新地點、新圖片一致",
+          "如果仍找不到，寧可 placeholder，也不要放錯圖",
+          "Caption 只能描述圖片中真正看得到的內容",
+          "否則 Editorial QA 一律 FAIL"
+        ]
+      }
     },
     "venueSwapped": false,
     "swappedFrom": null,
@@ -266,7 +274,7 @@
     "officialName": "Nakano Broadway",
     "officialNameLocal": "中野ブロードウェイ",
     "pipeline": {
-      "version": "venue-fallback",
+      "version": "travel-photo-rules",
       "steps": [
         "copy_semantic_analysis",
         "derive_photo_intent",
@@ -286,12 +294,12 @@
     "placeId": "ChIJBztW3x2MGGARadHYl5vTEK0",
     "googleRating": 4,
     "googleAddress": "Japan, 〒101-0021 Tokyo, Chiyoda City, Sotokanda, 3-chōme−15−５ MNビル 1F",
-    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZOM39L_gKxeukZKY6FOuRhy_XmTZ0TGqVFkTRGDzpfTK6uybViVzstbpOQWKZEIKAWaFRln0GIYh-qNr5c53EURn__O9qtV-sPf62Ft32yJ9WFBHxfcqr2AELVO85RnP77GlG0uRcXdCpAJsub0d5z5hw=s4800-w1600-h1200",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZOldJM0Ub-C5Z4AI_xJGgoOe_8vufxlo8uUgetJDFs6XL0W9Ag4OQUi_53HZyUA9GbG-7mxwl5wK9Ps_F5rr1A_vPaFYLytNlR2e0Od2QXw-aMH-i2U2Rpozgg8KNHa8safHgSuxq_iUxEKK3OiTYDv3w=s4800-w1600-h1200",
     "googleAttribution": "Loki",
     "imageSource": "google_places",
     "matched": true,
     "placeName": "Akihabara Gachapon Hall",
-    "photoScore": 167,
+    "photoScore": 139,
     "photoIndex": 1,
     "photoCaption": "整排扭蛋機一路延伸，色彩與機台本身就是風景。",
     "photoEvidence": {
@@ -391,7 +399,7 @@
     "officialName": "Akihabara Gachapon Hall",
     "officialNameLocal": "秋葉原ガチャポン会館",
     "pipeline": {
-      "version": "venue-fallback",
+      "version": "travel-photo-rules",
       "steps": [
         "copy_semantic_analysis",
         "derive_photo_intent",
@@ -411,27 +419,15 @@
     "placeId": "ChIJXTeLYx6MGGARNivhJ55nYVw",
     "googleRating": 4.2,
     "googleAddress": "Japan, 〒101-0021 Tokyo, Chiyoda City, Sotokanda, 3-chōme−8−３ 第一針谷ビル1Ｆ",
-    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZNRDx_vA680pblNvw8COOTJrEd8dWzorYWuqj_MGtLgJ5Hd8B2PBxowZlkhB6guGfagHGc48is7pev-cDi_05PWNKEdZ5vuZ-pO5BYMkXcdkkEOgnAZvOwcvd5NiKaIE0_ri79pDAFpWpsdaJcsZUrH_g=s4800-w1600-h1200",
-    "googleAttribution": "田中そば店 秋葉原店",
-    "imageSource": "google_places",
-    "matched": true,
+    "googlePhotoUrl": null,
+    "googleAttribution": null,
+    "imageSource": null,
+    "matched": false,
     "placeName": "Ramen Tanaka soba Akihabara",
-    "photoScore": 275,
-    "photoIndex": 1,
-    "photoCaption": "醬油湯頭與麵一同上桌，熱氣與香氣先於店名被記住。",
-    "photoEvidence": {
-      "primary": "food_dish",
-      "types": [
-        "food_dish"
-      ],
-      "signals": [
-        "ramen",
-        "soba"
-      ],
-      "subjectType": "venue",
-      "role": "food",
-      "blob": "ramen tanaka soba akihabara ramen tanaka soba akihabara ramen soba 田中 ramen tanaka soba akihabara 田中そば tanaka soba akihabara ramen soba 田中 田中そば tanaka そば"
-    },
+    "photoScore": null,
+    "photoIndex": null,
+    "photoCaption": null,
+    "photoEvidence": null,
     "copySemantics": {
       "primary": "dish",
       "categories": [
@@ -479,31 +475,38 @@
       "copyExcerpt": "田中そば店 秋葉原店 · 掃街中途的熱湯補給 醬油湯頭、出餐快，午餐控制在三十分鐘內剛好。尖峰時段先排隊，再回周邊繼續逛。 田中そば店 秋葉原店 田中そば店 秋葉原店"
     },
     "copyDerivedPhotoIntent": "成品料理、餐點本體、街景、霓虹、人潮、地標建築外觀",
-    "matchedKeywords": [
-      "ramen",
-      "soba",
-      "田中",
-      "田中そば店 秋葉原店",
-      "Ramen Tanaka Soba Akihabara",
-      "田中そば",
-      "Tanaka Soba Akihabara",
-      "ramen",
-      "soba",
-      "田中",
-      "田中そば",
-      "Tanaka",
-      "そば"
-    ],
-    "photoPlaceName": "Ramen Tanaka soba Akihabara",
+    "matchedKeywords": [],
+    "photoPlaceName": null,
     "searchUsed": "placeId:ChIJXTeLYx6MGGARNivhJ55nYVw",
-    "photoSearchUsed": "content_place",
+    "photoSearchUsed": null,
     "sectionType": "food",
     "role": null,
-    "rejectReason": null,
+    "rejectReason": "travel_reject_primary_food_dish|travel_reject_primary_food_dish|travel_reject_primary_food_dish|travel_reject_primary_food_dish|travel_reject_primary_food_dish|travel_reject_primary_food_dish|travel_reject_primary_food_dish|travel_reject_primary_food_dish",
     "editorialQA": {
-      "ok": true,
-      "issues": [],
-      "usePlaceholder": false
+      "ok": false,
+      "issues": [
+        "no_photo"
+      ],
+      "usePlaceholder": true,
+      "pass": false,
+      "recommendation": "use_placeholder",
+      "goldenRule": {
+        "principle": "圖片永遠服務文案；優先選旅遊者最想看到的照片（外觀/街景優先）。",
+        "rules": [
+          "街區/商圈/景點：第一張必須是代表整個區域的廣角街景、地標或全景",
+          "商店：第一張優先店門口或外觀，第二張才是店內",
+          "餐廳：第一張優先店門口、招牌、外觀，第二張才是餐點",
+          "住宿：第一張優先外觀/入口，第二張 Lobby，第三張房型",
+          "街區介紹必須至少有一張街景",
+          "圖片必須直接對應文案描述",
+          "搜尋優先當地語言，驗證不符則重新搜尋，禁止隨機 fallback",
+          "若原訂地點無合格圖，依 venueAlternatives 換成同類型知名地點並改寫文案",
+          "改寫後文案必須與新地點、新圖片一致",
+          "如果仍找不到，寧可 placeholder，也不要放錯圖",
+          "Caption 只能描述圖片中真正看得到的內容",
+          "否則 Editorial QA 一律 FAIL"
+        ]
+      }
     },
     "venueSwapped": false,
     "swappedFrom": null,
@@ -514,7 +517,7 @@
     "officialName": "Ramen Tanaka Soba Akihabara",
     "officialNameLocal": "田中そば店 秋葉原店",
     "pipeline": {
-      "version": "venue-fallback",
+      "version": "travel-photo-rules",
       "steps": [
         "copy_semantic_analysis",
         "derive_photo_intent",
@@ -534,13 +537,13 @@
     "placeId": "ChIJvQtxBAaNGGARTiTMJ-Nzhvc",
     "googleRating": 4.9,
     "googleAddress": "〒101-0021 東京都千代田区外神田１丁目１５−13 秋葉原 神田B&Vビル 10F",
-    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZOUyqgrwMTWl3lM7gnXTjGrq0OuwG8yLijBp-k410VbbmkroisVOrm5NILgikRmtlqjzAtG1pd8EyXECtZzlC_FpQcH22M_iV2Mmpgi9fCyWeO7q1GGLMRga64V2_BZRRlifLk4afANyDmmQDM=s4800-w1365-h1200",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZNLM2HL3uq2_iUhFu544p-HYOIlV9029dhYr65aVgyUh3VL43fboOflXkQT2mXFNvTsMMaTDhPFg40JDkgJbnWUYDYa8LGNwPD-ty9ehlcghjNe3uuZI4tdcujNxMkHGRMm45XxmmvWYjlbFUw=s4800-w669-h393",
     "googleAttribution": "MAID MADE 秋葉原駅前店",
     "imageSource": "google_places",
     "matched": true,
     "placeName": "MAID MADE 秋葉原駅前店",
-    "photoScore": 127,
-    "photoIndex": 0,
+    "photoScore": 76,
+    "photoIndex": 1,
     "photoCaption": "主題內裝與座位區呈現店內氛圍，一眼就知道這是主題咖啡廳。",
     "photoEvidence": {
       "primary": "cafe_interior",
@@ -825,17 +828,19 @@
       },
       "recommendation": "approve",
       "goldenRule": {
-        "principle": "圖片永遠服務文案；若原訂地點無合格圖，可改寫文案並換成同類型替代地點。",
+        "principle": "圖片永遠服務文案；優先選旅遊者最想看到的照片（外觀/街景優先）。",
         "rules": [
-          "如果圖片無法支撐文案，請重新搜尋圖片",
-          "若原訂地點仍無合格圖，依 venueAlternatives 換成同類型知名地點並改寫文案",
+          "街區/商圈/景點：第一張必須是代表整個區域的廣角街景、地標或全景",
+          "商店：第一張優先店門口或外觀，第二張才是店內",
+          "餐廳：第一張優先店門口、招牌、外觀，第二張才是餐點",
+          "住宿：第一張優先外觀/入口，第二張 Lobby，第三張房型",
+          "街區介紹必須至少有一張街景",
+          "圖片必須直接對應文案描述",
+          "搜尋優先當地語言，驗證不符則重新搜尋，禁止隨機 fallback",
+          "若原訂地點無合格圖，依 venueAlternatives 換成同類型知名地點並改寫文案",
           "改寫後文案必須與新地點、新圖片一致",
           "如果仍找不到，寧可 placeholder，也不要放錯圖",
           "Caption 只能描述圖片中真正看得到的內容",
-          "住宿圖片必須驗證 Hotel Name 與 Place ID",
-          "景點圖片必須驗證 Landmark",
-          "美食圖片必須驗證 Dish",
-          "體驗圖片必須驗證 Activity",
           "否則 Editorial QA 一律 FAIL"
         ]
       },
@@ -850,7 +855,7 @@
     "officialName": "MAID MADE 秋葉原駅前店",
     "officialNameLocal": "ufotableカフェTOKYO",
     "pipeline": {
-      "version": "venue-fallback",
+      "version": "travel-photo-rules",
       "steps": [
         "copy_semantic_analysis",
         "derive_photo_intent",
@@ -871,18 +876,18 @@
     "placeId": "ChIJH8hUDqiOGGARKbhUAocHMfs",
     "googleRating": 4.3,
     "googleAddress": "〒101-0025 東京都千代田区神田佐久間町１丁目６−５",
-    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZPwdW0KUtInMwwt5MmtYAGA7XTxRg3Ljti8W_NAI_OeiiFPL6FB_BW0xQ-K6QceesMaHXDROvF5XnPdjC5XoMqij6luC_DVeUyJjCbou1ghhxQBu5bUZhoXsY6RiKpQ0_-lKxGW77tMqx93G1w=s4800-w1600-h1200",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZN2xkzUaIXpf_rbuG6mhxNq1dqou8CkZHCBKQ2HN-bfWyfedUlvSlcmemkRJhet8cd3qychqQq_qGeSQaVRlpWtkNEABWc8mivtoGsW3ZsDWMKxtDc2A-jNaa8MFoDQbeNHjD2sq6h1g2zA-sY=s4800-w1600-h1200",
     "googleAttribution": "レム秋葉原",
     "imageSource": "google_places",
     "matched": true,
     "placeName": "レム秋葉原",
-    "photoScore": 131,
+    "photoScore": 75,
     "photoIndex": 1,
-    "photoCaption": "客房採簡約設計，採光充足，作為秋葉原巡禮的落腳處剛好。",
+    "photoCaption": "旅宿外觀與入口清楚可見，方便確認是否抵達正確地點。",
     "photoEvidence": {
-      "primary": "room",
+      "primary": "facade",
       "types": [
-        "room"
+        "facade"
       ],
       "blob": "レム秋葉原"
     },
@@ -959,7 +964,6 @@
     "copyDerivedPhotoIntent": "地標建築、代表性招牌、街區辨識點、街景、霓虹、人潮、地標建築外觀",
     "matchedKeywords": [
       "レム",
-      "レム秋葉原",
       "レム"
     ],
     "photoPlaceName": "レム秋葉原",
@@ -974,9 +978,9 @@
       "usePlaceholder": false,
       "pass": true,
       "photoEvidence": {
-        "primary": "room",
+        "primary": "facade",
         "types": [
-          "room"
+          "facade"
         ],
         "blob": "レム秋葉原"
       },
@@ -1052,17 +1056,19 @@
       },
       "recommendation": "approve",
       "goldenRule": {
-        "principle": "圖片永遠服務文案；若原訂地點無合格圖，可改寫文案並換成同類型替代地點。",
+        "principle": "圖片永遠服務文案；優先選旅遊者最想看到的照片（外觀/街景優先）。",
         "rules": [
-          "如果圖片無法支撐文案，請重新搜尋圖片",
-          "若原訂地點仍無合格圖，依 venueAlternatives 換成同類型知名地點並改寫文案",
+          "街區/商圈/景點：第一張必須是代表整個區域的廣角街景、地標或全景",
+          "商店：第一張優先店門口或外觀，第二張才是店內",
+          "餐廳：第一張優先店門口、招牌、外觀，第二張才是餐點",
+          "住宿：第一張優先外觀/入口，第二張 Lobby，第三張房型",
+          "街區介紹必須至少有一張街景",
+          "圖片必須直接對應文案描述",
+          "搜尋優先當地語言，驗證不符則重新搜尋，禁止隨機 fallback",
+          "若原訂地點無合格圖，依 venueAlternatives 換成同類型知名地點並改寫文案",
           "改寫後文案必須與新地點、新圖片一致",
           "如果仍找不到，寧可 placeholder，也不要放錯圖",
           "Caption 只能描述圖片中真正看得到的內容",
-          "住宿圖片必須驗證 Hotel Name 與 Place ID",
-          "景點圖片必須驗證 Landmark",
-          "美食圖片必須驗證 Dish",
-          "體驗圖片必須驗證 Activity",
           "否則 Editorial QA 一律 FAIL"
         ]
       },
@@ -1077,7 +1083,7 @@
     "officialName": "レム秋葉原",
     "officialNameLocal": "レム秋葉原",
     "pipeline": {
-      "version": "venue-fallback",
+      "version": "travel-photo-rules",
       "steps": [
         "copy_semantic_analysis",
         "derive_photo_intent",
@@ -1098,19 +1104,18 @@
     "placeId": "ChIJjTWKIa6OGGAR6kmG9UpLIIU",
     "googleRating": 4.2,
     "googleAddress": "〒111-0053 東京都台東区浅草橋４丁目１１−６",
-    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZONnM3_tmTOL8qNze3UCkddE98g3lKzmlAAt5DddafjBMXSrhEcLxYsR-wqUjo5oZhg6IF7EuuQr_RfgLZYP41TOKTcPbiHyfJyb5_Y5OIe87ATwAJF1YlCtoRlOSoGba6ykhUfGRvvY8FTjko=s4800-w1600-h1200",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZNU7n7wX0soOBatzUvN0pGDDdIll54FZjzKaNqH7h9tENq1ixM7oHWoKey5e-v-cpLsKQAh1iCKib5QMFTtxxqYITWUAf3Uo6XRVtWY2zHLcANPRiLBpLjoyViJAO3JiFp-dl0rJKfZ3coK9pM=s4800-w1600-h1200",
     "googleAttribution": "Gou Nishi",
     "imageSource": "google_places",
     "matched": true,
     "placeName": "グリッズ 東京 浅草橋 ホテル & ホステル",
-    "photoScore": 151,
+    "photoScore": 93,
     "photoIndex": 1,
-    "photoCaption": "交誼空間與床位區維持簡潔，適合獨旅或預算旅人。",
+    "photoCaption": "旅宿外觀與入口清楚可見，方便確認是否抵達正確地點。",
     "photoEvidence": {
-      "primary": "lobby_bar",
+      "primary": "facade",
       "types": [
-        "lobby_bar",
-        "room"
+        "facade"
       ],
       "blob": "グリッズ 東京 浅草橋 ホテル & ホステル"
     },
@@ -1220,10 +1225,9 @@
       "usePlaceholder": false,
       "pass": true,
       "photoEvidence": {
-        "primary": "lobby_bar",
+        "primary": "facade",
         "types": [
-          "lobby_bar",
-          "room"
+          "facade"
         ],
         "blob": "グリッズ 東京 浅草橋 ホテル & ホステル"
       },
@@ -1318,17 +1322,19 @@
       },
       "recommendation": "approve",
       "goldenRule": {
-        "principle": "圖片永遠服務文案；若原訂地點無合格圖，可改寫文案並換成同類型替代地點。",
+        "principle": "圖片永遠服務文案；優先選旅遊者最想看到的照片（外觀/街景優先）。",
         "rules": [
-          "如果圖片無法支撐文案，請重新搜尋圖片",
-          "若原訂地點仍無合格圖，依 venueAlternatives 換成同類型知名地點並改寫文案",
+          "街區/商圈/景點：第一張必須是代表整個區域的廣角街景、地標或全景",
+          "商店：第一張優先店門口或外觀，第二張才是店內",
+          "餐廳：第一張優先店門口、招牌、外觀，第二張才是餐點",
+          "住宿：第一張優先外觀/入口，第二張 Lobby，第三張房型",
+          "街區介紹必須至少有一張街景",
+          "圖片必須直接對應文案描述",
+          "搜尋優先當地語言，驗證不符則重新搜尋，禁止隨機 fallback",
+          "若原訂地點無合格圖，依 venueAlternatives 換成同類型知名地點並改寫文案",
           "改寫後文案必須與新地點、新圖片一致",
           "如果仍找不到，寧可 placeholder，也不要放錯圖",
           "Caption 只能描述圖片中真正看得到的內容",
-          "住宿圖片必須驗證 Hotel Name 與 Place ID",
-          "景點圖片必須驗證 Landmark",
-          "美食圖片必須驗證 Dish",
-          "體驗圖片必須驗證 Activity",
           "否則 Editorial QA 一律 FAIL"
         ]
       },
@@ -1343,7 +1349,7 @@
     "officialName": "グリッズ 東京 浅草橋 ホテル & ホステル",
     "officialNameLocal": "グリッドホテル浅草橋",
     "pipeline": {
-      "version": "venue-fallback",
+      "version": "travel-photo-rules",
       "steps": [
         "copy_semantic_analysis",
         "derive_photo_intent",
@@ -1420,7 +1426,7 @@
     "photoSearchUsed": null,
     "sectionType": "landmark",
     "role": "hero",
-    "rejectReason": "copy_image_semantic_mismatch|copy_image_semantic_mismatch|copy_image_semantic_mismatch|copy_image_semantic_mismatch|copy_image_semantic_mismatch",
+    "rejectReason": "travel_slot_type_mismatch|travel_slot_type_mismatch|travel_slot_type_mismatch|travel_slot_type_mismatch|travel_slot_type_mismatch|travel_slot_type_mismatch|travel_slot_type_mismatch|travel_slot_type_mismatch",
     "editorialQA": {
       "ok": false,
       "issues": [
@@ -1430,17 +1436,19 @@
       "pass": false,
       "recommendation": "use_placeholder",
       "goldenRule": {
-        "principle": "圖片永遠服務文案；若原訂地點無合格圖，可改寫文案並換成同類型替代地點。",
+        "principle": "圖片永遠服務文案；優先選旅遊者最想看到的照片（外觀/街景優先）。",
         "rules": [
-          "如果圖片無法支撐文案，請重新搜尋圖片",
-          "若原訂地點仍無合格圖，依 venueAlternatives 換成同類型知名地點並改寫文案",
+          "街區/商圈/景點：第一張必須是代表整個區域的廣角街景、地標或全景",
+          "商店：第一張優先店門口或外觀，第二張才是店內",
+          "餐廳：第一張優先店門口、招牌、外觀，第二張才是餐點",
+          "住宿：第一張優先外觀/入口，第二張 Lobby，第三張房型",
+          "街區介紹必須至少有一張街景",
+          "圖片必須直接對應文案描述",
+          "搜尋優先當地語言，驗證不符則重新搜尋，禁止隨機 fallback",
+          "若原訂地點無合格圖，依 venueAlternatives 換成同類型知名地點並改寫文案",
           "改寫後文案必須與新地點、新圖片一致",
           "如果仍找不到，寧可 placeholder，也不要放錯圖",
           "Caption 只能描述圖片中真正看得到的內容",
-          "住宿圖片必須驗證 Hotel Name 與 Place ID",
-          "景點圖片必須驗證 Landmark",
-          "美食圖片必須驗證 Dish",
-          "體驗圖片必須驗證 Activity",
           "否則 Editorial QA 一律 FAIL"
         ]
       }
@@ -1454,7 +1462,7 @@
     "officialName": "Radio Kaikan",
     "officialNameLocal": "ラジオ会館",
     "pipeline": {
-      "version": "venue-fallback",
+      "version": "travel-photo-rules",
       "steps": [
         "copy_semantic_analysis",
         "derive_photo_intent",
