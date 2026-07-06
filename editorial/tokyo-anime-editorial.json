@@ -100,10 +100,16 @@
       "aliases": ["Akihabara Electric Town", "秋葉原中央通り", "ラジオ会館", "アニメイト秋葉原", "GIGO秋葉原"],
       "mapsQuery": "Akihabara Electric Town Tokyo Japan",
       "photoPlaceQueries": [
+        "秋葉原 電気街",
+        "秋葉原 中央通り",
+        "秋葉原 ラジオ会館 外観",
+        "秋葉原 GiGO 外観",
+        "秋葉原 アニメイト 外観",
+        "Akihabara Chuo Dori anime signs",
+        "Akihabara Electric Town street",
         "ラジオ会館 秋葉原",
         "GIGO 秋葉原 中央通",
-        "秋葉原中央通り",
-        "アニメイト 秋葉原本店"
+        "秋葉原中央通り"
       ],
       "photoAnchorTerms": ["Animate", "アニメイト", "Radio Kaikan", "ラジオ会館", "GIGO", "ゲーセン"],
       "allowGenericPhotoFallback": false,
@@ -150,10 +156,14 @@
       "mapsQuery": "Nakano Broadway Tokyo Japan",
       "placeId": "ChIJg-7dspDyGGARvvDv4E5-tuE",
       "photoPlaceQueries": [
+        "中野ブロードウェイ 外観",
+        "中野ブロードウェイ 入口",
+        "中野ブロードウェイ まんだらけ",
+        "中野 Sun Mall 商店街",
+        "Nakano Broadway entrance",
+        "Nakano Broadway Mandarake",
         "まんだらけ 中野本店",
-        "Mandarake Nakano Broadway",
-        "株式会社まんだらけ 中野店",
-        "らしんばん 中野"
+        "Mandarake Nakano Broadway"
       ],
       "photoAnchorTerms": ["Mandarake", "まんだらけ", "らしんばん", "Lashinbang"],
       "allowGenericPhotoFallback": false,
@@ -228,7 +238,42 @@
       "aliases": ["田中そば", "Tanaka Soba Akihabara"],
       "mapsQuery": "田中そば店 秋葉原店",
       "placeId": "ChIJXTeLYx6MGGARNivhJ55nYVw",
-      "photoPlaceQueries": ["田中そば店 秋葉原店"],
+      "photoPlaceQueries": [
+        "田中そば店 秋葉原店 外観",
+        "田中そば店 秋葉原店",
+        "Tanaka Soba Akihabara exterior"
+      ],
+      "allowVenueSwap": true,
+      "venueAlternatives": [
+        {
+          "id": "menya-hajime-akihabara",
+          "officialName": "Menya Hajime",
+          "officialNameLocal": "麺屋 はじめ",
+          "aliases": ["麺屋はじめ", "Menya Hajime Akihabara"],
+          "mapsQuery": "麺屋 はじめ 秋葉原",
+          "photoPlaceQueries": [
+            "麺屋 はじめ 秋葉原 外観",
+            "Menya Hajime Akihabara storefront"
+          ],
+          "photoAnchorTerms": ["はじめ", "Hajime", "麺屋"],
+          "sectionRole": "food",
+          "sectionType": "food"
+        },
+        {
+          "id": "ramen-yokozuna-akihabara",
+          "officialName": "Ramen Yokozuna Akihabara",
+          "officialNameLocal": "ラーメン横綱 秋葉原店",
+          "aliases": ["横綱 秋葉原", "Yokozuna Akihabara"],
+          "mapsQuery": "ラーメン横綱 秋葉原店",
+          "photoPlaceQueries": [
+            "ラーメン横綱 秋葉原店 外観",
+            "Ramen Yokozuna Akihabara exterior"
+          ],
+          "photoAnchorTerms": ["横綱", "Yokozuna"],
+          "sectionRole": "food",
+          "sectionType": "food"
+        }
+      ],
       "photoAnchorTerms": ["田中そば", "Tanaka", "そば"],
       "allowGenericPhotoFallback": false,
       "photoIntent": "拉麵本體、醬油湯頭、店內吧台、熱湯、ラーメン",

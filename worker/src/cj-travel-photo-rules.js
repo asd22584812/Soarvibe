@@ -95,6 +95,19 @@ var PHOTO_SLOTS = {
       accept: ['room'],
       minIndex: 2
     }
+  ],
+  gachapon: [
+    {
+      id: 'storefront',
+      accept: ['facade'],
+      rejectPrimary: ['gachapon_wall', 'shop_interior'],
+      preferIndexMax: 1
+    },
+    {
+      id: 'wall',
+      accept: ['gachapon_wall', 'shop_interior'],
+      minIndex: 0
+    }
   ]
 };
 
@@ -124,6 +137,11 @@ export function resolveTravelProfile(section) {
   if (role === 'cafe' || section.sectionType === 'cafe') return 'cafe';
   if (role === 'hotel' || section.sectionType === 'hotel') return 'hotel';
   if (role === 'hostel' || section.sectionType === 'hostel') return 'hostel';
+  if (/gachapon|ガチャ|扭蛋|capsule/i.test(
+    (section.subject || '') + (section.officialName || '') + (section.officialNameLocal || '') + (section.sectionId || '')
+  )) {
+    return 'gachapon';
+  }
   if (role === 'night') return 'district';
   return 'shop';
 }

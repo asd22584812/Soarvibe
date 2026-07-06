@@ -11,7 +11,8 @@ export var TRAVEL_PHOTO_RULES = {
     '住宿：第一張優先外觀/入口，第二張 Lobby，第三張房型',
     '街區介紹必須至少有一張街景',
     '圖片必須直接對應文案描述',
-    '搜尋優先當地語言，驗證不符則重新搜尋，禁止隨機 fallback'
+    '搜尋優先當地語言，驗證不符則重新搜尋，禁止隨機 fallback',
+    '搜尋失敗必須依序 retry：精準店名 → 當地語言+外觀/街景 suffix → 英文 suffix → Place photos → 深度 photo index'
   ]
 };
 
@@ -21,5 +22,6 @@ export var TRAVEL_SEARCH_HINTS = {
   restaurant: ['exterior', 'storefront', 'entrance', '外観', '招牌'],
   cafe: ['exterior', 'storefront', 'cafe entrance', '外観'],
   hotel: ['exterior', 'building', 'facade', '外観', '入口'],
-  hostel: ['exterior', 'building', 'facade', '外観', '入口']
+  hostel: ['exterior', 'building', 'facade', '外観', '入口'],
+  gachapon: ['exterior', 'gachapon hall', 'capsule toy wall', 'interior']
 };

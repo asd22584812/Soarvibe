@@ -3967,7 +3967,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
-            const SOARVIBE_APP_BUILD = 'v123';
+            const SOARVIBE_APP_BUILD = 'v124';
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
@@ -14812,18 +14812,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                         return googleImage;
                     }
                 }
-                var manifestUrl = resolveJournalImageKey(section.imageKey, {
-                    cityId: article.cityId,
-                    styleKey: article.styleKey,
-                    category: 'section',
-                    sectionId: section.sectionId,
-                    allowedFor: ['section']
-                });
-                var placeholder = getJournalPlaceholder();
-                if (manifestUrl && manifestUrl !== placeholder && !isPlaceholderJournalImage(manifestUrl) && manifestUrl !== heroUrl) {
-                    return { url: manifestUrl, attribution: null, source: 'manifest' };
-                }
-                return { url: placeholder, attribution: null, source: 'placeholder' };
+                return { url: getJournalPlaceholder(), attribution: null, source: 'placeholder' };
             }
 
             function resolveArticleHeroImage(article) {
@@ -14833,17 +14822,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     imageSource: article.heroImageSource
                 });
                 if (googleImage && googleImage.url) return googleImage;
-                var manifestUrl = resolveJournalImageKey(article.heroImageKey, {
-                    cityId: article.cityId,
-                    styleKey: article.styleKey,
-                    category: 'article-hero',
-                    allowedFor: ['article-hero']
-                });
-                return {
-                    url: manifestUrl || getJournalPlaceholder(),
-                    attribution: null,
-                    source: manifestUrl ? 'manifest' : 'placeholder'
-                };
+                return { url: getJournalPlaceholder(), attribution: null, source: 'placeholder' };
             }
 
             function resolveArticleCoverImage(article) {
@@ -14853,17 +14832,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     imageSource: article.coverImageSource
                 });
                 if (googleImage && googleImage.url) return googleImage;
-                var manifestUrl = resolveJournalImageKey(article.coverImageKey, {
-                    cityId: article.cityId,
-                    styleKey: article.styleKey,
-                    category: 'edition-cover',
-                    allowedFor: ['edition-cover']
-                });
-                return {
-                    url: manifestUrl || getJournalPlaceholder(),
-                    attribution: null,
-                    source: manifestUrl ? 'manifest' : 'placeholder'
-                };
+                return { url: getJournalPlaceholder(), attribution: null, source: 'placeholder' };
             }
 
             function cjAttributionHtml(attribution, source) {

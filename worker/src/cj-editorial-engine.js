@@ -314,3 +314,9 @@ export function runEngineQA(section, photoResult, caption, resolvedPlaceId) {
 
 export { EDITORIAL_GOLDEN_RULE, analyzeCopySemantics, derivePhotoIntentFromSemantics };
 export { TRAVEL_PHOTO_RULES, resolveTravelProfile, getTravelPhotoSlots } from './cj-travel-photo-rules.js';
+export {
+  buildPhotoSearchRetryPlan,
+  createPhotoSearchDebug,
+  SEARCH_PHASES,
+  QUERY_SUFFIXES_BY_PROFILE
+} from './cj-photo-search-strategy.js';

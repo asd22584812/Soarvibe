@@ -215,11 +215,19 @@ async function main() {
       row.matched ? 'PASS' : 'PLACEHOLDER',
       row.imageSource || '',
       'score:' + (row.photoScore || ai.score || '-'),
+      'slot:' + (row.travelPhotoSlot || '-'),
+      'phase:' + (row.photoSearchPhase || '-'),
       'candidates:' + (row.candidatesReviewed || '-'),
       row.venueSwapped ? 'SWAPPED→' + (row.swappedTo || '') : '',
       qa.recommendation || row.rejectReason || '',
       row.photoCaption ? row.photoCaption.slice(0, 28) : '(no caption)'
     );
+    if (row.photoSearchDebug && row.photoSearchDebug.attempts) {
+      var last = row.photoSearchDebug.attempts[row.photoSearchDebug.attempts.length - 1];
+      console.log('  [DEBUG]', row.sectionId, 'attempts:', row.photoSearchDebug.attempts.length,
+        last && last.selectedImageUrl ? 'SELECTED' : 'NONE',
+        last && last.query ? last.query.slice(0, 40) : '');
+    }
     src = patchSectionRow(src, row);
   }
   if (hero) {

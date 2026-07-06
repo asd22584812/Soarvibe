@@ -3,7 +3,7 @@
  * Google Places = place verify + photo metadata scoring only.
  */
 import { normalizeSection, normalizeArticle, runEngineQA } from './cj-editorial-engine.js';
-import { buildLocaleSearchQueries, resolveRegionCode } from './cj-locale-search.js';
+import { resolveRegionCode } from './cj-locale-search.js';
 import { isAnchorPhotoPlace } from './cj-editorial-pipeline.js';
 import { rankPhotos, photoAttrText } from './cj-photo-scoring.js';
 import { generateCaptionWithEvidence } from './cj-caption.js';
@@ -15,16 +15,21 @@ import {
   validatePlaceResult,
   validatePhotoAttribution,
   placeDisplayName,
-  placeInTargetRegion,
-  attributionInTargetRegion
+  placeInTargetRegion
 } from './cj-place-resolve.js';
 import { resolveVenueFallback } from './cj-venue-fallback.js';
 import {
   getTravelPhotoSlots,
   validateTravelSlotGate,
   validateCopyTravelAlignment,
-  validateDistrictPhotoQuality
+  validateDistrictPhotoQuality,
+  resolveTravelProfile
 } from './cj-travel-photo-rules.js';
+import {
+  buildPhotoSearchRetryPlan,
+  createPhotoSearchDebug,
+  logPhotoSearchAttempt
+} from './cj-photo-search-strategy.js';
 
 function placeIdFromResource(id) {
   return String(id || '').replace(/^places\//, '').trim();
@@ -38,15 +43,6 @@ function buildPhotoAttribution(photo) {
     .join(' / ') || 'Google Maps';
 }
 
-function buildPhotoSearchQueries(section, articleCtx) {
-  var isDistrict = section.subjectType === 'district';
-  var plan = buildLocaleSearchQueries(section, articleCtx, { maxQueries: 12 });
-  if (isDistrict) {
-    return plan.queries;
-  }
-  return plan.queries;
-}
-
 function isSingleStorePlaceForDistrict(place, item) {
   if (!place || item.subjectType !== 'district') return false;
   var name = placeDisplayName(place).toLowerCase();
@@ -56,7 +52,9 @@ function isSingleStorePlaceForDistrict(place, item) {
     item.subject,
     'electric town',
     '電気街',
-    'akihabara'
+    'akihabara',
+    'broadway',
+    'ブロードウェイ'
   ].filter(Boolean).map(function (t) { return String(t).toLowerCase(); });
   for (var i = 0; i < districtTerms.length; i++) {
     if (name.indexOf(districtTerms[i]) !== -1) return false;
@@ -64,11 +62,20 @@ function isSingleStorePlaceForDistrict(place, item) {
   return /animate|アニメイト|mandarake|まんだらけ|gigo|ゲーセン|cafe|カフェ|hotel|ホテル|ramen|ラーメン/i.test(name);
 }
 
-async function pickScoredPhoto(mapsKey, place, context, excludeUrls, item, deps) {
+async function pickScoredPhoto(mapsKey, place, context, excludeUrls, item, deps, pickOptions) {
   var placeName = placeDisplayName(place);
   var visualKeywords = (item.imageChecklist || []).concat(item.searchKeywords || []).slice(0, 24);
+  var photos = place.photos || [];
+  var deepScan = pickOptions && pickOptions.deepScan;
+  var debug = pickOptions && pickOptions.debug;
+  var queryMeta = pickOptions && pickOptions.queryMeta;
+
+  if (deepScan && photos.length > 1) {
+    photos = photos.slice(0, 12);
+  }
+
   var ranked = rankPhotos(
-    place.photos || [],
+    photos,
     Object.assign({}, context, {
       placeName: placeName,
       visualKeywords: visualKeywords,
@@ -82,31 +89,34 @@ async function pickScoredPhoto(mapsKey, place, context, excludeUrls, item, deps)
   var exclude = {};
   (excludeUrls || []).forEach(function (u) { if (u) exclude[u] = true; });
   var debugRejects = [];
-  var travelSlots = getTravelPhotoSlots(item, { primaryOnly: false });
+  var profile = resolveTravelProfile(item);
+  var multiSlot = profile === 'restaurant' || profile === 'shop' || profile === 'cafe' || profile === 'gachapon';
+  var travelSlots = getTravelPhotoSlots(item, { primaryOnly: !multiSlot });
+  var uriResolveBudget = 6;
 
   for (var si = 0; si < travelSlots.length; si++) {
     var slot = travelSlots[si];
-    for (var r = 0; r < ranked.length && r < 15; r++) {
+    for (var r = 0; r < ranked.length && r < 10; r++) {
       var row = ranked[r];
       if (!row.photo || !row.photo.name) continue;
       if (!row.gate || row.gate.score < 40 || !row.gate.photoEvidence) {
-        if (debugRejects.length < 8) debugRejects.push(row.gate && row.gate.rejectReason || 'gate_fail');
+        if (debugRejects.length < 12) debugRejects.push(row.gate && row.gate.rejectReason || 'gate_fail');
         continue;
       }
       if (row.gate.rejectReason === 'logo_only' || row.gate.rejectReason === 'unknown_evidence') {
-        if (debugRejects.length < 8) debugRejects.push(row.gate.rejectReason);
+        if (debugRejects.length < 12) debugRejects.push(row.gate.rejectReason);
         continue;
       }
       var slotGate = validateTravelSlotGate(row.gate.photoEvidence, row.photo._index, slot, item, row.photo, {
         fallbackSlot: si > 0
       });
       if (!slotGate.ok) {
-        if (debugRejects.length < 8) debugRejects.push(slotGate.reason || 'travel_slot_fail');
+        if (debugRejects.length < 12) debugRejects.push(slotGate.reason || 'travel_slot_fail');
         continue;
       }
       var districtOk = validateDistrictPhotoQuality(row.gate.photoEvidence, item, placeName);
       if (!districtOk.ok) {
-        if (debugRejects.length < 8) debugRejects.push(districtOk.reason || 'travel_district_fail');
+        if (debugRejects.length < 12) debugRejects.push(districtOk.reason || 'travel_district_fail');
         continue;
       }
       var attribution = buildPhotoAttribution(row.photo);
@@ -127,7 +137,8 @@ async function pickScoredPhoto(mapsKey, place, context, excludeUrls, item, deps)
         photoIntent: item.photoIntent,
         subject: item.subject || item.title,
         matchedKeywords: row.gate.matchedKeywords || [],
-        photoEvidence: row.gate.photoEvidence
+        photoEvidence: row.gate.photoEvidence,
+        travelPhotoSlot: slot.id
       };
       var capPack = generateCaptionWithEvidence(captionCtx);
       if (!capPack.caption && item && (item.primaryVenueFailed || item.venueSwapped)) {
@@ -143,12 +154,28 @@ async function pickScoredPhoto(mapsKey, place, context, excludeUrls, item, deps)
 
       var copyAlign = validateCopyTravelAlignment(item, capPack.photoEvidence || row.gate.photoEvidence, capPack.caption);
       if (!copyAlign.ok && !(item && (item.primaryVenueFailed || item.venueSwapped))) {
-        if (debugRejects.length < 8) debugRejects.push(copyAlign.reason || 'travel_copy_mismatch');
+        if (debugRejects.length < 12) debugRejects.push(copyAlign.reason || 'travel_copy_mismatch');
         continue;
       }
 
+      if (uriResolveBudget <= 0) continue;
+
       var url = await deps.resolveGooglePhotoUri(mapsKey, row.photo.name);
+      uriResolveBudget -= 1;
       if (url && !exclude[url]) {
+        if (debug) {
+          logPhotoSearchAttempt(debug, {
+            sectionId: item.sectionId,
+            slot: slot.id,
+            query: queryMeta && queryMeta.query,
+            phase: queryMeta && queryMeta.phase,
+            candidateCount: photos.length,
+            photoIndex: row.photo._index,
+            selectedImageUrl: url,
+            selectedReason: 'slot_' + slot.id + '_score_' + row.score,
+            rejectReason: null
+          });
+        }
         return {
           googlePhotoUrl: url,
           googleAttribution: attribution,
@@ -172,6 +199,19 @@ async function pickScoredPhoto(mapsKey, place, context, excludeUrls, item, deps)
   return null;
 }
 
+async function tryPickFromPlace(mapsKey, place, item, photoContext, excludeUrls, deps, pickOptions) {
+  if (!place) return null;
+  return pickScoredPhoto(
+    mapsKey,
+    place,
+    Object.assign({}, photoContext, { placeName: placeDisplayName(place) }),
+    excludeUrls,
+    item,
+    deps,
+    pickOptions
+  );
+}
+
 async function resolvePhotoForSection(mapsKey, item, contentPlace, excludeUrls, deps, articleCtx) {
   var photoContext = {
     role: item.role || (String(item.sectionId || '').indexOf('hero') === 0 ? 'hero' : 'section'),
@@ -184,99 +224,110 @@ async function resolvePhotoForSection(mapsKey, item, contentPlace, excludeUrls, 
     visualKeywords: item.imageChecklist || []
   };
 
-  var contentPlaceName = contentPlace ? placeDisplayName(contentPlace) : '';
   var isDistrict = item.subjectType === 'district';
-  var tryContentPlaceFirst = contentPlace && (isDistrict || isAnchorPhotoPlace(contentPlaceName, item.photoAnchorTerms || []));
+  var debug = createPhotoSearchDebug(item.sectionId);
+  item._photoSearchDebug = debug;
 
-  if (tryContentPlaceFirst) {
-    var primaryName = placeDisplayName(contentPlace);
-    var primaryPick = await pickScoredPhoto(
+  var retryPlan = buildPhotoSearchRetryPlan(item, articleCtx, { maxQueries: 28 });
+  item._photoSearchPlan = retryPlan;
+
+  if (contentPlace) {
+    logPhotoSearchAttempt(debug, {
+      sectionId: item.sectionId,
+      slot: getTravelPhotoSlots(item, { primaryOnly: true })[0] && getTravelPhotoSlots(item, { primaryOnly: true })[0].id,
+      query: 'placeId:' + placeIdFromResource(contentPlace.id || contentPlace.name),
+      phase: 'place_photos',
+      candidateCount: (contentPlace.photos || []).length,
+      selectedImageUrl: null,
+      selectedReason: null,
+      rejectReason: null
+    });
+    var contentPick = await tryPickFromPlace(
       mapsKey,
       contentPlace,
-      Object.assign({}, photoContext, { placeName: primaryName }),
-      excludeUrls,
       item,
-      deps
+      photoContext,
+      excludeUrls,
+      deps,
+      { debug: debug, queryMeta: { query: 'content_place', phase: 'place_photos' }, deepScan: false }
     );
-    if (primaryPick && primaryPick.googlePhotoUrl) {
-      primaryPick.photoSearchUsed = 'content_place';
-      return primaryPick;
+    if (contentPick && contentPick.googlePhotoUrl) {
+      contentPick.photoSearchUsed = 'content_place';
+      contentPick.photoSearchDebug = debug.toJSON();
+      return contentPick;
     }
-    if (primaryPick && primaryPick.photoDebugRejects) {
-      item._photoDebugRejects = primaryPick.photoDebugRejects;
+
+    logPhotoSearchAttempt(debug, {
+      sectionId: item.sectionId,
+      slot: null,
+      query: 'placeId:' + placeIdFromResource(contentPlace.id || contentPlace.name),
+      phase: 'review_photos',
+      candidateCount: (contentPlace.photos || []).length,
+      selectedImageUrl: null,
+      selectedReason: null,
+      rejectReason: 'content_place_no_match'
+    });
+    var deepPick = await tryPickFromPlace(
+      mapsKey,
+      contentPlace,
+      item,
+      photoContext,
+      excludeUrls,
+      deps,
+      { debug: debug, queryMeta: { query: 'content_place_deep', phase: 'review_photos' }, deepScan: true }
+    );
+    if (deepPick && deepPick.googlePhotoUrl) {
+      deepPick.photoSearchUsed = 'content_place_review_photos';
+      deepPick.photoSearchDebug = debug.toJSON();
+      return deepPick;
     }
   }
 
-  var maxQueries = tryContentPlaceFirst ? 6 : 10;
-  var queries = buildPhotoSearchQueries(item, articleCtx).slice(0, maxQueries);
-  var q;
-  for (q = 0; q < queries.length; q++) {
-    var places = await deps.searchGooglePlace(mapsKey, queries[q].query, queries[q].lang, deps.regionCode);
+  var qi;
+  for (qi = 0; qi < retryPlan.queries.length; qi++) {
+    var queryRow = retryPlan.queries[qi];
+    var places = await deps.searchGooglePlace(mapsKey, queryRow.query, queryRow.lang, deps.regionCode);
+    logPhotoSearchAttempt(debug, {
+      sectionId: item.sectionId,
+      slot: null,
+      query: queryRow.query,
+      phase: queryRow.phase,
+      candidateCount: places.length,
+      selectedImageUrl: null,
+      selectedReason: null,
+      rejectReason: places.length ? null : 'zero_places'
+    });
+
     var p;
-    for (p = 0; p < places.length; p++) {
+    for (p = 0; p < places.length && p < 3; p++) {
       if (!placeInTargetRegion(places[p], item, deps.regionCode || 'JP')) continue;
       if (isDistrict && isSingleStorePlaceForDistrict(places[p], item)) continue;
       var placeVal = validatePlaceResult(places[p], item);
       if (!placeVal.ok) continue;
-      var pn = placeDisplayName(places[p]);
-      var pick = await pickScoredPhoto(
+
+      var pick = await tryPickFromPlace(
         mapsKey,
         places[p],
-        Object.assign({}, photoContext, { placeName: pn }),
-        excludeUrls,
         item,
-        deps
+        photoContext,
+        excludeUrls,
+        deps,
+        { debug: debug, queryMeta: queryRow, deepScan: false }
       );
       if (pick && pick.googlePhotoUrl) {
-        pick.photoSearchUsed = queries[q].query;
+        pick.photoSearchUsed = queryRow.query;
+        pick.photoSearchPhase = queryRow.phase;
+        pick.photoSearchDebug = debug.toJSON();
         return pick;
       }
     }
   }
 
-  if (!tryContentPlaceFirst && contentPlace) {
-    var fallbackName = placeDisplayName(contentPlace);
-    var fallbackPick = await pickScoredPhoto(
-      mapsKey,
-      contentPlace,
-      Object.assign({}, photoContext, { placeName: fallbackName }),
-      excludeUrls,
-      item,
-      deps
-    );
-    if (fallbackPick && fallbackPick.googlePhotoUrl) {
-      fallbackPick.photoSearchUsed = 'content_place_fallback';
-      return fallbackPick;
-    }
-    if (fallbackPick && fallbackPick.photoDebugRejects) {
-      item._photoDebugRejects = fallbackPick.photoDebugRejects;
-    }
-  }
-
-  if (isDistrict && item.photoAnchorTerms && item.photoAnchorTerms.length) {
-    var anchorQueries = ['Radio Kaikan Akihabara', 'ラジオ会館 秋葉原', '秋葉原 中央通'];
-    for (var aq = 0; aq < anchorQueries.length; aq++) {
-      var anchorPlaces = await deps.searchGooglePlace(mapsKey, anchorQueries[aq], 'ja', deps.regionCode);
-      for (var ap = 0; ap < anchorPlaces.length; ap++) {
-        if (!placeInTargetRegion(anchorPlaces[ap], item, deps.regionCode || 'JP')) continue;
-        var apn = placeDisplayName(anchorPlaces[ap]);
-        var anchorPick = await pickScoredPhoto(
-          mapsKey,
-          anchorPlaces[ap],
-          Object.assign({}, photoContext, { placeName: apn }),
-          excludeUrls,
-          item,
-          deps
-        );
-        if (anchorPick && anchorPick.googlePhotoUrl) {
-          anchorPick.photoSearchUsed = anchorQueries[aq];
-          return anchorPick;
-        }
-      }
-    }
-  }
-
-  return null;
+  return {
+    googlePhotoUrl: null,
+    photoSearchDebug: debug.toJSON(),
+    photoDebugRejects: item._photoDebugRejects || ['exhausted_retry_plan']
+  };
 }
 
 function failedRow(sectionId, subject, mapsQuery, reason, pipelineLog) {
@@ -302,7 +353,7 @@ export async function resolveSectionRules(mapsKey, item, articleCtx, deps) {
   var sectionId = String(section.sectionId || '').trim();
   var subject = String(section.subject || section.title || '').trim();
   var mapsQuery = String(section.mapsQuery || '').trim();
-  var pipelineLog = { version: 'travel-photo-rules', steps: [], aiTokens: 0 };
+  var pipelineLog = { version: 'photo-search-retry-v1', steps: [], aiTokens: 0 };
 
   if (!sectionId) {
     return { sectionId: sectionId, error: 'missing_section_id' };
@@ -328,7 +379,7 @@ export async function resolveSectionRules(mapsKey, item, articleCtx, deps) {
     var originalPlaceId = placeId;
     var originalPlaceName = placeName;
 
-    pipelineLog.steps.push('keyword_search');
+    pipelineLog.steps.push('photo_search_retry');
     pipelineLog.steps.push('photo_first_pick');
 
     var photoPick = await resolvePhotoForSection(
@@ -340,10 +391,14 @@ export async function resolveSectionRules(mapsKey, item, articleCtx, deps) {
       articleCtx
     );
 
+    if (photoPick && photoPick.photoSearchDebug) {
+      pipelineLog.photoSearchDebug = photoPick.photoSearchDebug;
+    }
+    if (photoPick && photoPick.photoDebugRejects) {
+      section._photoDebugRejects = photoPick.photoDebugRejects;
+    }
+
     if (photoPick && !photoPick.googlePhotoUrl) {
-      if (photoPick.photoDebugRejects) {
-        section._photoDebugRejects = photoPick.photoDebugRejects;
-      }
       photoPick = null;
     }
 
@@ -373,7 +428,12 @@ export async function resolveSectionRules(mapsKey, item, articleCtx, deps) {
         articleCtx,
         deps,
         section.excludeUrls || [],
-        pickScoredPhoto
+        function (mapsKeyInner, place, context, exclude, sec, depsInner) {
+          return pickScoredPhoto(mapsKeyInner, place, context, exclude, sec, depsInner, {
+            debug: sec._photoSearchDebug || createPhotoSearchDebug(sec.sectionId),
+            queryMeta: { query: 'venue_swap', phase: 'place_photos' }
+          });
+        }
       );
       if (venueSwap) {
         swappedSection = venueSwap.section;
@@ -423,12 +483,15 @@ export async function resolveSectionRules(mapsKey, item, articleCtx, deps) {
       photoIndex: photoPick ? photoPick.photoIndex : null,
       photoCaption: photoCaption,
       photoEvidence: photoPick ? photoPick.photoEvidence : null,
+      travelPhotoSlot: photoPick ? photoPick.travelPhotoSlot : null,
       copySemantics: section.copySemantics || null,
       copyDerivedPhotoIntent: section.copyDerivedPhotoIntent || null,
       matchedKeywords: photoPick ? photoPick.matchedKeywords : [],
       photoPlaceName: photoPick ? photoPick.photoPlaceName : null,
       searchUsed: resolved.searchUsed || null,
       photoSearchUsed: photoPick ? photoPick.photoSearchUsed : null,
+      photoSearchPhase: photoPick ? photoPick.photoSearchPhase : null,
+      photoSearchDebug: photoPick ? photoPick.photoSearchDebug : (pipelineLog.photoSearchDebug || null),
       sectionType: section.sectionType || null,
       role: section.role || null,
       rejectReason: photoPick ? null : ((section._photoDebugRejects && section._photoDebugRejects.join('|')) || (qa.issues && qa.issues.length ? qa.issues.join(',') : 'no_valid_photo')),
@@ -464,5 +527,5 @@ export async function resolveArticleRules(mapsKey, payload, deps) {
     if (row.googlePhotoUrl) excludeUrls.push(row.googlePhotoUrl);
   }
 
-  return { results: results, excludeUrls: excludeUrls, pipelineVersion: 'travel-photo-rules' };
+  return { results: results, excludeUrls: excludeUrls, pipelineVersion: 'photo-search-retry-v1' };
 }
