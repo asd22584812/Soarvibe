@@ -2,7 +2,7 @@
     'use strict';
 
     var CJ_BASE = './assets/city-journal';
-    var CJ_PLACEHOLDER = CJ_BASE + '/placeholder-city-journal.jpg';
+    var CJ_PLACEHOLDER = CJ_BASE + '/placeholder-city-journal.svg';
 
     function entry(imageKey, fileName, cityId, styleKey, category, subject, allowedFor) {
         return {

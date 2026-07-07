@@ -154,9 +154,20 @@ export function classifyPhotoEvidence(blob, section, options) {
 
   if ((role === 'cafe' || role === 'food') && attrLooksLikeVenueOnly &&
       types.indexOf('dessert') === -1 && types.indexOf('cafe_interior') === -1 && types.indexOf('food_dish') === -1) {
-    types.push('logo_only');
+    if (photoIndex > 0) types.push('logo_only');
   }
   if (has(LOGO_ONLY_SIGNALS)) types.push('logo_only');
+
+  var interiorEvidence = ['food_dish', 'dessert', 'cafe_interior', 'room', 'lobby_bar', 'gachapon_wall', 'shop_interior'];
+  var hasInteriorEvidence = interiorEvidence.some(function (t) { return types.indexOf(t) !== -1; });
+  if (photoIndex === 0 && (role === 'food' || role === 'cafe' || role === 'hotel' || role === 'hostel')) {
+    if (!hasInteriorEvidence || types.indexOf('logo_only') !== -1) {
+      types = types.filter(function (t) {
+        return t !== 'logo_only' && t !== 'unknown';
+      });
+      if (types.indexOf('facade') === -1) types.unshift('facade');
+    }
+  }
 
   if (!types.length) types.push('unknown');
 
@@ -258,10 +269,12 @@ var CAPTION_BY_EVIDENCE = {
   },
   street_landmark: {
     radio: 'Radio Kaikan 外牆滿版動漫廣告，是這條電氣街最醒目的地標之一。',
-    chuo: '中央通兩旁的動漫招牌與霓虹，是電氣街最具代表性的街景。',
+    chuo: '中央通兩旁的動漫招牌林立，電氣街最具代表性的街景之一。',
     animate: 'Animate 本館前人潮與招牌交織，電氣街節奏從這裡開始。',
     gigo: 'GIGO 大型看板矗立街頭，是電氣街一眼辨識的地標。',
-    default: '街道兩側動漫招牌與霓虹交織，街區氛圍一眼可見。'
+    mandarake: 'Mandarake 櫥窗擺滿模型與收藏品，是動漫迷最容易停下腳步的地方。',
+    nakano: '中野百老匯商場外牆與入口，是老玩家公認的挖寶起點。',
+    default: '街道兩側店招與建築立面清楚可見，街區個性一眼可辨。'
   },
   anime_collectible: {
     mandarake: 'Mandarake 櫥窗擺滿模型與收藏品，是動漫迷最容易停下腳步的地方。',
@@ -293,16 +306,42 @@ var CAPTION_BY_EVIDENCE = {
   }
 };
 
+function facadeCaptionFromCtx(ctx, evidence) {
+  var name = [
+    ctx && ctx.photoPlaceName,
+    ctx && ctx.placeName,
+    ctx && ctx.subject,
+    ctx && ctx.officialNameLocal,
+    ctx && ctx.officialName
+  ].filter(Boolean)[0] || '';
+  var short = String(name).replace(/\s+Tokyo.*$/i, '').trim();
+  var slot = ctx && ctx.travelPhotoSlot;
+  if (slot === 'storefront' || evidence.primary === 'facade') {
+    if (/拉麵|ramen|soba|麺|らーめん/i.test(short + (ctx && ctx.sectionRole === 'food' ? ' food' : ''))) {
+      return short ? short + '店門口清楚可見，對照招牌就能找到。' : '店門口與招牌清楚可見，對照地圖即可抵達。';
+    }
+    if (/maid|メイド|cafe|カフェ/i.test(short)) {
+      return short ? short + '的店門口與主題招牌，是確認抵達的第一眼線索。' : '主題咖啡廳外觀清楚，方便對照地圖找路。';
+    }
+    if (/hotel|ホテル|hostel|旅館|グリッド|remm|レム/i.test(short)) {
+      return short ? short + '的建築外觀與入口，從街上就能確認位置。' : '旅宿外觀與入口清楚可見，方便核對地址。';
+    }
+    return short ? short + '的外觀與入口清楚可見，方便對照地圖找路。' : null;
+  }
+  return null;
+}
+
 function pickVariant(map, blob) {
   if (!map) return null;
   if (/radio|ラジオ/i.test(blob) && map.radio) return map.radio;
   if (/chuo|中央通/i.test(blob) && map.chuo) return map.chuo;
   if (/animate|アニメイト/i.test(blob) && map.animate) return map.animate;
   if (/gigo|ゲーセン/i.test(blob) && map.gigo) return map.gigo;
+  if (/mandarake|まんだらけ|中野|nakano|百老匯|broadway/i.test(blob) && map.nakano) return map.nakano;
   if (/mandarake|まんだらけ/i.test(blob) && map.mandarake) return map.mandarake;
   if (/figure|フィギュア|公仔/i.test(blob) && map.figure) return map.figure;
   if (/ramen|ラーメン|soba|拉麵/i.test(blob) && map.ramen) return map.ramen;
-  if (/washington|ワシントン|hotel|ホテル/i.test(blob) && map.hotel) return map.hotel;
+  if (/washington|ワシントン|remm|レム|hotel|ホテル|hostel|hostel|グリッド|grids/i.test(blob) && map.hotel) return map.hotel;
   return map.default || null;
 }
 
@@ -314,7 +353,11 @@ export function captionFromEvidence(evidence, section, ctx) {
     ctx && ctx.photoPlaceName
   ].join(' ').toLowerCase();
 
-  var caption = pickVariant(CAPTION_BY_EVIDENCE[evidence.primary], blob);
+  var caption = null;
+  if (evidence.primary === 'facade') {
+    caption = facadeCaptionFromCtx(ctx, evidence);
+  }
+  if (!caption) caption = pickVariant(CAPTION_BY_EVIDENCE[evidence.primary], blob);
   return caption || null;
 }
 

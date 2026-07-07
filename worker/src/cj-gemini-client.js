@@ -70,6 +70,50 @@ function extractPartialStringArray(text, key) {
   });
 }
 
+export function repairTruncatedJSON(text) {
+  var s = String(text || '').trim();
+  var fence = s.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  if (fence) s = fence[1].trim();
+  var start = s.indexOf('{');
+  if (start < 0) return null;
+  s = s.slice(start);
+
+  function closeJson(chunk) {
+    var out = chunk.replace(/,\s*"[^"]*"\s*:\s*"[^"]*$/, '');
+    out = out.replace(/,\s*"[^"]*"\s*:\s*$/, '');
+    out = out.replace(/,\s*$/, '');
+    var stack = [];
+    var inString = false;
+    var escape = false;
+    for (var i = 0; i < out.length; i++) {
+      var c = out[i];
+      if (inString) {
+        if (escape) escape = false;
+        else if (c === '\\') escape = true;
+        else if (c === '"') inString = false;
+        continue;
+      }
+      if (c === '"') inString = true;
+      else if (c === '{') stack.push('}');
+      else if (c === '[') stack.push(']');
+      else if (c === '}' || c === ']') {
+        if (stack.length && stack[stack.length - 1] === c) stack.pop();
+      }
+    }
+    for (var j = stack.length - 1; j >= 0; j--) {
+      out += stack[j];
+    }
+    return out;
+  }
+
+  for (var tryEnd = s.length; tryEnd > 200; tryEnd -= 40) {
+    try {
+      return JSON.parse(closeJson(s.slice(0, tryEnd)));
+    } catch (e) { /* retry shorter */ }
+  }
+  return null;
+}
+
 function salvageReviewJSON(text) {
   var s = String(text || '');
   var passMatch = /"pass"\s*:\s*(true|false)/i.exec(s);
@@ -118,10 +162,11 @@ function bytesToBase64(bytes) {
 
 async function fetchImageInline(imageUrl) {
   var res = await fetch(imageUrl, {
+    redirect: 'follow',
     headers: {
-      Accept: 'image/jpeg,image/png,image/webp,image/*',
-      Referer: 'https://asd22584812.github.io/',
-      'User-Agent': 'SoarVibe-Editorial/1.0'
+      Accept: 'image/jpeg,image/png,image/webp,image/*,*/*',
+      Referer: 'https://www.google.com/',
+      'User-Agent': 'Mozilla/5.0 (compatible; SoarVibe-Editorial/1.0)'
     }
   });
   if (!res.ok) return null;
@@ -132,7 +177,7 @@ async function fetchImageInline(imageUrl) {
   return { mimeType: mimeType, data: bytesToBase64(new Uint8Array(buf)) };
 }
 
-async function callGeminiRaw(body, modelId, apiKey) {
+export async function callGeminiRaw(body, modelId, apiKey) {
   var geminiUrl = GEMINI_BASE + modelId + ':generateContent';
   var upstream;
   try {
@@ -183,7 +228,7 @@ export async function callGeminiJSON(prompt, env, options) {
       contents: [{ parts: [{ text: prompt }] }],
       generationConfig: {
         temperature: (options && options.temperature) != null ? options.temperature : 0.4,
-        maxOutputTokens: (options && options.maxOutputTokens) || 4096,
+        maxOutputTokens: (options && options.maxOutputTokens) || 8192,
         responseMimeType: 'application/json'
       }
     };
@@ -193,6 +238,10 @@ export async function callGeminiJSON(prompt, env, options) {
         var parsed = parseJSONResponse(upstream.text, false);
         return { ok: true, data: parsed, model: modelId, keySlot: keyIndex + 1 };
       } catch (e) {
+        var repaired = repairTruncatedJSON(upstream.text);
+        if (repaired) {
+          return { ok: true, data: repaired, model: modelId, keySlot: keyIndex + 1, salvaged: true };
+        }
         return { ok: false, error: 'invalid_json_response', raw: upstream.text };
       }
     }
@@ -201,6 +250,50 @@ export async function callGeminiJSON(prompt, env, options) {
     if (upstream.status === 429) {
       if (isRpmThrottle(upstream.result)) continue;
       if (isKeyLevelQuota(upstream.status, upstream.result)) continue;
+      continue;
+    }
+    break;
+  }
+
+  return {
+    ok: false,
+    error: 'gemini_failed',
+    details: lastFailure ? lastFailure.result : null
+  };
+}
+
+export async function callGeminiText(prompt, env, options) {
+  var keys = parseGeminiKeys(env);
+  if (!keys.length) {
+    return { ok: false, error: 'no_gemini_keys' };
+  }
+
+  var modelId = (options && options.model) || DEFAULT_MODEL;
+  var startIdx = pickRoundRobinStartIndex(keys.length);
+  var lastFailure = null;
+
+  for (var attempt = 0; attempt < keys.length; attempt++) {
+    var keyIndex = (startIdx + attempt) % keys.length;
+    var body = {
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: {
+        temperature: (options && options.temperature) != null ? options.temperature : 0.4,
+        maxOutputTokens: (options && options.maxOutputTokens) || 1024
+      }
+    };
+    var upstream = await callGeminiRaw(body, modelId, keys[keyIndex]);
+    if (upstream.ok && upstream.text) {
+      return { ok: true, text: upstream.text, model: modelId, keySlot: keyIndex + 1 };
+    }
+    lastFailure = upstream;
+    if (upstream.status === 401 || upstream.status === 403) continue;
+    if (upstream.status === 429) {
+      var retryMsg = getErrorMessage(upstream.result);
+      var waitMatch = /retry in ([\d.]+)s/i.exec(retryMsg);
+      if (waitMatch && attempt < keys.length - 1) {
+        await new Promise(function (r) { setTimeout(r, Math.min(60000, Math.ceil(parseFloat(waitMatch[1], 10) * 1000) + 500)); });
+        continue;
+      }
       continue;
     }
     break;

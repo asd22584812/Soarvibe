@@ -62,6 +62,29 @@ function isSingleStorePlaceForDistrict(place, item) {
   return /animate|アニメイト|mandarake|まんだらけ|gigo|ゲーセン|cafe|カフェ|hotel|ホテル|ramen|ラーメン/i.test(name);
 }
 
+function normalizeTravelPhotoOrder(photoPick) {
+  if (!photoPick || !photoPick.secondaryGooglePhotoUrl || !photoPick.googlePhotoUrl) return photoPick;
+  var exteriorSlots = ['storefront', 'exterior', 'district_panorama'];
+  var interiorSlots = ['dish', 'experience', 'wall', 'room', 'lobby', 'commons'];
+  var primarySlot = photoPick.travelPhotoSlot;
+  var secondarySlot = photoPick.secondaryPhotoSlot;
+  if (exteriorSlots.indexOf(secondarySlot) === -1 || interiorSlots.indexOf(primarySlot) === -1) {
+    return photoPick;
+  }
+  return Object.assign({}, photoPick, {
+    googlePhotoUrl: photoPick.secondaryGooglePhotoUrl,
+    googleAttribution: photoPick.secondaryGoogleAttribution,
+    photoCaption: photoPick.secondaryCaption,
+    travelPhotoSlot: secondarySlot,
+    photoEvidence: photoPick.secondaryPhotoEvidence || photoPick.photoEvidence,
+    secondaryGooglePhotoUrl: photoPick.googlePhotoUrl,
+    secondaryGoogleAttribution: photoPick.googleAttribution,
+    secondaryCaption: photoPick.photoCaption,
+    secondaryPhotoSlot: primarySlot,
+    secondaryPhotoEvidence: photoPick.photoEvidence
+  });
+}
+
 async function pickScoredPhoto(mapsKey, place, context, excludeUrls, item, deps, pickOptions) {
   var placeName = placeDisplayName(place);
   var visualKeywords = (item.imageChecklist || []).concat(item.searchKeywords || []).slice(0, 24);
@@ -90,9 +113,15 @@ async function pickScoredPhoto(mapsKey, place, context, excludeUrls, item, deps,
   (excludeUrls || []).forEach(function (u) { if (u) exclude[u] = true; });
   var debugRejects = [];
   var profile = resolveTravelProfile(item);
-  var multiSlot = profile === 'restaurant' || profile === 'shop' || profile === 'cafe' || profile === 'gachapon';
-  var travelSlots = getTravelPhotoSlots(item, { primaryOnly: !multiSlot });
-  var uriResolveBudget = 6;
+  var multiSlot = profile === 'restaurant' || profile === 'shop' || profile === 'cafe' ||
+    profile === 'gachapon' || profile === 'hotel' || profile === 'hostel';
+  var travelSlots = getTravelPhotoSlots(item, { primaryOnly: false });
+  if (pickOptions && pickOptions.secondaryOnly) {
+    travelSlots = travelSlots.slice(1);
+  } else if (!multiSlot) {
+    travelSlots = travelSlots.slice(0, 1);
+  }
+  var uriResolveBudget = (pickOptions && pickOptions.uriBudget) || 6;
 
   for (var si = 0; si < travelSlots.length; si++) {
     var slot = travelSlots[si];
@@ -176,7 +205,7 @@ async function pickScoredPhoto(mapsKey, place, context, excludeUrls, item, deps,
             rejectReason: null
           });
         }
-        return {
+        var result = {
           googlePhotoUrl: url,
           googleAttribution: attribution,
           photoScore: row.score,
@@ -190,9 +219,86 @@ async function pickScoredPhoto(mapsKey, place, context, excludeUrls, item, deps,
           travelPhotoSlot: slot.id,
           rejectReason: null
         };
+        if (!pickOptions || !pickOptions.secondaryOnly) {
+          if (multiSlot && travelSlots.length > 1 && uriResolveBudget > 0) {
+            var secPick = await pickScoredPhoto(
+              mapsKey,
+              place,
+              context,
+              (excludeUrls || []).concat([url]),
+              item,
+              deps,
+              Object.assign({}, pickOptions || {}, { secondaryOnly: true, uriBudget: 2 })
+            );
+            if (secPick && secPick.googlePhotoUrl) {
+              result.secondaryGooglePhotoUrl = secPick.googlePhotoUrl;
+              result.secondaryGoogleAttribution = secPick.googleAttribution;
+              result.secondaryCaption = secPick.photoCaption;
+              result.secondaryPhotoSlot = secPick.travelPhotoSlot;
+              result.secondaryPhotoEvidence = secPick.photoEvidence;
+            }
+          }
+        }
+        return normalizeTravelPhotoOrder(result);
       }
     }
   }
+
+  var weakProfile = resolveTravelProfile(item);
+  if (weakProfile === 'restaurant' || weakProfile === 'cafe' || weakProfile === 'hotel' || weakProfile === 'hostel') {
+    var weakSlot = travelSlots[0];
+    for (var wr = 0; wr < ranked.length && wr < 8; wr++) {
+      var wrow = ranked[wr];
+      if (!wrow.photo || !wrow.photo.name || wrow.photo._index > 2) continue;
+      if (!wrow.gate || wrow.gate.score < 45 || !wrow.gate.photoEvidence) continue;
+      if (wrow.gate.rejectReason === 'logo_only' || wrow.gate.rejectReason === 'unknown_evidence') continue;
+      var wEvidence = Object.assign({}, wrow.gate.photoEvidence, {
+        primary: 'facade',
+        types: ['facade'].concat((wrow.gate.photoEvidence.types || []).filter(function (t) {
+          return t !== 'logo_only' && t !== 'unknown';
+        }))
+      });
+      if (wEvidence.types.indexOf('facade') === -1) wEvidence.types.unshift('facade');
+      var wAttr = buildPhotoAttribution(wrow.photo);
+      var wCapPack = generateCaptionWithEvidence({
+        placeName: placeName,
+        photoPlaceName: placeName,
+        photoAttribution: wAttr,
+        sectionId: item.sectionId,
+        sectionType: item.sectionType,
+        sectionRole: item.sectionRole,
+        sectionPurpose: item.sectionPurpose,
+        subjectType: item.subjectType,
+        photoIntent: item.photoIntent,
+        subject: item.subject || item.title,
+        matchedKeywords: wrow.gate.matchedKeywords || [],
+        photoEvidence: wEvidence,
+        travelPhotoSlot: weakSlot && weakSlot.id
+      });
+      if (!wCapPack.caption) continue;
+      if (uriResolveBudget <= 0) continue;
+      var wUrl = await deps.resolveGooglePhotoUri(mapsKey, wrow.photo.name);
+      uriResolveBudget -= 1;
+      if (wUrl && !exclude[wUrl]) {
+        return normalizeTravelPhotoOrder({
+          googlePhotoUrl: wUrl,
+          googleAttribution: wAttr,
+          photoScore: wrow.score,
+          photoIndex: wrow.photo._index,
+          matchedKeywords: wrow.gate.matchedKeywords || [],
+          photoPlaceName: placeName,
+          photoEvidence: wCapPack.photoEvidence,
+          photoCaption: wCapPack.caption,
+          placeId: item.placeId || null,
+          anchorPlace: wrow.gate.anchorPlace || false,
+          travelPhotoSlot: weakSlot && weakSlot.id,
+          rejectReason: null,
+          weakVenueFallback: true
+        });
+      }
+    }
+  }
+
   if (debugRejects.length) {
     return { googlePhotoUrl: null, photoDebugRejects: debugRejects };
   }
@@ -482,6 +588,10 @@ export async function resolveSectionRules(mapsKey, item, articleCtx, deps) {
       photoScore: photoPick ? photoPick.photoScore : null,
       photoIndex: photoPick ? photoPick.photoIndex : null,
       photoCaption: photoCaption,
+      secondaryGooglePhotoUrl: photoPick ? photoPick.secondaryGooglePhotoUrl : null,
+      secondaryGoogleAttribution: photoPick ? photoPick.secondaryGoogleAttribution : null,
+      secondaryCaption: photoPick ? photoPick.secondaryCaption : null,
+      secondaryPhotoSlot: photoPick ? photoPick.secondaryPhotoSlot : null,
       photoEvidence: photoPick ? photoPick.photoEvidence : null,
       travelPhotoSlot: photoPick ? photoPick.travelPhotoSlot : null,
       copySemantics: section.copySemantics || null,
@@ -525,6 +635,7 @@ export async function resolveArticleRules(mapsKey, payload, deps) {
     var row = await resolveSectionRules(mapsKey, item, articleCtx, Object.assign({}, deps, { regionCode: regionCode }));
     results.push(row);
     if (row.googlePhotoUrl) excludeUrls.push(row.googlePhotoUrl);
+    if (row.secondaryGooglePhotoUrl) excludeUrls.push(row.secondaryGooglePhotoUrl);
   }
 
   return { results: results, excludeUrls: excludeUrls, pipelineVersion: 'photo-search-retry-v1' };

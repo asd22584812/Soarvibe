@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" role="img" aria-label="gG��-">
+  <rect width="1600" height="1000" fill="#EDEAE4"/>
+  <rect x="80" y="80" width="1440" height="840" rx="24" fill="#E4E0D8" stroke="#D5CFC4" stroke-width="2"/>
+  <g fill="none" stroke="#B0A99A" stroke-width="3" stroke-linecap="round">
+    <rect x="620" y="320" width="360" height="280" rx="12"/>
+    <circle cx="700" cy="420" r="36"/>
+    <path d="M640 540 L760 440 L880 500 L960 380 L1040 540"/>
+  </g>
+  <text x="800" y="680" text-anchor="middle" font-family="system-ui,sans-serif" font-size="28" fill="#8A8072">gG��-</text>
+</svg>

@@ -248,6 +248,17 @@ export function evidenceMatchesCopySemantics(evidence, semantics, section) {
     }
   }
 
+  if (section && (
+    section.sectionId === 'gachapon' ||
+    /gachapon|ガチャ|扭蛋|capsule/i.test([
+      section.photoIntent, section.sectionId, section.mapsQuery, section.officialName, section.officialNameLocal
+    ].join(' '))
+  )) {
+    if (types.indexOf('gachapon_wall') !== -1 || types.indexOf('shop_interior') !== -1) {
+      return { ok: true, reason: null };
+    }
+  }
+
   if (semantics.primary === 'shop_collectible' || semantics.primary === 'gachapon') {
     if (types.indexOf('facade') !== -1 || types.indexOf('shop_interior') !== -1 ||
         types.indexOf('gachapon_wall') !== -1 || types.indexOf('anime_collectible') !== -1) {
@@ -410,6 +421,12 @@ export function runGoldenRuleQA(section, photoResult, caption, semantics, resolv
     sem,
     section
   );
+  if (!capCopyOk.ok && section && photoResult && photoResult.travelPhotoSlot) {
+    var exteriorSlots = ['storefront', 'exterior', 'district_panorama'];
+    if (exteriorSlots.indexOf(photoResult.travelPhotoSlot) !== -1 && capOk.ok) {
+      capCopyOk = { ok: true, reason: null };
+    }
+  }
   if (!capCopyOk.ok && section && section.venueSwapped && capOk.ok) {
     capCopyOk = { ok: true, reason: null };
   }

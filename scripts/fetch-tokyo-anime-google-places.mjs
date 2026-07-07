@@ -5,6 +5,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { visionCaptionViaWorker } from './lib/vision-caption.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -61,7 +62,8 @@ function patchSectionRow(src, row) {
   const fields = [
     'officialName', 'officialNameLocal', 'aliases', 'photoIntent', 'imageChecklist', 'imageRejectRules',
     'subject', 'mapsQuery', 'placeId', 'googleRating', 'googleAddress',
-    'googlePhotoUrl', 'googleAttribution', 'imageSource', 'caption', 'photoPlaceName', 'matchedKeywords',
+    'googlePhotoUrl', 'googleAttribution', 'imageSource', 'caption',     'photoPlaceName', 'matchedKeywords',
+    'secondaryGooglePhotoUrl', 'secondaryGoogleAttribution', 'secondaryCaption',
     'heading', 'content'
   ];
   let out = src;
@@ -73,13 +75,16 @@ function patchSectionRow(src, row) {
     else if (key === 'imageSource' && !row.imageSource) val = 'null';
     else if (key === 'aliases' || key === 'imageChecklist' || key === 'imageRejectRules' || key === 'matchedKeywords') {
       val = jsString(row[key] || []);
-    }     else if (key === 'photoPlaceName') {
+    } else if (key === 'photoPlaceName') {
       val = jsString(row.photoPlaceName || null);
-    } else if (key === 'heading') {
-      if (!row.venueSwapped || !row.heading) continue;
+    } else if (key === 'secondaryGooglePhotoUrl' && !row.secondaryGooglePhotoUrl) val = 'null';
+    else if (key === 'secondaryGoogleAttribution' && !row.secondaryGoogleAttribution) val = 'null';
+    else if (key === 'secondaryCaption') val = jsString(row.secondaryCaption || null);
+    else if (key === 'heading') {
+      if (!row.heading) continue;
       val = jsString(row.heading);
     } else if (key === 'content') {
-      if (!row.venueSwapped || !row.content) continue;
+      if (!row.content) continue;
       val = jsString(row.content);
     } else val = jsString(row[key]);
     out = patchField(out, key, val, start, blockEnd);
@@ -176,9 +181,79 @@ async function resolveAll(payload) {
     const row = (data.results && data.results[0]) || data;
     results.push(row);
     if (row.googlePhotoUrl) excludeUrls.push(row.googlePhotoUrl);
+    if (row.secondaryGooglePhotoUrl) excludeUrls.push(row.secondaryGooglePhotoUrl);
     if (data.excludeUrls) excludeUrls = data.excludeUrls;
   }
 
+  return results;
+}
+
+async function rewriteCaptionsWithVision(results, article, editorial) {
+  for (let i = 0; i < results.length; i++) {
+    const row = results[i];
+    if (!row.googlePhotoUrl || !row.matched) continue;
+    const section = (editorial.sections || []).find(function (s) { return s.sectionId === row.sectionId; }) || {};
+    const ctx = {
+      heading: row.heading || section.heading,
+      subject: row.subject || section.title,
+      placeName: row.placeName || row.photoPlaceName,
+      officialName: row.officialName || section.officialName,
+      officialNameLocal: row.officialNameLocal || section.officialNameLocal
+    };
+    try {
+      const caption = await visionCaptionViaWorker(row.googlePhotoUrl, ctx, section);
+      if (caption) {
+        row.photoCaption = caption;
+        console.log('[VISION]', row.sectionId, caption);
+      }
+      if (row.secondaryGooglePhotoUrl) {
+        const secCap = await visionCaptionViaWorker(row.secondaryGooglePhotoUrl, ctx, section);
+        if (secCap) row.secondaryCaption = secCap;
+      }
+    } catch (err) {
+      console.warn('[VISION SKIP]', row.sectionId, err.message);
+    }
+  }
+  return results;
+}
+
+async function syncSectionCopy(results, article, editorial) {
+  for (let i = 0; i < results.length; i++) {
+    const row = results[i];
+    if (!row.matched || row.sectionId === 'hero-anime') continue;
+    const section = (editorial.sections || []).find(function (s) { return s.sectionId === row.sectionId; }) || {};
+    if (!row.placeName) continue;
+    try {
+      const response = await fetch(API_BASE + '/api/editorial/section-copy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Origin: ORIGIN },
+        body: JSON.stringify({
+          article: article,
+          section: section,
+          place: {
+            placeName: row.placeName,
+            officialName: row.officialName || section.officialName,
+            officialNameLocal: row.officialNameLocal || section.officialNameLocal,
+            googleAddress: row.googleAddress
+          },
+          photoCaption: row.photoCaption || ''
+        })
+      });
+      const data = await response.json();
+      if (response.ok && data.heading && data.content) {
+        row.heading = data.heading;
+        row.content = data.content;
+        if (data.officialName) row.officialName = data.officialName;
+        if (data.officialNameLocal) row.officialNameLocal = data.officialNameLocal;
+        console.log('[COPY]', row.sectionId, data.heading.slice(0, 24));
+      } else {
+        console.warn('[COPY FAIL]', row.sectionId, data.error || JSON.stringify(data).slice(0, 80));
+      }
+    } catch (err) {
+      console.warn('[COPY SKIP]', row.sectionId, err.message);
+    }
+    await new Promise(function (r) { setTimeout(r, 1500); });
+  }
   return results;
 }
 
@@ -189,6 +264,12 @@ async function main() {
 
   console.log('[PIPELINE]', USE_LEGACY_PLACES ? 'legacy-places' : 'semantic-match');
   const results = await resolveAll(payload);
+  if (process.env.SOARVIBE_VISION_CAPTIONS !== '0') {
+    await rewriteCaptionsWithVision(results, payload.article, editorial);
+  }
+  if (process.env.SOARVIBE_SYNC_COPY !== '0') {
+    await syncSectionCopy(results, payload.article, editorial);
+  }
   fs.writeFileSync(OUT_JSON, JSON.stringify(results, null, 2), 'utf8');
   console.log('[WROTE]', OUT_JSON);
 

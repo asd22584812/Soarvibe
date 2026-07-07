@@ -1,83 +1,47 @@
 [
   {
     "sectionId": "akihabara",
-    "subject": "秋葉原電氣街",
-    "mapsQuery": "Akihabara Electric Town Tokyo Japan",
+    "subject": "秋葉原電氣街：動漫聖地巡禮",
+    "mapsQuery": "Akihabara Electric Town",
     "placeId": "ChIJAVf7lh2MGGARJylRnQ_3dpI",
     "googleRating": 4.2,
     "googleAddress": "〒101-0021 東京都千代田区外神田４丁目３−１",
-    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZOsuyJ6v5jh8Z2g4lM1l_dA16FIlK8IBV6xwMkbvqjI0OKKbkqe3xIRe7N03ZIiDqJy1uLDnb4Cs74ALXd9NWaBHO6kYqKgc_KKfMKoXgOugc84x8p0paIXh2awJlcEzTzYZEHskIoLl0Kl=s4800-w1600-h1200",
-    "googleAttribution": "Blake Bishop",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZPMILnrBsPlga96Y5ufCHIO0RbtW_YpeyN5tkGw7i18KvCR8E5yfdln9QGUP9wcKF_y_a55_elxkwZXLnH9aCThqxrb-v_CRjavrAgO4u0G-4E-eGPkcGmMvzhXwRml5Y2xDA8DbVbhxuZIQ0A=s4800-w1600-h1200",
+    "googleAttribution": "Marta",
     "imageSource": "google_places",
     "matched": true,
     "placeName": "アニメイト秋葉原",
-    "photoScore": 214,
-    "photoIndex": 1,
-    "photoCaption": "GIGO大型看板矗立街頭，是電氣街一眼辨識的地標。",
+    "photoScore": 166,
+    "photoIndex": 0,
+    "photoCaption": "街道兩側店招與建築立面清楚可見，街區個性一眼可辨。",
     "photoEvidence": {
       "primary": "street_landmark",
       "types": [
-        "landmark_building",
         "street_landmark"
       ],
       "signals": [
-        "gigo",
-        "gigo"
+        "街"
       ],
       "subjectType": "district",
       "role": "landmark",
-      "blob": "blake bishop gigo akihabara building 3 gigo gigo"
+      "blob": "marta 秋葉原電氣街"
     },
     "travelPhotoSlot": "district_panorama",
     "copySemantics": {
       "primary": "street_scene",
       "categories": [
         "street_scene",
-        "landmark",
-        "night",
         "shop_collectible",
-        "storefront"
+        "activity"
       ],
       "hits": [
         {
           "category": "street_scene",
-          "score": 9,
+          "score": 3,
           "matched": [
             "電氣街",
-            "中央通",
-            "霓虹",
-            "人潮",
             "街區",
-            "一整片",
-            "兩側",
-            "招牌",
-            "廣角"
-          ],
-          "evidence": [
-            "street_landmark",
-            "landmark_building"
-          ]
-        },
-        {
-          "category": "landmark",
-          "score": 4,
-          "matched": [
-            "radio kaikan",
-            "animate",
-            "gigo",
-            "朝聖"
-          ],
-          "evidence": [
-            "landmark_building",
-            "street_landmark"
-          ]
-        },
-        {
-          "category": "night",
-          "score": 2,
-          "matched": [
-            "霓虹亮起",
-            "傍晚"
+            "一整片"
           ],
           "evidence": [
             "street_landmark",
@@ -88,8 +52,8 @@
           "category": "shop_collectible",
           "score": 2,
           "matched": [
-            "模型",
-            "櫥窗"
+            "收藏",
+            "漫畫"
           ],
           "evidence": [
             "anime_collectible",
@@ -97,14 +61,16 @@
           ]
         },
         {
-          "category": "storefront",
-          "score": 1,
+          "category": "activity",
+          "score": 2,
           "matched": [
-            "招牌"
+            "沉浸",
+            "巡禮"
           ],
           "evidence": [
-            "facade",
-            "landmark_building"
+            "cafe_interior",
+            "anime_collectible",
+            "shop_interior"
           ]
         }
       ],
@@ -113,44 +79,30 @@
         "landmark_building",
         "anime_collectible",
         "shop_interior",
-        "facade"
+        "cafe_interior"
       ],
       "searchBoost": [
         "電氣街",
-        "中央通",
-        "霓虹",
-        "人潮",
         "街區",
         "一整片",
-        "兩側",
-        "招牌",
-        "廣角",
-        "radio kaikan",
-        "animate",
-        "gigo",
-        "朝聖",
-        "霓虹亮起",
-        "傍晚",
-        "模型",
-        "櫥窗"
+        "收藏",
+        "漫畫",
+        "沉浸",
+        "巡禮"
       ],
-      "copyExcerpt": "秋葉原電氣街 · 動漫朝聖的起點 從 JR 秋葉原站電氣街口跨出去，中央通兩側的動漫招牌幾乎不給人思考的時間。Radio Kaikan 的模型櫥窗、Animate 本館的人潮、GIGO 大型看板——這裡不是單一景點，而是一整片會讓人自然放慢步調的街區。上午十點前人潮還算溫和，先把 Animate 與最想逛的兩間店鎖定；午後再鑽進卡牌專賣與地下復古遊戲機。傍晚霓虹亮起，電氣街才進入主場，廣角拍中央通最剛好。帶現金與行動電源，這條路線通常比預期多留兩小時。 電氣街不是單一景點，而是一整片會讓人自然放慢步調的動漫街區 秋葉原電氣街 秋葉原電氣街"
+      "copyExcerpt": "秋葉原電氣街：動漫聖地巡禮 踏入秋葉原，彷彿置身於動漫世界的心臟！這裡不僅有最新電子產品，更是動漫周邊、漫畫、遊戲的天堂。從大型連鎖店到隱密小巷，處處充滿驚喜。感受電波系的熱情，尋找你的專屬收藏，沉浸在二次元的魅力中吧！ 電氣街不是單一景點，而是一整片會讓人自然放慢步調的動漫街區 秋葉原電氣街：動漫聖地巡禮 秋葉原電氣街：動漫聖地巡禮"
     },
-    "copyDerivedPhotoIntent": "街景、霓虹、人潮、地標建築外觀、地標建築、代表性招牌、街區辨識點",
-    "matchedKeywords": [
-      "GIGO",
-      "GIGO",
-      "GIGO"
-    ],
-    "photoPlaceName": "GiGO Akihabara Building 3",
+    "copyDerivedPhotoIntent": "街景、霓虹、人潮、地標建築外觀、商品陳列、公仔模型、收藏櫥窗",
+    "matchedKeywords": [],
+    "photoPlaceName": "秋葉原電氣街",
     "searchUsed": "アニメイト 秋葉原本店",
-    "photoSearchUsed": "秋葉原 GiGO 外観",
+    "photoSearchUsed": "秋葉原 電気街",
     "photoSearchPhase": "precise_local",
     "photoSearchDebug": {
       "sectionId": "akihabara",
       "attempts": [
         {
-          "ts": 1783332479398,
+          "ts": 1783406224704,
           "sectionId": "akihabara",
           "slot": "district_panorama",
           "query": "placeId:ChIJAVf7lh2MGGARJylRnQ_3dpI",
@@ -161,7 +113,7 @@
           "rejectReason": null
         },
         {
-          "ts": 1783332479398,
+          "ts": 1783406224704,
           "sectionId": "akihabara",
           "slot": null,
           "query": "placeId:ChIJAVf7lh2MGGARJylRnQ_3dpI",
@@ -172,7 +124,7 @@
           "rejectReason": "content_place_no_match"
         },
         {
-          "ts": 1783332479565,
+          "ts": 1783406225073,
           "sectionId": "akihabara",
           "slot": null,
           "query": "秋葉原 電気街",
@@ -183,48 +135,15 @@
           "rejectReason": null
         },
         {
-          "ts": 1783332479710,
-          "sectionId": "akihabara",
-          "slot": null,
-          "query": "秋葉原 中央通り",
-          "phase": "precise_local",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332479860,
-          "sectionId": "akihabara",
-          "slot": null,
-          "query": "秋葉原 ラジオ会館 外観",
-          "phase": "precise_local",
-          "candidateCount": 2,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332480013,
-          "sectionId": "akihabara",
-          "slot": null,
-          "query": "秋葉原 GiGO 外観",
-          "phase": "precise_local",
-          "candidateCount": 3,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332480036,
+          "ts": 1783406225090,
           "sectionId": "akihabara",
           "slot": "district_panorama",
-          "query": "秋葉原 GiGO 外観",
+          "query": "秋葉原 電気街",
           "phase": "precise_local",
           "candidateCount": 10,
-          "photoIndex": 1,
-          "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZOsuyJ6v5jh8Z2g4lM1l_dA16FIlK8IBV6xwMkbvqjI0OKKbkqe3xIRe7N03ZIiDqJy1uLDnb4Cs74ALXd9NWaBHO6kYqKgc_KKfMKoXgOugc84x8p0paIXh2awJlcEzTzYZEHskIoLl0Kl=s4800-w1600-h1200",
-          "selectedReason": "slot_district_panorama_score_214",
+          "photoIndex": 0,
+          "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZPMILnrBsPlga96Y5ufCHIO0RbtW_YpeyN5tkGw7i18KvCR8E5yfdln9QGUP9wcKF_y_a55_elxkwZXLnH9aCThqxrb-v_CRjavrAgO4u0G-4E-eGPkcGmMvzhXwRml5Y2xDA8DbVbhxuZIQ0A=s4800-w1600-h1200",
+          "selectedReason": "slot_district_panorama_score_166",
           "rejectReason": null
         }
       ]
@@ -241,8 +160,8 @@
     "swappedFrom": null,
     "swappedTo": null,
     "alternativeId": null,
-    "heading": "秋葉原電氣街 · 動漫朝聖的起點",
-    "content": "從 JR 秋葉原站電氣街口跨出去，中央通兩側的動漫招牌幾乎不給人思考的時間。Radio Kaikan 的模型櫥窗、Animate 本館的人潮、GIGO 大型看板——這裡不是單一景點，而是一整片會讓人自然放慢步調的街區。上午十點前人潮還算溫和，先把 Animate 與最想逛的兩間店鎖定；午後再鑽進卡牌專賣與地下復古遊戲機。傍晚霓虹亮起，電氣街才進入主場，廣角拍中央通最剛好。帶現金與行動電源，這條路線通常比預期多留兩小時。",
+    "heading": "秋葉原電氣街：動漫聖地巡禮",
+    "content": "踏入秋葉原，彷彿置身於動漫世界的心臟！這裡不僅有最新電子產品，更是動漫周邊、漫畫、遊戲的天堂。從大型連鎖店到隱密小巷，處處充滿驚喜。感受電波系的熱情，尋找你的專屬收藏，沉浸在二次元的魅力中吧！",
     "officialName": "Akihabara Electric Town",
     "officialNameLocal": "秋葉原電気街",
     "pipeline": {
@@ -261,7 +180,7 @@
         "sectionId": "akihabara",
         "attempts": [
           {
-            "ts": 1783332479398,
+            "ts": 1783406224704,
             "sectionId": "akihabara",
             "slot": "district_panorama",
             "query": "placeId:ChIJAVf7lh2MGGARJylRnQ_3dpI",
@@ -272,7 +191,7 @@
             "rejectReason": null
           },
           {
-            "ts": 1783332479398,
+            "ts": 1783406224704,
             "sectionId": "akihabara",
             "slot": null,
             "query": "placeId:ChIJAVf7lh2MGGARJylRnQ_3dpI",
@@ -283,7 +202,7 @@
             "rejectReason": "content_place_no_match"
           },
           {
-            "ts": 1783332479565,
+            "ts": 1783406225073,
             "sectionId": "akihabara",
             "slot": null,
             "query": "秋葉原 電気街",
@@ -294,48 +213,15 @@
             "rejectReason": null
           },
           {
-            "ts": 1783332479710,
-            "sectionId": "akihabara",
-            "slot": null,
-            "query": "秋葉原 中央通り",
-            "phase": "precise_local",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332479860,
-            "sectionId": "akihabara",
-            "slot": null,
-            "query": "秋葉原 ラジオ会館 外観",
-            "phase": "precise_local",
-            "candidateCount": 2,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332480013,
-            "sectionId": "akihabara",
-            "slot": null,
-            "query": "秋葉原 GiGO 外観",
-            "phase": "precise_local",
-            "candidateCount": 3,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332480036,
+            "ts": 1783406225090,
             "sectionId": "akihabara",
             "slot": "district_panorama",
-            "query": "秋葉原 GiGO 外観",
+            "query": "秋葉原 電気街",
             "phase": "precise_local",
             "candidateCount": 10,
-            "photoIndex": 1,
-            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZOsuyJ6v5jh8Z2g4lM1l_dA16FIlK8IBV6xwMkbvqjI0OKKbkqe3xIRe7N03ZIiDqJy1uLDnb4Cs74ALXd9NWaBHO6kYqKgc_KKfMKoXgOugc84x8p0paIXh2awJlcEzTzYZEHskIoLl0Kl=s4800-w1600-h1200",
-            "selectedReason": "slot_district_panorama_score_214",
+            "photoIndex": 0,
+            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZPMILnrBsPlga96Y5ufCHIO0RbtW_YpeyN5tkGw7i18KvCR8E5yfdln9QGUP9wcKF_y_a55_elxkwZXLnH9aCThqxrb-v_CRjavrAgO4u0G-4E-eGPkcGmMvzhXwRml5Y2xDA8DbVbhxuZIQ0A=s4800-w1600-h1200",
+            "selectedReason": "slot_district_panorama_score_166",
             "rejectReason": null
           }
         ]
@@ -344,19 +230,19 @@
   },
   {
     "sectionId": "nakano",
-    "subject": "中野百老匯",
-    "mapsQuery": "Nakano Broadway Tokyo Japan",
+    "subject": "中野百老匯：尋寶者的天堂",
+    "mapsQuery": "Nakano Broadway",
     "placeId": "ChIJg-7dspDyGGARvvDv4E5-tuE",
     "googleRating": 4.2,
     "googleAddress": "5-chōme-52-15 Nakano, Nakano City, Tokyo 164-0001, Japan",
-    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZM4lQaEb1On6sUwXzOdlyuNVLahc6jNkvnMYLhBTciWbz2IMmi3yRNTIVDZ0yRs9qUbR0Oujya74F4NPNgi03D8HjI5mwFxBdcAjg9jRzsfA77Izrc5Db5mk5kXENy-YrQTbowytw9K3MuV0Q=s4800-w1600-h1200",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZMigFyleAUe57AfEEaYBxf1hNecm_KlklS3iCWK3vZZpkRFyzvFm49SWH9HhbHzohIRzUzwESCmuih3YmySkxkDnhcNHIiSRDOnBwN8tPeq766Pz16WfbcioTV2FIMdWZuhv2qZ7MVtFZcFzA=s4800-w1600-h1200",
     "googleAttribution": "加藤展康",
     "imageSource": "google_places",
     "matched": true,
     "placeName": "Nakano Broadway",
     "photoScore": 140,
     "photoIndex": 1,
-    "photoCaption": "街道兩側動漫招牌與霓虹交織，街區氛圍一眼可見。",
+    "photoCaption": "中野百老匯商場外牆與入口，是老玩家公認的挖寶起點。",
     "photoEvidence": {
       "primary": "street_landmark",
       "types": [
@@ -378,14 +264,12 @@
       "hits": [
         {
           "category": "shop_collectible",
-          "score": 6,
+          "score": 4,
           "matched": [
-            "mandarake",
             "公仔",
-            "模型",
             "挖寶",
-            "漫畫",
-            "中古"
+            "收藏",
+            "漫畫"
           ],
           "evidence": [
             "anime_collectible",
@@ -398,14 +282,12 @@
         "shop_interior"
       ],
       "searchBoost": [
-        "mandarake",
         "公仔",
-        "模型",
         "挖寶",
-        "漫畫",
-        "中古"
+        "收藏",
+        "漫畫"
       ],
-      "copyExcerpt": "中野百老匯 · 老玩家公認的挖寶聖地 JR 中野站北口走五分鐘，中野百老匯的電梯一開就是另一種東京。Mandarake 各樓層擠滿中古公仔、模型、卡牌與復古漫畫，價格常有意外驚喜；らしんばん 等店也適合比價。下午光線較暖，邊逛邊翻櫃剛好。預留兩小時以上，這座寶庫很少讓人空手而回。 老玩家公認挖寶聖地，不是普通商場 中野百老匯 中野百老匯"
+      "copyExcerpt": "中野百老匯：尋寶者的天堂 遠離喧囂，中野百老匯是動漫迷的秘密基地。這棟複合式商場匯集了各式懷舊漫畫、公仔、絕版遊戲與獨立畫廊。漫步其中，彷彿穿越時空，每一次轉角都可能發現意想不到的珍寶，是尋找獨特收藏的絕佳去處。 老玩家公認挖寶聖地，不是普通商場 中野百老匯：尋寶者的天堂 中野百老匯：尋寶者的天堂"
     },
     "copyDerivedPhotoIntent": "商品陳列、公仔模型、收藏櫥窗",
     "matchedKeywords": [],
@@ -417,7 +299,7 @@
       "sectionId": "nakano",
       "attempts": [
         {
-          "ts": 1783332480134,
+          "ts": 1783406225195,
           "sectionId": "nakano",
           "slot": "district_panorama",
           "query": "placeId:ChIJg-7dspDyGGARvvDv4E5-tuE",
@@ -428,7 +310,7 @@
           "rejectReason": null
         },
         {
-          "ts": 1783332480134,
+          "ts": 1783406225195,
           "sectionId": "nakano",
           "slot": null,
           "query": "placeId:ChIJg-7dspDyGGARvvDv4E5-tuE",
@@ -439,7 +321,7 @@
           "rejectReason": "content_place_no_match"
         },
         {
-          "ts": 1783332480340,
+          "ts": 1783406225402,
           "sectionId": "nakano",
           "slot": null,
           "query": "中野ブロードウェイ 外観",
@@ -450,7 +332,7 @@
           "rejectReason": null
         },
         {
-          "ts": 1783332480515,
+          "ts": 1783406225577,
           "sectionId": "nakano",
           "slot": null,
           "query": "中野ブロードウェイ 入口",
@@ -461,7 +343,7 @@
           "rejectReason": null
         },
         {
-          "ts": 1783332480716,
+          "ts": 1783406225840,
           "sectionId": "nakano",
           "slot": null,
           "query": "中野ブロードウェイ まんだらけ",
@@ -472,7 +354,7 @@
           "rejectReason": null
         },
         {
-          "ts": 1783332480891,
+          "ts": 1783406225992,
           "sectionId": "nakano",
           "slot": null,
           "query": "中野 Sun Mall 商店街",
@@ -483,14 +365,14 @@
           "rejectReason": null
         },
         {
-          "ts": 1783332480908,
+          "ts": 1783406226008,
           "sectionId": "nakano",
           "slot": "district_panorama",
           "query": "中野 Sun Mall 商店街",
           "phase": "precise_local",
           "candidateCount": 10,
           "photoIndex": 1,
-          "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZM4lQaEb1On6sUwXzOdlyuNVLahc6jNkvnMYLhBTciWbz2IMmi3yRNTIVDZ0yRs9qUbR0Oujya74F4NPNgi03D8HjI5mwFxBdcAjg9jRzsfA77Izrc5Db5mk5kXENy-YrQTbowytw9K3MuV0Q=s4800-w1600-h1200",
+          "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZMigFyleAUe57AfEEaYBxf1hNecm_KlklS3iCWK3vZZpkRFyzvFm49SWH9HhbHzohIRzUzwESCmuih3YmySkxkDnhcNHIiSRDOnBwN8tPeq766Pz16WfbcioTV2FIMdWZuhv2qZ7MVtFZcFzA=s4800-w1600-h1200",
           "selectedReason": "slot_district_panorama_score_140",
           "rejectReason": null
         }
@@ -508,8 +390,8 @@
     "swappedFrom": null,
     "swappedTo": null,
     "alternativeId": null,
-    "heading": "中野百老匯 · 老玩家公認的挖寶聖地",
-    "content": "JR 中野站北口走五分鐘，中野百老匯的電梯一開就是另一種東京。Mandarake 各樓層擠滿中古公仔、模型、卡牌與復古漫畫，價格常有意外驚喜；らしんばん 等店也適合比價。下午光線較暖，邊逛邊翻櫃剛好。預留兩小時以上，這座寶庫很少讓人空手而回。",
+    "heading": "中野百老匯：尋寶者的天堂",
+    "content": "遠離喧囂，中野百老匯是動漫迷的秘密基地。這棟複合式商場匯集了各式懷舊漫畫、公仔、絕版遊戲與獨立畫廊。漫步其中，彷彿穿越時空，每一次轉角都可能發現意想不到的珍寶，是尋找獨特收藏的絕佳去處。",
     "officialName": "Nakano Broadway",
     "officialNameLocal": "中野ブロードウェイ",
     "pipeline": {
@@ -528,7 +410,7 @@
         "sectionId": "nakano",
         "attempts": [
           {
-            "ts": 1783332480134,
+            "ts": 1783406225195,
             "sectionId": "nakano",
             "slot": "district_panorama",
             "query": "placeId:ChIJg-7dspDyGGARvvDv4E5-tuE",
@@ -539,7 +421,7 @@
             "rejectReason": null
           },
           {
-            "ts": 1783332480134,
+            "ts": 1783406225195,
             "sectionId": "nakano",
             "slot": null,
             "query": "placeId:ChIJg-7dspDyGGARvvDv4E5-tuE",
@@ -550,7 +432,7 @@
             "rejectReason": "content_place_no_match"
           },
           {
-            "ts": 1783332480340,
+            "ts": 1783406225402,
             "sectionId": "nakano",
             "slot": null,
             "query": "中野ブロードウェイ 外観",
@@ -561,7 +443,7 @@
             "rejectReason": null
           },
           {
-            "ts": 1783332480515,
+            "ts": 1783406225577,
             "sectionId": "nakano",
             "slot": null,
             "query": "中野ブロードウェイ 入口",
@@ -572,7 +454,7 @@
             "rejectReason": null
           },
           {
-            "ts": 1783332480716,
+            "ts": 1783406225840,
             "sectionId": "nakano",
             "slot": null,
             "query": "中野ブロードウェイ まんだらけ",
@@ -583,7 +465,7 @@
             "rejectReason": null
           },
           {
-            "ts": 1783332480891,
+            "ts": 1783406225992,
             "sectionId": "nakano",
             "slot": null,
             "query": "中野 Sun Mall 商店街",
@@ -594,14 +476,14 @@
             "rejectReason": null
           },
           {
-            "ts": 1783332480908,
+            "ts": 1783406226008,
             "sectionId": "nakano",
             "slot": "district_panorama",
             "query": "中野 Sun Mall 商店街",
             "phase": "precise_local",
             "candidateCount": 10,
             "photoIndex": 1,
-            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZM4lQaEb1On6sUwXzOdlyuNVLahc6jNkvnMYLhBTciWbz2IMmi3yRNTIVDZ0yRs9qUbR0Oujya74F4NPNgi03D8HjI5mwFxBdcAjg9jRzsfA77Izrc5Db5mk5kXENy-YrQTbowytw9K3MuV0Q=s4800-w1600-h1200",
+            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZMigFyleAUe57AfEEaYBxf1hNecm_KlklS3iCWK3vZZpkRFyzvFm49SWH9HhbHzohIRzUzwESCmuih3YmySkxkDnhcNHIiSRDOnBwN8tPeq766Pz16WfbcioTV2FIMdWZuhv2qZ7MVtFZcFzA=s4800-w1600-h1200",
             "selectedReason": "slot_district_panorama_score_140",
             "rejectReason": null
           }
@@ -611,19 +493,23 @@
   },
   {
     "sectionId": "gachapon",
-    "subject": "GACHAPON 扭蛋會館",
-    "mapsQuery": "Gachapon Kaikan Akihabara Tokyo",
+    "subject": "扭蛋會館：驚喜轉不停",
+    "mapsQuery": "Gashapon Department Store Ikebukuro",
     "placeId": "ChIJBztW3x2MGGARadHYl5vTEK0",
     "googleRating": 4,
     "googleAddress": "Japan, 〒101-0021 Tokyo, Chiyoda City, Sotokanda, 3-chōme−15−５ MNビル 1F",
-    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZOldJM0Ub-C5Z4AI_xJGgoOe_8vufxlo8uUgetJDFs6XL0W9Ag4OQUi_53HZyUA9GbG-7mxwl5wK9Ps_F5rr1A_vPaFYLytNlR2e0Od2QXw-aMH-i2U2Rpozgg8KNHa8safHgSuxq_iUxEKK3OiTYDv3w=s4800-w1600-h1200",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZPoAkoWVVPOdfNpjIBO6VAxm-RiBobqX69xbD2QFDgTASyiTwl8yRfKQz94WVsEpk6EnsfMpXY1wTPQQeRDrOpFbAmNL_aiWz0YnDJLmj5sTZvY65La6vFkeIVs3uLnlvZruDcWKt90wSWOj6SRBYzOzw=s4800-w1600-h1200",
     "googleAttribution": "Loki",
     "imageSource": "google_places",
     "matched": true,
     "placeName": "Akihabara Gachapon Hall",
-    "photoScore": 139,
+    "photoScore": 157,
     "photoIndex": 1,
     "photoCaption": "整排扭蛋機一路延伸，色彩與機台本身就是風景。",
+    "secondaryGooglePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZNxs6pDyAwCs2ZAPfO68cQ4P0mhOTAD8HLSTguhc6v-Z95sHqa12INRYImSivqOdc7qIbnbG1dBKF-c-DxA_lK5vzhk2dlgPgAtkxfHawVaWibdyqXk9NCBuKYjUbBUKVzFpTgYSzAl8qUQpA=s4800-w1600-h1200",
+    "secondaryGoogleAttribution": "iris soh",
+    "secondaryCaption": "整排扭蛋機一路延伸，色彩與機台本身就是風景。",
+    "secondaryPhotoSlot": "wall",
     "photoEvidence": {
       "primary": "gachapon_wall",
       "types": [
@@ -642,7 +528,9 @@
       "categories": [
         "gachapon",
         "storefront",
-        "street_scene"
+        "street_scene",
+        "cafe_experience",
+        "activity"
       ],
       "hits": [
         {
@@ -650,7 +538,7 @@
           "score": 2,
           "matched": [
             "扭蛋",
-            "gachapon"
+            "膠囊"
           ],
           "evidence": [
             "gachapon_wall"
@@ -678,21 +566,49 @@
             "street_landmark",
             "landmark_building"
           ]
+        },
+        {
+          "category": "cafe_experience",
+          "score": 1,
+          "matched": [
+            "體驗"
+          ],
+          "evidence": [
+            "dessert",
+            "cafe_interior"
+          ]
+        },
+        {
+          "category": "activity",
+          "score": 1,
+          "matched": [
+            "體驗"
+          ],
+          "evidence": [
+            "cafe_interior",
+            "anime_collectible",
+            "shop_interior"
+          ]
         }
       ],
       "requiredEvidence": [
         "street_landmark",
         "landmark_building",
         "gachapon_wall",
-        "facade"
+        "dessert",
+        "cafe_interior",
+        "facade",
+        "anime_collectible",
+        "shop_interior"
       ],
       "searchBoost": [
         "招牌",
         "扭蛋",
-        "gachapon",
+        "膠囊",
+        "體驗",
         "外觀"
       ],
-      "copyExcerpt": "GACHAPON 扭蛋會館 · 整面牆都是驚喜 整面牆的扭蛋機，轉一圈就可能入坑。先設定預算上限，再開始試手氣——這是過來人的溫柔提醒。 整面牆都是驚喜，不是黃色招牌外觀 GACHAPON 扭蛋會館 GACHAPON 扭蛋會館"
+      "copyExcerpt": "扭蛋會館：驚喜轉不停 扭蛋的魅力在於那份未知與期待！東京各地都有扭蛋機，其中扭蛋會館更是種類繁多，從動漫角色到搞怪小物應有盡有。投入硬幣，輕輕一轉，打開膠囊的瞬間，總能帶來無比的驚喜與樂趣，是收集控不可錯過的體驗。 整面牆都是驚喜，不是黃色招牌外觀 扭蛋會館：驚喜轉不停 扭蛋會館：驚喜轉不停"
     },
     "copyDerivedPhotoIntent": "整排扭蛋機、扭蛋牆、店面外觀",
     "matchedKeywords": [
@@ -708,7 +624,7 @@
       "sectionId": "gachapon",
       "attempts": [
         {
-          "ts": 1783332481003,
+          "ts": 1783406226093,
           "sectionId": "gachapon",
           "slot": "storefront",
           "query": "placeId:ChIJBztW3x2MGGARadHYl5vTEK0",
@@ -719,15 +635,27 @@
           "rejectReason": null
         },
         {
-          "ts": 1783332481023,
+          "ts": 1783406226106,
           "sectionId": "gachapon",
           "slot": "wall",
           "query": "content_place",
           "phase": "place_photos",
           "candidateCount": 10,
           "photoIndex": 1,
-          "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZOldJM0Ub-C5Z4AI_xJGgoOe_8vufxlo8uUgetJDFs6XL0W9Ag4OQUi_53HZyUA9GbG-7mxwl5wK9Ps_F5rr1A_vPaFYLytNlR2e0Od2QXw-aMH-i2U2Rpozgg8KNHa8safHgSuxq_iUxEKK3OiTYDv3w=s4800-w1600-h1200",
-          "selectedReason": "slot_wall_score_139",
+          "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZPoAkoWVVPOdfNpjIBO6VAxm-RiBobqX69xbD2QFDgTASyiTwl8yRfKQz94WVsEpk6EnsfMpXY1wTPQQeRDrOpFbAmNL_aiWz0YnDJLmj5sTZvY65La6vFkeIVs3uLnlvZruDcWKt90wSWOj6SRBYzOzw=s4800-w1600-h1200",
+          "selectedReason": "slot_wall_score_157",
+          "rejectReason": null
+        },
+        {
+          "ts": 1783406226133,
+          "sectionId": "gachapon",
+          "slot": "wall",
+          "query": "content_place",
+          "phase": "place_photos",
+          "candidateCount": 10,
+          "photoIndex": 2,
+          "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZNxs6pDyAwCs2ZAPfO68cQ4P0mhOTAD8HLSTguhc6v-Z95sHqa12INRYImSivqOdc7qIbnbG1dBKF-c-DxA_lK5vzhk2dlgPgAtkxfHawVaWibdyqXk9NCBuKYjUbBUKVzFpTgYSzAl8qUQpA=s4800-w1600-h1200",
+          "selectedReason": "slot_wall_score_157",
           "rejectReason": null
         }
       ]
@@ -744,10 +672,10 @@
     "swappedFrom": null,
     "swappedTo": null,
     "alternativeId": null,
-    "heading": "GACHAPON 扭蛋會館 · 整面牆都是驚喜",
-    "content": "整面牆的扭蛋機，轉一圈就可能入坑。先設定預算上限，再開始試手氣——這是過來人的溫柔提醒。",
-    "officialName": "Akihabara Gachapon Hall",
-    "officialNameLocal": "秋葉原ガチャポン会館",
+    "heading": "扭蛋會館：驚喜轉不停",
+    "content": "扭蛋的魅力在於那份未知與期待！東京各地都有扭蛋機，其中扭蛋會館更是種類繁多，從動漫角色到搞怪小物應有盡有。投入硬幣，輕輕一轉，打開膠囊的瞬間，總能帶來無比的驚喜與樂趣，是收集控不可錯過的體驗。",
+    "officialName": "Gashapon Department Store Ikebukuro",
+    "officialNameLocal": "ガシャポン百貨店 池袋総本店",
     "pipeline": {
       "version": "photo-search-retry-v1",
       "steps": [
@@ -764,7 +692,7 @@
         "sectionId": "gachapon",
         "attempts": [
           {
-            "ts": 1783332481003,
+            "ts": 1783406226093,
             "sectionId": "gachapon",
             "slot": "storefront",
             "query": "placeId:ChIJBztW3x2MGGARadHYl5vTEK0",
@@ -775,15 +703,27 @@
             "rejectReason": null
           },
           {
-            "ts": 1783332481023,
+            "ts": 1783406226106,
             "sectionId": "gachapon",
             "slot": "wall",
             "query": "content_place",
             "phase": "place_photos",
             "candidateCount": 10,
             "photoIndex": 1,
-            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZOldJM0Ub-C5Z4AI_xJGgoOe_8vufxlo8uUgetJDFs6XL0W9Ag4OQUi_53HZyUA9GbG-7mxwl5wK9Ps_F5rr1A_vPaFYLytNlR2e0Od2QXw-aMH-i2U2Rpozgg8KNHa8safHgSuxq_iUxEKK3OiTYDv3w=s4800-w1600-h1200",
-            "selectedReason": "slot_wall_score_139",
+            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZPoAkoWVVPOdfNpjIBO6VAxm-RiBobqX69xbD2QFDgTASyiTwl8yRfKQz94WVsEpk6EnsfMpXY1wTPQQeRDrOpFbAmNL_aiWz0YnDJLmj5sTZvY65La6vFkeIVs3uLnlvZruDcWKt90wSWOj6SRBYzOzw=s4800-w1600-h1200",
+            "selectedReason": "slot_wall_score_157",
+            "rejectReason": null
+          },
+          {
+            "ts": 1783406226133,
+            "sectionId": "gachapon",
+            "slot": "wall",
+            "query": "content_place",
+            "phase": "place_photos",
+            "candidateCount": 10,
+            "photoIndex": 2,
+            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZNxs6pDyAwCs2ZAPfO68cQ4P0mhOTAD8HLSTguhc6v-Z95sHqa12INRYImSivqOdc7qIbnbG1dBKF-c-DxA_lK5vzhk2dlgPgAtkxfHawVaWibdyqXk9NCBuKYjUbBUKVzFpTgYSzAl8qUQpA=s4800-w1600-h1200",
+            "selectedReason": "slot_wall_score_157",
             "rejectReason": null
           }
         ]
@@ -792,872 +732,49 @@
   },
   {
     "sectionId": "ichiran",
-    "subject": "田中そば店 秋葉原店",
-    "mapsQuery": "田中そば店 秋葉原店",
+    "subject": "一蘭拉麵：獨享美味的秘密",
+    "mapsQuery": "Ichiran Ramen Shinjuku",
     "placeId": "ChIJXTeLYx6MGGARNivhJ55nYVw",
     "googleRating": 4.2,
     "googleAddress": "Japan, 〒101-0021 Tokyo, Chiyoda City, Sotokanda, 3-chōme−8−３ 第一針谷ビル1Ｆ",
-    "googlePhotoUrl": null,
-    "googleAttribution": null,
-    "imageSource": null,
-    "matched": false,
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZMOcp-6Fx6csDimv0rOHEEOWgQIvfUzqyokPw0G-nEIDOb9hss1IxnUXdTjpdkjO2kftVKleNe5ihtVZ0GzXFaiNoMJAtVIVi3KYSO-Ab0E_QYSVHMvIl_f2kyp54n3LYVBCeIsSwK3l4Vvk9heOQewoA=s4800-w1600-h1200",
+    "googleAttribution": "田中そば店 秋葉原店",
+    "imageSource": "google_places",
+    "matched": true,
     "placeName": "Ramen Tanaka soba Akihabara",
-    "photoScore": null,
-    "photoIndex": null,
-    "photoCaption": null,
-    "photoEvidence": null,
-    "travelPhotoSlot": null,
+    "photoScore": 189,
+    "photoIndex": 1,
+    "photoCaption": "RamenTanakasobaAkihabara店門口清楚可見，對照招牌就能找到。",
+    "photoEvidence": {
+      "primary": "facade",
+      "types": [
+        "facade",
+        "food_dish"
+      ],
+      "signals": [],
+      "subjectType": "venue",
+      "role": "food",
+      "blob": "店 秋葉原店"
+    },
+    "travelPhotoSlot": "storefront",
     "copySemantics": {
       "primary": "dish",
       "categories": [
         "dish",
-        "street_scene"
+        "activity",
+        "cafe_experience"
       ],
       "hits": [
         {
           "category": "dish",
-          "score": 4,
+          "score": 3,
           "matched": [
+            "拉麵",
             "湯頭",
-            "醬油",
-            "熱湯",
-            "補給"
+            "麵"
           ],
           "evidence": [
             "food_dish"
-          ]
-        },
-        {
-          "category": "street_scene",
-          "score": 1,
-          "matched": [
-            "掃街"
-          ],
-          "evidence": [
-            "street_landmark",
-            "landmark_building"
-          ]
-        }
-      ],
-      "requiredEvidence": [
-        "street_landmark",
-        "landmark_building",
-        "food_dish"
-      ],
-      "searchBoost": [
-        "掃街",
-        "湯頭",
-        "醬油",
-        "熱湯",
-        "補給"
-      ],
-      "copyExcerpt": "田中そば店 秋葉原店 · 掃街中途的熱湯補給 醬油湯頭、出餐快，午餐控制在三十分鐘內剛好。尖峰時段先排隊，再回周邊繼續逛。 田中そば店 秋葉原店 田中そば店 秋葉原店"
-    },
-    "copyDerivedPhotoIntent": "成品料理、餐點本體、街景、霓虹、人潮、地標建築外觀",
-    "matchedKeywords": [],
-    "photoPlaceName": null,
-    "searchUsed": "placeId:ChIJXTeLYx6MGGARNivhJ55nYVw",
-    "photoSearchUsed": null,
-    "photoSearchPhase": null,
-    "photoSearchDebug": {
-      "sectionId": "ichiran",
-      "attempts": [
-        {
-          "ts": 1783332481092,
-          "sectionId": "ichiran",
-          "slot": "storefront",
-          "query": "placeId:ChIJXTeLYx6MGGARNivhJ55nYVw",
-          "phase": "place_photos",
-          "candidateCount": 10,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332481092,
-          "sectionId": "ichiran",
-          "slot": null,
-          "query": "placeId:ChIJXTeLYx6MGGARNivhJ55nYVw",
-          "phase": "review_photos",
-          "candidateCount": 10,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": "content_place_no_match"
-        },
-        {
-          "ts": 1783332481236,
-          "sectionId": "ichiran",
-          "slot": null,
-          "query": "田中そば店 秋葉原店 外観",
-          "phase": "precise_local",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332481381,
-          "sectionId": "ichiran",
-          "slot": null,
-          "query": "田中そば店 秋葉原店",
-          "phase": "precise_local",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332481533,
-          "sectionId": "ichiran",
-          "slot": null,
-          "query": "Tanaka Soba Akihabara exterior",
-          "phase": "precise_local",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332481659,
-          "sectionId": "ichiran",
-          "slot": null,
-          "query": "Ramen Tanaka Soba Akihabara",
-          "phase": "precise_local",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332481840,
-          "sectionId": "ichiran",
-          "slot": null,
-          "query": "田中そば",
-          "phase": "precise_local",
-          "candidateCount": 5,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332482010,
-          "sectionId": "ichiran",
-          "slot": null,
-          "query": "Tanaka Soba Akihabara",
-          "phase": "precise_local",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332482172,
-          "sectionId": "ichiran",
-          "slot": null,
-          "query": "田中そば店 秋葉原店 入口",
-          "phase": "local_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332482334,
-          "sectionId": "ichiran",
-          "slot": null,
-          "query": "田中そば店 秋葉原店 店頭",
-          "phase": "local_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332482472,
-          "sectionId": "ichiran",
-          "slot": null,
-          "query": "Ramen Tanaka Soba Akihabara 外観",
-          "phase": "local_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332482644,
-          "sectionId": "ichiran",
-          "slot": null,
-          "query": "Ramen Tanaka Soba Akihabara 入口",
-          "phase": "local_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332482810,
-          "sectionId": "ichiran",
-          "slot": null,
-          "query": "Ramen Tanaka Soba Akihabara 店頭",
-          "phase": "local_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332482942,
-          "sectionId": "ichiran",
-          "slot": null,
-          "query": "田中そば 外観",
-          "phase": "local_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332483102,
-          "sectionId": "ichiran",
-          "slot": null,
-          "query": "田中そば 入口",
-          "phase": "local_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332483261,
-          "sectionId": "ichiran",
-          "slot": null,
-          "query": "田中そば 店頭",
-          "phase": "local_suffix",
-          "candidateCount": 5,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332483506,
-          "sectionId": "ichiran",
-          "slot": null,
-          "query": "Tanaka Soba Akihabara 外観",
-          "phase": "local_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332483667,
-          "sectionId": "ichiran",
-          "slot": null,
-          "query": "Tanaka Soba Akihabara 入口",
-          "phase": "local_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332483903,
-          "sectionId": "ichiran",
-          "slot": null,
-          "query": "Tanaka Soba Akihabara 店頭",
-          "phase": "local_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332484048,
-          "sectionId": "ichiran",
-          "slot": null,
-          "query": "田中そば店 秋葉原店 storefront",
-          "phase": "english_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332484217,
-          "sectionId": "ichiran",
-          "slot": null,
-          "query": "田中そば店 秋葉原店 entrance",
-          "phase": "english_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332484439,
-          "sectionId": "ichiran",
-          "slot": null,
-          "query": "田中そば店 秋葉原店 exterior",
-          "phase": "english_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332484699,
-          "sectionId": "ichiran",
-          "slot": null,
-          "query": "田中そば店 秋葉原店 ramen",
-          "phase": "english_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332484842,
-          "sectionId": "ichiran",
-          "slot": null,
-          "query": "Ramen Tanaka Soba Akihabara storefront",
-          "phase": "english_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332485080,
-          "sectionId": "ichiran",
-          "slot": null,
-          "query": "Ramen Tanaka Soba Akihabara entrance",
-          "phase": "english_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332485308,
-          "sectionId": "ichiran",
-          "slot": null,
-          "query": "Ramen Tanaka Soba Akihabara exterior",
-          "phase": "english_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332485551,
-          "sectionId": "ichiran",
-          "slot": null,
-          "query": "Ramen Tanaka Soba Akihabara ramen",
-          "phase": "english_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332485728,
-          "sectionId": "ichiran",
-          "slot": null,
-          "query": "田中そば storefront",
-          "phase": "english_suffix",
-          "candidateCount": 4,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332485895,
-          "sectionId": "ichiran",
-          "slot": null,
-          "query": "田中そば entrance",
-          "phase": "english_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332486047,
-          "sectionId": "ichiran",
-          "slot": null,
-          "query": "田中そば exterior",
-          "phase": "english_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        }
-      ]
-    },
-    "sectionType": "food",
-    "role": null,
-    "rejectReason": "exhausted_retry_plan",
-    "editorialQA": {
-      "ok": false,
-      "issues": [
-        "no_photo"
-      ],
-      "usePlaceholder": true,
-      "pass": false,
-      "recommendation": "use_placeholder",
-      "goldenRule": {
-        "principle": "圖片永遠服務文案；優先選旅遊者最想看到的照片（外觀/街景優先）。",
-        "rules": [
-          "街區/商圈/景點：第一張必須是代表整個區域的廣角街景、地標或全景",
-          "商店：第一張優先店門口或外觀，第二張才是店內",
-          "餐廳：第一張優先店門口、招牌、外觀，第二張才是餐點",
-          "住宿：第一張優先外觀/入口，第二張 Lobby，第三張房型",
-          "街區介紹必須至少有一張街景",
-          "圖片必須直接對應文案描述",
-          "搜尋優先當地語言，驗證不符則重新搜尋，禁止隨機 fallback",
-          "搜尋失敗必須依序 retry：精準店名 → 當地語言+外觀/街景 suffix → 英文 suffix → Place photos → 深度 photo index",
-          "若原訂地點無合格圖，依 venueAlternatives 換成同類型知名地點並改寫文案",
-          "改寫後文案必須與新地點、新圖片一致",
-          "如果仍找不到，寧可 placeholder，也不要放錯圖",
-          "Caption 只能描述圖片中真正看得到的內容",
-          "否則 Editorial QA 一律 FAIL"
-        ]
-      }
-    },
-    "venueSwapped": false,
-    "swappedFrom": null,
-    "swappedTo": null,
-    "alternativeId": null,
-    "heading": "田中そば店 秋葉原店 · 掃街中途的熱湯補給",
-    "content": "醬油湯頭、出餐快，午餐控制在三十分鐘內剛好。尖峰時段先排隊，再回周邊繼續逛。",
-    "officialName": "Ramen Tanaka Soba Akihabara",
-    "officialNameLocal": "田中そば店 秋葉原店",
-    "pipeline": {
-      "version": "photo-search-retry-v1",
-      "steps": [
-        "copy_semantic_analysis",
-        "derive_photo_intent",
-        "place_verify",
-        "photo_search_retry",
-        "photo_first_pick",
-        "evidence_caption",
-        "venue_fallback",
-        "rule_qa"
-      ],
-      "aiTokens": 0,
-      "photoSearchDebug": {
-        "sectionId": "ichiran",
-        "attempts": [
-          {
-            "ts": 1783332481092,
-            "sectionId": "ichiran",
-            "slot": "storefront",
-            "query": "placeId:ChIJXTeLYx6MGGARNivhJ55nYVw",
-            "phase": "place_photos",
-            "candidateCount": 10,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332481092,
-            "sectionId": "ichiran",
-            "slot": null,
-            "query": "placeId:ChIJXTeLYx6MGGARNivhJ55nYVw",
-            "phase": "review_photos",
-            "candidateCount": 10,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": "content_place_no_match"
-          },
-          {
-            "ts": 1783332481236,
-            "sectionId": "ichiran",
-            "slot": null,
-            "query": "田中そば店 秋葉原店 外観",
-            "phase": "precise_local",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332481381,
-            "sectionId": "ichiran",
-            "slot": null,
-            "query": "田中そば店 秋葉原店",
-            "phase": "precise_local",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332481533,
-            "sectionId": "ichiran",
-            "slot": null,
-            "query": "Tanaka Soba Akihabara exterior",
-            "phase": "precise_local",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332481659,
-            "sectionId": "ichiran",
-            "slot": null,
-            "query": "Ramen Tanaka Soba Akihabara",
-            "phase": "precise_local",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332481840,
-            "sectionId": "ichiran",
-            "slot": null,
-            "query": "田中そば",
-            "phase": "precise_local",
-            "candidateCount": 5,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332482010,
-            "sectionId": "ichiran",
-            "slot": null,
-            "query": "Tanaka Soba Akihabara",
-            "phase": "precise_local",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332482172,
-            "sectionId": "ichiran",
-            "slot": null,
-            "query": "田中そば店 秋葉原店 入口",
-            "phase": "local_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332482334,
-            "sectionId": "ichiran",
-            "slot": null,
-            "query": "田中そば店 秋葉原店 店頭",
-            "phase": "local_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332482472,
-            "sectionId": "ichiran",
-            "slot": null,
-            "query": "Ramen Tanaka Soba Akihabara 外観",
-            "phase": "local_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332482644,
-            "sectionId": "ichiran",
-            "slot": null,
-            "query": "Ramen Tanaka Soba Akihabara 入口",
-            "phase": "local_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332482810,
-            "sectionId": "ichiran",
-            "slot": null,
-            "query": "Ramen Tanaka Soba Akihabara 店頭",
-            "phase": "local_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332482942,
-            "sectionId": "ichiran",
-            "slot": null,
-            "query": "田中そば 外観",
-            "phase": "local_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332483102,
-            "sectionId": "ichiran",
-            "slot": null,
-            "query": "田中そば 入口",
-            "phase": "local_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332483261,
-            "sectionId": "ichiran",
-            "slot": null,
-            "query": "田中そば 店頭",
-            "phase": "local_suffix",
-            "candidateCount": 5,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332483506,
-            "sectionId": "ichiran",
-            "slot": null,
-            "query": "Tanaka Soba Akihabara 外観",
-            "phase": "local_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332483667,
-            "sectionId": "ichiran",
-            "slot": null,
-            "query": "Tanaka Soba Akihabara 入口",
-            "phase": "local_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332483903,
-            "sectionId": "ichiran",
-            "slot": null,
-            "query": "Tanaka Soba Akihabara 店頭",
-            "phase": "local_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332484048,
-            "sectionId": "ichiran",
-            "slot": null,
-            "query": "田中そば店 秋葉原店 storefront",
-            "phase": "english_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332484217,
-            "sectionId": "ichiran",
-            "slot": null,
-            "query": "田中そば店 秋葉原店 entrance",
-            "phase": "english_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332484439,
-            "sectionId": "ichiran",
-            "slot": null,
-            "query": "田中そば店 秋葉原店 exterior",
-            "phase": "english_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332484699,
-            "sectionId": "ichiran",
-            "slot": null,
-            "query": "田中そば店 秋葉原店 ramen",
-            "phase": "english_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332484842,
-            "sectionId": "ichiran",
-            "slot": null,
-            "query": "Ramen Tanaka Soba Akihabara storefront",
-            "phase": "english_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332485080,
-            "sectionId": "ichiran",
-            "slot": null,
-            "query": "Ramen Tanaka Soba Akihabara entrance",
-            "phase": "english_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332485308,
-            "sectionId": "ichiran",
-            "slot": null,
-            "query": "Ramen Tanaka Soba Akihabara exterior",
-            "phase": "english_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332485551,
-            "sectionId": "ichiran",
-            "slot": null,
-            "query": "Ramen Tanaka Soba Akihabara ramen",
-            "phase": "english_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332485728,
-            "sectionId": "ichiran",
-            "slot": null,
-            "query": "田中そば storefront",
-            "phase": "english_suffix",
-            "candidateCount": 4,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332485895,
-            "sectionId": "ichiran",
-            "slot": null,
-            "query": "田中そば entrance",
-            "phase": "english_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332486047,
-            "sectionId": "ichiran",
-            "slot": null,
-            "query": "田中そば exterior",
-            "phase": "english_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          }
-        ]
-      }
-    }
-  },
-  {
-    "sectionId": "maid-cafe",
-    "subject": "MAID MADE 秋葉原駅前店",
-    "mapsQuery": "ufotable Cafe TOKYO Nakano Nogata",
-    "placeId": "ChIJvQtxBAaNGGARTiTMJ-Nzhvc",
-    "googleRating": 4.9,
-    "googleAddress": "〒101-0021 東京都千代田区外神田１丁目１５−13 秋葉原 神田B&Vビル 10F",
-    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZNLM2HL3uq2_iUhFu544p-HYOIlV9029dhYr65aVgyUh3VL43fboOflXkQT2mXFNvTsMMaTDhPFg40JDkgJbnWUYDYa8LGNwPD-ty9ehlcghjNe3uuZI4tdcujNxMkHGRMm45XxmmvWYjlbFUw=s4800-w669-h393",
-    "googleAttribution": "MAID MADE 秋葉原駅前店",
-    "imageSource": "google_places",
-    "matched": true,
-    "placeName": "MAID MADE 秋葉原駅前店",
-    "photoScore": 76,
-    "photoIndex": 1,
-    "photoCaption": "主題內裝與座位區呈現店內氛圍，一眼就知道這是主題咖啡廳。",
-    "photoEvidence": {
-      "primary": "cafe_interior",
-      "types": [
-        "cafe_interior",
-        "cafe_interior"
-      ],
-      "signals": [],
-      "subjectType": "venue",
-      "role": "cafe",
-      "blob": "maid made 秋葉原駅前店"
-    },
-    "travelPhotoSlot": "experience",
-    "copySemantics": {
-      "primary": "cafe_experience",
-      "categories": [
-        "cafe_experience",
-        "landmark",
-        "shop_collectible",
-        "activity",
-        "street_scene",
-        "dish",
-        "dessert"
-      ],
-      "hits": [
-        {
-          "category": "cafe_experience",
-          "score": 5,
-          "matched": [
-            "咖啡",
-            "主題內裝",
-            "maid",
-            "カフェ",
-            "體驗"
-          ],
-          "evidence": [
-            "dessert",
-            "cafe_interior"
-          ]
-        },
-        {
-          "category": "landmark",
-          "score": 2,
-          "matched": [
-            "radio kaikan",
-            "朝聖"
-          ],
-          "evidence": [
-            "landmark_building",
-            "street_landmark"
-          ]
-        },
-        {
-          "category": "shop_collectible",
-          "score": 2,
-          "matched": [
-            "mandarake",
-            "挖寶"
-          ],
-          "evidence": [
-            "anime_collectible",
-            "shop_interior"
           ]
         },
         {
@@ -1674,31 +791,10 @@
           ]
         },
         {
-          "category": "street_scene",
+          "category": "cafe_experience",
           "score": 1,
           "matched": [
-            "電氣街"
-          ],
-          "evidence": [
-            "street_landmark",
-            "landmark_building"
-          ]
-        },
-        {
-          "category": "dish",
-          "score": 1,
-          "matched": [
-            "補給"
-          ],
-          "evidence": [
-            "food_dish"
-          ]
-        },
-        {
-          "category": "dessert",
-          "score": 1,
-          "matched": [
-            "甜點"
+            "體驗"
           ],
           "evidence": [
             "dessert",
@@ -1707,39 +803,439 @@
         }
       ],
       "requiredEvidence": [
-        "street_landmark",
-        "landmark_building",
-        "anime_collectible",
-        "shop_interior",
         "food_dish",
         "dessert",
-        "cafe_interior"
+        "cafe_interior",
+        "anime_collectible",
+        "shop_interior"
       ],
       "searchBoost": [
-        "電氣街",
-        "radio kaikan",
-        "朝聖",
-        "mandarake",
-        "挖寶",
-        "補給",
-        "甜點",
-        "咖啡",
-        "主題內裝",
-        "maid",
-        "カフェ",
+        "拉麵",
+        "湯頭",
+        "麵",
         "體驗",
         "巡禮"
       ],
-      "copyExcerpt": "MAID MADE 秋葉原駅前店 · 次文化體驗的一杯咖啡 秋葉原的MAID MADE 秋葉原駅前店，以動漫聯名甜點與角色主題內裝著稱，是東京動漫聖地巡禮——電氣街與中野的挖寶節奏途中常見的咖啡補給點。把時間控制在六十分鐘內，邊吃甜點邊整理剛買的戰利品，剛好留體力給下一間店。 不是購物清單，而是動漫迷的朝聖路線：從 Radio Kaikan 到 Mandarake 深處 MAID MADE 秋葉原駅前店 ufotableカフェTOKYO"
+      "copyExcerpt": "一蘭拉麵：獨享美味的秘密 體驗一蘭獨特的「味集中」座位，享受專屬於你的拉麵時光。從麵條硬度、湯頭濃淡到配料，都能客製化。豚骨湯頭濃郁醇厚，搭配秘製醬汁，每一口都是極致的味蕾享受。即使一個人也能自在品嚐，是動漫巡禮後的最佳慰藉。 一蘭拉麵：獨享美味的秘密 一蘭拉麵：獨享美味的秘密"
     },
-    "copyDerivedPhotoIntent": "店內氛圍、甜點、主題內裝、地標建築、代表性招牌、街區辨識點",
+    "copyDerivedPhotoIntent": "成品料理、餐點本體、體驗場景、店內活動",
     "matchedKeywords": [
-      "MAID MADE"
+      "ramen",
+      "soba",
+      "田中",
+      "田中そば",
+      "Tanaka Soba Akihabara",
+      "田中そば店 秋葉原店",
+      "田中そば",
+      "Tanaka",
+      "そば"
     ],
-    "photoPlaceName": "MAID MADE 秋葉原駅前店",
-    "searchUsed": "placeId:ChIJvQtxBAaNGGARTiTMJ-Nzhvc",
-    "photoSearchUsed": "venue_chosen_place",
+    "photoPlaceName": "Ramen Tanaka soba Akihabara",
+    "searchUsed": "placeId:ChIJXTeLYx6MGGARNivhJ55nYVw",
+    "photoSearchUsed": "content_place",
+    "photoSearchDebug": {
+      "sectionId": "ichiran",
+      "attempts": [
+        {
+          "ts": 1783406226208,
+          "sectionId": "ichiran",
+          "slot": "storefront",
+          "query": "placeId:ChIJXTeLYx6MGGARNivhJ55nYVw",
+          "phase": "place_photos",
+          "candidateCount": 10,
+          "selectedImageUrl": null,
+          "selectedReason": null,
+          "rejectReason": null
+        }
+      ]
+    },
+    "sectionType": "food",
+    "role": null,
+    "rejectReason": null,
+    "editorialQA": {
+      "ok": true,
+      "issues": [],
+      "usePlaceholder": false
+    },
+    "venueSwapped": false,
+    "swappedFrom": null,
+    "swappedTo": null,
+    "alternativeId": null,
+    "heading": "一蘭拉麵：獨享美味的秘密",
+    "content": "體驗一蘭獨特的「味集中」座位，享受專屬於你的拉麵時光。從麵條硬度、湯頭濃淡到配料，都能客製化。豚骨湯頭濃郁醇厚，搭配秘製醬汁，每一口都是極致的味蕾享受。即使一個人也能自在品嚐，是動漫巡禮後的最佳慰藉。",
+    "officialName": "Ichiran Ramen Shinjuku",
+    "officialNameLocal": "一蘭ラーメン 新宿店",
+    "pipeline": {
+      "version": "photo-search-retry-v1",
+      "steps": [
+        "copy_semantic_analysis",
+        "derive_photo_intent",
+        "place_verify",
+        "photo_search_retry",
+        "photo_first_pick",
+        "evidence_caption",
+        "rule_qa"
+      ],
+      "aiTokens": 0,
+      "photoSearchDebug": {
+        "sectionId": "ichiran",
+        "attempts": [
+          {
+            "ts": 1783406226208,
+            "sectionId": "ichiran",
+            "slot": "storefront",
+            "query": "placeId:ChIJXTeLYx6MGGARNivhJ55nYVw",
+            "phase": "place_photos",
+            "candidateCount": 10,
+            "selectedImageUrl": null,
+            "selectedReason": null,
+            "rejectReason": null
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sectionId": "maid-cafe",
+    "subject": "女僕咖啡廳：萌萌的魔法體驗",
+    "mapsQuery": "Maidreamin Akihabara Main Store",
+    "placeId": "ChIJyR7AdR6MGGAROowxIYdMsj0",
+    "googleRating": 4.9,
+    "googleAddress": "〒101-0021 東京都千代田区外神田３丁目１６−１７ 住吉ビル 6階",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZNITb7PuqmPsudYDTtK9E7G0BJy34Ym29KpPImatViUdPPaAOwdBGVILsi6ZZ0zaVas3YTwRdCkhSNXnz2qF_T7Eizx0f0V8CMZtGj7uEzLotBwMGA4RUC88pNfpQiO1EE8nvJpBRgN8J40krOFa-uDFA=s4800-w543-h345",
+    "googleAttribution": "めいどりーみん 秋葉原 本店",
+    "imageSource": "google_places",
+    "matched": true,
+    "placeName": "めいどりーみん 秋葉原 本店",
+    "photoScore": 129,
+    "photoIndex": 0,
+    "photoCaption": "めいどりーみん秋葉原本店的外觀與入口清楚可見，方便對照地圖找路。",
+    "secondaryGooglePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZPm6ky5pnCyu6UMabQZ4Uf6cGN8-RgpXVgWx4o2q2MbFIL_8Q9yRcbixgxSqkeegO6NWqBfjglYtNrF2kQAAzklifkYPWTsM8LTcP4RLMRu5BDMr-vwRP7JbNFnX9RBeBwFx4aS-1XFHAlUJ0MwYURciw=s4800-w1600-h1200",
+    "secondaryGoogleAttribution": "めいどりーみん 秋葉原 本店",
+    "secondaryCaption": "主題內裝與座位區呈現店內氛圍，一眼就知道這是主題咖啡廳。",
+    "secondaryPhotoSlot": "experience",
+    "photoEvidence": {
+      "primary": "facade",
+      "types": [
+        "facade"
+      ],
+      "signals": [],
+      "subjectType": "venue",
+      "role": "cafe",
+      "blob": ""
+    },
+    "travelPhotoSlot": "storefront",
+    "copySemantics": {
+      "primary": "cafe_experience",
+      "categories": [
+        "cafe_experience",
+        "activity",
+        "dish"
+      ],
+      "hits": [
+        {
+          "category": "cafe_experience",
+          "score": 3,
+          "matched": [
+            "女僕",
+            "咖啡",
+            "體驗"
+          ],
+          "evidence": [
+            "dessert",
+            "cafe_interior"
+          ]
+        },
+        {
+          "category": "activity",
+          "score": 2,
+          "matched": [
+            "體驗",
+            "沉浸"
+          ],
+          "evidence": [
+            "cafe_interior",
+            "anime_collectible",
+            "shop_interior"
+          ]
+        },
+        {
+          "category": "dish",
+          "score": 1,
+          "matched": [
+            "餐點"
+          ],
+          "evidence": [
+            "food_dish"
+          ]
+        }
+      ],
+      "requiredEvidence": [
+        "food_dish",
+        "dessert",
+        "cafe_interior",
+        "anime_collectible",
+        "shop_interior"
+      ],
+      "searchBoost": [
+        "餐點",
+        "女僕",
+        "咖啡",
+        "體驗",
+        "沉浸"
+      ],
+      "copyExcerpt": "女僕咖啡廳：萌萌的魔法體驗 來到東京，怎能錯過女僕咖啡廳的獨特魅力？穿著可愛制服的女僕們，會用「主人」、「大小姐」稱呼你，並施展「萌萌咒語」讓餐點變得更美味。這不僅是咖啡廳，更是一場充滿歡樂與互動的沉浸式表演，絕對讓你心滿意足。 女僕咖啡廳：萌萌的魔法體驗 女僕咖啡廳：萌萌的魔法體驗"
+    },
+    "copyDerivedPhotoIntent": "店內氛圍、甜點、主題內裝、體驗場景、店內活動",
+    "matchedKeywords": [
+      "めいどりーみん 秋葉原 本店"
+    ],
+    "photoPlaceName": "めいどりーみん 秋葉原 本店",
+    "searchUsed": "めいどりーみん 秋葉原 本店",
+    "photoSearchUsed": "content_place",
+    "photoSearchDebug": {
+      "sectionId": "maid-cafe",
+      "attempts": [
+        {
+          "ts": 1783406226396,
+          "sectionId": "maid-cafe",
+          "slot": "storefront",
+          "query": "placeId:ChIJyR7AdR6MGGAROowxIYdMsj0",
+          "phase": "place_photos",
+          "candidateCount": 10,
+          "selectedImageUrl": null,
+          "selectedReason": null,
+          "rejectReason": null
+        },
+        {
+          "ts": 1783406226411,
+          "sectionId": "maid-cafe",
+          "slot": "storefront",
+          "query": "content_place",
+          "phase": "place_photos",
+          "candidateCount": 10,
+          "photoIndex": 0,
+          "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZNITb7PuqmPsudYDTtK9E7G0BJy34Ym29KpPImatViUdPPaAOwdBGVILsi6ZZ0zaVas3YTwRdCkhSNXnz2qF_T7Eizx0f0V8CMZtGj7uEzLotBwMGA4RUC88pNfpQiO1EE8nvJpBRgN8J40krOFa-uDFA=s4800-w543-h345",
+          "selectedReason": "slot_storefront_score_129",
+          "rejectReason": null
+        },
+        {
+          "ts": 1783406226424,
+          "sectionId": "maid-cafe",
+          "slot": "experience",
+          "query": "content_place",
+          "phase": "place_photos",
+          "candidateCount": 10,
+          "photoIndex": 2,
+          "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZPm6ky5pnCyu6UMabQZ4Uf6cGN8-RgpXVgWx4o2q2MbFIL_8Q9yRcbixgxSqkeegO6NWqBfjglYtNrF2kQAAzklifkYPWTsM8LTcP4RLMRu5BDMr-vwRP7JbNFnX9RBeBwFx4aS-1XFHAlUJ0MwYURciw=s4800-w1600-h1200",
+          "selectedReason": "slot_experience_score_109",
+          "rejectReason": null
+        }
+      ]
+    },
     "sectionType": "cafe",
+    "role": null,
+    "rejectReason": null,
+    "editorialQA": {
+      "ok": true,
+      "issues": [],
+      "usePlaceholder": false
+    },
+    "venueSwapped": false,
+    "swappedFrom": null,
+    "swappedTo": null,
+    "alternativeId": null,
+    "heading": "秋葉原本店：女僕咖啡入門",
+    "content": "位於外神田住吉ビル6樓，是「めいどりーみん」的起點。入店需付入場費及低消一杯飲品，餐點可請女僕施展「萌萌心動」咒語繪製。與女僕合照需付費並經許可，店內攝影規範請依現場指示。感受獨特互動樂趣，是電氣街巡禮的必訪一站。",
+    "officialName": "Maidreamin Akihabara Main Store",
+    "officialNameLocal": "めいどりーみん 秋葉原 本店",
+    "pipeline": {
+      "version": "photo-search-retry-v1",
+      "steps": [
+        "copy_semantic_analysis",
+        "derive_photo_intent",
+        "place_verify",
+        "photo_search_retry",
+        "photo_first_pick",
+        "evidence_caption",
+        "rule_qa"
+      ],
+      "aiTokens": 0,
+      "photoSearchDebug": {
+        "sectionId": "maid-cafe",
+        "attempts": [
+          {
+            "ts": 1783406226396,
+            "sectionId": "maid-cafe",
+            "slot": "storefront",
+            "query": "placeId:ChIJyR7AdR6MGGAROowxIYdMsj0",
+            "phase": "place_photos",
+            "candidateCount": 10,
+            "selectedImageUrl": null,
+            "selectedReason": null,
+            "rejectReason": null
+          },
+          {
+            "ts": 1783406226411,
+            "sectionId": "maid-cafe",
+            "slot": "storefront",
+            "query": "content_place",
+            "phase": "place_photos",
+            "candidateCount": 10,
+            "photoIndex": 0,
+            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZNITb7PuqmPsudYDTtK9E7G0BJy34Ym29KpPImatViUdPPaAOwdBGVILsi6ZZ0zaVas3YTwRdCkhSNXnz2qF_T7Eizx0f0V8CMZtGj7uEzLotBwMGA4RUC88pNfpQiO1EE8nvJpBRgN8J40krOFa-uDFA=s4800-w543-h345",
+            "selectedReason": "slot_storefront_score_129",
+            "rejectReason": null
+          },
+          {
+            "ts": 1783406226424,
+            "sectionId": "maid-cafe",
+            "slot": "experience",
+            "query": "content_place",
+            "phase": "place_photos",
+            "candidateCount": 10,
+            "photoIndex": 2,
+            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZPm6ky5pnCyu6UMabQZ4Uf6cGN8-RgpXVgWx4o2q2MbFIL_8Q9yRcbixgxSqkeegO6NWqBfjglYtNrF2kQAAzklifkYPWTsM8LTcP4RLMRu5BDMr-vwRP7JbNFnX9RBeBwFx4aS-1XFHAlUJ0MwYURciw=s4800-w1600-h1200",
+            "selectedReason": "slot_experience_score_109",
+            "rejectReason": null
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sectionId": "nui-hostel",
+    "subject": "グリッズ 東京 浅草橋 ホテル & ホステル",
+    "mapsQuery": "Grids Tokyo Asakusabashi Hotel&Hostel",
+    "placeId": "ChIJjTWKIa6OGGAR6kmG9UpLIIU",
+    "googleRating": 4.2,
+    "googleAddress": "〒111-0053 東京都台東区浅草橋４丁目１１−６",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZPpehISfyQL2weH4bQ14IWKjcs6BkXaXyAlvY24c-XGieLkL0QPoeEHgrHHXUYXs7gnZwGTfQkx90LXY4rSBR9HzLcPwYKmOyL47pKxI7kiJSLx5Ltm9x4lU523P4e9yqw7OBp7yPHawKu4WQk=s4800-w1600-h1200",
+    "googleAttribution": "百目木陽介",
+    "imageSource": "google_places",
+    "matched": true,
+    "placeName": "グリッズ 東京 浅草橋 ホテル & ホステル",
+    "photoScore": 148,
+    "photoIndex": 0,
+    "photoCaption": "グリッズ東京浅草橋ホテル&ホステル的建築外觀與入口，從街上就能確認位置。",
+    "secondaryGooglePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZNU7n7wX0soOBatzUvN0pGDDdIll54FZjzKaNqH7h9tENq1ixM7oHWoKey5e-v-cpLsKQAh1iCKib5QMFTtxxqYITWUAf3Uo6XRVtWY2zHLcANPRiLBpLjoyViJAO3JiFp-dl0rJKfZ3coK9pM=s4800-w1600-h1200",
+    "secondaryGoogleAttribution": "Gou Nishi",
+    "secondaryCaption": "客房採簡約木質設計，採光充足，空間雖緊湊但收納完整。",
+    "secondaryPhotoSlot": "room",
+    "photoEvidence": {
+      "primary": "facade",
+      "types": [
+        "facade"
+      ],
+      "signals": [],
+      "subjectType": "venue",
+      "role": "hostel",
+      "blob": "百目木陽介"
+    },
+    "travelPhotoSlot": "exterior",
+    "copySemantics": {
+      "primary": "lobby",
+      "categories": [
+        "lobby",
+        "room",
+        "landmark",
+        "night",
+        "shop_collectible"
+      ],
+      "hits": [
+        {
+          "category": "lobby",
+          "score": 5,
+          "matched": [
+            "吧台",
+            "交誼",
+            "公共空間",
+            "交流",
+            "聚集"
+          ],
+          "evidence": [
+            "lobby_bar"
+          ]
+        },
+        {
+          "category": "room",
+          "score": 3,
+          "matched": [
+            "客房",
+            "床位",
+            "簡潔"
+          ],
+          "evidence": [
+            "room"
+          ]
+        },
+        {
+          "category": "landmark",
+          "score": 2,
+          "matched": [
+            "radio kaikan",
+            "朝聖"
+          ],
+          "evidence": [
+            "landmark_building",
+            "street_landmark"
+          ]
+        },
+        {
+          "category": "night",
+          "score": 1,
+          "matched": [
+            "傍晚"
+          ],
+          "evidence": [
+            "street_landmark",
+            "landmark_building"
+          ]
+        },
+        {
+          "category": "shop_collectible",
+          "score": 1,
+          "matched": [
+            "mandarake"
+          ],
+          "evidence": [
+            "anime_collectible",
+            "shop_interior"
+          ]
+        }
+      ],
+      "requiredEvidence": [
+        "landmark_building",
+        "street_landmark",
+        "anime_collectible",
+        "shop_interior",
+        "lobby_bar",
+        "room"
+      ],
+      "searchBoost": [
+        "radio kaikan",
+        "朝聖",
+        "傍晚",
+        "mandarake",
+        "吧台",
+        "交誼",
+        "公共空間",
+        "交流",
+        "聚集",
+        "客房",
+        "床位",
+        "簡潔"
+      ],
+      "copyExcerpt": "グリッズ 東京 浅草橋 ホテル & ホステル · 設計感旅宿落腳 淺草橋一帶的グリッズ 東京 浅草橋 ホテル & ホステル，簡潔客房、公共吧台、交誼空間，適合獨旅或預算控管。若喜歡交流，公共空間傍晚仍常有旅人聚集。週末床位記得提早訂。 不是購物清單，而是動漫迷的朝聖路線：從 Radio Kaikan 到 Mandarake 深處 グリッズ 東京 浅草橋 ホテル & ホステル Grids Tokyo Asakusabashi Hotel&Hostel"
+    },
+    "copyDerivedPhotoIntent": "Lobby、公共吧台、交誼空間、客房、房間、床位空間",
+    "matchedKeywords": [
+      "グリッズ"
+    ],
+    "photoPlaceName": "グリッズ 東京 浅草橋 ホテル & ホステル",
+    "searchUsed": "Nui. HOSTEL & BAR LOUNGE",
+    "photoSearchUsed": "venue_chosen_place",
+    "sectionType": "hostel",
     "role": null,
     "rejectReason": null,
     "editorialQA": {
@@ -1748,41 +1244,49 @@
       "usePlaceholder": false,
       "pass": true,
       "photoEvidence": {
-        "primary": "cafe_interior",
+        "primary": "facade",
         "types": [
-          "cafe_interior",
-          "cafe_interior"
+          "facade"
         ],
         "signals": [],
         "subjectType": "venue",
-        "role": "cafe",
-        "blob": "maid made 秋葉原駅前店"
+        "role": "hostel",
+        "blob": "百目木陽介"
       },
       "copySemantics": {
-        "primary": "cafe_experience",
+        "primary": "lobby",
         "categories": [
-          "cafe_experience",
+          "lobby",
+          "room",
           "landmark",
-          "shop_collectible",
-          "activity",
-          "street_scene",
-          "dish",
-          "dessert"
+          "night",
+          "shop_collectible"
         ],
         "hits": [
           {
-            "category": "cafe_experience",
+            "category": "lobby",
             "score": 5,
             "matched": [
-              "咖啡",
-              "主題內裝",
-              "maid",
-              "カフェ",
-              "體驗"
+              "吧台",
+              "交誼",
+              "公共空間",
+              "交流",
+              "聚集"
             ],
             "evidence": [
-              "dessert",
-              "cafe_interior"
+              "lobby_bar"
+            ]
+          },
+          {
+            "category": "room",
+            "score": 3,
+            "matched": [
+              "客房",
+              "床位",
+              "簡潔"
+            ],
+            "evidence": [
+              "room"
             ]
           },
           {
@@ -1798,35 +1302,10 @@
             ]
           },
           {
-            "category": "shop_collectible",
-            "score": 2,
-            "matched": [
-              "mandarake",
-              "挖寶"
-            ],
-            "evidence": [
-              "anime_collectible",
-              "shop_interior"
-            ]
-          },
-          {
-            "category": "activity",
-            "score": 2,
-            "matched": [
-              "體驗",
-              "巡禮"
-            ],
-            "evidence": [
-              "cafe_interior",
-              "anime_collectible",
-              "shop_interior"
-            ]
-          },
-          {
-            "category": "street_scene",
+            "category": "night",
             "score": 1,
             "matched": [
-              "電氣街"
+              "傍晚"
             ],
             "evidence": [
               "street_landmark",
@@ -1834,52 +1313,40 @@
             ]
           },
           {
-            "category": "dish",
+            "category": "shop_collectible",
             "score": 1,
             "matched": [
-              "補給"
+              "mandarake"
             ],
             "evidence": [
-              "food_dish"
-            ]
-          },
-          {
-            "category": "dessert",
-            "score": 1,
-            "matched": [
-              "甜點"
-            ],
-            "evidence": [
-              "dessert",
-              "cafe_interior"
+              "anime_collectible",
+              "shop_interior"
             ]
           }
         ],
         "requiredEvidence": [
-          "street_landmark",
           "landmark_building",
+          "street_landmark",
           "anime_collectible",
           "shop_interior",
-          "food_dish",
-          "dessert",
-          "cafe_interior"
+          "lobby_bar",
+          "room"
         ],
         "searchBoost": [
-          "電氣街",
           "radio kaikan",
           "朝聖",
+          "傍晚",
           "mandarake",
-          "挖寶",
-          "補給",
-          "甜點",
-          "咖啡",
-          "主題內裝",
-          "maid",
-          "カフェ",
-          "體驗",
-          "巡禮"
+          "吧台",
+          "交誼",
+          "公共空間",
+          "交流",
+          "聚集",
+          "客房",
+          "床位",
+          "簡潔"
         ],
-        "copyExcerpt": "MAID MADE 秋葉原駅前店 · 次文化體驗的一杯咖啡 秋葉原的MAID MADE 秋葉原駅前店，以動漫聯名甜點與角色主題內裝著稱，是東京動漫聖地巡禮——電氣街與中野的挖寶節奏途中常見的咖啡補給點。把時間控制在六十分鐘內，邊吃甜點邊整理剛買的戰利品，剛好留體力給下一間店。 不是購物清單，而是動漫迷的朝聖路線：從 Radio Kaikan 到 Mandarake 深處 MAID MADE 秋葉原駅前店 ufotableカフェTOKYO"
+        "copyExcerpt": "グリッズ 東京 浅草橋 ホテル & ホステル · 設計感旅宿落腳 淺草橋一帶的グリッズ 東京 浅草橋 ホテル & ホステル，簡潔客房、公共吧台、交誼空間，適合獨旅或預算控管。若喜歡交流，公共空間傍晚仍常有旅人聚集。週末床位記得提早訂。 不是購物清單，而是動漫迷的朝聖路線：從 Radio Kaikan 到 Mandarake 深處 グリッズ 東京 浅草橋 ホテル & ホステル Grids Tokyo Asakusabashi Hotel&Hostel"
       },
       "recommendation": "approve",
       "goldenRule": {
@@ -1903,1297 +1370,13 @@
       "modifyCopy": true
     },
     "venueSwapped": true,
-    "swappedFrom": "MAID MADE Akihabara",
-    "swappedTo": "MAID MADE 秋葉原駅前店",
-    "alternativeId": "ufotable-cafe-tokyo",
-    "heading": "MAID MADE 秋葉原駅前店 · 次文化體驗的一杯咖啡",
-    "content": "秋葉原的MAID MADE 秋葉原駅前店，以動漫聯名甜點與角色主題內裝著稱，是東京動漫聖地巡禮——電氣街與中野的挖寶節奏途中常見的咖啡補給點。把時間控制在六十分鐘內，邊吃甜點邊整理剛買的戰利品，剛好留體力給下一間店。",
-    "officialName": "MAID MADE 秋葉原駅前店",
-    "officialNameLocal": "ufotableカフェTOKYO",
-    "pipeline": {
-      "version": "photo-search-retry-v1",
-      "steps": [
-        "copy_semantic_analysis",
-        "derive_photo_intent",
-        "place_verify",
-        "photo_search_retry",
-        "photo_first_pick",
-        "evidence_caption",
-        "venue_fallback",
-        "rule_qa"
-      ],
-      "aiTokens": 0,
-      "photoSearchDebug": {
-        "sectionId": "maid-cafe",
-        "attempts": [
-          {
-            "ts": 1783332489144,
-            "sectionId": "maid-cafe",
-            "slot": "storefront",
-            "query": "placeId:ChIJvQtxBAaNGGARTiTMJ-Nzhvc",
-            "phase": "place_photos",
-            "candidateCount": 10,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332489159,
-            "sectionId": "maid-cafe",
-            "slot": "experience",
-            "query": "content_place",
-            "phase": "place_photos",
-            "candidateCount": 10,
-            "photoIndex": 1,
-            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZNLM2HL3uq2_iUhFu544p-HYOIlV9029dhYr65aVgyUh3VL43fboOflXkQT2mXFNvTsMMaTDhPFg40JDkgJbnWUYDYa8LGNwPD-ty9ehlcghjNe3uuZI4tdcujNxMkHGRMm45XxmmvWYjlbFUw=s4800-w669-h393",
-            "selectedReason": "slot_experience_score_106",
-            "rejectReason": null
-          }
-        ]
-      }
-    }
-  },
-  {
-    "sectionId": "hotel-gracery",
-    "subject": "秋葉原ワシントンホテル",
-    "mapsQuery": "Akihabara Washington Hotel Tokyo",
-    "placeId": "ChIJnxZoFqiOGGAReYJ1ck2lXiw",
-    "googleRating": 4.2,
-    "googleAddress": "Japan, 〒101-0025 Tokyo, Chiyoda City, Kanda Sakumachō, 1-chōme−８−３",
-    "googlePhotoUrl": null,
-    "googleAttribution": null,
-    "imageSource": null,
-    "matched": false,
-    "placeName": "Akihabara Washington Hotel",
-    "photoScore": null,
-    "photoIndex": null,
-    "photoCaption": null,
-    "photoEvidence": null,
-    "travelPhotoSlot": null,
-    "copySemantics": {
-      "primary": "street_scene",
-      "categories": [
-        "street_scene",
-        "room"
-      ],
-      "hits": [
-        {
-          "category": "street_scene",
-          "score": 1,
-          "matched": [
-            "電氣街"
-          ],
-          "evidence": [
-            "street_landmark",
-            "landmark_building"
-          ]
-        },
-        {
-          "category": "room",
-          "score": 1,
-          "matched": [
-            "客房"
-          ],
-          "evidence": [
-            "room"
-          ]
-        }
-      ],
-      "requiredEvidence": [
-        "street_landmark",
-        "landmark_building",
-        "room"
-      ],
-      "searchBoost": [
-        "電氣街",
-        "客房"
-      ],
-      "copyExcerpt": "レム秋葉原 · 步行可達電氣街 レム秋葉原落在千代田區，秋葉原站直結、客房緊湊實用，是把時間留給街上的務實落腳處。以秋葉原為基地、搭山手線往返各區，動線直覺。展期與週末記得提早訂房。 秋葉原ワシントンホテル 秋葉原ワシントンホテル"
-    },
-    "copyDerivedPhotoIntent": "街景、霓虹、人潮、地標建築外觀、客房、房間、床位空間",
-    "matchedKeywords": [],
-    "photoPlaceName": null,
-    "searchUsed": "placeId:ChIJnxZoFqiOGGAReYJ1ck2lXiw",
-    "photoSearchUsed": null,
-    "photoSearchPhase": null,
-    "photoSearchDebug": {
-      "sectionId": "hotel-gracery",
-      "attempts": [
-        {
-          "ts": 1783332490517,
-          "sectionId": "hotel-gracery",
-          "slot": "exterior",
-          "query": "placeId:ChIJnxZoFqiOGGAReYJ1ck2lXiw",
-          "phase": "place_photos",
-          "candidateCount": 10,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332490517,
-          "sectionId": "hotel-gracery",
-          "slot": null,
-          "query": "placeId:ChIJnxZoFqiOGGAReYJ1ck2lXiw",
-          "phase": "review_photos",
-          "candidateCount": 10,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": "content_place_no_match"
-        },
-        {
-          "ts": 1783332490685,
-          "sectionId": "hotel-gracery",
-          "slot": null,
-          "query": "秋葉原ワシントンホテル 客室",
-          "phase": "precise_local",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332490832,
-          "sectionId": "hotel-gracery",
-          "slot": null,
-          "query": "秋葉原ワシントンホテル",
-          "phase": "precise_local",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332490987,
-          "sectionId": "hotel-gracery",
-          "slot": null,
-          "query": "Akihabara Washington Hotel",
-          "phase": "precise_local",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332491149,
-          "sectionId": "hotel-gracery",
-          "slot": null,
-          "query": "Washington Hotel Akihabara",
-          "phase": "precise_local",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332491316,
-          "sectionId": "hotel-gracery",
-          "slot": null,
-          "query": "アキハバラワシントンホテル",
-          "phase": "precise_local",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332491546,
-          "sectionId": "hotel-gracery",
-          "slot": null,
-          "query": "秋葉原ワシントンホテル 外観",
-          "phase": "local_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332491767,
-          "sectionId": "hotel-gracery",
-          "slot": null,
-          "query": "秋葉原ワシントンホテル 入口",
-          "phase": "local_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332491999,
-          "sectionId": "hotel-gracery",
-          "slot": null,
-          "query": "秋葉原ワシントンホテル ロビー",
-          "phase": "local_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332492162,
-          "sectionId": "hotel-gracery",
-          "slot": null,
-          "query": "Akihabara Washington Hotel 外観",
-          "phase": "local_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332492363,
-          "sectionId": "hotel-gracery",
-          "slot": null,
-          "query": "Akihabara Washington Hotel 入口",
-          "phase": "local_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332492531,
-          "sectionId": "hotel-gracery",
-          "slot": null,
-          "query": "Akihabara Washington Hotel ロビー",
-          "phase": "local_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332492834,
-          "sectionId": "hotel-gracery",
-          "slot": null,
-          "query": "Akihabara Washington Hotel 客室",
-          "phase": "local_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332492980,
-          "sectionId": "hotel-gracery",
-          "slot": null,
-          "query": "Washington Hotel Akihabara 外観",
-          "phase": "local_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332493269,
-          "sectionId": "hotel-gracery",
-          "slot": null,
-          "query": "Washington Hotel Akihabara 入口",
-          "phase": "local_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332493431,
-          "sectionId": "hotel-gracery",
-          "slot": null,
-          "query": "Washington Hotel Akihabara ロビー",
-          "phase": "local_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332493615,
-          "sectionId": "hotel-gracery",
-          "slot": null,
-          "query": "Washington Hotel Akihabara 客室",
-          "phase": "local_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332494338,
-          "sectionId": "hotel-gracery",
-          "slot": null,
-          "query": "アキハバラワシントンホテル 外観",
-          "phase": "local_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332494596,
-          "sectionId": "hotel-gracery",
-          "slot": null,
-          "query": "アキハバラワシントンホテル 入口",
-          "phase": "local_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332494902,
-          "sectionId": "hotel-gracery",
-          "slot": null,
-          "query": "アキハバラワシントンホテル ロビー",
-          "phase": "local_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332495113,
-          "sectionId": "hotel-gracery",
-          "slot": null,
-          "query": "アキハバラワシントンホテル 客室",
-          "phase": "local_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332495286,
-          "sectionId": "hotel-gracery",
-          "slot": null,
-          "query": "秋葉原ワシントンホテル hotel exterior",
-          "phase": "english_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332495498,
-          "sectionId": "hotel-gracery",
-          "slot": null,
-          "query": "秋葉原ワシントンホテル entrance",
-          "phase": "english_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332495638,
-          "sectionId": "hotel-gracery",
-          "slot": null,
-          "query": "秋葉原ワシントンホテル lobby",
-          "phase": "english_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332495981,
-          "sectionId": "hotel-gracery",
-          "slot": null,
-          "query": "秋葉原ワシントンホテル room",
-          "phase": "english_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332496247,
-          "sectionId": "hotel-gracery",
-          "slot": null,
-          "query": "Akihabara Washington Hotel hotel exterior",
-          "phase": "english_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332496521,
-          "sectionId": "hotel-gracery",
-          "slot": null,
-          "query": "Akihabara Washington Hotel entrance",
-          "phase": "english_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332496710,
-          "sectionId": "hotel-gracery",
-          "slot": null,
-          "query": "Akihabara Washington Hotel lobby",
-          "phase": "english_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332496959,
-          "sectionId": "hotel-gracery",
-          "slot": null,
-          "query": "Akihabara Washington Hotel room",
-          "phase": "english_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        }
-      ]
-    },
-    "sectionType": "hotel",
-    "role": null,
-    "rejectReason": "exhausted_retry_plan",
-    "editorialQA": {
-      "ok": false,
-      "issues": [
-        "no_photo"
-      ],
-      "usePlaceholder": true,
-      "pass": false,
-      "recommendation": "use_placeholder",
-      "goldenRule": {
-        "principle": "圖片永遠服務文案；優先選旅遊者最想看到的照片（外觀/街景優先）。",
-        "rules": [
-          "街區/商圈/景點：第一張必須是代表整個區域的廣角街景、地標或全景",
-          "商店：第一張優先店門口或外觀，第二張才是店內",
-          "餐廳：第一張優先店門口、招牌、外觀，第二張才是餐點",
-          "住宿：第一張優先外觀/入口，第二張 Lobby，第三張房型",
-          "街區介紹必須至少有一張街景",
-          "圖片必須直接對應文案描述",
-          "搜尋優先當地語言，驗證不符則重新搜尋，禁止隨機 fallback",
-          "搜尋失敗必須依序 retry：精準店名 → 當地語言+外觀/街景 suffix → 英文 suffix → Place photos → 深度 photo index",
-          "若原訂地點無合格圖，依 venueAlternatives 換成同類型知名地點並改寫文案",
-          "改寫後文案必須與新地點、新圖片一致",
-          "如果仍找不到，寧可 placeholder，也不要放錯圖",
-          "Caption 只能描述圖片中真正看得到的內容",
-          "否則 Editorial QA 一律 FAIL"
-        ]
-      }
-    },
-    "venueSwapped": false,
-    "swappedFrom": null,
-    "swappedTo": null,
-    "alternativeId": null,
-    "heading": "レム秋葉原 · 步行可達電氣街",
-    "content": "レム秋葉原落在千代田區，秋葉原站直結、客房緊湊實用，是把時間留給街上的務實落腳處。以秋葉原為基地、搭山手線往返各區，動線直覺。展期與週末記得提早訂房。",
-    "officialName": "Akihabara Washington Hotel",
-    "officialNameLocal": "秋葉原ワシントンホテル",
-    "pipeline": {
-      "version": "photo-search-retry-v1",
-      "steps": [
-        "copy_semantic_analysis",
-        "derive_photo_intent",
-        "place_verify",
-        "photo_search_retry",
-        "photo_first_pick",
-        "evidence_caption",
-        "venue_fallback",
-        "rule_qa"
-      ],
-      "aiTokens": 0,
-      "photoSearchDebug": {
-        "sectionId": "hotel-gracery",
-        "attempts": [
-          {
-            "ts": 1783332490517,
-            "sectionId": "hotel-gracery",
-            "slot": "exterior",
-            "query": "placeId:ChIJnxZoFqiOGGAReYJ1ck2lXiw",
-            "phase": "place_photos",
-            "candidateCount": 10,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332490517,
-            "sectionId": "hotel-gracery",
-            "slot": null,
-            "query": "placeId:ChIJnxZoFqiOGGAReYJ1ck2lXiw",
-            "phase": "review_photos",
-            "candidateCount": 10,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": "content_place_no_match"
-          },
-          {
-            "ts": 1783332490685,
-            "sectionId": "hotel-gracery",
-            "slot": null,
-            "query": "秋葉原ワシントンホテル 客室",
-            "phase": "precise_local",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332490832,
-            "sectionId": "hotel-gracery",
-            "slot": null,
-            "query": "秋葉原ワシントンホテル",
-            "phase": "precise_local",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332490987,
-            "sectionId": "hotel-gracery",
-            "slot": null,
-            "query": "Akihabara Washington Hotel",
-            "phase": "precise_local",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332491149,
-            "sectionId": "hotel-gracery",
-            "slot": null,
-            "query": "Washington Hotel Akihabara",
-            "phase": "precise_local",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332491316,
-            "sectionId": "hotel-gracery",
-            "slot": null,
-            "query": "アキハバラワシントンホテル",
-            "phase": "precise_local",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332491546,
-            "sectionId": "hotel-gracery",
-            "slot": null,
-            "query": "秋葉原ワシントンホテル 外観",
-            "phase": "local_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332491767,
-            "sectionId": "hotel-gracery",
-            "slot": null,
-            "query": "秋葉原ワシントンホテル 入口",
-            "phase": "local_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332491999,
-            "sectionId": "hotel-gracery",
-            "slot": null,
-            "query": "秋葉原ワシントンホテル ロビー",
-            "phase": "local_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332492162,
-            "sectionId": "hotel-gracery",
-            "slot": null,
-            "query": "Akihabara Washington Hotel 外観",
-            "phase": "local_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332492363,
-            "sectionId": "hotel-gracery",
-            "slot": null,
-            "query": "Akihabara Washington Hotel 入口",
-            "phase": "local_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332492531,
-            "sectionId": "hotel-gracery",
-            "slot": null,
-            "query": "Akihabara Washington Hotel ロビー",
-            "phase": "local_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332492834,
-            "sectionId": "hotel-gracery",
-            "slot": null,
-            "query": "Akihabara Washington Hotel 客室",
-            "phase": "local_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332492980,
-            "sectionId": "hotel-gracery",
-            "slot": null,
-            "query": "Washington Hotel Akihabara 外観",
-            "phase": "local_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332493269,
-            "sectionId": "hotel-gracery",
-            "slot": null,
-            "query": "Washington Hotel Akihabara 入口",
-            "phase": "local_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332493431,
-            "sectionId": "hotel-gracery",
-            "slot": null,
-            "query": "Washington Hotel Akihabara ロビー",
-            "phase": "local_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332493615,
-            "sectionId": "hotel-gracery",
-            "slot": null,
-            "query": "Washington Hotel Akihabara 客室",
-            "phase": "local_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332494338,
-            "sectionId": "hotel-gracery",
-            "slot": null,
-            "query": "アキハバラワシントンホテル 外観",
-            "phase": "local_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332494596,
-            "sectionId": "hotel-gracery",
-            "slot": null,
-            "query": "アキハバラワシントンホテル 入口",
-            "phase": "local_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332494902,
-            "sectionId": "hotel-gracery",
-            "slot": null,
-            "query": "アキハバラワシントンホテル ロビー",
-            "phase": "local_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332495113,
-            "sectionId": "hotel-gracery",
-            "slot": null,
-            "query": "アキハバラワシントンホテル 客室",
-            "phase": "local_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332495286,
-            "sectionId": "hotel-gracery",
-            "slot": null,
-            "query": "秋葉原ワシントンホテル hotel exterior",
-            "phase": "english_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332495498,
-            "sectionId": "hotel-gracery",
-            "slot": null,
-            "query": "秋葉原ワシントンホテル entrance",
-            "phase": "english_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332495638,
-            "sectionId": "hotel-gracery",
-            "slot": null,
-            "query": "秋葉原ワシントンホテル lobby",
-            "phase": "english_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332495981,
-            "sectionId": "hotel-gracery",
-            "slot": null,
-            "query": "秋葉原ワシントンホテル room",
-            "phase": "english_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332496247,
-            "sectionId": "hotel-gracery",
-            "slot": null,
-            "query": "Akihabara Washington Hotel hotel exterior",
-            "phase": "english_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332496521,
-            "sectionId": "hotel-gracery",
-            "slot": null,
-            "query": "Akihabara Washington Hotel entrance",
-            "phase": "english_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332496710,
-            "sectionId": "hotel-gracery",
-            "slot": null,
-            "query": "Akihabara Washington Hotel lobby",
-            "phase": "english_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332496959,
-            "sectionId": "hotel-gracery",
-            "slot": null,
-            "query": "Akihabara Washington Hotel room",
-            "phase": "english_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          }
-        ]
-      }
-    }
-  },
-  {
-    "sectionId": "nui-hostel",
-    "subject": "Nui Hostel Tokyo",
-    "mapsQuery": "Nui Hostel & Bar Tokyo",
-    "placeId": "ChIJ4U-9KsiOGGARARhaBLZLqS0",
-    "googleRating": 4.5,
-    "googleAddress": "2-chōme-14-13 Kuramae, Taito City, Tokyo 111-0051, Japan",
-    "googlePhotoUrl": null,
-    "googleAttribution": null,
-    "imageSource": null,
-    "matched": false,
-    "placeName": "Nui. Hostel & Bar Lounge",
-    "photoScore": null,
-    "photoIndex": null,
-    "photoCaption": null,
-    "photoEvidence": null,
-    "travelPhotoSlot": null,
-    "copySemantics": {
-      "primary": "lobby",
-      "categories": [
-        "lobby",
-        "night",
-        "room"
-      ],
-      "hits": [
-        {
-          "category": "lobby",
-          "score": 4,
-          "matched": [
-            "交誼",
-            "公共空間",
-            "交流",
-            "聚集"
-          ],
-          "evidence": [
-            "lobby_bar"
-          ]
-        },
-        {
-          "category": "night",
-          "score": 1,
-          "matched": [
-            "傍晚"
-          ],
-          "evidence": [
-            "street_landmark",
-            "landmark_building"
-          ]
-        },
-        {
-          "category": "room",
-          "score": 1,
-          "matched": [
-            "床位"
-          ],
-          "evidence": [
-            "room"
-          ]
-        }
-      ],
-      "requiredEvidence": [
-        "street_landmark",
-        "landmark_building",
-        "lobby_bar",
-        "room"
-      ],
-      "searchBoost": [
-        "傍晚",
-        "交誼",
-        "公共空間",
-        "交流",
-        "聚集",
-        "床位"
-      ],
-      "copyExcerpt": "グリッズ 東京 浅草橋 ホテル & ホステル · 設計感旅宿落腳 淺草橋一帶的グリッズ 東京 浅草橋 ホテル & ホステル，淺草橋一帶的設計旅宿與交誼空間，適合獨旅或預算控管。若喜歡交流，公共空間傍晚仍常有旅人聚集。週末床位記得提早訂。 Nui Hostel Tokyo Nui Hostel Tokyo"
-    },
-    "copyDerivedPhotoIntent": "Lobby、公共吧台、交誼空間、夜景霓虹、傍晚街景",
-    "matchedKeywords": [],
-    "photoPlaceName": null,
-    "searchUsed": "placeId:ChIJ4U-9KsiOGGARARhaBLZLqS0",
-    "photoSearchUsed": null,
-    "photoSearchPhase": null,
-    "photoSearchDebug": {
-      "sectionId": "nui-hostel",
-      "attempts": [
-        {
-          "ts": 1783332498491,
-          "sectionId": "nui-hostel",
-          "slot": "exterior",
-          "query": "placeId:ChIJ4U-9KsiOGGARARhaBLZLqS0",
-          "phase": "place_photos",
-          "candidateCount": 10,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332498491,
-          "sectionId": "nui-hostel",
-          "slot": null,
-          "query": "placeId:ChIJ4U-9KsiOGGARARhaBLZLqS0",
-          "phase": "review_photos",
-          "candidateCount": 10,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": "content_place_no_match"
-        },
-        {
-          "ts": 1783332498619,
-          "sectionId": "nui-hostel",
-          "slot": null,
-          "query": "Nui. HOSTEL & BAR LOUNGE",
-          "phase": "precise_local",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332498810,
-          "sectionId": "nui-hostel",
-          "slot": null,
-          "query": "Nui. HOSTEL & BAR LOUNGE 客室",
-          "phase": "precise_local",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332498952,
-          "sectionId": "nui-hostel",
-          "slot": null,
-          "query": "Nui Hostel Tokyo",
-          "phase": "precise_local",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332499097,
-          "sectionId": "nui-hostel",
-          "slot": null,
-          "query": "Nui Hostel Kuramae",
-          "phase": "precise_local",
-          "candidateCount": 2,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332499233,
-          "sectionId": "nui-hostel",
-          "slot": null,
-          "query": "Nui. HOSTEL & BAR LOUNGE 外観",
-          "phase": "local_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332499376,
-          "sectionId": "nui-hostel",
-          "slot": null,
-          "query": "Nui. HOSTEL & BAR LOUNGE 入口",
-          "phase": "local_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332499519,
-          "sectionId": "nui-hostel",
-          "slot": null,
-          "query": "Nui. HOSTEL & BAR LOUNGE ロビー",
-          "phase": "local_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332499669,
-          "sectionId": "nui-hostel",
-          "slot": null,
-          "query": "Nui. HOSTEL & BAR LOUNGE 客室",
-          "phase": "local_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332499886,
-          "sectionId": "nui-hostel",
-          "slot": null,
-          "query": "Nui Hostel Tokyo 外観",
-          "phase": "local_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332500039,
-          "sectionId": "nui-hostel",
-          "slot": null,
-          "query": "Nui Hostel Tokyo 入口",
-          "phase": "local_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332500205,
-          "sectionId": "nui-hostel",
-          "slot": null,
-          "query": "Nui Hostel Tokyo ロビー",
-          "phase": "local_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332500410,
-          "sectionId": "nui-hostel",
-          "slot": null,
-          "query": "Nui Hostel Tokyo 客室",
-          "phase": "local_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332500575,
-          "sectionId": "nui-hostel",
-          "slot": null,
-          "query": "Nui Hostel Kuramae 外観",
-          "phase": "local_suffix",
-          "candidateCount": 2,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332500716,
-          "sectionId": "nui-hostel",
-          "slot": null,
-          "query": "Nui Hostel Kuramae 入口",
-          "phase": "local_suffix",
-          "candidateCount": 2,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332500958,
-          "sectionId": "nui-hostel",
-          "slot": null,
-          "query": "Nui Hostel Kuramae ロビー",
-          "phase": "local_suffix",
-          "candidateCount": 2,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332501129,
-          "sectionId": "nui-hostel",
-          "slot": null,
-          "query": "Nui Hostel Kuramae 客室",
-          "phase": "local_suffix",
-          "candidateCount": 2,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332501299,
-          "sectionId": "nui-hostel",
-          "slot": null,
-          "query": "Nui. HOSTEL & BAR LOUNGE hostel exterior",
-          "phase": "english_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332501480,
-          "sectionId": "nui-hostel",
-          "slot": null,
-          "query": "Nui. HOSTEL & BAR LOUNGE entrance",
-          "phase": "english_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332501623,
-          "sectionId": "nui-hostel",
-          "slot": null,
-          "query": "Nui. HOSTEL & BAR LOUNGE lobby",
-          "phase": "english_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332501870,
-          "sectionId": "nui-hostel",
-          "slot": null,
-          "query": "Nui. HOSTEL & BAR LOUNGE room",
-          "phase": "english_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332502024,
-          "sectionId": "nui-hostel",
-          "slot": null,
-          "query": "Nui Hostel Tokyo hostel exterior",
-          "phase": "english_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332502187,
-          "sectionId": "nui-hostel",
-          "slot": null,
-          "query": "Nui Hostel Tokyo entrance",
-          "phase": "english_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332502325,
-          "sectionId": "nui-hostel",
-          "slot": null,
-          "query": "Nui Hostel Tokyo lobby",
-          "phase": "english_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332502580,
-          "sectionId": "nui-hostel",
-          "slot": null,
-          "query": "Nui Hostel Tokyo room",
-          "phase": "english_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332502766,
-          "sectionId": "nui-hostel",
-          "slot": null,
-          "query": "Nui Hostel Kuramae hostel exterior",
-          "phase": "english_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332502922,
-          "sectionId": "nui-hostel",
-          "slot": null,
-          "query": "Nui Hostel Kuramae entrance",
-          "phase": "english_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332503092,
-          "sectionId": "nui-hostel",
-          "slot": null,
-          "query": "Nui Hostel Kuramae lobby",
-          "phase": "english_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332503278,
-          "sectionId": "nui-hostel",
-          "slot": null,
-          "query": "Nui Hostel Kuramae room",
-          "phase": "english_suffix",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        }
-      ]
-    },
-    "sectionType": "hostel",
-    "role": null,
-    "rejectReason": "exhausted_retry_plan",
-    "editorialQA": {
-      "ok": false,
-      "issues": [
-        "no_photo"
-      ],
-      "usePlaceholder": true,
-      "pass": false,
-      "recommendation": "use_placeholder",
-      "goldenRule": {
-        "principle": "圖片永遠服務文案；優先選旅遊者最想看到的照片（外觀/街景優先）。",
-        "rules": [
-          "街區/商圈/景點：第一張必須是代表整個區域的廣角街景、地標或全景",
-          "商店：第一張優先店門口或外觀，第二張才是店內",
-          "餐廳：第一張優先店門口、招牌、外觀，第二張才是餐點",
-          "住宿：第一張優先外觀/入口，第二張 Lobby，第三張房型",
-          "街區介紹必須至少有一張街景",
-          "圖片必須直接對應文案描述",
-          "搜尋優先當地語言，驗證不符則重新搜尋，禁止隨機 fallback",
-          "搜尋失敗必須依序 retry：精準店名 → 當地語言+外觀/街景 suffix → 英文 suffix → Place photos → 深度 photo index",
-          "若原訂地點無合格圖，依 venueAlternatives 換成同類型知名地點並改寫文案",
-          "改寫後文案必須與新地點、新圖片一致",
-          "如果仍找不到，寧可 placeholder，也不要放錯圖",
-          "Caption 只能描述圖片中真正看得到的內容",
-          "否則 Editorial QA 一律 FAIL"
-        ]
-      }
-    },
-    "venueSwapped": false,
-    "swappedFrom": null,
-    "swappedTo": null,
-    "alternativeId": null,
+    "swappedFrom": "Nui. HOSTEL & BAR LOUNGE",
+    "swappedTo": "グリッズ 東京 浅草橋 ホテル & ホステル",
+    "alternativeId": "Grids Tokyo Asakusabashi Hotel&Hostel",
     "heading": "グリッズ 東京 浅草橋 ホテル & ホステル · 設計感旅宿落腳",
-    "content": "淺草橋一帶的グリッズ 東京 浅草橋 ホテル & ホステル，淺草橋一帶的設計旅宿與交誼空間，適合獨旅或預算控管。若喜歡交流，公共空間傍晚仍常有旅人聚集。週末床位記得提早訂。",
-    "officialName": "Nui. Hostel & Bar Lounge",
-    "officialNameLocal": "Nui. HOSTEL & BAR LOUNGE",
+    "content": "淺草橋一帶的グリッズ 東京 浅草橋 ホテル & ホステル，簡潔客房、公共吧台、交誼空間，適合獨旅或預算控管。若喜歡交流，公共空間傍晚仍常有旅人聚集。週末床位記得提早訂。",
+    "officialName": "グリッズ 東京 浅草橋 ホテル & ホステル",
+    "officialNameLocal": "グリッズ 東京 浅草橋 ホテル & ホステル",
     "pipeline": {
       "version": "photo-search-retry-v1",
       "steps": [
@@ -3211,7 +1394,7 @@
         "sectionId": "nui-hostel",
         "attempts": [
           {
-            "ts": 1783332498491,
+            "ts": 1783406226688,
             "sectionId": "nui-hostel",
             "slot": "exterior",
             "query": "placeId:ChIJ4U-9KsiOGGARARhaBLZLqS0",
@@ -3222,322 +1405,217 @@
             "rejectReason": null
           },
           {
-            "ts": 1783332498491,
+            "ts": 1783406226704,
             "sectionId": "nui-hostel",
-            "slot": null,
-            "query": "placeId:ChIJ4U-9KsiOGGARARhaBLZLqS0",
-            "phase": "review_photos",
+            "slot": "room",
+            "query": "content_place",
+            "phase": "place_photos",
+            "candidateCount": 10,
+            "photoIndex": 1,
+            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjBBXzyXq_NTgb_OLkt2jooLn2oHtrFa7hgJHTThZhg_xXt7PGIStpthxEANnnusG3suHBs--cXU2EvvIVp8nfc19cxBmc_Dh2Pq0b2OsJR-xXoq4JaBLKJTYcLzDNmrM9bTs08qsbOFuhWISBQ=s4800-w1600-h1200",
+            "selectedReason": "slot_room_score_163",
+            "rejectReason": null
+          },
+          {
+            "ts": 1783406226733,
+            "sectionId": "nui-hostel",
+            "slot": "room",
+            "query": "content_place",
+            "phase": "place_photos",
+            "candidateCount": 10,
+            "photoIndex": 2,
+            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjDjOlDya78uypWA83A_PkdTxWJEDn6tLZBUSw7GzG_jNHVnxCLvxNrGb9j6_4Xs42FRyRGueil-fqc5v2IjMsiHi-flNEJH3J4_RsyQjkkeQvWydhYq1wYSAehTI3oSZnnqa993yO3IMwDttA=s4800-w1600-h1200",
+            "selectedReason": "slot_room_score_163",
+            "rejectReason": null
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sectionId": "hotel-gracery",
+    "subject": "新宿格拉斯麗酒店：哥吉拉的守護",
+    "mapsQuery": "Hotel Gracery Shinjuku",
+    "placeId": "ChIJH8hUDqiOGGARKbhUAocHMfs",
+    "googleRating": 4.3,
+    "googleAddress": "〒101-0025 東京都千代田区神田佐久間町１丁目６−５",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZOd5GYz4NBX_apXKje5CMfcQD7_Xnccc7_hHoWUDyI-W8xiK0G8G1PWEk393Y411LxnI30QqGZI_X6P4klB8GvCIY7hAwrP4ajiTWkGZRRPAfKJi0gVDT7ChqUi9S0Igsa2yhhwrGot4adE9w=s4800-w1600-h1200",
+    "googleAttribution": "レム秋葉原",
+    "imageSource": "google_places",
+    "matched": true,
+    "placeName": "レム秋葉原",
+    "photoScore": 148,
+    "photoIndex": 0,
+    "photoCaption": "レム秋葉原的建築外觀與入口，從街上就能確認位置。",
+    "secondaryGooglePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZN2xkzUaIXpf_rbuG6mhxNq1dqou8CkZHCBKQ2HN-bfWyfedUlvSlcmemkRJhet8cd3qychqQq_qGeSQaVRlpWtkNEABWc8mivtoGsW3ZsDWMKxtDc2A-jNaa8MFoDQbeNHjD2sq6h1g2zA-sY=s4800-w1600-h1200",
+    "secondaryGoogleAttribution": "レム秋葉原",
+    "secondaryCaption": "客房採簡約木質設計，採光充足，空間雖緊湊但收納完整。",
+    "secondaryPhotoSlot": "room",
+    "photoEvidence": {
+      "primary": "facade",
+      "types": [
+        "facade"
+      ],
+      "signals": [],
+      "subjectType": "venue",
+      "role": "hotel",
+      "blob": ""
+    },
+    "travelPhotoSlot": "exterior",
+    "copySemantics": {
+      "primary": "room",
+      "categories": [
+        "room",
+        "landmark"
+      ],
+      "hits": [
+        {
+          "category": "room",
+          "score": 2,
+          "matched": [
+            "客房",
+            "房間"
+          ],
+          "evidence": [
+            "room"
+          ]
+        },
+        {
+          "category": "landmark",
+          "score": 1,
+          "matched": [
+            "地標"
+          ],
+          "evidence": [
+            "landmark_building",
+            "street_landmark"
+          ]
+        }
+      ],
+      "requiredEvidence": [
+        "landmark_building",
+        "street_landmark",
+        "room"
+      ],
+      "searchBoost": [
+        "地標",
+        "客房",
+        "房間"
+      ],
+      "copyExcerpt": "新宿格拉斯麗酒店：哥吉拉的守護 提到新宿格拉斯麗，最吸睛的莫過於矗立在樓頂的巨大哥吉拉頭像！這不僅是酒店特色，更是新宿的地標。酒店位置優越，房間舒適，部分客房還能近距離欣賞哥吉拉。夜晚，哥吉拉的眼睛會發光，為你的東京之夜增添一份奇幻色彩。 新宿格拉斯麗酒店：哥吉拉的守護 新宿格拉斯麗酒店：哥吉拉的守護"
+    },
+    "copyDerivedPhotoIntent": "客房、房間、床位空間、地標建築、代表性招牌、街區辨識點",
+    "matchedKeywords": [
+      "レム秋葉原",
+      "レム"
+    ],
+    "photoPlaceName": "レム秋葉原",
+    "searchUsed": "remm Akihabara",
+    "photoSearchUsed": "content_place",
+    "photoSearchDebug": {
+      "sectionId": "hotel-gracery",
+      "attempts": [
+        {
+          "ts": 1783406229802,
+          "sectionId": "hotel-gracery",
+          "slot": "exterior",
+          "query": "placeId:ChIJH8hUDqiOGGARKbhUAocHMfs",
+          "phase": "place_photos",
+          "candidateCount": 10,
+          "selectedImageUrl": null,
+          "selectedReason": null,
+          "rejectReason": null
+        },
+        {
+          "ts": 1783406229817,
+          "sectionId": "hotel-gracery",
+          "slot": "exterior",
+          "query": "content_place",
+          "phase": "place_photos",
+          "candidateCount": 10,
+          "photoIndex": 0,
+          "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZOd5GYz4NBX_apXKje5CMfcQD7_Xnccc7_hHoWUDyI-W8xiK0G8G1PWEk393Y411LxnI30QqGZI_X6P4klB8GvCIY7hAwrP4ajiTWkGZRRPAfKJi0gVDT7ChqUi9S0Igsa2yhhwrGot4adE9w=s4800-w1600-h1200",
+          "selectedReason": "slot_exterior_score_148",
+          "rejectReason": null
+        },
+        {
+          "ts": 1783406229829,
+          "sectionId": "hotel-gracery",
+          "slot": "room",
+          "query": "content_place",
+          "phase": "place_photos",
+          "candidateCount": 10,
+          "photoIndex": 1,
+          "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZN2xkzUaIXpf_rbuG6mhxNq1dqou8CkZHCBKQ2HN-bfWyfedUlvSlcmemkRJhet8cd3qychqQq_qGeSQaVRlpWtkNEABWc8mivtoGsW3ZsDWMKxtDc2A-jNaa8MFoDQbeNHjD2sq6h1g2zA-sY=s4800-w1600-h1200",
+          "selectedReason": "slot_room_score_75",
+          "rejectReason": null
+        }
+      ]
+    },
+    "sectionType": "hotel",
+    "role": null,
+    "rejectReason": null,
+    "editorialQA": {
+      "ok": true,
+      "issues": [],
+      "usePlaceholder": false
+    },
+    "venueSwapped": false,
+    "swappedFrom": null,
+    "swappedTo": null,
+    "alternativeId": null,
+    "heading": "新宿格拉斯麗酒店：哥吉拉的守護",
+    "content": "提到新宿格拉斯麗，最吸睛的莫過於矗立在樓頂的巨大哥吉拉頭像！這不僅是酒店特色，更是新宿的地標。酒店位置優越，房間舒適，部分客房還能近距離欣賞哥吉拉。夜晚，哥吉拉的眼睛會發光，為你的東京之夜增添一份奇幻色彩。",
+    "officialName": "Hotel Gracery Shinjuku",
+    "officialNameLocal": "ホテルグレイスリー新宿",
+    "pipeline": {
+      "version": "photo-search-retry-v1",
+      "steps": [
+        "copy_semantic_analysis",
+        "derive_photo_intent",
+        "place_verify",
+        "photo_search_retry",
+        "photo_first_pick",
+        "evidence_caption",
+        "rule_qa"
+      ],
+      "aiTokens": 0,
+      "photoSearchDebug": {
+        "sectionId": "hotel-gracery",
+        "attempts": [
+          {
+            "ts": 1783406229802,
+            "sectionId": "hotel-gracery",
+            "slot": "exterior",
+            "query": "placeId:ChIJH8hUDqiOGGARKbhUAocHMfs",
+            "phase": "place_photos",
             "candidateCount": 10,
             "selectedImageUrl": null,
             "selectedReason": null,
-            "rejectReason": "content_place_no_match"
-          },
-          {
-            "ts": 1783332498619,
-            "sectionId": "nui-hostel",
-            "slot": null,
-            "query": "Nui. HOSTEL & BAR LOUNGE",
-            "phase": "precise_local",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
             "rejectReason": null
           },
           {
-            "ts": 1783332498810,
-            "sectionId": "nui-hostel",
-            "slot": null,
-            "query": "Nui. HOSTEL & BAR LOUNGE 客室",
-            "phase": "precise_local",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
+            "ts": 1783406229817,
+            "sectionId": "hotel-gracery",
+            "slot": "exterior",
+            "query": "content_place",
+            "phase": "place_photos",
+            "candidateCount": 10,
+            "photoIndex": 0,
+            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZOd5GYz4NBX_apXKje5CMfcQD7_Xnccc7_hHoWUDyI-W8xiK0G8G1PWEk393Y411LxnI30QqGZI_X6P4klB8GvCIY7hAwrP4ajiTWkGZRRPAfKJi0gVDT7ChqUi9S0Igsa2yhhwrGot4adE9w=s4800-w1600-h1200",
+            "selectedReason": "slot_exterior_score_148",
             "rejectReason": null
           },
           {
-            "ts": 1783332498952,
-            "sectionId": "nui-hostel",
-            "slot": null,
-            "query": "Nui Hostel Tokyo",
-            "phase": "precise_local",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332499097,
-            "sectionId": "nui-hostel",
-            "slot": null,
-            "query": "Nui Hostel Kuramae",
-            "phase": "precise_local",
-            "candidateCount": 2,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332499233,
-            "sectionId": "nui-hostel",
-            "slot": null,
-            "query": "Nui. HOSTEL & BAR LOUNGE 外観",
-            "phase": "local_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332499376,
-            "sectionId": "nui-hostel",
-            "slot": null,
-            "query": "Nui. HOSTEL & BAR LOUNGE 入口",
-            "phase": "local_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332499519,
-            "sectionId": "nui-hostel",
-            "slot": null,
-            "query": "Nui. HOSTEL & BAR LOUNGE ロビー",
-            "phase": "local_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332499669,
-            "sectionId": "nui-hostel",
-            "slot": null,
-            "query": "Nui. HOSTEL & BAR LOUNGE 客室",
-            "phase": "local_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332499886,
-            "sectionId": "nui-hostel",
-            "slot": null,
-            "query": "Nui Hostel Tokyo 外観",
-            "phase": "local_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332500039,
-            "sectionId": "nui-hostel",
-            "slot": null,
-            "query": "Nui Hostel Tokyo 入口",
-            "phase": "local_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332500205,
-            "sectionId": "nui-hostel",
-            "slot": null,
-            "query": "Nui Hostel Tokyo ロビー",
-            "phase": "local_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332500410,
-            "sectionId": "nui-hostel",
-            "slot": null,
-            "query": "Nui Hostel Tokyo 客室",
-            "phase": "local_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332500575,
-            "sectionId": "nui-hostel",
-            "slot": null,
-            "query": "Nui Hostel Kuramae 外観",
-            "phase": "local_suffix",
-            "candidateCount": 2,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332500716,
-            "sectionId": "nui-hostel",
-            "slot": null,
-            "query": "Nui Hostel Kuramae 入口",
-            "phase": "local_suffix",
-            "candidateCount": 2,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332500958,
-            "sectionId": "nui-hostel",
-            "slot": null,
-            "query": "Nui Hostel Kuramae ロビー",
-            "phase": "local_suffix",
-            "candidateCount": 2,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332501129,
-            "sectionId": "nui-hostel",
-            "slot": null,
-            "query": "Nui Hostel Kuramae 客室",
-            "phase": "local_suffix",
-            "candidateCount": 2,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332501299,
-            "sectionId": "nui-hostel",
-            "slot": null,
-            "query": "Nui. HOSTEL & BAR LOUNGE hostel exterior",
-            "phase": "english_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332501480,
-            "sectionId": "nui-hostel",
-            "slot": null,
-            "query": "Nui. HOSTEL & BAR LOUNGE entrance",
-            "phase": "english_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332501623,
-            "sectionId": "nui-hostel",
-            "slot": null,
-            "query": "Nui. HOSTEL & BAR LOUNGE lobby",
-            "phase": "english_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332501870,
-            "sectionId": "nui-hostel",
-            "slot": null,
-            "query": "Nui. HOSTEL & BAR LOUNGE room",
-            "phase": "english_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332502024,
-            "sectionId": "nui-hostel",
-            "slot": null,
-            "query": "Nui Hostel Tokyo hostel exterior",
-            "phase": "english_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332502187,
-            "sectionId": "nui-hostel",
-            "slot": null,
-            "query": "Nui Hostel Tokyo entrance",
-            "phase": "english_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332502325,
-            "sectionId": "nui-hostel",
-            "slot": null,
-            "query": "Nui Hostel Tokyo lobby",
-            "phase": "english_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332502580,
-            "sectionId": "nui-hostel",
-            "slot": null,
-            "query": "Nui Hostel Tokyo room",
-            "phase": "english_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332502766,
-            "sectionId": "nui-hostel",
-            "slot": null,
-            "query": "Nui Hostel Kuramae hostel exterior",
-            "phase": "english_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332502922,
-            "sectionId": "nui-hostel",
-            "slot": null,
-            "query": "Nui Hostel Kuramae entrance",
-            "phase": "english_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332503092,
-            "sectionId": "nui-hostel",
-            "slot": null,
-            "query": "Nui Hostel Kuramae lobby",
-            "phase": "english_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332503278,
-            "sectionId": "nui-hostel",
-            "slot": null,
-            "query": "Nui Hostel Kuramae room",
-            "phase": "english_suffix",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
+            "ts": 1783406229829,
+            "sectionId": "hotel-gracery",
+            "slot": "room",
+            "query": "content_place",
+            "phase": "place_photos",
+            "candidateCount": 10,
+            "photoIndex": 1,
+            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZN2xkzUaIXpf_rbuG6mhxNq1dqou8CkZHCBKQ2HN-bfWyfedUlvSlcmemkRJhet8cd3qychqQq_qGeSQaVRlpWtkNEABWc8mivtoGsW3ZsDWMKxtDc2A-jNaa8MFoDQbeNHjD2sq6h1g2zA-sY=s4800-w1600-h1200",
+            "selectedReason": "slot_room_score_75",
             "rejectReason": null
           }
         ]
@@ -3547,18 +1625,18 @@
   {
     "sectionId": "hero-anime",
     "subject": "秋葉原電氣街",
-    "mapsQuery": "Radio Kaikan Akihabara Tokyo",
+    "mapsQuery": "Akihabara Electric Town Chuo Dori Tokyo",
     "placeId": "ChIJ__-AdayOGGAR6EGPwvcpzTA",
     "googleRating": 4.3,
     "googleAddress": "1-chōme-15-16 Sotokanda, Chiyoda City, Tokyo 101-0021, Japan",
-    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZPSKpcC17ugD4ix9t-pNdZKZab57DaufejNoDlBROclKKINEK-gvsc7-6ESmvP7Q9jNUBsnAk-nABEZf2ZyuLKRCcnM4yr8T7x4-Dde_5LH8ONvJZyknyte_eMRVeKhbBD9Hg4NqtgXjEzjmt_0D85aWQ=s4800-w1600-h1200",
-    "googleAttribution": "Dario Borselli",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZM4jLX8CPit4fycc_kYPp732Iv7GPguJ1q779aYpYKc63AtIfBZVnMRDeb8w6DGZBk6aR8gRKCdGH20jnZRzNYzQduW3fm6UtCXv8hlXOez7gSxObvuWIGDTDhyh2Pwn4Btdr_81jWplOuJFg50Ej3BZw=s4800-w1600-h1200",
+    "googleAttribution": "Giampaolo Mancinelli",
     "imageSource": "google_places",
     "matched": true,
     "placeName": "Akihabara Radio Kaikan",
-    "photoScore": 289,
-    "photoIndex": 2,
-    "photoCaption": "GIGO大型看板矗立街頭，是電氣街一眼辨識的地標。",
+    "photoScore": 303,
+    "photoIndex": 1,
+    "photoCaption": "RadioKaikan外牆滿版動漫廣告，是這條電氣街最醒目的地標之一。",
     "photoEvidence": {
       "primary": "street_landmark",
       "types": [
@@ -3566,12 +1644,12 @@
         "street_landmark"
       ],
       "signals": [
-        "gigo",
-        "gigo"
+        "radio kaikan",
+        "radio kaikan"
       ],
       "subjectType": "district",
       "role": "opening",
-      "blob": "dario borselli gigo akihabara building 3 gigo gigo"
+      "blob": "giampaolo mancinelli akihabara radio kaikan radio kaikan radio kaikan"
     },
     "travelPhotoSlot": "district_panorama",
     "copySemantics": {
@@ -3616,19 +1694,18 @@
     },
     "copyDerivedPhotoIntent": "街景、霓虹、人潮、地標建築外觀、地標建築、代表性招牌、街區辨識點",
     "matchedKeywords": [
-      "GIGO",
-      "GIGO",
-      "GIGO"
+      "Radio Kaikan",
+      "Radio Kaikan",
+      "Radio Kaikan"
     ],
-    "photoPlaceName": "GiGO Akihabara Building 3",
+    "photoPlaceName": "Akihabara Radio Kaikan",
     "searchUsed": "placeId:ChIJ__-AdayOGGAR6EGPwvcpzTA",
-    "photoSearchUsed": "GIGO 秋葉原 中央通",
-    "photoSearchPhase": "precise_local",
+    "photoSearchUsed": "content_place",
     "photoSearchDebug": {
       "sectionId": "hero-anime",
       "attempts": [
         {
-          "ts": 1783332505259,
+          "ts": 1783406229904,
           "sectionId": "hero-anime",
           "slot": "district_panorama",
           "query": "placeId:ChIJ__-AdayOGGAR6EGPwvcpzTA",
@@ -3639,59 +1716,15 @@
           "rejectReason": null
         },
         {
-          "ts": 1783332505259,
-          "sectionId": "hero-anime",
-          "slot": null,
-          "query": "placeId:ChIJ__-AdayOGGAR6EGPwvcpzTA",
-          "phase": "review_photos",
-          "candidateCount": 10,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": "content_place_no_match"
-        },
-        {
-          "ts": 1783332505438,
-          "sectionId": "hero-anime",
-          "slot": null,
-          "query": "ラジオ会館 秋葉原",
-          "phase": "precise_local",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332505640,
-          "sectionId": "hero-anime",
-          "slot": null,
-          "query": "アニメイト 秋葉原本店",
-          "phase": "precise_local",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332505864,
-          "sectionId": "hero-anime",
-          "slot": null,
-          "query": "GIGO 秋葉原 中央通",
-          "phase": "precise_local",
-          "candidateCount": 3,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783332505893,
+          "ts": 1783406229916,
           "sectionId": "hero-anime",
           "slot": "district_panorama",
-          "query": "GIGO 秋葉原 中央通",
-          "phase": "precise_local",
+          "query": "content_place",
+          "phase": "place_photos",
           "candidateCount": 10,
-          "photoIndex": 2,
-          "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZPSKpcC17ugD4ix9t-pNdZKZab57DaufejNoDlBROclKKINEK-gvsc7-6ESmvP7Q9jNUBsnAk-nABEZf2ZyuLKRCcnM4yr8T7x4-Dde_5LH8ONvJZyknyte_eMRVeKhbBD9Hg4NqtgXjEzjmt_0D85aWQ=s4800-w1600-h1200",
-          "selectedReason": "slot_district_panorama_score_289",
+          "photoIndex": 1,
+          "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZM4jLX8CPit4fycc_kYPp732Iv7GPguJ1q779aYpYKc63AtIfBZVnMRDeb8w6DGZBk6aR8gRKCdGH20jnZRzNYzQduW3fm6UtCXv8hlXOez7gSxObvuWIGDTDhyh2Pwn4Btdr_81jWplOuJFg50Ej3BZw=s4800-w1600-h1200",
+          "selectedReason": "slot_district_panorama_score_303",
           "rejectReason": null
         }
       ]
@@ -3710,8 +1743,8 @@
     "alternativeId": null,
     "heading": null,
     "content": null,
-    "officialName": "Radio Kaikan",
-    "officialNameLocal": "ラジオ会館",
+    "officialName": "Akihabara Electric Town",
+    "officialNameLocal": "秋葉原電気街",
     "pipeline": {
       "version": "photo-search-retry-v1",
       "steps": [
@@ -3728,7 +1761,7 @@
         "sectionId": "hero-anime",
         "attempts": [
           {
-            "ts": 1783332505259,
+            "ts": 1783406229904,
             "sectionId": "hero-anime",
             "slot": "district_panorama",
             "query": "placeId:ChIJ__-AdayOGGAR6EGPwvcpzTA",
@@ -3739,59 +1772,15 @@
             "rejectReason": null
           },
           {
-            "ts": 1783332505259,
-            "sectionId": "hero-anime",
-            "slot": null,
-            "query": "placeId:ChIJ__-AdayOGGAR6EGPwvcpzTA",
-            "phase": "review_photos",
-            "candidateCount": 10,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": "content_place_no_match"
-          },
-          {
-            "ts": 1783332505438,
-            "sectionId": "hero-anime",
-            "slot": null,
-            "query": "ラジオ会館 秋葉原",
-            "phase": "precise_local",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332505640,
-            "sectionId": "hero-anime",
-            "slot": null,
-            "query": "アニメイト 秋葉原本店",
-            "phase": "precise_local",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332505864,
-            "sectionId": "hero-anime",
-            "slot": null,
-            "query": "GIGO 秋葉原 中央通",
-            "phase": "precise_local",
-            "candidateCount": 3,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783332505893,
+            "ts": 1783406229916,
             "sectionId": "hero-anime",
             "slot": "district_panorama",
-            "query": "GIGO 秋葉原 中央通",
-            "phase": "precise_local",
+            "query": "content_place",
+            "phase": "place_photos",
             "candidateCount": 10,
-            "photoIndex": 2,
-            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZPSKpcC17ugD4ix9t-pNdZKZab57DaufejNoDlBROclKKINEK-gvsc7-6ESmvP7Q9jNUBsnAk-nABEZf2ZyuLKRCcnM4yr8T7x4-Dde_5LH8ONvJZyknyte_eMRVeKhbBD9Hg4NqtgXjEzjmt_0D85aWQ=s4800-w1600-h1200",
-            "selectedReason": "slot_district_panorama_score_289",
+            "photoIndex": 1,
+            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZM4jLX8CPit4fycc_kYPp732Iv7GPguJ1q779aYpYKc63AtIfBZVnMRDeb8w6DGZBk6aR8gRKCdGH20jnZRzNYzQduW3fm6UtCXv8hlXOez7gSxObvuWIGDTDhyh2Pwn4Btdr_81jWplOuJFg50Ej3BZw=s4800-w1600-h1200",
+            "selectedReason": "slot_district_panorama_score_303",
             "rejectReason": null
           }
         ]

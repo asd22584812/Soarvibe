@@ -8,6 +8,9 @@ import { generateCaption } from './cj-caption.js';
 import { resolveOfficialPlace, validatePhotoAttribution, placeDisplayName } from './cj-place-resolve.js';
 import { runEditorialQA } from './cj-editorial-pipeline.js';
 import { resolveArticleRules } from './cj-pipeline-rules.js';
+import { generateEditorialArticle, generateSectionCopy, placeCopyNeedsResync } from './cj-editorial-generate.js';
+import { generateAICaption } from './cj-ai-caption.js';
+import { callGeminiRaw } from './cj-gemini-client.js';
 import { resolveRegionCode } from './cj-locale-search.js';
 
 const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta/models/';
@@ -575,6 +578,122 @@ async function handleEditorialResolve(request, env, auth) {
   return jsonResponse(output, 200, auth.origin, env);
 }
 
+async function handleEditorialGenerate(request, env, auth) {
+  var body = {};
+  try {
+    body = await request.json();
+  } catch (e) {
+    return jsonResponse({ error: 'invalid_json' }, 400, auth.origin, env);
+  }
+  var result = await generateEditorialArticle(env, {
+    month: body.month || '6',
+    year: body.year || '2026',
+    styleKey: body.styleKey || 'anime',
+    existingEditorial: body.existingEditorial || null
+  });
+  if (!result.ok) {
+    return jsonResponse({ error: result.error, detail: result.detail || null }, 502, auth.origin, env);
+  }
+  return jsonResponse(Object.assign({ _meta: result.meta || null }, result.article), 200, auth.origin, env);
+}
+
+async function handleEditorialSectionCopy(request, env, auth) {
+  var body = {};
+  try {
+    body = await request.json();
+  } catch (e) {
+    return jsonResponse({ error: 'invalid_json' }, 400, auth.origin, env);
+  }
+  var result = await generateSectionCopy(env, {
+    section: body.section || {},
+    place: body.place || {},
+    article: body.article || {},
+    photoCaption: body.photoCaption || ''
+  });
+  if (!result.ok) {
+    return jsonResponse({ error: result.error }, 502, auth.origin, env);
+  }
+  return jsonResponse(result, 200, auth.origin, env);
+}
+
+async function handleEditorialVisionCaption(request, env, auth) {
+  var body = {};
+  try {
+    body = await request.json();
+  } catch (e) {
+    return jsonResponse({ error: 'invalid_json' }, 400, auth.origin, env);
+  }
+  if (!body.imageBase64) {
+    return jsonResponse({ error: 'missing_image' }, 400, auth.origin, env);
+  }
+  var section = body.section || {};
+  var prompt = [
+    '你是繁體中文旅遊雜誌圖說編輯。只看這張照片，寫一句圖說。',
+    '14–26 字；只描述看得見的內容；不可寫霓虹、人潮、氛圍除非照片裡真的有。',
+    '不可寫「外觀清楚標示位置」等空話。',
+    '段落：' + (section.heading || section.subject || ''),
+    '地點：' + (body.placeName || section.officialNameLocal || section.officialName || ''),
+    '回傳 JSON: { "caption": "..." }'
+  ].join('\n');
+
+  var keys = parseGeminiKeys(env);
+  if (!keys.length) {
+    return jsonResponse({ error: 'no_gemini_keys' }, 503, auth.origin, env);
+  }
+  var mime = body.mimeType || 'image/jpeg';
+  var geminiBody = {
+    contents: [{
+      parts: [
+        { text: prompt },
+        { inline_data: { mime_type: mime, data: body.imageBase64 } }
+      ]
+    }],
+    generationConfig: {
+      temperature: 0.35,
+      maxOutputTokens: 256,
+      responseMimeType: 'application/json'
+    }
+  };
+  var upstream = await callGeminiRaw(geminiBody, DEFAULT_MODEL, keys[0]);
+  if (!upstream.ok) {
+    return jsonResponse({ error: 'vision_failed', detail: upstream.result }, 502, auth.origin, env);
+  }
+  try {
+    var parsed = JSON.parse(upstream.text.trim());
+    return jsonResponse({ caption: parsed.caption || null }, 200, auth.origin, env);
+  } catch (e) {
+    var m = upstream.text.match(/"caption"\s*:\s*"([^"]+)"/);
+    return jsonResponse({ caption: m ? m[1] : null }, 200, auth.origin, env);
+  }
+}
+
+async function handleEditorialCaption(request, env, auth) {
+  var body = {};
+  try {
+    body = await request.json();
+  } catch (e) {
+    return jsonResponse({ error: 'invalid_json' }, 400, auth.origin, env);
+  }
+  var section = body.section || {};
+  var selected = body.selected || {};
+  if (!selected.imageUrl) {
+    return jsonResponse({ error: 'missing_image_url' }, 400, auth.origin, env);
+  }
+  if (!selected.aiReview) {
+    selected.aiReview = {
+      visibleDescription: body.visibleDescription || '',
+      matchedElements: body.matchedElements || [],
+      photoType: body.photoType || section.travelPhotoSlot || ''
+    };
+  }
+  var caption = await generateAICaption(section, Object.assign({}, selected, {
+    imageUrl: selected.imageUrl,
+    googlePhotoUrl: selected.imageUrl,
+    sourcePlaceName: selected.sourcePlaceName || section.officialNameLocal || section.officialName
+  }), body.article || {}, env);
+  return jsonResponse({ caption: caption || null }, 200, auth.origin, env);
+}
+
 async function handlePlacesResolve(request, env, auth) {
   var mapsKey = getMapsKey(env);
   if (!mapsKey) {
@@ -666,6 +785,22 @@ export default {
 
     if (url.pathname === '/api/editorial/resolve' && request.method === 'POST') {
       return handleEditorialResolve(request, env, auth);
+    }
+
+    if (url.pathname === '/api/editorial/generate' && request.method === 'POST') {
+      return handleEditorialGenerate(request, env, auth);
+    }
+
+    if (url.pathname === '/api/editorial/section-copy' && request.method === 'POST') {
+      return handleEditorialSectionCopy(request, env, auth);
+    }
+
+    if (url.pathname === '/api/editorial/vision-caption' && request.method === 'POST') {
+      return handleEditorialVisionCaption(request, env, auth);
+    }
+
+    if (url.pathname === '/api/editorial/caption' && request.method === 'POST') {
+      return handleEditorialCaption(request, env, auth);
     }
 
     if (url.pathname === '/api/cover-image' && request.method === 'GET') {

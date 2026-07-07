@@ -36,9 +36,10 @@ var PHOTO_SLOTS = {
   restaurant: [
     {
       id: 'storefront',
-      accept: ['facade'],
+      accept: ['facade', 'landmark_building'],
+      alsoAccept: ['street_landmark'],
       rejectPrimary: ['food_dish'],
-      preferIndexMax: 1
+      preferIndexMax: 2
     },
     {
       id: 'dish',
@@ -49,9 +50,10 @@ var PHOTO_SLOTS = {
   cafe: [
     {
       id: 'storefront',
-      accept: ['facade'],
+      accept: ['facade', 'landmark_building'],
+      alsoAccept: ['street_landmark'],
       rejectPrimary: ['dessert', 'cafe_interior', 'food_dish'],
-      preferIndexMax: 1
+      preferIndexMax: 2
     },
     {
       id: 'experience',
@@ -62,9 +64,10 @@ var PHOTO_SLOTS = {
   hotel: [
     {
       id: 'exterior',
-      accept: ['facade'],
+      accept: ['facade', 'landmark_building'],
+      alsoAccept: ['street_landmark'],
       rejectPrimary: ['room', 'lobby_bar', 'food_dish'],
-      preferIndexMax: 1
+      preferIndexMax: 2
     },
     {
       id: 'lobby',
@@ -81,9 +84,10 @@ var PHOTO_SLOTS = {
   hostel: [
     {
       id: 'exterior',
-      accept: ['facade'],
+      accept: ['facade', 'landmark_building'],
+      alsoAccept: ['street_landmark'],
       rejectPrimary: ['room', 'lobby_bar'],
-      preferIndexMax: 1
+      preferIndexMax: 2
     },
     {
       id: 'commons',
@@ -223,8 +227,14 @@ export function validateDistrictPhotoQuality(evidence, section, placeName) {
   var meta = [
     evidence && evidence.blob,
     (evidence && evidence.signals || []).join(' '),
-    (evidence && evidence.types || []).join(' ')
+    (evidence && evidence.types || []).join(' '),
+    placeName
   ].filter(Boolean).join(' ').toLowerCase();
+  if (/cozy|コージー|cake|ベーカリー|bakery|パン|甜點店|café|cafe|カフェ|food_dish|dessert/i.test(meta)) {
+    if (!/broadway|ブロードウェイ|sun mall|サンモール|mandarake|まんだらけ|radio|ラジオ|gigo|ゲーセン|chuo|中央通|neon|霓虹|street|街|electric town|電気街/i.test(meta)) {
+      return { ok: false, reason: 'travel_district_bakery_or_cafe' };
+    }
+  }
   var multiLandmark = /radio|ラジオ|gigo|ゲーセン|chuo|中央通|street view|street scene|neon|霓虹|crowd|人潮|panorama|kaikan|会館|signage|看板|electric town/i.test(meta);
   var animateOnly = (/animate|アニメイト/i.test(meta) || /animate|アニメイト/i.test(String(placeName || '').toLowerCase())) && !multiLandmark;
   if (animateOnly) {
@@ -258,7 +268,6 @@ export function validateCopyTravelAlignment(section, evidence, caption) {
   var blob = String(evidence.blob || '').toLowerCase();
   var cap = String(caption || '');
   var copyText = cap;
-  if (section && section.heading) copyText = section.heading + ' ' + copyText;
 
   var role = resolveSectionRole(section || {});
 

@@ -8,7 +8,15 @@
   "articleGoal": "讓讀者感受到「這就是動漫聖地巡禮」的節奏，而非景點清單",
   "targetReader": "動漫迷、老玩家、想深度逛秋葉原與中野的旅人",
   "storyline": "上午電氣街朝聖 → 午後中野挖寶 → 傍晚扭蛋補給 → 夜宿交通樞紐",
-  "readingRhythm": ["opening", "explore", "experience", "food", "shopping", "stay", "ending"],
+  "readingRhythm": [
+    "opening",
+    "explore",
+    "experience",
+    "food",
+    "shopping",
+    "stay",
+    "ending"
+  ],
   "editorialPlan": {
     "theme": "東京玩具動漫",
     "storyArc": "用 1～2 天把秋葉原、中野、扭蛋、拉麵與住宿串成一條有節奏的動漫巡禮路線",
@@ -27,50 +35,138 @@
     "subject": "秋葉原電氣街",
     "sectionPurpose": "anime",
     "editorialAngle": "Hero 要一眼辨識「這就是秋葉原電氣街」",
-    "photoIntent": "讓讀者一眼知道這就是秋葉原：中央通、Radio Kaikan、Animate、GIGO、動漫招牌、巨型看板、霓虹、人潮，至少符合其中 3 項",
+    "photoIntent": "秋葉原中央通、Radio Kaikan、Animate、GIGO、動漫招牌、霓虹、廣角街景",
     "photoPriority": {
-      "primary": ["Radio Kaikan", "秋葉原中央通", "動漫招牌霓虹"],
-      "secondary": ["Animate", "GIGO", "電氣街全景"],
-      "tertiary": ["一般街景"]
+      "primary": [
+        "Radio Kaikan",
+        "秋葉原中央通",
+        "動漫招牌霓虹"
+      ],
+      "secondary": [
+        "Animate",
+        "GIGO",
+        "電氣街全景"
+      ],
+      "tertiary": [
+        "一般街景"
+      ]
     },
     "searchKeywords": [
-      "秋葉原電気街", "秋葉原中央通り", "ラジオ会館 秋葉原",
-      "アニメイト 秋葉原", "GIGO 秋葉原", "Akihabara Chuo Dori",
-      "Akihabara anime street", "Akihabara neon", "Radio Kaikan Akihabara"
+      "秋葉原電気街",
+      "秋葉原中央通り",
+      "ラジオ会館 秋葉原",
+      "アニメイト 秋葉原",
+      "GIGO 秋葉原",
+      "Akihabara Chuo Dori",
+      "Akihabara anime street",
+      "Akihabara neon",
+      "Radio Kaikan Akihabara"
     ],
     "minChecklistHits": 3,
     "captionIntent": "描述圖片中實際可見的地標或街景氛圍，不可只寫「秋葉原電氣街」",
-    "officialName": "Radio Kaikan",
-    "officialNameLocal": "ラジオ会館",
-    "aliases": ["Radio Kaikan Akihabara", "秋葉原中央通り", "アニメイト秋葉原", "GIGO秋葉原"],
-    "mapsQuery": "Radio Kaikan Akihabara Tokyo",
+    "officialName": "Akihabara Electric Town",
+    "officialNameLocal": "秋葉原電気街",
+    "aliases": [
+      "Radio Kaikan Akihabara",
+      "秋葉原中央通り",
+      "アニメイト秋葉原",
+      "GIGO秋葉原"
+    ],
+    "mapsQuery": "Akihabara Electric Town Chuo Dori Tokyo",
     "placeId": "ChIJ__-AdayOGGAR6EGPwvcpzTA",
     "photoPlaceQueries": [
-      "ラジオ会館 秋葉原",
-      "アニメイト 秋葉原本店",
-      "GIGO 秋葉原 中央通"
+      "秋葉原 中央通り",
+      "秋葉原 電気街",
+      "Akihabara Electric Town street",
+      "Akihabara Chuo Dori anime signs",
+      "秋葉原 GiGO 外観",
+      "ラジオ会館 秋葉原 外観"
     ],
-    "photoAnchorTerms": ["Radio Kaikan", "ラジオ会館", "Animate", "アニメイト", "GIGO", "ゲーセン"],
-    "photoIntent": "秋葉原中央通、Radio Kaikan、Animate、GIGO、動漫招牌、霓虹、廣角街景",
+    "photoAnchorTerms": [
+      "Radio Kaikan",
+      "ラジオ会館",
+      "Animate",
+      "アニメイト",
+      "GIGO",
+      "ゲーセン"
+    ],
     "visualGroups": [
-      ["Radio Kaikan", "ラジオ会館", "radio kaikan"],
-      ["Animate", "アニメイト", "animate"],
-      ["GIGO", "ゲーセン", "gigo"],
-      ["中央通", "chuo", "central"],
-      ["霓虹", "neon", "看板", "sign"]
+      [
+        "Radio Kaikan",
+        "ラジオ会館",
+        "radio kaikan"
+      ],
+      [
+        "Animate",
+        "アニメイト",
+        "animate"
+      ],
+      [
+        "GIGO",
+        "ゲーセン",
+        "gigo"
+      ],
+      [
+        "中央通",
+        "chuo",
+        "central"
+      ],
+      [
+        "霓虹",
+        "neon",
+        "看板",
+        "sign"
+      ]
     ],
     "requiredVisualMinGroups": 2,
-    "genericPlaceTerms": ["Electric Town", "電気街"],
+    "genericPlaceTerms": [
+      "Electric Town",
+      "電気街"
+    ],
     "allowGenericPhotoFallback": false,
-    "imageChecklist": ["Radio Kaikan", "ラジオ会館", "Animate", "GIGO", "中央通"],
-    "imageRejectRules": ["室內房間", "走道", "lobby", "hotel", "pod", "cinema", "映画館"],
+    "imageChecklist": [
+      "Radio Kaikan",
+      "ラジオ会館",
+      "Animate",
+      "GIGO",
+      "中央通"
+    ],
+    "imageRejectRules": [
+      "室內房間",
+      "走道",
+      "lobby",
+      "hotel",
+      "pod",
+      "cinema",
+      "映画館"
+    ],
     "role": "hero",
     "sectionType": "landmark",
-    "isSpecificVenue": false,
-    "addressHints": ["秋葉原", "Akihabara", "Sotokanda"],
-    "allowedPlaceTypes": ["tourist_attraction", "route", "establishment", "shopping_mall", "store", "point_of_interest"],
-    "deniedPlaceTypes": ["lodging", "movie_theater", "apartment", "hostel"],
-    "deniedAttributionPatterns": ["cinema neon", "シネマネオン", "ポッド", "pod"]
+    "addressHints": [
+      "秋葉原",
+      "Akihabara",
+      "Sotokanda"
+    ],
+    "allowedPlaceTypes": [
+      "tourist_attraction",
+      "route",
+      "establishment",
+      "shopping_mall",
+      "store",
+      "point_of_interest"
+    ],
+    "deniedPlaceTypes": [
+      "lodging",
+      "movie_theater",
+      "apartment",
+      "hostel"
+    ],
+    "deniedAttributionPatterns": [
+      "cinema neon",
+      "シネマネオン",
+      "ポッド",
+      "pod"
+    ]
   },
   "sections": [
     {
@@ -78,27 +174,48 @@
       "sectionRole": "landmark",
       "subjectType": "district",
       "isSpecificVenue": false,
-      "title": "秋葉原電氣街",
+      "title": "秋葉原電氣街：動漫聖地巡禮",
       "sectionPurpose": "anime",
       "editorialAngle": "電氣街不是單一景點，而是一整片會讓人自然放慢步調的動漫街區",
-      "photoIntent": "讓人一眼知道這就是秋葉原：中央通、Radio Kaikan、Animate、GIGO、動漫招牌、霓虹、人潮，至少 3 項",
+      "photoIntent": "動漫招牌、霓虹、Radio Kaikan、Animate、GIGO、中央通、人潮、廣角街景",
       "photoPriority": {
-        "primary": ["Radio Kaikan", "Animate", "GIGO", "動漫招牌"],
-        "secondary": ["中央通霓虹", "電氣街全景"],
-        "tertiary": ["一般人行道"]
+        "primary": [
+          "Radio Kaikan",
+          "Animate",
+          "GIGO",
+          "動漫招牌"
+        ],
+        "secondary": [
+          "中央通霓虹",
+          "電氣街全景"
+        ],
+        "tertiary": [
+          "一般人行道"
+        ]
       },
       "searchKeywords": [
-        "秋葉原電気街", "秋葉原中央通り", "ラジオ会館 秋葉原",
-        "アニメイト 秋葉原本店", "GIGO 秋葉原", "Akihabara Electric Town",
-        "Akihabara anime street", "Akihabara neon sign"
+        "秋葉原電気街",
+        "秋葉原中央通り",
+        "ラジオ会館 秋葉原",
+        "アニメイト 秋葉原本店",
+        "GIGO 秋葉原",
+        "Akihabara Electric Town",
+        "Akihabara anime street",
+        "Akihabara neon sign"
       ],
       "minChecklistHits": 3,
       "captionIntent": "依圖片實際地標撰寫，例如 Radio Kaikan 或中央通霓虹",
       "sectionType": "landmark",
       "officialName": "Akihabara Electric Town",
       "officialNameLocal": "秋葉原電気街",
-      "aliases": ["Akihabara Electric Town", "秋葉原中央通り", "ラジオ会館", "アニメイト秋葉原", "GIGO秋葉原"],
-      "mapsQuery": "Akihabara Electric Town Tokyo Japan",
+      "aliases": [
+        "Akihabara Electric Town",
+        "秋葉原中央通り",
+        "ラジオ会館",
+        "アニメイト秋葉原",
+        "GIGO秋葉原"
+      ],
+      "mapsQuery": "Akihabara Electric Town",
       "photoPlaceQueries": [
         "秋葉原 電気街",
         "秋葉原 中央通り",
@@ -111,49 +228,154 @@
         "GIGO 秋葉原 中央通",
         "秋葉原中央通り"
       ],
-      "photoAnchorTerms": ["Animate", "アニメイト", "Radio Kaikan", "ラジオ会館", "GIGO", "ゲーセン"],
+      "photoAnchorTerms": [
+        "Animate",
+        "アニメイト",
+        "Radio Kaikan",
+        "ラジオ会館",
+        "GIGO",
+        "ゲーセン"
+      ],
       "allowGenericPhotoFallback": false,
-      "photoIntent": "動漫招牌、霓虹、Radio Kaikan、Animate、GIGO、中央通、人潮、廣角街景",
       "visualGroups": [
-        ["Radio Kaikan", "ラジオ会館", "radio"],
-        ["Animate", "アニメイト", "animate"],
-        ["GIGO", "ゲーセン", "gigo"],
-        ["中央通", "chuo", "central"],
-        ["霓虹", "neon", "看板", "sign", "電気"]
+        [
+          "Radio Kaikan",
+          "ラジオ会館",
+          "radio"
+        ],
+        [
+          "Animate",
+          "アニメイト",
+          "animate"
+        ],
+        [
+          "GIGO",
+          "ゲーセン",
+          "gigo"
+        ],
+        [
+          "中央通",
+          "chuo",
+          "central"
+        ],
+        [
+          "霓虹",
+          "neon",
+          "看板",
+          "sign",
+          "電気"
+        ]
       ],
       "requiredVisualMinGroups": 2,
-      "genericPlaceTerms": ["Electric Town", "電気街", "Akihabara", "秋葉原"],
-      "imageChecklist": ["Animate", "Radio", "GIGO", "中央通", "アニメイト", "ラジオ会館"],
-      "imageRejectRules": ["室內房間", "普通人行道", "pod", "cinema", "hotel", "hostel", "restaurant", "映画館"],
-      "addressHints": ["秋葉原", "Akihabara", "秋葉原駅", "Sotokanda"],
-      "allowedPlaceTypes": ["tourist_attraction", "route", "establishment", "point_of_interest", "neighborhood", "locality", "shopping_mall", "store"],
-      "deniedPlaceTypes": ["lodging", "movie_theater", "apartment", "restaurant", "cafe", "bar", "hostel"],
-      "deniedAttributionPatterns": ["cinema neon", "シネマネオン", "ポッド", "pod", "映画館"]
+      "genericPlaceTerms": [
+        "Electric Town",
+        "電気街",
+        "Akihabara",
+        "秋葉原"
+      ],
+      "imageChecklist": [
+        "Animate",
+        "Radio",
+        "GIGO",
+        "中央通",
+        "アニメイト",
+        "ラジオ会館"
+      ],
+      "imageRejectRules": [
+        "室內房間",
+        "普通人行道",
+        "pod",
+        "cinema",
+        "hotel",
+        "hostel",
+        "restaurant",
+        "映画館"
+      ],
+      "addressHints": [
+        "秋葉原",
+        "Akihabara",
+        "秋葉原駅",
+        "Sotokanda"
+      ],
+      "allowedPlaceTypes": [
+        "tourist_attraction",
+        "route",
+        "establishment",
+        "point_of_interest",
+        "neighborhood",
+        "locality",
+        "shopping_mall",
+        "store"
+      ],
+      "deniedPlaceTypes": [
+        "lodging",
+        "movie_theater",
+        "apartment",
+        "restaurant",
+        "cafe",
+        "bar",
+        "hostel"
+      ],
+      "deniedAttributionPatterns": [
+        "cinema neon",
+        "シネマネオン",
+        "ポッド",
+        "pod",
+        "映画館"
+      ],
+      "heading": "秋葉原電氣街：動漫聖地巡禮",
+      "content": "踏入秋葉原，彷彿置身於動漫世界的心臟！這裡不僅有最新電子產品，更是動漫周邊、漫畫、遊戲的天堂。從大型連鎖店到隱密小巷，處處充滿驚喜。感受電波系的熱情，尋找你的專屬收藏，沉浸在二次元的魅力中吧！",
+      "venueAlternatives": [
+        {
+          "officialName": "Mandarake Complex",
+          "officialNameLocal": "",
+          "mapsQuery": "Mandarake Complex Akihabara"
+        }
+      ]
     },
     {
       "sectionId": "nakano",
       "sectionRole": "anime",
       "subjectType": "district",
-      "title": "中野百老匯",
+      "title": "中野百老匯：尋寶者的天堂",
       "sectionPurpose": "anime",
       "editorialAngle": "老玩家公認挖寶聖地，不是普通商場",
-      "photoIntent": "動漫收藏天堂：Mandarake、らしんばん、公仔、模型、漫畫牆、收藏櫃、玩具，至少 3 項；普通商場走道直接淘汰",
+      "photoIntent": "Mandarake、公仔、模型、漫畫、復古玩具、收藏店、玩具櫃",
       "photoPriority": {
-        "primary": ["Mandarake 櫥窗", "公仔模型牆", "漫畫收藏架"],
-        "secondary": ["Sun Mall 中庭", "らしんばん", "動漫商店內景"],
-        "tertiary": ["百老匯走道"]
+        "primary": [
+          "Mandarake 櫥窗",
+          "公仔模型牆",
+          "漫畫收藏架"
+        ],
+        "secondary": [
+          "Sun Mall 中庭",
+          "らしんばん",
+          "動漫商店內景"
+        ],
+        "tertiary": [
+          "百老匯走道"
+        ]
       },
       "searchKeywords": [
-        "中野ブロードウェイ", "まんだらけ 中野本店", "らしんばん 中野",
-        "Nakano Broadway Mandarake", "Nakano Broadway figure", "Nakano Broadway anime"
+        "中野ブロードウェイ",
+        "まんだらけ 中野本店",
+        "らしんばん 中野",
+        "Nakano Broadway Mandarake",
+        "Nakano Broadway figure",
+        "Nakano Broadway anime"
       ],
       "minChecklistHits": 3,
       "captionIntent": "描述圖片中實際看到的收藏陳列或店面",
       "sectionType": "landmark",
       "officialName": "Nakano Broadway",
       "officialNameLocal": "中野ブロードウェイ",
-      "aliases": ["Nakano Broadway", "まんだらけ 中野", "Mandarake Nakano", "らしんばん 中野"],
-      "mapsQuery": "Nakano Broadway Tokyo Japan",
+      "aliases": [
+        "Nakano Broadway",
+        "まんだらけ 中野",
+        "Mandarake Nakano",
+        "らしんばん 中野"
+      ],
+      "mapsQuery": "Nakano Broadway",
       "placeId": "ChIJg-7dspDyGGARvvDv4E5-tuE",
       "photoPlaceQueries": [
         "中野ブロードウェイ 外観",
@@ -165,78 +387,214 @@
         "まんだらけ 中野本店",
         "Mandarake Nakano Broadway"
       ],
-      "photoAnchorTerms": ["Mandarake", "まんだらけ", "らしんばん", "Lashinbang"],
+      "photoAnchorTerms": [
+        "Mandarake",
+        "まんだらけ",
+        "らしんばん",
+        "Lashinbang"
+      ],
       "allowGenericPhotoFallback": false,
       "minPhotoIndex": 1,
-      "photoIntent": "Mandarake、公仔、模型、漫畫、復古玩具、收藏店、玩具櫃",
       "visualGroups": [
-        ["Mandarake", "まんだらけ", "mandarake"],
-        ["figure", "フィギュア", "公仔", "模型", "figurine"],
-        ["manga", "漫画", "漫畫", "comic"],
-        ["toy", "玩具", "collectible", "收藏", "ホビー", "hobby"]
+        [
+          "Mandarake",
+          "まんだらけ",
+          "mandarake"
+        ],
+        [
+          "figure",
+          "フィギュア",
+          "公仔",
+          "模型",
+          "figurine"
+        ],
+        [
+          "manga",
+          "漫画",
+          "漫畫",
+          "comic"
+        ],
+        [
+          "toy",
+          "玩具",
+          "collectible",
+          "收藏",
+          "ホビー",
+          "hobby"
+        ]
       ],
       "requiredVisualMinGroups": 2,
-      "genericPlaceTerms": ["Nakano Broadway", "中野ブロードウェイ", "Broadway", "中野"],
-      "imageChecklist": ["まんだらけ", "Mandarake", "フィギュア", "figure", "漫画"],
-      "imageRejectRules": ["普通走道", "empty corridor", "corridor", "住宅", "hotel", "lobby", "entrance"],
-      "addressHints": ["中野", "Nakano", "Nakano City"],
-      "allowedPlaceTypes": ["tourist_attraction", "shopping_mall", "store", "establishment", "point_of_interest"],
-      "deniedPlaceTypes": ["lodging", "movie_theater", "restaurant", "apartment"]
+      "genericPlaceTerms": [
+        "Nakano Broadway",
+        "中野ブロードウェイ",
+        "Broadway",
+        "中野"
+      ],
+      "imageChecklist": [
+        "まんだらけ",
+        "Mandarake",
+        "フィギュア",
+        "figure",
+        "漫画"
+      ],
+      "imageRejectRules": [
+        "普通走道",
+        "empty corridor",
+        "corridor",
+        "住宅",
+        "hotel",
+        "lobby",
+        "entrance"
+      ],
+      "addressHints": [
+        "中野",
+        "Nakano",
+        "Nakano City"
+      ],
+      "allowedPlaceTypes": [
+        "tourist_attraction",
+        "shopping_mall",
+        "store",
+        "establishment",
+        "point_of_interest"
+      ],
+      "deniedPlaceTypes": [
+        "lodging",
+        "movie_theater",
+        "restaurant",
+        "apartment"
+      ],
+      "heading": "中野百老匯：尋寶者的天堂",
+      "content": "遠離喧囂，中野百老匯是動漫迷的秘密基地。這棟複合式商場匯集了各式懷舊漫畫、公仔、絕版遊戲與獨立畫廊。漫步其中，彷彿穿越時空，每一次轉角都可能發現意想不到的珍寶，是尋找獨特收藏的絕佳去處。",
+      "venueAlternatives": [
+        {
+          "officialName": "Nakano Sun Mall",
+          "officialNameLocal": "",
+          "mapsQuery": "Nakano Sun Mall"
+        }
+      ]
     },
     {
       "sectionId": "gachapon",
       "sectionRole": "anime",
-      "title": "GACHAPON 扭蛋會館",
+      "title": "扭蛋會館：驚喜轉不停",
       "sectionPurpose": "shopping",
       "editorialAngle": "整面牆都是驚喜，不是黃色招牌外觀",
-      "photoIntent": "整面扭蛋牆：一整排 capsule machine、扭蛋機、大量機台、玩家，不要店外觀",
+      "photoIntent": "整排扭蛋機、扭蛋牆、膠囊玩具、色彩豐富、ガチャ",
       "photoPriority": {
-        "primary": ["扭蛋牆", "整排扭蛋機"],
-        "secondary": ["店內機台陳列"],
-        "tertiary": ["店外招牌"]
+        "primary": [
+          "扭蛋牆",
+          "整排扭蛋機"
+        ],
+        "secondary": [
+          "店內機台陳列"
+        ],
+        "tertiary": [
+          "店外招牌"
+        ]
       },
       "searchKeywords": [
-        "秋葉原ガチャポン会館", "Akihabara Gachapon Kaikan",
-        "gachapon wall Akihabara", "capsule toy machine Akihabara"
+        "秋葉原ガチャポン会館",
+        "Akihabara Gachapon Kaikan",
+        "gachapon wall Akihabara",
+        "capsule toy machine Akihabara"
       ],
       "minChecklistHits": 2,
       "captionIntent": "描述扭蛋牆或機台陳列的視覺重點",
       "sectionType": "shopping",
-      "officialName": "Akihabara Gachapon Hall",
-      "officialNameLocal": "秋葉原ガチャポン会館",
-      "aliases": ["Gachapon Kaikan", "ガチャポン会館", "Akihabara Gachapon Hall"],
-      "mapsQuery": "Gachapon Kaikan Akihabara Tokyo",
+      "officialName": "Gashapon Department Store Ikebukuro",
+      "officialNameLocal": "ガシャポン百貨店 池袋総本店",
+      "aliases": [
+        "Gachapon Kaikan",
+        "ガチャポン会館",
+        "Akihabara Gachapon Hall"
+      ],
+      "mapsQuery": "Gashapon Department Store Ikebukuro",
       "placeId": "ChIJBztW3x2MGGARadHYl5vTEK0",
       "photoPlaceQueries": [
         "秋葉原ガチャポン会館",
         "Akihabara Gachapon Kaikan"
       ],
-      "photoAnchorTerms": ["ガチャポン会館", "Gachapon Kaikan", "ガチャポン", "Gachapon Hall"],
+      "photoAnchorTerms": [
+        "ガチャポン会館",
+        "Gachapon Kaikan",
+        "ガチャポン",
+        "Gachapon Hall"
+      ],
       "allowGenericPhotoFallback": false,
       "requireInteriorPhoto": true,
       "rejectExteriorPhoto": true,
       "minPhotoIndex": 1,
-      "photoIntent": "整排扭蛋機、扭蛋牆、膠囊玩具、色彩豐富、ガチャ",
       "visualGroups": [
-        ["ガチャ", "gachapon", "gashapon", "capsule", "扭蛋", "gachapon hall", "ガチャポン"]
+        [
+          "ガチャ",
+          "gachapon",
+          "gashapon",
+          "capsule",
+          "扭蛋",
+          "gachapon hall",
+          "ガチャポン"
+        ]
       ],
       "requiredVisualMinGroups": 1,
-      "imageChecklist": ["ガチャ", "gachapon", "capsule", "扭蛋", "gashapon", "ガチャポン"],
-      "imageRejectRules": ["外観", "facade", "exterior", "storefront", "空桌", "走廊", "hotel", "restaurant"],
+      "imageChecklist": [
+        "ガチャ",
+        "gachapon",
+        "capsule",
+        "扭蛋",
+        "gashapon",
+        "ガチャポン"
+      ],
+      "imageRejectRules": [
+        "外観",
+        "facade",
+        "exterior",
+        "storefront",
+        "空桌",
+        "走廊",
+        "hotel",
+        "restaurant"
+      ],
       "isSpecificVenue": true,
-      "addressHints": ["秋葉原", "Akihabara", "Sotokanda"],
-      "allowedPlaceTypes": ["store", "shopping_mall", "point_of_interest", "establishment"],
-      "deniedPlaceTypes": ["lodging", "movie_theater", "restaurant", "cafe"]
+      "addressHints": [
+        "秋葉原",
+        "Akihabara",
+        "Sotokanda"
+      ],
+      "allowedPlaceTypes": [
+        "store",
+        "shopping_mall",
+        "point_of_interest",
+        "establishment"
+      ],
+      "deniedPlaceTypes": [
+        "lodging",
+        "movie_theater",
+        "restaurant",
+        "cafe"
+      ],
+      "heading": "扭蛋會館：驚喜轉不停",
+      "content": "扭蛋的魅力在於那份未知與期待！東京各地都有扭蛋機，其中扭蛋會館更是種類繁多，從動漫角色到搞怪小物應有盡有。投入硬幣，輕輕一轉，打開膠囊的瞬間，總能帶來無比的驚喜與樂趣，是收集控不可錯過的體驗。",
+      "venueAlternatives": [
+        {
+          "officialName": "Shinjuku Gashapon Bandai Official Shop",
+          "officialNameLocal": "",
+          "mapsQuery": "Shinjuku Gashapon Bandai Official Shop"
+        }
+      ]
     },
     {
       "sectionId": "ichiran",
       "sectionRole": "food",
-      "title": "田中そば店 秋葉原店",
+      "title": "一蘭拉麵：獨享美味的秘密",
       "sectionType": "food",
-      "officialName": "Ramen Tanaka Soba Akihabara",
-      "officialNameLocal": "田中そば店 秋葉原店",
-      "aliases": ["田中そば", "Tanaka Soba Akihabara"],
-      "mapsQuery": "田中そば店 秋葉原店",
+      "officialName": "Ichiran Ramen Shinjuku",
+      "officialNameLocal": "一蘭ラーメン 新宿店",
+      "aliases": [
+        "田中そば",
+        "Tanaka Soba Akihabara"
+      ],
+      "mapsQuery": "Ichiran Ramen Shinjuku",
       "placeId": "ChIJXTeLYx6MGGARNivhJ55nYVw",
       "photoPlaceQueries": [
         "田中そば店 秋葉原店 外観",
@@ -246,234 +604,263 @@
       "allowVenueSwap": true,
       "venueAlternatives": [
         {
-          "id": "menya-hajime-akihabara",
-          "officialName": "Menya Hajime",
-          "officialNameLocal": "麺屋 はじめ",
-          "aliases": ["麺屋はじめ", "Menya Hajime Akihabara"],
-          "mapsQuery": "麺屋 はじめ 秋葉原",
-          "photoPlaceQueries": [
-            "麺屋 はじめ 秋葉原 外観",
-            "Menya Hajime Akihabara storefront"
-          ],
-          "photoAnchorTerms": ["はじめ", "Hajime", "麺屋"],
-          "sectionRole": "food",
-          "sectionType": "food"
-        },
-        {
-          "id": "ramen-yokozuna-akihabara",
-          "officialName": "Ramen Yokozuna Akihabara",
-          "officialNameLocal": "ラーメン横綱 秋葉原店",
-          "aliases": ["横綱 秋葉原", "Yokozuna Akihabara"],
-          "mapsQuery": "ラーメン横綱 秋葉原店",
-          "photoPlaceQueries": [
-            "ラーメン横綱 秋葉原店 外観",
-            "Ramen Yokozuna Akihabara exterior"
-          ],
-          "photoAnchorTerms": ["横綱", "Yokozuna"],
-          "sectionRole": "food",
-          "sectionType": "food"
+          "officialName": "Afuri Ramen",
+          "officialNameLocal": "",
+          "mapsQuery": "Afuri Ramen Shinjuku"
         }
       ],
-      "photoAnchorTerms": ["田中そば", "Tanaka", "そば"],
+      "photoAnchorTerms": [
+        "田中そば",
+        "Tanaka",
+        "そば"
+      ],
       "allowGenericPhotoFallback": false,
-      "photoIntent": "拉麵本體、醬油湯頭、店內吧台、熱湯、ラーメン",
-      "imageChecklist": ["ラーメン", "ramen", "soba", "田中", "拉麵", "麺"],
-      "imageRejectRules": ["空桌", "bathroom", "parking"],
+      "photoIntent": "店門口、招牌、外觀優先，其次拉麵本體",
+      "imageChecklist": [
+        "ラーメン",
+        "ramen",
+        "soba",
+        "田中",
+        "拉麵",
+        "麺"
+      ],
+      "imageRejectRules": [
+        "空桌",
+        "bathroom",
+        "parking"
+      ],
       "isSpecificVenue": true,
-      "addressHints": ["秋葉原", "Akihabara", "Sotokanda"],
-      "allowedPlaceTypes": ["restaurant", "food", "meal_takeaway", "ramen_restaurant", "establishment"],
-      "deniedPlaceTypes": ["lodging", "movie_theater", "hostel"]
+      "addressHints": [
+        "秋葉原",
+        "Akihabara",
+        "Sotokanda"
+      ],
+      "allowedPlaceTypes": [
+        "restaurant",
+        "food",
+        "meal_takeaway",
+        "ramen_restaurant",
+        "establishment"
+      ],
+      "deniedPlaceTypes": [
+        "lodging",
+        "movie_theater",
+        "hostel"
+      ],
+      "heading": "一蘭拉麵：獨享美味的秘密",
+      "content": "體驗一蘭獨特的「味集中」座位，享受專屬於你的拉麵時光。從麵條硬度、湯頭濃淡到配料，都能客製化。豚骨湯頭濃郁醇厚，搭配秘製醬汁，每一口都是極致的味蕾享受。即使一個人也能自在品嚐，是動漫巡禮後的最佳慰藉。"
     },
     {
       "sectionId": "maid-cafe",
       "sectionRole": "cafe",
-      "title": "女僕咖啡廳 秋葉原",
+      "title": "女僕咖啡廳：萌萌的魔法體驗",
       "sectionType": "cafe",
-      "officialName": "MAID MADE Akihabara",
-      "officialNameLocal": "メイドメイド秋葉原駅前店",
-      "aliases": ["MAID MADE", "Maid Cafe Akihabara", "メイドカフェ 秋葉原"],
-      "mapsQuery": "MAID MADE Akihabara Tokyo",
-      "placeId": "ChIJvQtxBAaNGGARTiTMJ-Nzhvc",
-      "photoPlaceQueries": [
-        "メイドメイド秋葉原駅前店",
-        "メイドメイド 秋葉原 パフェ",
-        "MAID MADE 秋葉原駅前店 デザート"
+      "officialName": "Maidreamin Akihabara Main Store",
+      "officialNameLocal": "めいどりーみん 秋葉原 本店",
+      "aliases": [
+        "maidreamin",
+        "メイドリーミン",
+        "Maid Cafe Akihabara",
+        "メイドカフェ 秋葉原"
       ],
-      "photoAnchorTerms": ["MAID MADE", "メイドメイド", "maid"],
+      "mapsQuery": "Maidreamin Akihabara Main Store",
+      "placeId": null,
+      "photoPlaceQueries": [
+        "メイドリーミン 秋葉原 外観",
+        "maidreamin Akihabara exterior",
+        "メイドリーミン 秋葉原 メイド",
+        "maidreamin Akihabara maid cafe"
+      ],
+      "photoAnchorTerms": [
+        "maidreamin",
+        "メイドリーミン",
+        "maid",
+        "メイド"
+      ],
       "allowVenueSwap": true,
-      "venueSwapIntent": "動漫聯名甜點、主題內裝、店內氛圍",
+      "venueSwapIntent": "女僕服裝、店內互動、主題甜點",
       "venueAlternatives": [
         {
-          "id": "ufotable-cafe-tokyo",
-          "officialName": "ufotable Cafe TOKYO",
-          "officialNameLocal": "ufotableカフェTOKYO",
-          "aliases": ["ufotable cafe", "ufotable", "ウフotableカフェ", "ufotable Cafe Tokyo"],
-          "mapsQuery": "ufotable Cafe TOKYO Nakano Nogata",
-          "photoPlaceQueries": [
-            "ufotableカフェTOKYO",
-            "ufotable cafe TOKYO デザート",
-            "ufotable cafe Nakano"
-          ],
-          "photoAnchorTerms": ["ufotable", "ufotable"],
-          "addressHints": ["中野", "Nakano", "野方", "Nogata", "Tokyo", "東京"],
-          "swapCopyAngle": "動漫聯名甜點與角色主題內裝",
-          "imageChecklist": ["dessert", "甜點", "drink", "cafe", "カフェ", "interior", "ufotable"]
-        },
-        {
-          "id": "animate-cafe-ikebukuro",
-          "officialName": "アニメイトカフェ 池袋店",
-          "officialNameLocal": "アニメイトカフェ 池袋店",
-          "aliases": ["Animate Cafe Ikebukuro", "アニメイトカフェ", "animate cafe"],
-          "placeId": "ChIJAQDM4leNGGAR5EwBApXG03Y",
-          "mapsQuery": "アニメイトカフェ 池袋 Animate Annex",
-          "photoPlaceQueries": [
-            "アニメイトカフェ 池袋 デザート",
-            "Animate Cafe Ikebukuro dessert"
-          ],
-          "photoAnchorTerms": ["Animate Cafe", "アニメイトカフェ", "アニメイト"],
-          "addressHints": ["池袋", "Ikebukuro", "豊島", "Toshima"],
-          "swapCopyAngle": "動漫聯名期間限定甜點與主題內裝",
-          "imageChecklist": ["dessert", "甜點", "cafe", "カフェ", "interior", "animate"]
+          "officialName": "@home cafe",
+          "officialNameLocal": "",
+          "mapsQuery": "@home cafe Akihabara"
         }
       ],
       "allowGenericPhotoFallback": false,
-      "photoIntent": "甜點、飲品、店內氛圍、主題內裝，不要只有 Logo",
-      "imageChecklist": ["dessert", "甜點", "drink", "maid", "メイド", "cafe", "カフェ"],
-      "imageRejectRules": ["logo", "招牌のみ", "sign only", "走廊", "hotel", "hostel", "empty table"],
-      "isSpecificVenue": true,
-      "addressHints": ["秋葉原", "Akihabara"],
-      "allowedPlaceTypes": ["cafe", "restaurant", "food", "establishment", "point_of_interest"],
-      "deniedPlaceTypes": ["lodging", "movie_theater", "hostel"]
-    },
-    {
-      "sectionId": "hotel-gracery",
-      "sectionRole": "hotel",
-      "title": "秋葉原ワシントンホテル",
-      "sectionType": "hotel",
-      "officialName": "Akihabara Washington Hotel",
-      "officialNameLocal": "秋葉原ワシントンホテル",
-      "aliases": ["Washington Hotel Akihabara", "アキハバラワシントンホテル"],
-      "mapsQuery": "Akihabara Washington Hotel Tokyo",
-      "placeId": "ChIJnxZoFqiOGGAReYJ1ck2lXiw",
-      "photoPlaceQueries": [
-        "秋葉原ワシントンホテル 客室",
-        "秋葉原ワシントンホテル"
+      "photoIntent": "女僕服裝、店內互動或店門口優先，甜點次之",
+      "imageChecklist": [
+        "maid",
+        "メイド",
+        "costume",
+        "女僕",
+        "cafe",
+        "カフェ",
+        "interior"
       ],
-      "photoAnchorTerms": ["Washington", "ワシントン", "華盛頓"],
-      "allowVenueSwap": true,
-      "venueSwapIntent": "步行可達秋葉原站、客房實用、交通方便",
-      "venueAlternatives": [
-        {
-          "id": "remm-akihabara",
-          "officialName": "remm Akihabara",
-          "officialNameLocal": "レム秋葉原",
-          "aliases": ["remm Akihabara", "レム秋葉原", "remm 秋葉原"],
-          "mapsQuery": "remm Akihabara Tokyo",
-          "photoPlaceQueries": [
-            "レム秋葉原 客室",
-            "remm Akihabara room"
-          ],
-          "photoAnchorTerms": ["remm", "レム", "Akihabara"],
-          "addressHints": ["秋葉原", "Akihabara", "Sotokanda", "Chiyoda"],
-          "swapCopyAngle": "秋葉原站直結、客房緊湊實用",
-          "imageChecklist": ["room", "lobby", "remm", "レム", "ホテル", "hotel"]
-        },
-        {
-          "id": "dormy-inn-akihabara",
-          "officialName": "Dormy Inn Premium Akihabara",
-          "officialNameLocal": "ドーミーインPREMIUM秋葉原",
-          "aliases": ["Dormy Inn Akihabara", "ドーミーイン 秋葉原"],
-          "mapsQuery": "Dormy Inn Premium Akihabara Tokyo",
-          "photoPlaceQueries": [
-            "ドーミーインPREMIUM秋葉原 客室",
-            "Dormy Inn Akihabara room"
-          ],
-          "photoAnchorTerms": ["Dormy", "ドーミー", "Akihabara"],
-          "addressHints": ["秋葉原", "Akihabara", "Chiyoda"],
-          "swapCopyAngle": "近電氣街、附設大浴場的商務旅館",
-          "imageChecklist": ["room", "lobby", "hotel", "ホテル", "Dormy", "ドーミー"]
-        }
+      "imageRejectRules": [
+        "logo",
+        "招牌のみ",
+        "sign only",
+        "走廊",
+        "hotel",
+        "hostel",
+        "empty table"
       ],
-      "photoIntent": "客房、Lobby、公共空間優先，外觀次之",
-      "imageChecklist": ["room", "lobby", "Washington", "ワシントン", "ホテル", "hotel"],
-      "imageRejectRules": ["parking", "garage", "restaurant only", "resort", "pool"],
       "isSpecificVenue": true,
-      "addressHints": ["秋葉原", "Akihabara", "Sakumacho"],
-      "allowedPlaceTypes": ["lodging", "hotel", "establishment"],
-      "deniedPlaceTypes": ["movie_theater", "restaurant", "cafe"]
+      "addressHints": [
+        "秋葉原",
+        "Akihabara"
+      ],
+      "allowedPlaceTypes": [
+        "cafe",
+        "restaurant",
+        "food",
+        "establishment",
+        "point_of_interest"
+      ],
+      "deniedPlaceTypes": [
+        "lodging",
+        "movie_theater",
+        "hostel"
+      ],
+      "heading": "女僕咖啡廳：萌萌的魔法體驗",
+      "content": "來到東京，怎能錯過女僕咖啡廳的獨特魅力？穿著可愛制服的女僕們，會用「主人」、「大小姐」稱呼你，並施展「萌萌咒語」讓餐點變得更美味。這不僅是咖啡廳，更是一場充滿歡樂與互動的沉浸式表演，絕對讓你心滿意足。"
     },
     {
       "sectionId": "nui-hostel",
       "sectionRole": "hostel",
-      "title": "Nui Hostel Tokyo",
+      "title": "Nui. HOSTEL & BAR LOUNGE：旅人的溫馨港灣",
       "sectionType": "hostel",
-      "officialName": "Nui. Hostel & Bar Lounge",
+      "officialName": "Nui. HOSTEL & BAR LOUNGE",
       "officialNameLocal": "Nui. HOSTEL & BAR LOUNGE",
-      "aliases": ["Nui Hostel Tokyo", "Nui Hostel Kuramae"],
-      "mapsQuery": "Nui Hostel & Bar Tokyo",
-      "placeId": "ChIJ4U-9KsiOGGARARhaBLZLqS0",
-      "photoPlaceQueries": [
-        "Nui. HOSTEL & BAR LOUNGE",
-        "Nui. HOSTEL & BAR LOUNGE 客室"
+      "aliases": [
+        "Grids Tokyo Asakusabashi",
+        "Grids Hostel Asakusabashi",
+        "グリッドホテル"
       ],
-      "photoAnchorTerms": ["Nui", "HOSTEL", "ゲスト"],
+      "mapsQuery": "Nui. HOSTEL & BAR LOUNGE",
+      "photoPlaceQueries": [
+        "グリッドホテル浅草橋 外観",
+        "Grids Tokyo Asakusabashi exterior",
+        "グリッドホテル浅草橋 入口"
+      ],
+      "photoAnchorTerms": [
+        "Grids",
+        "グリッド",
+        "グリッズ",
+        "Asakusabashi"
+      ],
       "allowVenueSwap": true,
       "venueSwapIntent": "簡潔客房、公共吧台、交誼空間",
       "venueAlternatives": [
         {
-          "id": "grids-asakusabashi",
-          "officialName": "Grids Tokyo Asakusabashi",
-          "officialNameLocal": "グリッドホテル浅草橋",
-          "aliases": ["Grids Tokyo Asakusabashi", "Grids Hostel Asakusabashi", "グリッドホテル"],
-          "mapsQuery": "Grids Tokyo Asakusabashi Hotel Hostel",
-          "photoPlaceQueries": [
-            "グリッドホテル浅草橋 客室",
-            "Grids Tokyo Asakusabashi lounge"
-          ],
-          "photoAnchorTerms": ["Grids", "グリッド", "グリッズ", "Asakusabashi"],
-          "addressHints": ["浅草橋", "Asakusabashi", "蔵前", "Kuramae", "Taito"],
-          "swapCopyAngle": "淺草橋一帶的設計旅宿與交誼空間",
-          "imageChecklist": ["room", "dorm", "lounge", "Grids", "hostel", "ホテル"]
-        },
-        {
-          "id": "citan-hostel",
-          "officialName": "CITAN Hostel",
-          "officialNameLocal": "シータンホステル",
-          "aliases": ["CITAN Hostel Tokyo", "CITAN", "シータン"],
-          "mapsQuery": "CITAN Hostel Nihonbashi Tokyo",
-          "photoPlaceQueries": [
-            "CITAN Hostel Tokyo bar",
-            "シータンホステル ラウンジ"
-          ],
-          "photoAnchorTerms": ["CITAN", "シータン", "CITAN Hostel"],
-          "addressHints": ["日本橋", "Nihonbashi", "人形町", "Chuo", "Tokyo"],
-          "swapCopyAngle": "附設咖啡酒吧的設計型旅宿",
-          "imageChecklist": ["room", "dorm", "bar", "lounge", "CITAN", "hostel"]
-        },
-        {
-          "id": "bunka-hostel",
-          "officialName": "Bunka Hostel Tokyo",
-          "officialNameLocal": "ブンカホステル東京",
-          "aliases": ["Bunka Hostel Tokyo", "Bunka Hostel", "ブンカホステル"],
-          "mapsQuery": "Bunka Hostel Tokyo hostel",
-          "deniedPlaceTypes": ["restaurant", "bar", "meal_takeaway", "food"],
-          "photoPlaceQueries": [
-            "Bunka Hostel Tokyo room",
-            "ブンカホステル東京 客室"
-          ],
-          "photoAnchorTerms": ["Bunka", "ブンカ", "Bunka Hostel"],
-          "addressHints": ["浅草", "Asakusa", "Taito", "Tokyo"],
-          "swapCopyAngle": "浅草區的設計旅宿與交誼空間",
-          "imageChecklist": ["room", "dorm", "lounge", "Bunka", "hostel", "ゲスト"]
+          "officialName": "Grids Tokyo Asakusabashi Hotel&Hostel",
+          "officialNameLocal": "",
+          "mapsQuery": "Grids Tokyo Asakusabashi Hotel&Hostel"
         }
       ],
-      "photoIntent": "客房、公共吧台、交誼廳、Lobby 優先，外觀次之",
-      "imageChecklist": ["room", "dorm", "bar", "lounge", "Nui", "hostel", "ゲスト"],
-      "imageRejectRules": ["parking", "restaurant only", "resort", "pool"],
+      "photoIntent": "旅宿外觀、入口優先，其次交誼廳，最後客房",
+      "imageChecklist": [
+        "facade",
+        "exterior",
+        "外観",
+        "lounge",
+        "bar",
+        "room",
+        "hostel"
+      ],
+      "imageRejectRules": [
+        "parking",
+        "restaurant only",
+        "resort",
+        "pool"
+      ],
       "isSpecificVenue": true,
-      "addressHints": ["蔵前", "Kuramae", "浅草橋"],
-      "allowedPlaceTypes": ["lodging", "hostel", "hotel", "establishment"],
-      "deniedPlaceTypes": ["movie_theater"]
+      "addressHints": [
+        "蔵前",
+        "Kuramae",
+        "浅草橋"
+      ],
+      "allowedPlaceTypes": [
+        "lodging",
+        "hostel",
+        "hotel",
+        "establishment"
+      ],
+      "deniedPlaceTypes": [
+        "movie_theater"
+      ],
+      "heading": "Nui. HOSTEL & BAR LOUNGE：旅人的溫馨港灣",
+      "content": "位於藏前，Nui. Hostel以其工業風設計與溫馨氛圍聞名。一樓的酒吧是旅人交流的好地方，能結識來自世界各地的朋友。雖然是青年旅館，但環境整潔舒適，提供高品質的住宿體驗，是預算有限又想體驗東京在地生活的理想選擇。"
+    },
+    {
+      "sectionId": "hotel-gracery",
+      "sectionRole": "hotel",
+      "title": "新宿格拉斯麗酒店：哥吉拉的守護",
+      "sectionType": "hotel",
+      "officialName": "Hotel Gracery Shinjuku",
+      "officialNameLocal": "ホテルグレイスリー新宿",
+      "aliases": [
+        "remm Akihabara",
+        "レム秋葉原",
+        "remm 秋葉原"
+      ],
+      "mapsQuery": "Hotel Gracery Shinjuku",
+      "photoPlaceQueries": [
+        "レム秋葉原 外観",
+        "remm Akihabara exterior",
+        "レム秋葉原 入口",
+        "秋葉原ワシントンホテル 外観"
+      ],
+      "photoAnchorTerms": [
+        "remm",
+        "レム",
+        "Akihabara"
+      ],
+      "allowVenueSwap": true,
+      "venueSwapIntent": "步行可達秋葉原站、客房實用、交通方便",
+      "venueAlternatives": [
+        {
+          "officialName": "Shinjuku Prince Hotel",
+          "officialNameLocal": "",
+          "mapsQuery": "Shinjuku Prince Hotel"
+        }
+      ],
+      "photoIntent": "飯店外觀、建築入口優先，其次 Lobby，最後客房",
+      "imageChecklist": [
+        "facade",
+        "exterior",
+        "外観",
+        "entrance",
+        "lobby",
+        "room",
+        "ホテル"
+      ],
+      "imageRejectRules": [
+        "parking",
+        "garage",
+        "restaurant only",
+        "resort",
+        "pool"
+      ],
+      "isSpecificVenue": true,
+      "addressHints": [
+        "秋葉原",
+        "Akihabara",
+        "Sakumacho"
+      ],
+      "allowedPlaceTypes": [
+        "lodging",
+        "hotel",
+        "establishment"
+      ],
+      "deniedPlaceTypes": [
+        "movie_theater",
+        "restaurant",
+        "cafe"
+      ],
+      "heading": "新宿格拉斯麗酒店：哥吉拉的守護",
+      "content": "提到新宿格拉斯麗，最吸睛的莫過於矗立在樓頂的巨大哥吉拉頭像！這不僅是酒店特色，更是新宿的地標。酒店位置優越，房間舒適，部分客房還能近距離欣賞哥吉拉。夜晚，哥吉拉的眼睛會發光，為你的東京之夜增添一份奇幻色彩。"
     }
   ]
 }

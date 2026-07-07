@@ -3967,7 +3967,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
-            const SOARVIBE_APP_BUILD = 'v124';
+            const SOARVIBE_APP_BUILD = 'v127';
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
@@ -14694,7 +14694,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     meta: {},
                     articles: {},
                     editionCatalog: [],
-                    placeholderImage: './assets/city-journal/placeholder-city-journal.jpg'
+                    placeholderImage: './assets/city-journal/placeholder-city-journal.svg'
                 };
             }
 
@@ -14702,7 +14702,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 var api = getImageManifestApi();
                 if (api.placeholder) return api.placeholder;
                 var bundle = getCityJournalBundle();
-                return bundle.placeholderImage || './assets/city-journal/placeholder-city-journal.jpg';
+                return bundle.placeholderImage || './assets/city-journal/placeholder-city-journal.svg';
             }
 
             function resolveJournalImageKey(imageKey, context) {
@@ -14715,7 +14715,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             function isPlaceholderJournalImage(url) {
-                return !url || url.indexOf('placeholder-city-journal.jpg') !== -1;
+                return !url || url.indexOf('placeholder-city-journal') !== -1;
             }
 
             function getEditionCoverImage(cityId, editionKey, article) {
@@ -14749,7 +14749,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 if (!img || img.getAttribute('data-cj-fallback') === '1') return;
                 var placeholder = getJournalPlaceholder();
                 var current = img.getAttribute('src') || '';
-                if (current.indexOf('placeholder-city-journal.jpg') !== -1) return;
+                if (current.indexOf('placeholder-city-journal') !== -1) return;
                 img.setAttribute('data-cj-fallback', '1');
                 img.src = placeholder;
             }
@@ -14869,7 +14869,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 var url = info.url || getJournalPlaceholder();
                 return (
                     '<figure class="cj-figure">' +
-                    '<img class="cj-figure-img cj-figure-img--wide"' + cjJournalImgAttrs() + ' src="' + escapeHtml(url) + '" alt="' + escapeHtml(caption || '') + '" loading="lazy" decoding="async" onerror="handleCityJournalImageError(this)">' +
+                    '<img class="cj-figure-img cj-figure-img--wide"' + cjJournalImgAttrs() + ' src="' + escapeHtml(url) + '" alt="" role="presentation" loading="lazy" decoding="async" onerror="handleCityJournalImageError(this)">' +
                     (caption ? '<figcaption class="cj-caption">' + escapeHtml(caption) + '</figcaption>' : '') +
                     cjAttributionHtml(info.attribution, info.source) +
                     '</figure>'
@@ -14877,23 +14877,30 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             function resolveSectionCaption(section, imageInfo) {
-                var capApi = window.SOARVIBE_CJ_CAPTION;
-                if (capApi && typeof capApi.generateCaption === 'function') {
-                    var dynamic = capApi.generateCaption({
-                        sectionId: section.sectionId,
-                        placeName: section.subject,
-                        photoPlaceName: section.photoPlaceName || imageInfo.photoPlaceName || section.subject,
-                        googleAttribution: imageInfo && imageInfo.attribution
-                    });
-                    if (dynamic) return dynamic;
+                if (section.caption && imageInfo && (imageInfo.source === 'google_places' || imageInfo.source === 'editorial_ai')) {
+                    return section.caption;
                 }
                 return section.caption || '';
+            }
+
+            function resolveSectionSecondaryImage(section) {
+                if (!section || !section.secondaryGooglePhotoUrl) return null;
+                if (section.imageSource !== 'google_places') return null;
+                return {
+                    url: section.secondaryGooglePhotoUrl,
+                    attribution: section.secondaryGoogleAttribution || 'Google Maps',
+                    source: 'google_places'
+                };
             }
 
             function renderMagazineSection(section, article, heroUrl) {
                 if (!section) return '';
                 var imageInfo = resolveSectionImage(section, article, heroUrl);
                 var caption = resolveSectionCaption(section, imageInfo);
+                var secondaryInfo = resolveSectionSecondaryImage(section);
+                var secondaryHtml = secondaryInfo
+                    ? cjFigureBlock(secondaryInfo, section.secondaryCaption || '')
+                    : '';
                 console.log('[CJ SECTION IMAGE]', section.sectionId, imageInfo.source, imageInfo.url);
                 return (
                     '<article class="cj-magazine-section">' +
@@ -14901,6 +14908,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     renderEditorialMetaHtml(section.editorialMeta) +
                     (section.content ? '<p class="cj-section-content">' + escapeHtml(section.content) + '</p>' : '') +
                     cjFigureBlock(imageInfo, caption) +
+                    secondaryHtml +
                     '</article>'
                 );
             }
@@ -15167,7 +15175,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     return;
                 }
                 img.setAttribute('data-mag-card-fallback', '1');
-                img.src = './assets/city-journal/placeholder-city-journal.jpg';
+                img.src = './assets/city-journal/placeholder-city-journal.svg';
             }
 
             function initCityJournalCityCards() {
