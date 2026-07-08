@@ -30,6 +30,7 @@ import {
   createPhotoSearchDebug,
   logPhotoSearchAttempt
 } from './cj-photo-search-strategy.js';
+import { isStrictLandmarkSection, pickLandmarkPhotoFromPlace } from './cj-landmark-photo.js';
 
 function placeIdFromResource(id) {
   return String(id || '').replace(/^places\//, '').trim();
@@ -330,9 +331,29 @@ async function resolvePhotoForSection(mapsKey, item, contentPlace, excludeUrls, 
     visualKeywords: item.imageChecklist || []
   };
 
-  var isDistrict = item.subjectType === 'district';
   var debug = createPhotoSearchDebug(item.sectionId);
   item._photoSearchDebug = debug;
+
+  if (isStrictLandmarkSection(item) && contentPlace) {
+    var landmarkPick = await pickLandmarkPhotoFromPlace(
+      mapsKey,
+      contentPlace,
+      item,
+      deps,
+      {
+        excludeUrls: excludeUrls,
+        minPhotoIndex: item.minPhotoIndex != null ? item.minPhotoIndex : 0,
+        maxPhotoIndex: item.maxLandmarkPhotoIndex != null ? item.maxLandmarkPhotoIndex : 5,
+        debug: debug
+      }
+    );
+    if (landmarkPick && landmarkPick.googlePhotoUrl) {
+      landmarkPick.photoSearchDebug = debug.toJSON();
+      return landmarkPick;
+    }
+  }
+
+  var isDistrict = item.subjectType === 'district';
 
   var retryPlan = buildPhotoSearchRetryPlan(item, articleCtx, { maxQueries: 28 });
   item._photoSearchPlan = retryPlan;
@@ -509,13 +530,25 @@ export async function resolveSectionRules(mapsKey, item, articleCtx, deps) {
     }
 
     var photoCaption = photoPick ? photoPick.photoCaption : null;
-    if (photoPick && photoPick.googlePhotoUrl && !photoCaption) {
+    if (photoPick && photoPick.googlePhotoUrl && !photoCaption && !photoPick.landmarkPickMode) {
       photoPick = null;
     }
 
     pipelineLog.steps.push('evidence_caption');
     var qa = runEditorialQA(section, photoPick);
-    var engineQa = runEngineQA(section, photoPick, photoCaption, placeId);
+    var engineQa;
+    if (photoPick && photoPick.landmarkPickMode) {
+      engineQa = {
+        pass: true,
+        ok: true,
+        usePlaceholder: false,
+        recommendation: 'pending_vision',
+        issues: [],
+        landmarkPickMode: true
+      };
+    } else {
+      engineQa = runEngineQA(section, photoPick, photoCaption, placeId);
+    }
     if (engineQa.usePlaceholder) {
       qa = Object.assign({}, qa, engineQa);
     }

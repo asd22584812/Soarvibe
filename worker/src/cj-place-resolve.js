@@ -243,6 +243,10 @@ export async function resolveOfficialPlace(mapsKey, item, deps, articleCtx) {
     }
   }
 
+  if (item.strictVenueLock === true || (item.sectionType === 'landmark' && item.isSpecificVenue === true)) {
+    return null;
+  }
+
   for (var s2 = 0; s2 < sequence.length; s2++) {
     var step2 = sequence[s2];
     var places2 = await search(mapsKey, step2.query, step2.lang, regionCode);

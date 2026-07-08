@@ -10,7 +10,7 @@ import { runEditorialQA } from './cj-editorial-pipeline.js';
 import { resolveArticleRules } from './cj-pipeline-rules.js';
 import { generateEditorialArticle, generateSectionCopy, placeCopyNeedsResync } from './cj-editorial-generate.js';
 import { generateAICaption } from './cj-ai-caption.js';
-import { callGeminiRaw } from './cj-gemini-client.js';
+import { callGeminiVisionInlineJSON } from './cj-gemini-client.js';
 import { resolveRegionCode } from './cj-locale-search.js';
 
 const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta/models/';
@@ -627,44 +627,68 @@ async function handleEditorialVisionCaption(request, env, auth) {
     return jsonResponse({ error: 'missing_image' }, 400, auth.origin, env);
   }
   var section = body.section || {};
-  var prompt = [
-    '你是繁體中文旅遊雜誌圖說編輯。只看這張照片，寫一句圖說。',
-    '14–26 字；只描述看得見的內容；不可寫霓虹、人潮、氛圍除非照片裡真的有。',
-    '不可寫「外觀清楚標示位置」等空話。',
-    '段落：' + (section.heading || section.subject || ''),
-    '地點：' + (body.placeName || section.officialNameLocal || section.officialName || ''),
-    '回傳 JSON: { "caption": "..." }'
-  ].join('\n');
+  var verifyMode = body.verifyVenue === true || section.strictVenueLock === true;
+  var mustShow = []
+    .concat(section.photoAnchorTerms || [])
+    .concat(section.imageChecklist || [])
+    .concat([section.officialNameLocal, section.officialName])
+    .filter(Boolean)
+    .slice(0, 8);
 
-  var keys = parseGeminiKeys(env);
-  if (!keys.length) {
-    return jsonResponse({ error: 'no_gemini_keys' }, 503, auth.origin, env);
+  var prompt = verifyMode
+    ? [
+      '你是旅遊雜誌圖片審核編輯。只看這張照片。',
+      '目標地標：' + (section.officialNameLocal || section.officialName || body.placeName || ''),
+      '英文名：' + (section.officialName || ''),
+      '辨識特徵：' + mustShow.join('、'),
+      '若照片主體清楚是這個地標（全景、外觀、入口、塔身、燈籠等皆可），venueMatch=true。',
+      '僅在完全看不出是該地標、或明顯是別家店／室內商品時，venueMatch=false。',
+      '必須只回傳這個 JSON（不要 markdown）：',
+      '{"venueMatch":true,"confidence":0.9,"visibleSubjects":["塔身"],"caption":"14到26字的繁中圖說"}'
+    ].join('\n')
+    : [
+      '你是繁體中文旅遊雜誌圖說編輯。只看這張照片，寫一句圖說。',
+      '14–26 字；只描述看得見的內容；不可寫霓虹、人潮、氛圍除非照片裡真的有。',
+      '不可寫「外觀清楚標示位置」等空話。',
+      '段落：' + (section.heading || section.subject || ''),
+      '地點：' + (body.placeName || section.officialNameLocal || section.officialName || ''),
+      '回傳 JSON: { "caption": "..." }'
+    ].join('\n');
+
+  var vision = await callGeminiVisionInlineJSON(prompt, {
+    data: body.imageBase64,
+    mimeType: body.mimeType || 'image/jpeg'
+  }, env, {
+    temperature: 0.2,
+    maxOutputTokens: 512,
+    salvage: verifyMode ? 'venue' : true
+  });
+  if (!vision.ok) {
+    return jsonResponse({
+      error: 'vision_failed',
+      detail: vision.details || vision.error,
+      raw: vision.raw || null
+    }, 502, auth.origin, env);
   }
-  var mime = body.mimeType || 'image/jpeg';
-  var geminiBody = {
-    contents: [{
-      parts: [
-        { text: prompt },
-        { inline_data: { mime_type: mime, data: body.imageBase64 } }
-      ]
-    }],
-    generationConfig: {
-      temperature: 0.35,
-      maxOutputTokens: 256,
-      responseMimeType: 'application/json'
+  var parsed = vision.data || {};
+  if (verifyMode) {
+    var venueMatch = parsed.venueMatch === true;
+    // If Gemini returned review-salvage shape by mistake, treat pass as venueMatch.
+    if (!venueMatch && parsed.pass === true && !Object.prototype.hasOwnProperty.call(parsed, 'venueMatch')) {
+      venueMatch = true;
     }
-  };
-  var upstream = await callGeminiRaw(geminiBody, DEFAULT_MODEL, keys[0]);
-  if (!upstream.ok) {
-    return jsonResponse({ error: 'vision_failed', detail: upstream.result }, 502, auth.origin, env);
+    return jsonResponse({
+      venueMatch: venueMatch,
+      confidence: typeof parsed.confidence === 'number' ? parsed.confidence : null,
+      visibleSubjects: Array.isArray(parsed.visibleSubjects) ? parsed.visibleSubjects : [],
+      caption: parsed.caption || parsed.visibleDescription || null,
+      keySlot: vision.keySlot || null
+    }, 200, auth.origin, env);
   }
-  try {
-    var parsed = JSON.parse(upstream.text.trim());
-    return jsonResponse({ caption: parsed.caption || null }, 200, auth.origin, env);
-  } catch (e) {
-    var m = upstream.text.match(/"caption"\s*:\s*"([^"]+)"/);
-    return jsonResponse({ caption: m ? m[1] : null }, 200, auth.origin, env);
-  }
+  return jsonResponse({
+    caption: parsed.caption || null,
+    keySlot: vision.keySlot || null
+  }, 200, auth.origin, env);
 }
 
 async function handleEditorialCaption(request, env, auth) {

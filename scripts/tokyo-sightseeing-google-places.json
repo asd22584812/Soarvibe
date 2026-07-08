@@ -1,0 +1,1007 @@
+[
+  {
+    "sectionId": "asakusa",
+    "subject": "淺草寺與仲見世通",
+    "mapsQuery": "Senso-ji Temple Tokyo",
+    "placeId": "ChIJPd37MMGOGGARvJ2hfxoiNVE",
+    "googleRating": 4.3,
+    "googleAddress": "〒111-0032 東京都台東区浅草１丁目３６−３",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjC_BEDPRvFCm5YTh5uzrhUuCfSj6PQJn5vbsrdI9SzCYpKqLSGj_oxgwj-9Sk8PXWYkKCilCzQSsXVdS0c25hsMQZ-kEFAerRfJC8j0Kapf2B-jZzmAw9tkQhNa_1ZvZcwa67PjdfiQmvwSuA=s4800-w1600-h1200",
+    "googleAttribution": "ぴぴねこ",
+    "imageSource": "google_places",
+    "matched": true,
+    "placeName": "仲見世商店街",
+    "photoScore": 100,
+    "photoIndex": 0,
+    "photoEvidence": {
+      "primary": "landmark_building",
+      "types": [
+        "landmark_building",
+        "facade"
+      ],
+      "subjectType": "landmark",
+      "role": "landmark",
+      "blob": "仲見世商店街"
+    },
+    "travelPhotoSlot": "landmark_exterior",
+    "copySemantics": {
+      "primary": "street_scene",
+      "categories": [
+        "street_scene"
+      ],
+      "hits": [
+        {
+          "category": "street_scene",
+          "score": 1,
+          "matched": [
+            "兩側"
+          ],
+          "evidence": [
+            "street_landmark",
+            "landmark_building"
+          ]
+        }
+      ],
+      "requiredEvidence": [
+        "street_landmark",
+        "landmark_building"
+      ],
+      "searchBoost": [
+        "兩側"
+      ],
+      "copyExcerpt": "淺草寺與仲見世通 從雷門的大紅燈籠走進仲見世通，淺草寺是大多數旅人認識東京的第一站。參道兩側是人形燒、炸饅頭與和服配件，穿過二天門後，五重塔與本堂在面前展開。建議早上九點前抵達，避開旅行團高峰；參拜後可沿隅田川散步，或搭淺草線一站到晴空塔。 淺草寺與仲見世通 淺草寺與仲見世通"
+    },
+    "copyDerivedPhotoIntent": "街景、霓虹、人潮、地標建築外觀",
+    "matchedKeywords": [
+      "五重塔",
+      "仲見世",
+      "浅草寺",
+      "参道"
+    ],
+    "photoPlaceName": "仲見世商店街",
+    "searchUsed": "仲見世通り",
+    "photoSearchUsed": "landmark_verified_place",
+    "photoSearchPhase": "landmark_pick",
+    "photoSearchDebug": {
+      "sectionId": "asakusa",
+      "attempts": [
+        {
+          "ts": 1783508310414,
+          "sectionId": "asakusa",
+          "slot": "landmark_verified",
+          "query": "placeId:仲見世商店街",
+          "phase": "landmark_pick",
+          "candidateCount": 10,
+          "photoIndex": 0,
+          "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjC_BEDPRvFCm5YTh5uzrhUuCfSj6PQJn5vbsrdI9SzCYpKqLSGj_oxgwj-9Sk8PXWYkKCilCzQSsXVdS0c25hsMQZ-kEFAerRfJC8j0Kapf2B-jZzmAw9tkQhNa_1ZvZcwa67PjdfiQmvwSuA=s4800-w1600-h1200",
+          "selectedReason": "landmark_verified_index_0",
+          "rejectReason": null
+        }
+      ]
+    },
+    "sectionType": "landmark",
+    "role": null,
+    "rejectReason": null,
+    "editorialQA": {
+      "ok": true,
+      "issues": [],
+      "usePlaceholder": false
+    },
+    "venueSwapped": false,
+    "swappedFrom": null,
+    "swappedTo": null,
+    "alternativeId": null,
+    "heading": "淺草寺與仲見世通",
+    "content": "從雷門的大紅燈籠走進仲見世通，淺草寺是大多數旅人認識東京的第一站。參道兩側是人形燒、炸饅頭與和服配件，穿過二天門後，五重塔與本堂在面前展開。建議早上九點前抵達，避開旅行團高峰；參拜後可沿隅田川散步，或搭淺草線一站到晴空塔。",
+    "officialName": "Senso-ji Temple",
+    "officialNameLocal": "浅草寺",
+    "pipeline": {
+      "version": "photo-search-retry-v1",
+      "steps": [
+        "copy_semantic_analysis",
+        "derive_photo_intent",
+        "place_verify",
+        "photo_search_retry",
+        "photo_first_pick",
+        "evidence_caption",
+        "rule_qa"
+      ],
+      "aiTokens": 0,
+      "photoSearchDebug": {
+        "sectionId": "asakusa",
+        "attempts": [
+          {
+            "ts": 1783508310414,
+            "sectionId": "asakusa",
+            "slot": "landmark_verified",
+            "query": "placeId:仲見世商店街",
+            "phase": "landmark_pick",
+            "candidateCount": 10,
+            "photoIndex": 0,
+            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjC_BEDPRvFCm5YTh5uzrhUuCfSj6PQJn5vbsrdI9SzCYpKqLSGj_oxgwj-9Sk8PXWYkKCilCzQSsXVdS0c25hsMQZ-kEFAerRfJC8j0Kapf2B-jZzmAw9tkQhNa_1ZvZcwa67PjdfiQmvwSuA=s4800-w1600-h1200",
+            "selectedReason": "landmark_verified_index_0",
+            "rejectReason": null
+          }
+        ]
+      }
+    },
+    "photoCaption": "浅草寺的景觀清楚可見，與本段介紹的地標一致。"
+  },
+  {
+    "sectionId": "skytree",
+    "subject": "東京晴空塔",
+    "mapsQuery": "Tokyo Skytree",
+    "placeId": "ChIJ35ov0dCOGGARKvdDH7NPHX0",
+    "googleRating": 4.4,
+    "googleAddress": "〒131-0045 東京都墨田区押上１丁目１−２",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjC1jHIfY1jcq6MiGc3Q82tEjKtUSWaeTtRD3TwOESHBc9CCQaUNZb-yLHyU92GfBZP23ygOQ77t7vuW7wHmgIeE6Rf8YFEziteZee-JXU9YGZGc2cPQXaKV0Cz45BuUfZWEqgI5K1TTBCJ1Jg=s4800-w1600-h1200",
+    "googleAttribution": "Riccardo Widera",
+    "imageSource": "google_places",
+    "matched": true,
+    "placeName": "東京スカイツリー",
+    "photoScore": 100,
+    "photoIndex": 0,
+    "photoEvidence": {
+      "primary": "landmark_building",
+      "types": [
+        "landmark_building",
+        "facade"
+      ],
+      "subjectType": "landmark",
+      "role": "landmark",
+      "blob": "東京スカイツリー"
+    },
+    "travelPhotoSlot": "landmark_exterior",
+    "copySemantics": {
+      "primary": "landmark",
+      "categories": [],
+      "hits": [],
+      "requiredEvidence": [
+        "street_landmark",
+        "landmark_building"
+      ],
+      "searchBoost": [],
+      "copyExcerpt": "東京晴空塔 從淺草步行或搭一站地鐵，634 公尺高的晴空塔會突然出現在視線裡。塔下ソラマチ有餐飲與伴手禮，建議先在外圍廣場拍塔身全景，再決定是否登展望台。天氣好時從高處可望見富士山輪廓，是認識東京天際線的最佳座標之一。 東京晴空塔 東京晴空塔"
+    },
+    "copyDerivedPhotoIntent": "地標建築、代表性招牌、街區辨識點",
+    "matchedKeywords": [
+      "スカイツリー",
+      "Skytree",
+      "晴空塔"
+    ],
+    "photoPlaceName": "東京スカイツリー",
+    "searchUsed": "東京スカイツリー",
+    "photoSearchUsed": "landmark_verified_place",
+    "photoSearchPhase": "landmark_pick",
+    "photoSearchDebug": {
+      "sectionId": "skytree",
+      "attempts": [
+        {
+          "ts": 1783508315672,
+          "sectionId": "skytree",
+          "slot": "landmark_verified",
+          "query": "placeId:東京スカイツリー",
+          "phase": "landmark_pick",
+          "candidateCount": 10,
+          "photoIndex": 0,
+          "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjC1jHIfY1jcq6MiGc3Q82tEjKtUSWaeTtRD3TwOESHBc9CCQaUNZb-yLHyU92GfBZP23ygOQ77t7vuW7wHmgIeE6Rf8YFEziteZee-JXU9YGZGc2cPQXaKV0Cz45BuUfZWEqgI5K1TTBCJ1Jg=s4800-w1600-h1200",
+          "selectedReason": "landmark_verified_index_0",
+          "rejectReason": null
+        }
+      ]
+    },
+    "sectionType": "landmark",
+    "role": null,
+    "rejectReason": null,
+    "editorialQA": {
+      "ok": true,
+      "issues": [],
+      "usePlaceholder": false
+    },
+    "venueSwapped": false,
+    "swappedFrom": null,
+    "swappedTo": null,
+    "alternativeId": null,
+    "heading": "東京晴空塔",
+    "content": "從淺草步行或搭一站地鐵，634 公尺高的晴空塔會突然出現在視線裡。塔下ソラマチ有餐飲與伴手禮，建議先在外圍廣場拍塔身全景，再決定是否登展望台。天氣好時從高處可望見富士山輪廓，是認識東京天際線的最佳座標之一。",
+    "officialName": "Tokyo Skytree",
+    "officialNameLocal": "東京スカイツリー",
+    "pipeline": {
+      "version": "photo-search-retry-v1",
+      "steps": [
+        "copy_semantic_analysis",
+        "derive_photo_intent",
+        "place_verify",
+        "photo_search_retry",
+        "photo_first_pick",
+        "evidence_caption",
+        "rule_qa"
+      ],
+      "aiTokens": 0,
+      "photoSearchDebug": {
+        "sectionId": "skytree",
+        "attempts": [
+          {
+            "ts": 1783508315672,
+            "sectionId": "skytree",
+            "slot": "landmark_verified",
+            "query": "placeId:東京スカイツリー",
+            "phase": "landmark_pick",
+            "candidateCount": 10,
+            "photoIndex": 0,
+            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjC1jHIfY1jcq6MiGc3Q82tEjKtUSWaeTtRD3TwOESHBc9CCQaUNZb-yLHyU92GfBZP23ygOQ77t7vuW7wHmgIeE6Rf8YFEziteZee-JXU9YGZGc2cPQXaKV0Cz45BuUfZWEqgI5K1TTBCJ1Jg=s4800-w1600-h1200",
+            "selectedReason": "landmark_verified_index_0",
+            "rejectReason": null
+          }
+        ]
+      }
+    },
+    "photoCaption": "東京スカイツリー的景觀清楚可見，與本段介紹的地標一致。"
+  },
+  {
+    "sectionId": "ueno",
+    "subject": "上野公園",
+    "mapsQuery": "Ueno Park Tokyo",
+    "placeId": "ChIJw2qQRZuOGGARWmROEiM2y7E",
+    "googleRating": 4.4,
+    "googleAddress": "〒110-0007 東京都台東区上野公園４",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjCmxYPRasZe-RukNZpekc5l2s2Ai1xz1-JBlLGc3yIc6nrVevydDspZB3nfPTEv2_1JqnDH_x2_jCyCmib-vst5GMbY1uY6MNuoYaMcW9HrlBq4KYieWKKzLx5_fbrslioIc_lJJndQzR6dhk4=s4800-w1600-h1200",
+    "googleAttribution": "jared lee",
+    "imageSource": "google_places",
+    "matched": true,
+    "placeName": "上野恩賜公園",
+    "photoScore": 100,
+    "photoIndex": 0,
+    "photoEvidence": {
+      "primary": "landmark_building",
+      "types": [
+        "landmark_building",
+        "facade"
+      ],
+      "subjectType": "landmark",
+      "role": "landmark",
+      "blob": "上野恩賜公園"
+    },
+    "travelPhotoSlot": "landmark_exterior",
+    "copySemantics": {
+      "primary": "street_scene",
+      "categories": [
+        "street_scene",
+        "room"
+      ],
+      "hits": [
+        {
+          "category": "street_scene",
+          "score": 1,
+          "matched": [
+            "人潮"
+          ],
+          "evidence": [
+            "street_landmark",
+            "landmark_building"
+          ]
+        },
+        {
+          "category": "room",
+          "score": 1,
+          "matched": [
+            "休息"
+          ],
+          "evidence": [
+            "room"
+          ]
+        }
+      ],
+      "requiredEvidence": [
+        "street_landmark",
+        "landmark_building",
+        "room"
+      ],
+      "searchBoost": [
+        "人潮",
+        "休息"
+      ],
+      "copyExcerpt": "上野公園 JR 上野站步行五分鐘，不忍池畔的步道把國立博物館、科學博物館與動物園串在一起。第一次來不必每館都進——選一間（國立博物館藏品最豐）搭配園內散步就剛好。春天櫻花盛開時人潮洶湧，平日午後則適合坐在池邊休息，感受東京少見的遼闊綠意。 上野公園 上野公園"
+    },
+    "copyDerivedPhotoIntent": "街景、霓虹、人潮、地標建築外觀、客房、房間、床位空間",
+    "matchedKeywords": [
+      "上野",
+      "不忍池",
+      "公園"
+    ],
+    "photoPlaceName": "上野恩賜公園",
+    "searchUsed": "Ueno Park",
+    "photoSearchUsed": "landmark_verified_place",
+    "photoSearchPhase": "landmark_pick",
+    "photoSearchDebug": {
+      "sectionId": "ueno",
+      "attempts": [
+        {
+          "ts": 1783508320191,
+          "sectionId": "ueno",
+          "slot": "landmark_verified",
+          "query": "placeId:上野恩賜公園",
+          "phase": "landmark_pick",
+          "candidateCount": 10,
+          "photoIndex": 0,
+          "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjCmxYPRasZe-RukNZpekc5l2s2Ai1xz1-JBlLGc3yIc6nrVevydDspZB3nfPTEv2_1JqnDH_x2_jCyCmib-vst5GMbY1uY6MNuoYaMcW9HrlBq4KYieWKKzLx5_fbrslioIc_lJJndQzR6dhk4=s4800-w1600-h1200",
+          "selectedReason": "landmark_verified_index_0",
+          "rejectReason": null
+        }
+      ]
+    },
+    "sectionType": "landmark",
+    "role": null,
+    "rejectReason": null,
+    "editorialQA": {
+      "ok": true,
+      "issues": [],
+      "usePlaceholder": false
+    },
+    "venueSwapped": false,
+    "swappedFrom": null,
+    "swappedTo": null,
+    "alternativeId": null,
+    "heading": "上野公園",
+    "content": "JR 上野站步行五分鐘，不忍池畔的步道把國立博物館、科學博物館與動物園串在一起。第一次來不必每館都進——選一間（國立博物館藏品最豐）搭配園內散步就剛好。春天櫻花盛開時人潮洶湧，平日午後則適合坐在池邊休息，感受東京少見的遼闊綠意。",
+    "officialName": "Ueno Park",
+    "officialNameLocal": "上野恩賜公園",
+    "pipeline": {
+      "version": "photo-search-retry-v1",
+      "steps": [
+        "copy_semantic_analysis",
+        "derive_photo_intent",
+        "place_verify",
+        "photo_search_retry",
+        "photo_first_pick",
+        "evidence_caption",
+        "rule_qa"
+      ],
+      "aiTokens": 0,
+      "photoSearchDebug": {
+        "sectionId": "ueno",
+        "attempts": [
+          {
+            "ts": 1783508320191,
+            "sectionId": "ueno",
+            "slot": "landmark_verified",
+            "query": "placeId:上野恩賜公園",
+            "phase": "landmark_pick",
+            "candidateCount": 10,
+            "photoIndex": 0,
+            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjCmxYPRasZe-RukNZpekc5l2s2Ai1xz1-JBlLGc3yIc6nrVevydDspZB3nfPTEv2_1JqnDH_x2_jCyCmib-vst5GMbY1uY6MNuoYaMcW9HrlBq4KYieWKKzLx5_fbrslioIc_lJJndQzR6dhk4=s4800-w1600-h1200",
+            "selectedReason": "landmark_verified_index_0",
+            "rejectReason": null
+          }
+        ]
+      }
+    },
+    "photoCaption": "上野恩賜公園的景觀清楚可見，與本段介紹的地標一致。"
+  },
+  {
+    "sectionId": "shibuya",
+    "subject": "澀谷十字路口",
+    "mapsQuery": "Shibuya Scramble Crossing Tokyo",
+    "placeId": "ChIJx1e971eLGGARum8w_tnpFwI",
+    "googleRating": 4.4,
+    "googleAddress": "〒150-0043 東京都渋谷区道玄坂２丁目１",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjAd7z4zP7KFm_T2HjW-FaIiwqT_-f7t0phYbzqEjC0Cw0zW3z1B6P_5gtupfnaj7v_Cfymk43WmXVIupimm4NYMNk2cSLRyHLIQRM5peGTSuZ3YX0vD2XwPjE5xTMcnyMQv7HxRerD8xeR78p0=s4800-w1600-h1200",
+    "googleAttribution": "Trip Be Me Travel Stories",
+    "imageSource": "google_places",
+    "matched": true,
+    "placeName": "忠犬ハチ公像",
+    "photoScore": 100,
+    "photoIndex": 0,
+    "photoEvidence": {
+      "primary": "landmark_building",
+      "types": [
+        "landmark_building",
+        "facade"
+      ],
+      "subjectType": "landmark",
+      "role": "landmark",
+      "blob": "忠犬ハチ公像"
+    },
+    "travelPhotoSlot": "landmark_exterior",
+    "copySemantics": {
+      "primary": "night",
+      "categories": [
+        "night",
+        "street_scene"
+      ],
+      "hits": [
+        {
+          "category": "night",
+          "score": 3,
+          "matched": [
+            "霓虹亮起",
+            "傍晚",
+            "夜間"
+          ],
+          "evidence": [
+            "street_landmark",
+            "landmark_building"
+          ]
+        },
+        {
+          "category": "street_scene",
+          "score": 2,
+          "matched": [
+            "霓虹",
+            "街區"
+          ],
+          "evidence": [
+            "street_landmark",
+            "landmark_building"
+          ]
+        }
+      ],
+      "requiredEvidence": [
+        "street_landmark",
+        "landmark_building"
+      ],
+      "searchBoost": [
+        "霓虹",
+        "街區",
+        "霓虹亮起",
+        "傍晚",
+        "夜間"
+      ],
+      "copyExcerpt": "澀谷十字路口 八公雕像前集合，等號誌一變，數千人同時穿過馬路——這是東京最經典的都市畫面。建議從 MAGNET 的 Shibuya Sky 或車站二樓展望窗俯瞰，再下樓親身走一趟。傍晚到夜間霓虹亮起，街區最有張力；周邊宮下公園與表參道延伸可以留到隔天。 澀谷十字路口 澀谷十字路口"
+    },
+    "copyDerivedPhotoIntent": "夜景霓虹、傍晚街景、街景、霓虹、人潮、地標建築外觀",
+    "matchedKeywords": [
+      "スクランブル",
+      "Scramble",
+      "ハチ公",
+      "Hachiko"
+    ],
+    "photoPlaceName": "忠犬ハチ公像",
+    "searchUsed": "ハチ公",
+    "photoSearchUsed": "landmark_verified_place",
+    "photoSearchPhase": "landmark_pick",
+    "photoSearchDebug": {
+      "sectionId": "shibuya",
+      "attempts": [
+        {
+          "ts": 1783508325654,
+          "sectionId": "shibuya",
+          "slot": "landmark_verified",
+          "query": "placeId:忠犬ハチ公像",
+          "phase": "landmark_pick",
+          "candidateCount": 10,
+          "photoIndex": 0,
+          "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjAd7z4zP7KFm_T2HjW-FaIiwqT_-f7t0phYbzqEjC0Cw0zW3z1B6P_5gtupfnaj7v_Cfymk43WmXVIupimm4NYMNk2cSLRyHLIQRM5peGTSuZ3YX0vD2XwPjE5xTMcnyMQv7HxRerD8xeR78p0=s4800-w1600-h1200",
+          "selectedReason": "landmark_verified_index_0",
+          "rejectReason": null
+        }
+      ]
+    },
+    "sectionType": "landmark",
+    "role": null,
+    "rejectReason": null,
+    "editorialQA": {
+      "ok": true,
+      "issues": [],
+      "usePlaceholder": false
+    },
+    "venueSwapped": false,
+    "swappedFrom": null,
+    "swappedTo": null,
+    "alternativeId": null,
+    "heading": "澀谷十字路口",
+    "content": "八公雕像前集合，等號誌一變，數千人同時穿過馬路——這是東京最經典的都市畫面。建議從 MAGNET 的 Shibuya Sky 或車站二樓展望窗俯瞰，再下樓親身走一趟。傍晚到夜間霓虹亮起，街區最有張力；周邊宮下公園與表參道延伸可以留到隔天。",
+    "officialName": "Shibuya Scramble Crossing",
+    "officialNameLocal": "渋谷スクランブル交差点",
+    "pipeline": {
+      "version": "photo-search-retry-v1",
+      "steps": [
+        "copy_semantic_analysis",
+        "derive_photo_intent",
+        "place_verify",
+        "photo_search_retry",
+        "photo_first_pick",
+        "evidence_caption",
+        "rule_qa"
+      ],
+      "aiTokens": 0,
+      "photoSearchDebug": {
+        "sectionId": "shibuya",
+        "attempts": [
+          {
+            "ts": 1783508325654,
+            "sectionId": "shibuya",
+            "slot": "landmark_verified",
+            "query": "placeId:忠犬ハチ公像",
+            "phase": "landmark_pick",
+            "candidateCount": 10,
+            "photoIndex": 0,
+            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjAd7z4zP7KFm_T2HjW-FaIiwqT_-f7t0phYbzqEjC0Cw0zW3z1B6P_5gtupfnaj7v_Cfymk43WmXVIupimm4NYMNk2cSLRyHLIQRM5peGTSuZ3YX0vD2XwPjE5xTMcnyMQv7HxRerD8xeR78p0=s4800-w1600-h1200",
+            "selectedReason": "landmark_verified_index_0",
+            "rejectReason": null
+          }
+        ]
+      }
+    },
+    "photoCaption": "渋谷スクランブル交差点的景觀清楚可見，與本段介紹的地標一致。"
+  },
+  {
+    "sectionId": "shinjuku",
+    "subject": "東京都廳展望台",
+    "mapsQuery": "Tokyo Metropolitan Government Building Shinjuku",
+    "placeId": "ChIJoTcat9SMGGAR6GGG8zdcZvE",
+    "googleRating": 4.5,
+    "googleAddress": "〒163-8001 東京都新宿区西新宿２丁目８−１",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjCEJMUPLumnpHRCE0RCL_11eJVzPFmBPaq888r6JZtDlSqyYOuhdBUFR1bVOph4SjFS4FxlvrdcRgNHYzr9s6Qw7zf4ewxxHTF96yXvuqKW3FkEcly4ctDWAmVUJzHainMeqVnqNiz_eYTGmg=s4800-w1600-h1200",
+    "googleAttribution": "Michał Jasnowski",
+    "imageSource": "google_places",
+    "matched": true,
+    "placeName": "東京都庁",
+    "photoScore": 100,
+    "photoIndex": 0,
+    "photoEvidence": {
+      "primary": "landmark_building",
+      "types": [
+        "landmark_building",
+        "facade"
+      ],
+      "subjectType": "landmark",
+      "role": "landmark",
+      "blob": "東京都庁"
+    },
+    "travelPhotoSlot": "landmark_exterior",
+    "copySemantics": {
+      "primary": "night",
+      "categories": [
+        "night"
+      ],
+      "hits": [
+        {
+          "category": "night",
+          "score": 1,
+          "matched": [
+            "夜景"
+          ],
+          "evidence": [
+            "street_landmark",
+            "landmark_building"
+          ]
+        }
+      ],
+      "requiredEvidence": [
+        "street_landmark",
+        "landmark_building"
+      ],
+      "searchBoost": [
+        "夜景"
+      ],
+      "copyExcerpt": "東京都廳展望台 新宿西口的都廳雙塔，45 樓展望室免費開放（僅需排隊安檢）。東京鐵塔、晴空塔與遠方富士山在夜色裡一字排開，是預算型旅人的夜景首選。建議日落前 40 分鐘抵達，同時捕捉夕陽與亮燈；下樓後可步行至新宿御苑外圍或歌舞伎町一帶晚餐。 東京都廳展望台 東京都廳展望台"
+    },
+    "copyDerivedPhotoIntent": "夜景霓虹、傍晚街景",
+    "matchedKeywords": [
+      "都庁",
+      "展望",
+      "TMG"
+    ],
+    "photoPlaceName": "東京都庁",
+    "searchUsed": "TMG Building",
+    "photoSearchUsed": "landmark_verified_place",
+    "photoSearchPhase": "landmark_pick",
+    "photoSearchDebug": {
+      "sectionId": "shinjuku",
+      "attempts": [
+        {
+          "ts": 1783508330426,
+          "sectionId": "shinjuku",
+          "slot": "landmark_verified",
+          "query": "placeId:東京都庁",
+          "phase": "landmark_pick",
+          "candidateCount": 10,
+          "photoIndex": 0,
+          "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjCEJMUPLumnpHRCE0RCL_11eJVzPFmBPaq888r6JZtDlSqyYOuhdBUFR1bVOph4SjFS4FxlvrdcRgNHYzr9s6Qw7zf4ewxxHTF96yXvuqKW3FkEcly4ctDWAmVUJzHainMeqVnqNiz_eYTGmg=s4800-w1600-h1200",
+          "selectedReason": "landmark_verified_index_0",
+          "rejectReason": null
+        }
+      ]
+    },
+    "sectionType": "landmark",
+    "role": null,
+    "rejectReason": null,
+    "editorialQA": {
+      "ok": true,
+      "issues": [],
+      "usePlaceholder": false
+    },
+    "venueSwapped": false,
+    "swappedFrom": null,
+    "swappedTo": null,
+    "alternativeId": null,
+    "heading": "東京都廳展望台",
+    "content": "新宿西口的都廳雙塔，45 樓展望室免費開放（僅需排隊安檢）。東京鐵塔、晴空塔與遠方富士山在夜色裡一字排開，是預算型旅人的夜景首選。建議日落前 40 分鐘抵達，同時捕捉夕陽與亮燈；下樓後可步行至新宿御苑外圍或歌舞伎町一帶晚餐。",
+    "officialName": "Tokyo Metropolitan Government Building",
+    "officialNameLocal": "東京都庁",
+    "pipeline": {
+      "version": "photo-search-retry-v1",
+      "steps": [
+        "copy_semantic_analysis",
+        "derive_photo_intent",
+        "place_verify",
+        "photo_search_retry",
+        "photo_first_pick",
+        "evidence_caption",
+        "rule_qa"
+      ],
+      "aiTokens": 0,
+      "photoSearchDebug": {
+        "sectionId": "shinjuku",
+        "attempts": [
+          {
+            "ts": 1783508330426,
+            "sectionId": "shinjuku",
+            "slot": "landmark_verified",
+            "query": "placeId:東京都庁",
+            "phase": "landmark_pick",
+            "candidateCount": 10,
+            "photoIndex": 0,
+            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjCEJMUPLumnpHRCE0RCL_11eJVzPFmBPaq888r6JZtDlSqyYOuhdBUFR1bVOph4SjFS4FxlvrdcRgNHYzr9s6Qw7zf4ewxxHTF96yXvuqKW3FkEcly4ctDWAmVUJzHainMeqVnqNiz_eYTGmg=s4800-w1600-h1200",
+            "selectedReason": "landmark_verified_index_0",
+            "rejectReason": null
+          }
+        ]
+      }
+    },
+    "photoCaption": "東京都庁的景觀清楚可見，與本段介紹的地標一致。"
+  },
+  {
+    "sectionId": "odaiba",
+    "subject": "台場海濱公園",
+    "mapsQuery": "Odaiba Seaside Park Tokyo",
+    "placeId": "ChIJbWVFlTCKGGARr5l6ox-7_CA",
+    "googleRating": 4.5,
+    "googleAddress": "〒105-0000 東京都港区海岸３丁目",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZMM-cHj-qPZax969K5-wWlj5-KSUapOor3VI4nab2Nmz_U1FJdQtvNNd9iRvfMdMECaKHhHHDuy5CcgQRZjQuJTZ4hwQBeYbd4V3RNxh88QA3CdFre2NO5MQM5ptiqwhkUGiiIatAknRbYnbhjI1l1X=s4800-w569-h400",
+    "googleAttribution": "浩二",
+    "imageSource": "google_places",
+    "matched": true,
+    "placeName": "レインボーブリッジ",
+    "photoScore": 100,
+    "photoIndex": 0,
+    "photoEvidence": {
+      "primary": "landmark_building",
+      "types": [
+        "landmark_building",
+        "facade"
+      ],
+      "subjectType": "landmark",
+      "role": "landmark",
+      "blob": "レインボーブリッジ"
+    },
+    "travelPhotoSlot": "landmark_exterior",
+    "copySemantics": {
+      "primary": "night",
+      "categories": [
+        "night"
+      ],
+      "hits": [
+        {
+          "category": "night",
+          "score": 1,
+          "matched": [
+            "傍晚"
+          ],
+          "evidence": [
+            "street_landmark",
+            "landmark_building"
+          ]
+        }
+      ],
+      "requiredEvidence": [
+        "street_landmark",
+        "landmark_building"
+      ],
+      "searchBoost": [
+        "傍晚"
+      ],
+      "copyExcerpt": "台場海濱公園 百合海鷗線或臨海線到台場，海濱公園的步道正對彩虹大橋。自由女神像與富士電視台球體是經典取景點，傍晚海面反射大橋燈光。親子可順遊 teamLab Borderless 或 DiverCity 鋼彈，但第一次來，沿著海岸線散步、吹海風就足夠浪漫。 台場海濱公園 台場海濱公園"
+    },
+    "copyDerivedPhotoIntent": "夜景霓虹、傍晚街景",
+    "matchedKeywords": [
+      "お台場",
+      "レインボーブリッジ",
+      "自由の女神"
+    ],
+    "photoPlaceName": "レインボーブリッジ",
+    "searchUsed": "レインボーブリッジ",
+    "photoSearchUsed": "landmark_verified_place",
+    "photoSearchPhase": "landmark_pick",
+    "photoSearchDebug": {
+      "sectionId": "odaiba",
+      "attempts": [
+        {
+          "ts": 1783508334831,
+          "sectionId": "odaiba",
+          "slot": "landmark_verified",
+          "query": "placeId:レインボーブリッジ",
+          "phase": "landmark_pick",
+          "candidateCount": 10,
+          "photoIndex": 0,
+          "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZMM-cHj-qPZax969K5-wWlj5-KSUapOor3VI4nab2Nmz_U1FJdQtvNNd9iRvfMdMECaKHhHHDuy5CcgQRZjQuJTZ4hwQBeYbd4V3RNxh88QA3CdFre2NO5MQM5ptiqwhkUGiiIatAknRbYnbhjI1l1X=s4800-w569-h400",
+          "selectedReason": "landmark_verified_index_0",
+          "rejectReason": null
+        }
+      ]
+    },
+    "sectionType": "landmark",
+    "role": null,
+    "rejectReason": null,
+    "editorialQA": {
+      "ok": true,
+      "issues": [],
+      "usePlaceholder": false
+    },
+    "venueSwapped": false,
+    "swappedFrom": null,
+    "swappedTo": null,
+    "alternativeId": null,
+    "heading": "台場海濱公園",
+    "content": "百合海鷗線或臨海線到台場，海濱公園的步道正對彩虹大橋。自由女神像與富士電視台球體是經典取景點，傍晚海面反射大橋燈光。親子可順遊 teamLab Borderless 或 DiverCity 鋼彈，但第一次來，沿著海岸線散步、吹海風就足夠浪漫。",
+    "officialName": "Odaiba Seaside Park",
+    "officialNameLocal": "お台場海浜公園",
+    "pipeline": {
+      "version": "photo-search-retry-v1",
+      "steps": [
+        "copy_semantic_analysis",
+        "derive_photo_intent",
+        "place_verify",
+        "photo_search_retry",
+        "photo_first_pick",
+        "evidence_caption",
+        "rule_qa"
+      ],
+      "aiTokens": 0,
+      "photoSearchDebug": {
+        "sectionId": "odaiba",
+        "attempts": [
+          {
+            "ts": 1783508334831,
+            "sectionId": "odaiba",
+            "slot": "landmark_verified",
+            "query": "placeId:レインボーブリッジ",
+            "phase": "landmark_pick",
+            "candidateCount": 10,
+            "photoIndex": 0,
+            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZMM-cHj-qPZax969K5-wWlj5-KSUapOor3VI4nab2Nmz_U1FJdQtvNNd9iRvfMdMECaKHhHHDuy5CcgQRZjQuJTZ4hwQBeYbd4V3RNxh88QA3CdFre2NO5MQM5ptiqwhkUGiiIatAknRbYnbhjI1l1X=s4800-w569-h400",
+            "selectedReason": "landmark_verified_index_0",
+            "rejectReason": null
+          }
+        ]
+      }
+    },
+    "photoCaption": "橫跨東京灣的彩虹大橋，是台場海濱公園的標誌性景觀。"
+  },
+  {
+    "sectionId": "tsukiji",
+    "subject": "築地場外市場",
+    "mapsQuery": "Tsukiji Outer Market Tokyo",
+    "placeId": "ChIJW2cLzSGLGGARXAKXv6EkbqI",
+    "googleRating": 4.2,
+    "googleAddress": "〒104-0045 東京都中央区築地４丁目１６ および６丁目一部",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZMd-kIk7RKLgwMACo8gF_X2mSrJwaFirCG57ZXoW_sGH4KNhAY_IsQ8XqthOXDRNIlBHKE7VkgjrvPXRR3N7x7Yv6aj1bdnzl5kVRiXrbW2V63s1bW299GgERdv8VkZXNTg5F6Wxz3fe4ZCsQ=s4800-w1600-h1200",
+    "googleAttribution": "Kevin Wong",
+    "imageSource": "google_places",
+    "matched": true,
+    "placeName": "築地場外市場",
+    "photoScore": 165,
+    "photoIndex": 0,
+    "photoCaption": "築地場外市場的外觀與入口清楚可見，方便對照地圖找路。",
+    "photoEvidence": {
+      "primary": "facade",
+      "types": [
+        "facade",
+        "food_dish"
+      ],
+      "signals": [],
+      "subjectType": "market",
+      "role": "food",
+      "blob": "kevin wong"
+    },
+    "travelPhotoSlot": "storefront",
+    "copySemantics": {
+      "primary": "dish",
+      "categories": [],
+      "hits": [],
+      "requiredEvidence": [
+        "food_dish"
+      ],
+      "searchBoost": [],
+      "copyExcerpt": "築地場外市場 場外市場的巷弄在早上七點就熱鬧起來。玉子燒、海鮮丼與現開牡蠣攤位林立，不必迷信名店——看哪條隊伍順路排就好。多數店家只收現金，且不宜邊走邊吃；買好找個角落站定再開動。吃完可走 15 分鐘到銀座，或搭地鐵往機場方向離開東京。 築地場外市場 築地場外市場"
+    },
+    "copyDerivedPhotoIntent": "成品料理、餐點本體",
+    "matchedKeywords": [
+      "築地",
+      "市場",
+      "築地場外市場",
+      "築地",
+      "場外市場",
+      "築地",
+      "場外",
+      "市場"
+    ],
+    "photoPlaceName": "築地場外市場",
+    "searchUsed": "Tsukiji Market",
+    "photoSearchUsed": "content_place",
+    "photoSearchDebug": {
+      "sectionId": "tsukiji",
+      "attempts": [
+        {
+          "ts": 1783508339833,
+          "sectionId": "tsukiji",
+          "slot": "storefront",
+          "query": "placeId:ChIJW2cLzSGLGGARXAKXv6EkbqI",
+          "phase": "place_photos",
+          "candidateCount": 10,
+          "selectedImageUrl": null,
+          "selectedReason": null,
+          "rejectReason": null
+        }
+      ]
+    },
+    "sectionType": "food",
+    "role": null,
+    "rejectReason": null,
+    "editorialQA": {
+      "ok": true,
+      "issues": [],
+      "usePlaceholder": false
+    },
+    "venueSwapped": false,
+    "swappedFrom": null,
+    "swappedTo": null,
+    "alternativeId": null,
+    "heading": "築地場外市場",
+    "content": "場外市場的巷弄在早上七點就熱鬧起來。玉子燒、海鮮丼與現開牡蠣攤位林立，不必迷信名店——看哪條隊伍順路排就好。多數店家只收現金，且不宜邊走邊吃；買好找個角落站定再開動。吃完可走 15 分鐘到銀座，或搭地鐵往機場方向離開東京。",
+    "officialName": "Tsukiji Outer Market",
+    "officialNameLocal": "築地場外市場",
+    "pipeline": {
+      "version": "photo-search-retry-v1",
+      "steps": [
+        "copy_semantic_analysis",
+        "derive_photo_intent",
+        "place_verify",
+        "photo_search_retry",
+        "photo_first_pick",
+        "evidence_caption",
+        "rule_qa"
+      ],
+      "aiTokens": 0,
+      "photoSearchDebug": {
+        "sectionId": "tsukiji",
+        "attempts": [
+          {
+            "ts": 1783508339833,
+            "sectionId": "tsukiji",
+            "slot": "storefront",
+            "query": "placeId:ChIJW2cLzSGLGGARXAKXv6EkbqI",
+            "phase": "place_photos",
+            "candidateCount": 10,
+            "selectedImageUrl": null,
+            "selectedReason": null,
+            "rejectReason": null
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sectionId": "hero-sightseeing",
+    "subject": "淺草寺雷門",
+    "mapsQuery": "Kaminarimon Gate Senso-ji Tokyo",
+    "placeId": "ChIJ0YwG28aOGGARvRKAXIBWqNk",
+    "googleRating": 4.5,
+    "googleAddress": "〒111-0032 東京都台東区浅草２丁目３−１",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjBOvT0Gyafin39_A9iKXXqKnDymDGrBMy_FS-GnNjKKZM4RM8di_oqnaSgOVp2tUf7Gn6SgJFGQURZLjab3WzlawjN6206S8oVR-A-MqFKNsUJ3KRzjqwrC8THt2zCwa5tBDaa39gmejr3Oaw=s4800-w1600-h1200",
+    "googleAttribution": "Diego Silva",
+    "imageSource": "google_places",
+    "matched": true,
+    "placeName": "雷門",
+    "photoScore": 100,
+    "photoIndex": 0,
+    "photoEvidence": {
+      "primary": "landmark_building",
+      "types": [
+        "landmark_building",
+        "facade"
+      ],
+      "subjectType": "landmark",
+      "role": "opening",
+      "blob": "雷門"
+    },
+    "travelPhotoSlot": "landmark_exterior",
+    "copySemantics": {
+      "primary": "landmark",
+      "categories": [],
+      "hits": [],
+      "requiredEvidence": [
+        "street_landmark",
+        "landmark_building"
+      ],
+      "searchBoost": [],
+      "copyExcerpt": "淺草寺雷門 淺草寺雷門"
+    },
+    "copyDerivedPhotoIntent": "地標建築、代表性招牌、街區辨識點",
+    "matchedKeywords": [
+      "雷門",
+      "Kaminarimon",
+      "浅草寺",
+      "提灯"
+    ],
+    "photoPlaceName": "雷門",
+    "searchUsed": "Kaminarimon Gate",
+    "photoSearchUsed": "landmark_verified_place",
+    "photoSearchPhase": "landmark_pick",
+    "photoSearchDebug": {
+      "sectionId": "hero-sightseeing",
+      "attempts": [
+        {
+          "ts": 1783508340091,
+          "sectionId": "hero-sightseeing",
+          "slot": "landmark_verified",
+          "query": "placeId:雷門",
+          "phase": "landmark_pick",
+          "candidateCount": 10,
+          "photoIndex": 0,
+          "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjBOvT0Gyafin39_A9iKXXqKnDymDGrBMy_FS-GnNjKKZM4RM8di_oqnaSgOVp2tUf7Gn6SgJFGQURZLjab3WzlawjN6206S8oVR-A-MqFKNsUJ3KRzjqwrC8THt2zCwa5tBDaa39gmejr3Oaw=s4800-w1600-h1200",
+          "selectedReason": "landmark_verified_index_0",
+          "rejectReason": null
+        }
+      ]
+    },
+    "sectionType": "landmark",
+    "role": null,
+    "rejectReason": null,
+    "editorialQA": {
+      "ok": true,
+      "issues": [],
+      "usePlaceholder": false
+    },
+    "venueSwapped": false,
+    "swappedFrom": null,
+    "swappedTo": null,
+    "alternativeId": null,
+    "heading": null,
+    "content": null,
+    "officialName": "Kaminarimon Gate",
+    "officialNameLocal": "雷門",
+    "pipeline": {
+      "version": "photo-search-retry-v1",
+      "steps": [
+        "copy_semantic_analysis",
+        "derive_photo_intent",
+        "place_verify",
+        "photo_search_retry",
+        "photo_first_pick",
+        "evidence_caption",
+        "rule_qa"
+      ],
+      "aiTokens": 0,
+      "photoSearchDebug": {
+        "sectionId": "hero-sightseeing",
+        "attempts": [
+          {
+            "ts": 1783508340091,
+            "sectionId": "hero-sightseeing",
+            "slot": "landmark_verified",
+            "query": "placeId:雷門",
+            "phase": "landmark_pick",
+            "candidateCount": 10,
+            "photoIndex": 0,
+            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjBOvT0Gyafin39_A9iKXXqKnDymDGrBMy_FS-GnNjKKZM4RM8di_oqnaSgOVp2tUf7Gn6SgJFGQURZLjab3WzlawjN6206S8oVR-A-MqFKNsUJ3KRzjqwrC8THt2zCwa5tBDaa39gmejr3Oaw=s4800-w1600-h1200",
+            "selectedReason": "landmark_verified_index_0",
+            "rejectReason": null
+          }
+        ]
+      }
+    },
+    "photoCaption": "雷門的景觀清楚可見，與本段介紹的地標一致。"
+  }
+]

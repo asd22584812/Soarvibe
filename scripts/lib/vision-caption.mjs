@@ -54,3 +54,51 @@ export async function visionCaptionViaWorker(imageUrl, ctx, section) {
   }
   return null;
 }
+
+/** One Vision call: verify landmark match + caption (for ~500 TWD/mo budget). */
+export async function visionVerifyLandmarkViaWorker(imageUrl, ctx, section) {
+  if (!imageUrl) return { venueMatch: false, caption: null, apiError: 'no_url', visibleSubjects: [] };
+  const inline = await fetchImageBase64(imageUrl);
+  if (!inline) {
+    console.warn('[VISION] image fetch failed');
+    return { venueMatch: false, caption: null, apiError: 'image_fetch', visibleSubjects: [] };
+  }
+  for (let attempt = 0; attempt < 3; attempt++) {
+    if (attempt > 0) await sleep(2000 * attempt);
+    const response = await fetch(API_BASE + '/api/editorial/vision-caption', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Origin: ORIGIN },
+      body: JSON.stringify({
+        verifyVenue: true,
+        imageBase64: inline.data,
+        mimeType: inline.mime,
+        placeName: ctx.placeName,
+        section: Object.assign({}, section || {}, {
+          heading: ctx.heading,
+          subject: ctx.subject,
+          officialName: ctx.officialName,
+          officialNameLocal: ctx.officialNameLocal,
+          strictVenueLock: true,
+          photoAnchorTerms: section && section.photoAnchorTerms,
+          imageChecklist: section && section.imageChecklist
+        })
+      })
+    });
+    const data = await response.json();
+    if (response.ok) {
+      return {
+        venueMatch: data.venueMatch === true,
+        confidence: data.confidence,
+        visibleSubjects: data.visibleSubjects || [],
+        caption: data.caption ? String(data.caption).trim() : null,
+        apiError: null
+      };
+    }
+    const errCode = data.error || ('http_' + response.status);
+    if (data.error === 'vision_failed' || data.error === 'gemini_failed' || response.status === 502 || response.status === 429) {
+      return { venueMatch: null, caption: null, apiError: errCode, visibleSubjects: [] };
+    }
+    continue;
+  }
+  return { venueMatch: false, caption: null, apiError: 'exhausted', visibleSubjects: [] };
+}

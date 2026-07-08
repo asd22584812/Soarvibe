@@ -30,7 +30,7 @@
     }
 
     var META = {
-        tokyo: buildMeta('tokyo', '東京', 'TOKYO', '東京', '七種節奏，讀懂這座永遠不睡的城市', ['anime'], 'tokyo-hub-hero'),
+        tokyo: buildMeta('tokyo', '東京', 'TOKYO', '東京', '七種節奏，讀懂這座永遠不睡的城市', ['anime', 'sightseeing'], 'tokyo-hub-hero'),
         kyoto: buildMeta('kyoto', '京都', 'KYOTO', '京都', '專題即將推出', []),
         osaka: buildMeta('osaka', '大阪', 'OSAKA', '大阪', '專題即將推出', []),
         seoul: buildMeta('seoul', '首爾', 'SEOUL', '首爾', '專題即將推出', []),
@@ -42,6 +42,7 @@
     };
 
     META.tokyo.editionCoverKeys.anime = 'tokyo-anime-cover';
+    META.tokyo.editionCoverKeys.sightseeing = 'tokyo-sightseeing-cover';
 
     var ARTICLES = {
         tokyo: {
@@ -318,6 +319,247 @@
                     buttonText: '用這種風格產生行程',
                     destinationLabel: '東京',
                     styleKey: 'anime'
+                }
+            },
+            sightseeing: {
+                id: 'tokyo-sightseeing',
+                cityId: 'tokyo',
+                styleKey: 'sightseeing',
+                status: 'published',
+                title: '第一次東京：七站讀懂這座城市',
+                subtitle: '淺草、晴空塔、澀谷到台場——經典路線不趕路版',
+                editorialPlan: {
+                    theme: '東京初次觀光',
+                    storyArc: '用 2～3 天把淺草、晴空塔、上野、澀谷、新宿、台場與築地串成一條不趕路的經典路線',
+                    readingRhythm: '上午寺廟與街區 → 午後公園與博物館 → 傍晚十字路口與展望台 → 海濱收尾'
+                },
+                articleTheme: '東京初次觀光——經典路線的七日節奏',
+                editorialAngle: '不是打卡清單，而是第一次來東京該怎麼排、怎麼走',
+                readerPersona: '第一次來東京、行程 2～4 天的旅人',
+                travelStyle: '步行＋大眾運輸、經典地標、白天景點＋傍晚城市夜景',
+                emotion: '新鮮、震撼、從容不趕',
+                articleGoal: '讓讀者感受到「第一次東京就該這樣玩」的節奏',
+                heroImageKey: 'tokyo-sightseeing-hero',
+                coverImageKey: 'tokyo-sightseeing-cover',
+                heroSubject: '淺草寺雷門',
+                heroOfficialName: 'Kaminarimon Gate',
+                heroOfficialNameLocal: '雷門',
+                heroMapsQuery: 'Kaminarimon Gate Senso-ji Tokyo',
+                heroPlaceId: null,
+                heroGooglePhotoUrl: 'https://lh3.googleusercontent.com/place-photos/AG9NLjBOvT0Gyafin39_A9iKXXqKnDymDGrBMy_FS-GnNjKKZM4RM8di_oqnaSgOVp2tUf7Gn6SgJFGQURZLjab3WzlawjN6206S8oVR-A-MqFKNsUJ3KRzjqwrC8THt2zCwa5tBDaa39gmejr3Oaw=s4800-w1600-h1200',
+                heroGoogleAttribution: 'Diego Silva',
+                heroImageSource: 'google_places',
+                coverSubject: '淺草寺雷門',
+                coverMapsQuery: 'Senso-ji Temple Kaminarimon Tokyo',
+                coverPlaceId: null,
+                coverGooglePhotoUrl: 'https://lh3.googleusercontent.com/place-photos/AG9NLjBOvT0Gyafin39_A9iKXXqKnDymDGrBMy_FS-GnNjKKZM4RM8di_oqnaSgOVp2tUf7Gn6SgJFGQURZLjab3WzlawjN6206S8oVR-A-MqFKNsUJ3KRzjqwrC8THt2zCwa5tBDaa39gmejr3Oaw=s4800-w1600-h1200',
+                coverGoogleAttribution: 'Diego Silva',
+                coverImageSource: 'google_places',
+                issueLabel: '2026 年 7 月號',
+                intro: '第一次來東京，不必把全城塞進兩三天。這篇依經典動線整理七個「沒去過等於沒來」的停留點：從淺草寺的雷門出發，搭地鐵就能串起晴空塔、上野、澀谷與新宿夜景，最後到台場看海、築地吃海鮮收尾。節奏從容，但每一站都是東京的入門密碼。',
+                sections: [
+                    {
+                        sectionId: 'asakusa',
+                        sectionRole: 'landmark',
+                        subjectType: 'landmark',
+                        sectionType: 'landmark',
+                        officialName: 'Senso-ji Temple',
+                        officialNameLocal: '浅草寺',
+                        aliases: ['浅草寺', '仲見世通り', 'Nakamise Street', 'Kaminarimon'],
+                        photoIntent: '雷門、仲見世商店街、五重塔、寺廟境內、參道',
+                        imageChecklist: ['雷門', '仲見世', '五重塔', '浅草寺', '参道', 'Kaminarimon'],
+                        imageRejectRules: ['hotel', 'restaurant interior', 'parking', '便利店'],
+                        subject: '淺草寺與仲見世通',
+                        mapsQuery: 'Senso-ji Temple Tokyo',
+                        placeId: 'ChIJPd37MMGOGGARvJ2hfxoiNVE',
+                        googlePhotoUrl: 'https://lh3.googleusercontent.com/place-photos/AG9NLjC_BEDPRvFCm5YTh5uzrhUuCfSj6PQJn5vbsrdI9SzCYpKqLSGj_oxgwj-9Sk8PXWYkKCilCzQSsXVdS0c25hsMQZ-kEFAerRfJC8j0Kapf2B-jZzmAw9tkQhNa_1ZvZcwa67PjdfiQmvwSuA=s4800-w1600-h1200',
+                        googleAttribution: 'ぴぴねこ',
+                        imageSource: 'google_places',
+                        imageKey: 'tokyo-section-asakusa',
+                        caption: '浅草寺的景觀清楚可見，與本段介紹的地標一致。',
+                        heading: '淺草寺與仲見世通',
+                        content: '從雷門的大紅燈籠走進仲見世通，淺草寺是大多數旅人認識東京的第一站。參道兩側是人形燒、炸饅頭與和服配件，穿過二天門後，五重塔與本堂在面前展開。建議早上九點前抵達，避開旅行團高峰；參拜後可沿隅田川散步，或搭淺草線一站到晴空塔。',
+                        editorialMeta: [
+                            { icon: '⭐', label: '推薦程度', value: '必訪' },
+                            { icon: '⏰', label: '建議停留', value: '1.5–2 小時' },
+                            { icon: '🚉', label: '最近車站', value: '東京 Metro 淺草' },
+                            { icon: '🕐', label: '最佳時段', value: '早上 8–10 點' }
+                        ]
+                    },
+                    {
+                        sectionId: 'skytree',
+                        sectionRole: 'landmark',
+                        subjectType: 'landmark',
+                        sectionType: 'landmark',
+                        officialName: 'Tokyo Skytree',
+                        officialNameLocal: '東京スカイツリー',
+                        aliases: ['Skytree', 'スカイツリー', 'Tokyo Solamachi'],
+                        photoIntent: '晴空塔外觀、塔身全景、展望台視野',
+                        imageChecklist: ['スカイツリー', 'Skytree', '塔', '展望', 'ソラマチ'],
+                        imageRejectRules: ['室內商品', '餐廳', 'hotel', 'parking only'],
+                        subject: '東京晴空塔',
+                        mapsQuery: 'Tokyo Skytree',
+                        placeId: 'ChIJ35ov0dCOGGARKvdDH7NPHX0',
+                        googlePhotoUrl: 'https://lh3.googleusercontent.com/place-photos/AG9NLjC1jHIfY1jcq6MiGc3Q82tEjKtUSWaeTtRD3TwOESHBc9CCQaUNZb-yLHyU92GfBZP23ygOQ77t7vuW7wHmgIeE6Rf8YFEziteZee-JXU9YGZGc2cPQXaKV0Cz45BuUfZWEqgI5K1TTBCJ1Jg=s4800-w1600-h1200',
+                        googleAttribution: 'Riccardo Widera',
+                        imageSource: 'google_places',
+                        imageKey: 'tokyo-section-skytree',
+                        caption: '東京スカイツリー的景觀清楚可見，與本段介紹的地標一致。',
+                        heading: '東京晴空塔',
+                        content: '從淺草步行或搭一站地鐵，634 公尺高的晴空塔會突然出現在視線裡。塔下ソラマチ有餐飲與伴手禮，建議先在外圍廣場拍塔身全景，再決定是否登展望台。天氣好時從高處可望見富士山輪廓，是認識東京天際線的最佳座標之一。',
+                        editorialMeta: [
+                            { icon: '⭐', label: '推薦程度', value: '必訪' },
+                            { icon: '⏰', label: '建議停留', value: '2–3 小時' },
+                            { icon: '🚉', label: '最近車站', value: '東武晴空塔線 東京晴空塔' },
+                            { icon: '💰', label: '展望台', value: '¥2,100 起' }
+                        ]
+                    },
+                    {
+                        sectionId: 'ueno',
+                        sectionRole: 'landmark',
+                        subjectType: 'district',
+                        sectionType: 'landmark',
+                        officialName: 'Ueno Park',
+                        officialNameLocal: '上野恩賜公園',
+                        aliases: ['上野公園', 'Ueno Onshi Park', '不忍池', 'Shinobazu Pond'],
+                        photoIntent: '公園綠地、不忍池、博物館建築外觀、櫻花步道',
+                        imageChecklist: ['上野', '不忍池', '公園', '博物館', 'Ueno Park'],
+                        imageRejectRules: ['室內展覽', 'hotel', '車站內'],
+                        subject: '上野公園',
+                        mapsQuery: 'Ueno Park Tokyo',
+                        placeId: 'ChIJw2qQRZuOGGARWmROEiM2y7E',
+                        googlePhotoUrl: 'https://lh3.googleusercontent.com/place-photos/AG9NLjCmxYPRasZe-RukNZpekc5l2s2Ai1xz1-JBlLGc3yIc6nrVevydDspZB3nfPTEv2_1JqnDH_x2_jCyCmib-vst5GMbY1uY6MNuoYaMcW9HrlBq4KYieWKKzLx5_fbrslioIc_lJJndQzR6dhk4=s4800-w1600-h1200',
+                        googleAttribution: 'jared lee',
+                        imageSource: 'google_places',
+                        imageKey: 'tokyo-section-ueno',
+                        caption: '上野恩賜公園的景觀清楚可見，與本段介紹的地標一致。',
+                        heading: '上野公園',
+                        content: 'JR 上野站步行五分鐘，不忍池畔的步道把國立博物館、科學博物館與動物園串在一起。第一次來不必每館都進——選一間（國立博物館藏品最豐）搭配園內散步就剛好。春天櫻花盛開時人潮洶湧，平日午後則適合坐在池邊休息，感受東京少見的遼闊綠意。',
+                        editorialMeta: [
+                            { icon: '⭐', label: '推薦程度', value: '強烈推薦' },
+                            { icon: '⏰', label: '建議停留', value: '2–4 小時' },
+                            { icon: '🚉', label: '最近車站', value: 'JR 上野' },
+                            { icon: '🎨', label: '必選', value: '東京國立博物館' }
+                        ]
+                    },
+                    {
+                        sectionId: 'shibuya',
+                        sectionRole: 'landmark',
+                        subjectType: 'landmark',
+                        sectionType: 'landmark',
+                        officialName: 'Shibuya Scramble Crossing',
+                        officialNameLocal: '渋谷スクランブル交差点',
+                        aliases: ['Scramble Crossing', 'ハチ公', 'Hachiko', '渋谷駅前'],
+                        photoIntent: '十字路口人潮、澀谷站前、Hachiko 雕像、高樓街景',
+                        imageChecklist: ['スクランブル', 'Scramble', '渋谷', '交差点', 'ハチ公'],
+                        imageRejectRules: ['室內', '餐廳', 'hotel lobby'],
+                        subject: '澀谷十字路口',
+                        mapsQuery: 'Shibuya Scramble Crossing Tokyo',
+                        placeId: 'ChIJx1e971eLGGARum8w_tnpFwI',
+                        googlePhotoUrl: 'https://lh3.googleusercontent.com/place-photos/AG9NLjAd7z4zP7KFm_T2HjW-FaIiwqT_-f7t0phYbzqEjC0Cw0zW3z1B6P_5gtupfnaj7v_Cfymk43WmXVIupimm4NYMNk2cSLRyHLIQRM5peGTSuZ3YX0vD2XwPjE5xTMcnyMQv7HxRerD8xeR78p0=s4800-w1600-h1200',
+                        googleAttribution: 'Trip Be Me Travel Stories',
+                        imageSource: 'google_places',
+                        imageKey: 'tokyo-section-shibuya',
+                        caption: '渋谷スクランブル交差点的景觀清楚可見，與本段介紹的地標一致。',
+                        heading: '澀谷十字路口',
+                        content: '八公雕像前集合，等號誌一變，數千人同時穿過馬路——這是東京最經典的都市畫面。建議從 MAGNET 的 Shibuya Sky 或車站二樓展望窗俯瞰，再下樓親身走一趟。傍晚到夜間霓虹亮起，街區最有張力；周邊宮下公園與表參道延伸可以留到隔天。',
+                        editorialMeta: [
+                            { icon: '⭐', label: '推薦程度', value: '必訪' },
+                            { icon: '⏰', label: '建議停留', value: '1–2 小時' },
+                            { icon: '🚉', label: '最近車站', value: 'JR 澀谷' },
+                            { icon: '🕐', label: '最佳時段', value: '傍晚 17–20 點' }
+                        ]
+                    },
+                    {
+                        sectionId: 'shinjuku',
+                        sectionRole: 'landmark',
+                        subjectType: 'landmark',
+                        sectionType: 'landmark',
+                        officialName: 'Tokyo Metropolitan Government Building',
+                        officialNameLocal: '東京都庁',
+                        aliases: ['都庁', '都廳展望室', 'TMG Observatory', '新宿都庁'],
+                        photoIntent: '都廳雙塔外觀、展望台夜景、東京全景',
+                        imageChecklist: ['都庁', '展望', '夜景', '新宿', 'observatory'],
+                        imageRejectRules: ['辦公室', '會議室', 'hotel', '歌舞伎町招牌'],
+                        subject: '東京都廳展望台',
+                        mapsQuery: 'Tokyo Metropolitan Government Building Shinjuku',
+                        placeId: 'ChIJoTcat9SMGGAR6GGG8zdcZvE',
+                        googlePhotoUrl: 'https://lh3.googleusercontent.com/place-photos/AG9NLjCEJMUPLumnpHRCE0RCL_11eJVzPFmBPaq888r6JZtDlSqyYOuhdBUFR1bVOph4SjFS4FxlvrdcRgNHYzr9s6Qw7zf4ewxxHTF96yXvuqKW3FkEcly4ctDWAmVUJzHainMeqVnqNiz_eYTGmg=s4800-w1600-h1200',
+                        googleAttribution: 'Michał Jasnowski',
+                        imageSource: 'google_places',
+                        imageKey: 'tokyo-section-shinjuku',
+                        caption: '東京都庁的景觀清楚可見，與本段介紹的地標一致。',
+                        heading: '東京都廳展望台',
+                        content: '新宿西口的都廳雙塔，45 樓展望室免費開放（僅需排隊安檢）。東京鐵塔、晴空塔與遠方富士山在夜色裡一字排開，是預算型旅人的夜景首選。建議日落前 40 分鐘抵達，同時捕捉夕陽與亮燈；下樓後可步行至新宿御苑外圍或歌舞伎町一帶晚餐。',
+                        editorialMeta: [
+                            { icon: '⭐', label: '推薦程度', value: '強烈推薦' },
+                            { icon: '⏰', label: '建議停留', value: '45–60 分鐘' },
+                            { icon: '🚉', label: '最近車站', value: 'JR 新宿（西口）' },
+                            { icon: '💰', label: '門票', value: '免費' }
+                        ]
+                    },
+                    {
+                        sectionId: 'odaiba',
+                        sectionRole: 'landmark',
+                        subjectType: 'district',
+                        sectionType: 'landmark',
+                        officialName: 'Odaiba Seaside Park',
+                        officialNameLocal: 'お台場海浜公園',
+                        aliases: ['台場', 'お台場', 'Rainbow Bridge view', '自由の女神像 お台場'],
+                        photoIntent: '彩虹大橋、海濱步道、自由女神像、臨海景色',
+                        imageChecklist: ['お台場', 'レインボーブリッジ', '海浜', '自由の女神', 'Odaiba'],
+                        imageRejectRules: ['購物中心內', 'hotel room', 'parking'],
+                        subject: '台場海濱公園',
+                        mapsQuery: 'Odaiba Seaside Park Tokyo',
+                        placeId: 'ChIJbWVFlTCKGGARr5l6ox-7_CA',
+                        googlePhotoUrl: 'https://lh3.googleusercontent.com/place-photos/AJRVUZMM-cHj-qPZax969K5-wWlj5-KSUapOor3VI4nab2Nmz_U1FJdQtvNNd9iRvfMdMECaKHhHHDuy5CcgQRZjQuJTZ4hwQBeYbd4V3RNxh88QA3CdFre2NO5MQM5ptiqwhkUGiiIatAknRbYnbhjI1l1X=s4800-w569-h400',
+                        googleAttribution: '浩二',
+                        imageSource: 'google_places',
+                        imageKey: 'tokyo-section-odaiba',
+                        caption: '橫跨東京灣的彩虹大橋，是台場海濱公園的標誌性景觀。',
+                        heading: '台場海濱公園',
+                        content: '百合海鷗線或臨海線到台場，海濱公園的步道正對彩虹大橋。自由女神像與富士電視台球體是經典取景點，傍晚海面反射大橋燈光。親子可順遊 teamLab Borderless 或 DiverCity 鋼彈，但第一次來，沿著海岸線散步、吹海風就足夠浪漫。',
+                        editorialMeta: [
+                            { icon: '⭐', label: '推薦程度', value: '推薦' },
+                            { icon: '⏰', label: '建議停留', value: '2–3 小時' },
+                            { icon: '🚉', label: '最近車站', value: '百合海鷗線 台場' },
+                            { icon: '🕐', label: '最佳時段', value: '下午至日落' }
+                        ]
+                    },
+                    {
+                        sectionId: 'tsukiji',
+                        sectionRole: 'food',
+                        subjectType: 'market',
+                        sectionType: 'food',
+                        officialName: 'Tsukiji Outer Market',
+                        officialNameLocal: '築地場外市場',
+                        aliases: ['築地', 'Tsukiji Market', '場外市場', '築地魚河岸'],
+                        photoIntent: '市場巷道、海鮮丼、壽司店門口、攤位與人潮',
+                        imageChecklist: ['築地', '市場', '海鮮', '寿司', '丼', 'tsukiji'],
+                        imageRejectRules: ['空盤', '廚房後場', 'hotel', '超市'],
+                        subject: '築地場外市場',
+                        mapsQuery: 'Tsukiji Outer Market Tokyo',
+                        placeId: 'ChIJW2cLzSGLGGARXAKXv6EkbqI',
+                        googlePhotoUrl: 'https://lh3.googleusercontent.com/place-photos/AJRVUZMd-kIk7RKLgwMACo8gF_X2mSrJwaFirCG57ZXoW_sGH4KNhAY_IsQ8XqthOXDRNIlBHKE7VkgjrvPXRR3N7x7Yv6aj1bdnzl5kVRiXrbW2V63s1bW299GgERdv8VkZXNTg5F6Wxz3fe4ZCsQ=s4800-w1600-h1200',
+                        googleAttribution: 'Kevin Wong',
+                        imageSource: 'google_places',
+                        imageKey: 'tokyo-section-tsukiji',
+                        caption: '築地場外市場的外觀與入口清楚可見，方便對照地圖找路。',
+                        heading: '築地場外市場',
+                        content: '場外市場的巷弄在早上七點就熱鬧起來。玉子燒、海鮮丼與現開牡蠣攤位林立，不必迷信名店——看哪條隊伍順路排就好。多數店家只收現金，且不宜邊走邊吃；買好找個角落站定再開動。吃完可走 15 分鐘到銀座，或搭地鐵往機場方向離開東京。',
+                        editorialMeta: [
+                            { icon: '⭐', label: '推薦程度', value: '必訪' },
+                            { icon: '⏰', label: '建議停留', value: '1–1.5 小時' },
+                            { icon: '🚉', label: '最近車站', value: '東京 Metro 築地' },
+                            { icon: '🕐', label: '最佳時段', value: '早上 7–10 點' }
+                        ]
+                    }
+                ],
+                outro: '第一次東京不必完美——淺草的燈籠、澀谷的人潮、都廳的夜景，會在你心裡拼出這座城市的輪廓。把這七站拆進兩三天，留一點空白給意外發現的小巷與甜點店，才是初次觀光最舒服的節奏。下次再來，表參道、六本木或下北澤，會是另一種東京。',
+                cta: {
+                    buttonText: '用這種風格產生行程',
+                    destinationLabel: '東京',
+                    styleKey: 'sightseeing'
                 }
             }
         }

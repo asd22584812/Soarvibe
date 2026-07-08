@@ -132,6 +132,20 @@ function salvageReviewJSON(text) {
   };
 }
 
+function salvageVenueVerifyJSON(text) {
+  var s = String(text || '');
+  var match = /"venueMatch"\s*:\s*(true|false)/i.exec(s);
+  var conf = /"confidence"\s*:\s*([0-9.]+)/.exec(s);
+  var cap = /"caption"\s*:\s*"((?:\\.|[^"\\])*)"/.exec(s);
+  var subjects = extractPartialStringArray(s, 'visibleSubjects');
+  return {
+    venueMatch: match ? match[1].toLowerCase() === 'true' : false,
+    confidence: conf ? Number(conf[1]) : null,
+    visibleSubjects: subjects,
+    caption: cap ? cap[1].replace(/\\"/g, '"') : null
+  };
+}
+
 function parseJSONResponse(text, salvage) {
   var s = String(text || '').trim();
   var fence = s.match(/```(?:json)?\s*([\s\S]*?)```/i);
@@ -146,6 +160,9 @@ function parseJSONResponse(text, salvage) {
         return JSON.parse(s.slice(start, end + 1));
       } catch (e2) { /* fall through */ }
     }
+    var repaired = repairTruncatedJSON(s);
+    if (repaired) return repaired;
+    if (salvage === 'venue') return salvageVenueVerifyJSON(s);
     if (salvage) return salvageReviewJSON(s);
     throw e1;
   }
@@ -306,18 +323,17 @@ export async function callGeminiText(prompt, env, options) {
   };
 }
 
-export async function callGeminiVisionJSON(prompt, imageUrl, env, options) {
+export async function callGeminiVisionInlineJSON(prompt, inline, env, options) {
   var keys = parseGeminiKeys(env);
   if (!keys.length) {
     return { ok: false, error: 'no_gemini_keys' };
   }
-
-  var inline = await fetchImageInline(imageUrl);
-  if (!inline) {
-    return { ok: false, error: 'image_fetch_failed', imageUrl: imageUrl };
+  if (!inline || !inline.data) {
+    return { ok: false, error: 'missing_image' };
   }
 
   var modelId = (options && options.model) || VISION_MODEL;
+  var mime = inline.mimeType || inline.mime_type || 'image/jpeg';
   var startIdx = pickRoundRobinStartIndex(keys.length);
   var lastFailure = null;
 
@@ -327,7 +343,7 @@ export async function callGeminiVisionJSON(prompt, imageUrl, env, options) {
       contents: [{
         parts: [
           { text: prompt },
-          { inline_data: { mime_type: inline.mimeType, data: inline.data } }
+          { inline_data: { mime_type: mime, data: inline.data } }
         ]
       }],
       generationConfig: {
@@ -339,19 +355,16 @@ export async function callGeminiVisionJSON(prompt, imageUrl, env, options) {
     var upstream = await callGeminiRaw(body, modelId, keys[keyIndex]);
     if (upstream.ok) {
       try {
-        var parsed = parseJSONResponse(upstream.text, true);
-        return { ok: true, data: parsed, model: modelId, keySlot: keyIndex + 1 };
+        var salvageMode = (options && options.salvage) || true;
+        var parsed = parseJSONResponse(upstream.text, salvageMode);
+        return { ok: true, data: parsed, model: modelId, keySlot: keyIndex + 1, raw: upstream.text };
       } catch (e) {
         return { ok: false, error: 'invalid_json_response', raw: upstream.text };
       }
     }
     lastFailure = upstream;
     if (upstream.status === 401 || upstream.status === 403) continue;
-    if (upstream.status === 429) {
-      if (isRpmThrottle(upstream.result)) continue;
-      if (isKeyLevelQuota(upstream.status, upstream.result)) continue;
-      continue;
-    }
+    if (upstream.status === 429) continue;
     break;
   }
 
@@ -360,4 +373,12 @@ export async function callGeminiVisionJSON(prompt, imageUrl, env, options) {
     error: 'gemini_vision_failed',
     details: lastFailure ? lastFailure.result : null
   };
+}
+
+export async function callGeminiVisionJSON(prompt, imageUrl, env, options) {
+  var inline = await fetchImageInline(imageUrl);
+  if (!inline) {
+    return { ok: false, error: 'image_fetch_failed', imageUrl: imageUrl };
+  }
+  return callGeminiVisionInlineJSON(prompt, inline, env, options);
 }
