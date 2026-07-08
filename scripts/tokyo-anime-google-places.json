@@ -1,17 +1,17 @@
 [
   {
     "sectionId": "akihabara",
-    "subject": "秋葉原電気街：動漫聖地巡禮的起點",
+    "subject": "秋葉原電気街",
     "mapsQuery": "Akihabara Electric Town",
-    "placeId": "ChIJAVf7lh2MGGARJylRnQ_3dpI",
-    "googleRating": 4.2,
-    "googleAddress": "〒101-0021 東京都千代田区外神田４丁目３−１",
-    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZN9mOR405czzkCfNO4zPJU7mgFm4Zu7lv7ysBn2AYMCC5qPByvTarMxlfpgvTwuEaxL3DrcVY5uaftmnu1opFYiZYtkWwodgCdeVF4UjIvAGjgf3eYBgBjuLP9H11XBP4h2D7dptqsgqf97fA=s4800-w1600-h1200",
+    "placeId": "ChIJ__-AdayOGGAR6EGPwvcpzTA",
+    "googleRating": 4.3,
+    "googleAddress": "〒101-0021 東京都千代田区外神田１丁目１５−１６",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjA5BhMWykRJB3KwgiYGJjzFmjd5HAdHmQQdpZjcobdSKnRfZcM7D7miW3wJepcj8ocaIlvheSXLYK1HDKyJgSvYcIzjn0Cdz_5dAmW1rpwnPRXRmMWXsNuZFPZLGUBGT5oOiaX3hdPSYMzqfA=s4800-w1600-h1200",
     "googleAttribution": "Wesley d",
     "imageSource": "google_places",
     "matched": true,
-    "placeName": "アニメイト秋葉原",
-    "photoScore": 166,
+    "placeName": "秋葉原ラジオ会館",
+    "photoScore": 232,
     "photoIndex": 1,
     "photoCaption": "街道兩側店招與建築立面清楚可見，街區個性一眼可辨。",
     "photoEvidence": {
@@ -20,28 +20,27 @@
         "street_landmark"
       ],
       "signals": [
-        "街"
+        "街",
+        "電気街"
       ],
       "subjectType": "district",
       "role": "landmark",
-      "blob": "wesley d 秋葉原電氣街"
+      "blob": "wesley d 電気街 街"
     },
     "travelPhotoSlot": "district_panorama",
     "copySemantics": {
       "primary": "street_scene",
       "categories": [
         "street_scene",
-        "shop_collectible",
         "landmark",
-        "activity"
+        "shop_collectible"
       ],
       "hits": [
         {
           "category": "street_scene",
-          "score": 4,
+          "score": 3,
           "matched": [
             "電氣街",
-            "中央通",
             "街區",
             "一整片"
           ],
@@ -51,22 +50,11 @@
           ]
         },
         {
-          "category": "shop_collectible",
+          "category": "landmark",
           "score": 2,
           "matched": [
-            "mandarake",
-            "模型"
-          ],
-          "evidence": [
-            "anime_collectible",
-            "shop_interior"
-          ]
-        },
-        {
-          "category": "landmark",
-          "score": 1,
-          "matched": [
-            "animate"
+            "ラジオ会館",
+            "朝聖"
           ],
           "evidence": [
             "landmark_building",
@@ -74,13 +62,12 @@
           ]
         },
         {
-          "category": "activity",
+          "category": "shop_collectible",
           "score": 1,
           "matched": [
-            "巡禮"
+            "模型"
           ],
           "evidence": [
-            "cafe_interior",
             "anime_collectible",
             "shop_interior"
           ]
@@ -90,35 +77,37 @@
         "street_landmark",
         "landmark_building",
         "anime_collectible",
-        "shop_interior",
-        "cafe_interior"
+        "shop_interior"
       ],
       "searchBoost": [
         "電氣街",
-        "中央通",
         "街區",
         "一整片",
-        "animate",
-        "mandarake",
-        "模型",
-        "巡禮"
+        "ラジオ会館",
+        "朝聖",
+        "模型"
       ],
-      "copyExcerpt": "秋葉原電気街：動漫聖地巡禮的起點 來到秋葉原，直奔中央通與其周邊巷弄，這裡的「秋葉原電気街」是動漫周邊、模型與電子產品的集散地。建議從JR秋葉原站電器街口出站，沿主幹道向北步行，沿途的Animate、Mandarake等大型店鋪值得細逛。尤其假日中央通會實施步行者天國，逛起來更為舒適。記得多預留時間，這裡的店家密度高，很容易一待就是半天。 電氣街不是單一景點，而是一整片會讓人自然放慢步調的動漫街區 秋葉原電気街：動漫聖地巡禮的起點 秋葉原電気街：動漫聖地巡禮的起點"
+      "copyExcerpt": "秋葉原電気街 秋葉原電気街是動漫迷的朝聖地。從JR秋葉原站電氣街口出來，立刻會被琳瑯滿目的電子產品與動漫周邊商店包圍。務必留時間逛「ラジオ会館」，尋找稀有模型與卡牌，這裡總是能挖到寶。 電氣街不是單一景點，而是一整片會讓人自然放慢步調的動漫街區 秋葉原電気街 秋葉原電気街"
     },
-    "copyDerivedPhotoIntent": "街景、霓虹、人潮、地標建築外觀、商品陳列、公仔模型、收藏櫥窗",
-    "matchedKeywords": [],
-    "photoPlaceName": "秋葉原電氣街",
-    "searchUsed": "アニメイト 秋葉原本店",
-    "photoSearchUsed": "秋葉原 電気街",
+    "copyDerivedPhotoIntent": "街景、霓虹、人潮、地標建築外觀、地標建築、代表性招牌、街區辨識點",
+    "matchedKeywords": [
+      "電気街",
+      "街",
+      "秋葉原電気街",
+      "電気街"
+    ],
+    "photoPlaceName": "秋葉原電気街",
+    "searchUsed": "ラジオ会館 秋葉原",
+    "photoSearchUsed": "秋葉原電気街 街並み",
     "photoSearchPhase": "precise_local",
     "photoSearchDebug": {
       "sectionId": "akihabara",
       "attempts": [
         {
-          "ts": 1783510987539,
+          "ts": 1783527187987,
           "sectionId": "akihabara",
           "slot": "district_panorama",
-          "query": "placeId:ChIJAVf7lh2MGGARJylRnQ_3dpI",
+          "query": "placeId:ChIJ__-AdayOGGAR6EGPwvcpzTA",
           "phase": "place_photos",
           "candidateCount": 10,
           "selectedImageUrl": null,
@@ -126,10 +115,10 @@
           "rejectReason": null
         },
         {
-          "ts": 1783510987539,
+          "ts": 1783527187987,
           "sectionId": "akihabara",
           "slot": null,
-          "query": "placeId:ChIJAVf7lh2MGGARJylRnQ_3dpI",
+          "query": "placeId:ChIJ__-AdayOGGAR6EGPwvcpzTA",
           "phase": "review_photos",
           "candidateCount": 10,
           "selectedImageUrl": null,
@@ -137,10 +126,10 @@
           "rejectReason": "content_place_no_match"
         },
         {
-          "ts": 1783510987755,
+          "ts": 1783527188098,
           "sectionId": "akihabara",
           "slot": null,
-          "query": "秋葉原 電気街",
+          "query": "秋葉原 中央通り",
           "phase": "precise_local",
           "candidateCount": 1,
           "selectedImageUrl": null,
@@ -148,15 +137,26 @@
           "rejectReason": null
         },
         {
-          "ts": 1783510987773,
+          "ts": 1783527188269,
+          "sectionId": "akihabara",
+          "slot": null,
+          "query": "秋葉原電気街 街並み",
+          "phase": "precise_local",
+          "candidateCount": 2,
+          "selectedImageUrl": null,
+          "selectedReason": null,
+          "rejectReason": null
+        },
+        {
+          "ts": 1783527188287,
           "sectionId": "akihabara",
           "slot": "district_panorama",
-          "query": "秋葉原 電気街",
+          "query": "秋葉原電気街 街並み",
           "phase": "precise_local",
           "candidateCount": 10,
           "photoIndex": 1,
-          "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZN9mOR405czzkCfNO4zPJU7mgFm4Zu7lv7ysBn2AYMCC5qPByvTarMxlfpgvTwuEaxL3DrcVY5uaftmnu1opFYiZYtkWwodgCdeVF4UjIvAGjgf3eYBgBjuLP9H11XBP4h2D7dptqsgqf97fA=s4800-w1600-h1200",
-          "selectedReason": "slot_district_panorama_score_166",
+          "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjA5BhMWykRJB3KwgiYGJjzFmjd5HAdHmQQdpZjcobdSKnRfZcM7D7miW3wJepcj8ocaIlvheSXLYK1HDKyJgSvYcIzjn0Cdz_5dAmW1rpwnPRXRmMWXsNuZFPZLGUBGT5oOiaX3hdPSYMzqfA=s4800-w1600-h1200",
+          "selectedReason": "slot_district_panorama_score_232",
           "rejectReason": null
         }
       ]
@@ -173,8 +173,8 @@
     "swappedFrom": null,
     "swappedTo": null,
     "alternativeId": null,
-    "heading": "秋葉原電気街：動漫聖地巡禮的起點",
-    "content": "來到秋葉原，直奔中央通與其周邊巷弄，這裡的「秋葉原電気街」是動漫周邊、模型與電子產品的集散地。建議從JR秋葉原站電器街口出站，沿主幹道向北步行，沿途的Animate、Mandarake等大型店鋪值得細逛。尤其假日中央通會實施步行者天國，逛起來更為舒適。記得多預留時間，這裡的店家密度高，很容易一待就是半天。",
+    "heading": "秋葉原電気街",
+    "content": "秋葉原電気街是動漫迷的朝聖地。從JR秋葉原站電氣街口出來，立刻會被琳瑯滿目的電子產品與動漫周邊商店包圍。務必留時間逛「ラジオ会館」，尋找稀有模型與卡牌，這裡總是能挖到寶。",
     "officialName": "Akihabara Electric Town",
     "officialNameLocal": "秋葉原電気街",
     "pipeline": {
@@ -193,10 +193,10 @@
         "sectionId": "akihabara",
         "attempts": [
           {
-            "ts": 1783510987539,
+            "ts": 1783527187987,
             "sectionId": "akihabara",
             "slot": "district_panorama",
-            "query": "placeId:ChIJAVf7lh2MGGARJylRnQ_3dpI",
+            "query": "placeId:ChIJ__-AdayOGGAR6EGPwvcpzTA",
             "phase": "place_photos",
             "candidateCount": 10,
             "selectedImageUrl": null,
@@ -204,10 +204,10 @@
             "rejectReason": null
           },
           {
-            "ts": 1783510987539,
+            "ts": 1783527187987,
             "sectionId": "akihabara",
             "slot": null,
-            "query": "placeId:ChIJAVf7lh2MGGARJylRnQ_3dpI",
+            "query": "placeId:ChIJ__-AdayOGGAR6EGPwvcpzTA",
             "phase": "review_photos",
             "candidateCount": 10,
             "selectedImageUrl": null,
@@ -215,10 +215,10 @@
             "rejectReason": "content_place_no_match"
           },
           {
-            "ts": 1783510987755,
+            "ts": 1783527188098,
             "sectionId": "akihabara",
             "slot": null,
-            "query": "秋葉原 電気街",
+            "query": "秋葉原 中央通り",
             "phase": "precise_local",
             "candidateCount": 1,
             "selectedImageUrl": null,
@@ -226,15 +226,26 @@
             "rejectReason": null
           },
           {
-            "ts": 1783510987773,
+            "ts": 1783527188269,
+            "sectionId": "akihabara",
+            "slot": null,
+            "query": "秋葉原電気街 街並み",
+            "phase": "precise_local",
+            "candidateCount": 2,
+            "selectedImageUrl": null,
+            "selectedReason": null,
+            "rejectReason": null
+          },
+          {
+            "ts": 1783527188287,
             "sectionId": "akihabara",
             "slot": "district_panorama",
-            "query": "秋葉原 電気街",
+            "query": "秋葉原電気街 街並み",
             "phase": "precise_local",
             "candidateCount": 10,
             "photoIndex": 1,
-            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZN9mOR405czzkCfNO4zPJU7mgFm4Zu7lv7ysBn2AYMCC5qPByvTarMxlfpgvTwuEaxL3DrcVY5uaftmnu1opFYiZYtkWwodgCdeVF4UjIvAGjgf3eYBgBjuLP9H11XBP4h2D7dptqsgqf97fA=s4800-w1600-h1200",
-            "selectedReason": "slot_district_panorama_score_166",
+            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjA5BhMWykRJB3KwgiYGJjzFmjd5HAdHmQQdpZjcobdSKnRfZcM7D7miW3wJepcj8ocaIlvheSXLYK1HDKyJgSvYcIzjn0Cdz_5dAmW1rpwnPRXRmMWXsNuZFPZLGUBGT5oOiaX3hdPSYMzqfA=s4800-w1600-h1200",
+            "selectedReason": "slot_district_panorama_score_232",
             "rejectReason": null
           }
         ]
@@ -243,17 +254,17 @@
   },
   {
     "sectionId": "nakano",
-    "subject": "中野ブロードウェイ：挖寶天堂的深度探索",
+    "subject": "中野ブロードウェイ",
     "mapsQuery": "Nakano Broadway",
     "placeId": "ChIJg-7dspDyGGARvvDv4E5-tuE",
     "googleRating": 4.2,
     "googleAddress": "〒164-0001 東京都中野区中野５丁目５２−１５",
-    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjDdxzZwxq67qPx_hij8i4MZ5A8TddTou1YG4ym4oAFzIKAi456-HZY1tLiRE2cPnUZsKtUx63RQ1JFFTMoKO5tzh53cfAfEUaRr8zKTwPNBX3wDJjcUJPyyi1eI_MNohuc1pJpX7NhI90aVxQ=s4800-w1600-h1200",
-    "googleAttribution": "加藤展康",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjAn1npMVqT_rFm_befRlNsNj5Cm2dy1W3F6LtGa97Atb3j4tyLG4fNkGzrY9hk9MgHHzyCVP5t84_MCuBE1XHwfqKKeESpLwLjxBpz3MoTOpgf4TwDqeubpYvOEVmt1vdT00j4r3Ko_9BV9Azi1_NDcQw=s4800-w1600-h1200",
+    "googleAttribution": "Loki",
     "imageSource": "google_places",
     "matched": true,
     "placeName": "中野ブロードウェイ",
-    "photoScore": 140,
+    "photoScore": 206,
     "photoIndex": 1,
     "photoCaption": "中野百老匯商場外牆與入口，是老玩家公認的挖寶起點。",
     "photoEvidence": {
@@ -262,59 +273,75 @@
         "street_landmark"
       ],
       "signals": [
-        "街"
+        "ブロードウェイ"
       ],
       "subjectType": "district",
       "role": "anime",
-      "blob": "加藤展康 中野商店街 sun mall"
+      "blob": "loki ブロードウェイ 中野"
     },
     "travelPhotoSlot": "district_panorama",
     "copySemantics": {
       "primary": "shop_collectible",
       "categories": [
-        "shop_collectible"
+        "shop_collectible",
+        "cafe_experience"
       ],
       "hits": [
         {
           "category": "shop_collectible",
-          "score": 5,
+          "score": 3,
           "matched": [
-            "mandarake",
             "挖寶",
-            "收藏",
             "漫畫",
-            "中古"
+            "まんだらけ"
           ],
           "evidence": [
             "anime_collectible",
             "shop_interior"
           ]
+        },
+        {
+          "category": "cafe_experience",
+          "score": 1,
+          "matched": [
+            "氛圍"
+          ],
+          "evidence": [
+            "dessert",
+            "cafe_interior"
+          ]
         }
       ],
       "requiredEvidence": [
         "anime_collectible",
-        "shop_interior"
+        "shop_interior",
+        "dessert",
+        "cafe_interior"
       ],
       "searchBoost": [
-        "mandarake",
         "挖寶",
-        "收藏",
         "漫畫",
-        "中古"
+        "まんだらけ",
+        "氛圍"
       ],
-      "copyExcerpt": "中野ブロードウェイ：挖寶天堂的深度探索 從JR中野站北口出站，穿越商店街直達「中野ブロードウェイ」。這裡的特色是大量中古動漫周邊、漫畫與收藏品，尤其Mandarake系列店鋪佔據多個樓層，是尋找絕版品的寶庫。建議從二樓開始，沿著蜿蜒的走廊逐一探訪，許多小店藏在深處，需要耐心挖掘。注意，部分店家只收現金，務必準備足夠日幣。 老玩家公認挖寶聖地，不是普通商場 中野ブロードウェイ：挖寶天堂的深度探索 中野ブロードウェイ：挖寶天堂的深度探索"
+      "copyExcerpt": "中野ブロードウェイ 中野ブロードウェイ是尋寶者的天堂。從JR中野站北口步行5分鐘，這棟複合式商場內藏著無數古董漫畫、偶像周邊與獨立藝術品小店。建議直接上二樓「まんだらけ」總店，感受時間凝結的次文化氛圍。 老玩家公認挖寶聖地，不是普通商場 中野ブロードウェイ 中野ブロードウェイ"
     },
-    "copyDerivedPhotoIntent": "商品陳列、公仔模型、收藏櫥窗",
-    "matchedKeywords": [],
-    "photoPlaceName": "中野商店街 Sun Mall",
+    "copyDerivedPhotoIntent": "商品陳列、公仔模型、收藏櫥窗、店內氛圍、甜點、主題內裝",
+    "matchedKeywords": [
+      "ブロードウェイ",
+      "中野",
+      "中野ブロードウェイ",
+      "ブロードウェイ",
+      "中野"
+    ],
+    "photoPlaceName": "中野ブロードウェイ",
     "searchUsed": "中野ブロードウェイ",
-    "photoSearchUsed": "中野 Sun Mall 商店街",
-    "photoSearchPhase": "precise_local",
+    "photoSearchUsed": "content_place",
     "photoSearchDebug": {
       "sectionId": "nakano",
       "attempts": [
         {
-          "ts": 1783510988043,
+          "ts": 1783527188470,
           "sectionId": "nakano",
           "slot": "district_panorama",
           "query": "placeId:ChIJg-7dspDyGGARvvDv4E5-tuE",
@@ -325,70 +352,15 @@
           "rejectReason": null
         },
         {
-          "ts": 1783510988043,
-          "sectionId": "nakano",
-          "slot": null,
-          "query": "placeId:ChIJg-7dspDyGGARvvDv4E5-tuE",
-          "phase": "review_photos",
-          "candidateCount": 10,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": "content_place_no_match"
-        },
-        {
-          "ts": 1783510988205,
-          "sectionId": "nakano",
-          "slot": null,
-          "query": "中野ブロードウェイ 外観",
-          "phase": "precise_local",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783510988359,
-          "sectionId": "nakano",
-          "slot": null,
-          "query": "中野ブロードウェイ 入口",
-          "phase": "precise_local",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783510988637,
-          "sectionId": "nakano",
-          "slot": null,
-          "query": "中野ブロードウェイ まんだらけ",
-          "phase": "precise_local",
-          "candidateCount": 5,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783510988871,
-          "sectionId": "nakano",
-          "slot": null,
-          "query": "中野 Sun Mall 商店街",
-          "phase": "precise_local",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783510988887,
+          "ts": 1783527188494,
           "sectionId": "nakano",
           "slot": "district_panorama",
-          "query": "中野 Sun Mall 商店街",
-          "phase": "precise_local",
+          "query": "content_place",
+          "phase": "place_photos",
           "candidateCount": 10,
           "photoIndex": 1,
-          "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjDdxzZwxq67qPx_hij8i4MZ5A8TddTou1YG4ym4oAFzIKAi456-HZY1tLiRE2cPnUZsKtUx63RQ1JFFTMoKO5tzh53cfAfEUaRr8zKTwPNBX3wDJjcUJPyyi1eI_MNohuc1pJpX7NhI90aVxQ=s4800-w1600-h1200",
-          "selectedReason": "slot_district_panorama_score_140",
+          "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjAn1npMVqT_rFm_befRlNsNj5Cm2dy1W3F6LtGa97Atb3j4tyLG4fNkGzrY9hk9MgHHzyCVP5t84_MCuBE1XHwfqKKeESpLwLjxBpz3MoTOpgf4TwDqeubpYvOEVmt1vdT00j4r3Ko_9BV9Azi1_NDcQw=s4800-w1600-h1200",
+          "selectedReason": "slot_district_panorama_score_206",
           "rejectReason": null
         }
       ]
@@ -405,8 +377,8 @@
     "swappedFrom": null,
     "swappedTo": null,
     "alternativeId": null,
-    "heading": "中野ブロードウェイ：挖寶天堂的深度探索",
-    "content": "從JR中野站北口出站，穿越商店街直達「中野ブロードウェイ」。這裡的特色是大量中古動漫周邊、漫畫與收藏品，尤其Mandarake系列店鋪佔據多個樓層，是尋找絕版品的寶庫。建議從二樓開始，沿著蜿蜒的走廊逐一探訪，許多小店藏在深處，需要耐心挖掘。注意，部分店家只收現金，務必準備足夠日幣。",
+    "heading": "中野ブロードウェイ",
+    "content": "中野ブロードウェイ是尋寶者的天堂。從JR中野站北口步行5分鐘，這棟複合式商場內藏著無數古董漫畫、偶像周邊與獨立藝術品小店。建議直接上二樓「まんだらけ」總店，感受時間凝結的次文化氛圍。",
     "officialName": "Nakano Broadway",
     "officialNameLocal": "中野ブロードウェイ",
     "pipeline": {
@@ -425,7 +397,7 @@
         "sectionId": "nakano",
         "attempts": [
           {
-            "ts": 1783510988043,
+            "ts": 1783527188470,
             "sectionId": "nakano",
             "slot": "district_panorama",
             "query": "placeId:ChIJg-7dspDyGGARvvDv4E5-tuE",
@@ -436,70 +408,15 @@
             "rejectReason": null
           },
           {
-            "ts": 1783510988043,
-            "sectionId": "nakano",
-            "slot": null,
-            "query": "placeId:ChIJg-7dspDyGGARvvDv4E5-tuE",
-            "phase": "review_photos",
-            "candidateCount": 10,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": "content_place_no_match"
-          },
-          {
-            "ts": 1783510988205,
-            "sectionId": "nakano",
-            "slot": null,
-            "query": "中野ブロードウェイ 外観",
-            "phase": "precise_local",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783510988359,
-            "sectionId": "nakano",
-            "slot": null,
-            "query": "中野ブロードウェイ 入口",
-            "phase": "precise_local",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783510988637,
-            "sectionId": "nakano",
-            "slot": null,
-            "query": "中野ブロードウェイ まんだらけ",
-            "phase": "precise_local",
-            "candidateCount": 5,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783510988871,
-            "sectionId": "nakano",
-            "slot": null,
-            "query": "中野 Sun Mall 商店街",
-            "phase": "precise_local",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783510988887,
+            "ts": 1783527188494,
             "sectionId": "nakano",
             "slot": "district_panorama",
-            "query": "中野 Sun Mall 商店街",
-            "phase": "precise_local",
+            "query": "content_place",
+            "phase": "place_photos",
             "candidateCount": 10,
             "photoIndex": 1,
-            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjDdxzZwxq67qPx_hij8i4MZ5A8TddTou1YG4ym4oAFzIKAi456-HZY1tLiRE2cPnUZsKtUx63RQ1JFFTMoKO5tzh53cfAfEUaRr8zKTwPNBX3wDJjcUJPyyi1eI_MNohuc1pJpX7NhI90aVxQ=s4800-w1600-h1200",
-            "selectedReason": "slot_district_panorama_score_140",
+            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjAn1npMVqT_rFm_befRlNsNj5Cm2dy1W3F6LtGa97Atb3j4tyLG4fNkGzrY9hk9MgHHzyCVP5t84_MCuBE1XHwfqKKeESpLwLjxBpz3MoTOpgf4TwDqeubpYvOEVmt1vdT00j4r3Ko_9BV9Azi1_NDcQw=s4800-w1600-h1200",
+            "selectedReason": "slot_district_panorama_score_206",
             "rejectReason": null
           }
         ]
@@ -508,7 +425,7 @@
   },
   {
     "sectionId": "gachapon",
-    "subject": "ガシャポン百貨店 池袋総本店：扭蛋迷的天堂",
+    "subject": "ガシャポン百貨店 池袋総本店",
     "mapsQuery": "Gashapon Department Store Ikebukuro",
     "placeId": "ChIJBztW3x2MGGARadHYl5vTEK0",
     "googleRating": 4,
@@ -521,7 +438,7 @@
     "photoScore": 193,
     "photoIndex": 1,
     "photoCaption": "整排扭蛋機一路延伸，色彩與機台本身就是風景。",
-    "secondaryGooglePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjBK_tB9VervAAKptY4gJl5U0Icc70nGcqXU5swBoIYYDomxJPHMVBIFnPVCEziSFM7qRz-LaFuKM8MA6sTx_xTVaXxcA_OwqOMm0OSNfBDAq8M3s2dRoM_rfQ-4fi73d8PTxeHNd_Mfq2k_HA=s4800-w1600-h1200",
+    "secondaryGooglePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjDdZfA1kPSWkrorQNs3eC0fOgD84YKBQGFNd4M8ZBPG3i5jP9ebXqdlWhNpmtNvacSc2tKiaZ1bMr5wmOeuZ4cmVpR0QYt-dtsStA3wBaBwjGvfg5jy-ILFblPr2OFf6y3Z6rob_kFrry9gpA=s4800-w1600-h1200",
     "secondaryGoogleAttribution": "iris soh",
     "secondaryCaption": "整排扭蛋機一路延伸，色彩與機台本身就是風景。",
     "secondaryPhotoSlot": "wall",
@@ -543,9 +460,8 @@
       "categories": [
         "storefront",
         "street_scene",
-        "gachapon",
-        "cafe_experience",
-        "activity"
+        "shop_collectible",
+        "gachapon"
       ],
       "hits": [
         {
@@ -572,6 +488,17 @@
           ]
         },
         {
+          "category": "shop_collectible",
+          "score": 1,
+          "matched": [
+            "收藏"
+          ],
+          "evidence": [
+            "anime_collectible",
+            "shop_interior"
+          ]
+        },
+        {
           "category": "gachapon",
           "score": 1,
           "matched": [
@@ -580,48 +507,23 @@
           "evidence": [
             "gachapon_wall"
           ]
-        },
-        {
-          "category": "cafe_experience",
-          "score": 1,
-          "matched": [
-            "體驗"
-          ],
-          "evidence": [
-            "dessert",
-            "cafe_interior"
-          ]
-        },
-        {
-          "category": "activity",
-          "score": 1,
-          "matched": [
-            "體驗"
-          ],
-          "evidence": [
-            "cafe_interior",
-            "anime_collectible",
-            "shop_interior"
-          ]
         }
       ],
       "requiredEvidence": [
         "street_landmark",
         "landmark_building",
-        "gachapon_wall",
-        "dessert",
-        "cafe_interior",
-        "facade",
         "anime_collectible",
-        "shop_interior"
+        "shop_interior",
+        "gachapon_wall",
+        "facade"
       ],
       "searchBoost": [
         "招牌",
+        "收藏",
         "扭蛋",
-        "體驗",
         "外觀"
       ],
-      "copyExcerpt": "ガシャポン百貨店 池袋総本店：扭蛋迷的天堂 想體驗最純粹的扭蛋樂趣，務必前往「ガシャポン百貨店 池袋総本店」。從JR池袋站東口步行約5分鐘即可抵達，這間店擁有超過3000台扭蛋機，是全球最大的扭蛋專賣店。從經典動漫角色到搞怪小物，應有盡有。建議事先準備大量百元硬幣，或者直接在店內兌換，以免錯失心儀的款式。這裡的商品更新速度快，每次來都有新發現。 整面牆都是驚喜，不是黃色招牌外觀 ガシャポン百貨店 池袋総本店：扭蛋迷的天堂 ガシャポン百貨店 池袋総本店：扭蛋迷的天堂"
+      "copyExcerpt": "ガシャポン百貨店 池袋総本店 池袋的「ガシャポン百貨店」是扭蛋迷的夢幻據點。從JR池袋站東口步行約7分鐘，這間店擁有超過3000台扭蛋機，涵蓋從經典到最新款的各種主題。準備好零錢，一次滿足你的收藏慾。 整面牆都是驚喜，不是黃色招牌外觀 ガシャポン百貨店 池袋総本店 ガシャポン百貨店 池袋総本店"
     },
     "copyDerivedPhotoIntent": "店面外觀、街景、霓虹、人潮、地標建築外觀",
     "matchedKeywords": [
@@ -640,7 +542,7 @@
       "sectionId": "gachapon",
       "attempts": [
         {
-          "ts": 1783510989350,
+          "ts": 1783527188884,
           "sectionId": "gachapon",
           "slot": "storefront",
           "query": "placeId:ChIJBztW3x2MGGARadHYl5vTEK0",
@@ -651,7 +553,7 @@
           "rejectReason": null
         },
         {
-          "ts": 1783510989377,
+          "ts": 1783527188910,
           "sectionId": "gachapon",
           "slot": "wall",
           "query": "content_place",
@@ -663,14 +565,14 @@
           "rejectReason": null
         },
         {
-          "ts": 1783510989406,
+          "ts": 1783527188941,
           "sectionId": "gachapon",
           "slot": "wall",
           "query": "content_place",
           "phase": "place_photos",
           "candidateCount": 10,
           "photoIndex": 2,
-          "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjBK_tB9VervAAKptY4gJl5U0Icc70nGcqXU5swBoIYYDomxJPHMVBIFnPVCEziSFM7qRz-LaFuKM8MA6sTx_xTVaXxcA_OwqOMm0OSNfBDAq8M3s2dRoM_rfQ-4fi73d8PTxeHNd_Mfq2k_HA=s4800-w1600-h1200",
+          "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjDdZfA1kPSWkrorQNs3eC0fOgD84YKBQGFNd4M8ZBPG3i5jP9ebXqdlWhNpmtNvacSc2tKiaZ1bMr5wmOeuZ4cmVpR0QYt-dtsStA3wBaBwjGvfg5jy-ILFblPr2OFf6y3Z6rob_kFrry9gpA=s4800-w1600-h1200",
           "selectedReason": "slot_wall_score_193",
           "rejectReason": null
         }
@@ -688,8 +590,8 @@
     "swappedFrom": null,
     "swappedTo": null,
     "alternativeId": null,
-    "heading": "ガシャポン百貨店 池袋総本店：扭蛋迷的天堂",
-    "content": "想體驗最純粹的扭蛋樂趣，務必前往「ガシャポン百貨店 池袋総本店」。從JR池袋站東口步行約5分鐘即可抵達，這間店擁有超過3000台扭蛋機，是全球最大的扭蛋專賣店。從經典動漫角色到搞怪小物，應有盡有。建議事先準備大量百元硬幣，或者直接在店內兌換，以免錯失心儀的款式。這裡的商品更新速度快，每次來都有新發現。",
+    "heading": "ガシャポン百貨店 池袋総本店",
+    "content": "池袋的「ガシャポン百貨店」是扭蛋迷的夢幻據點。從JR池袋站東口步行約7分鐘，這間店擁有超過3000台扭蛋機，涵蓋從經典到最新款的各種主題。準備好零錢，一次滿足你的收藏慾。",
     "officialName": "Gashapon Department Store Ikebukuro",
     "officialNameLocal": "ガシャポン百貨店 池袋総本店",
     "pipeline": {
@@ -708,7 +610,7 @@
         "sectionId": "gachapon",
         "attempts": [
           {
-            "ts": 1783510989350,
+            "ts": 1783527188884,
             "sectionId": "gachapon",
             "slot": "storefront",
             "query": "placeId:ChIJBztW3x2MGGARadHYl5vTEK0",
@@ -719,7 +621,7 @@
             "rejectReason": null
           },
           {
-            "ts": 1783510989377,
+            "ts": 1783527188910,
             "sectionId": "gachapon",
             "slot": "wall",
             "query": "content_place",
@@ -731,14 +633,14 @@
             "rejectReason": null
           },
           {
-            "ts": 1783510989406,
+            "ts": 1783527188941,
             "sectionId": "gachapon",
             "slot": "wall",
             "query": "content_place",
             "phase": "place_photos",
             "candidateCount": 10,
             "photoIndex": 2,
-            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjBK_tB9VervAAKptY4gJl5U0Icc70nGcqXU5swBoIYYDomxJPHMVBIFnPVCEziSFM7qRz-LaFuKM8MA6sTx_xTVaXxcA_OwqOMm0OSNfBDAq8M3s2dRoM_rfQ-4fi73d8PTxeHNd_Mfq2k_HA=s4800-w1600-h1200",
+            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjDdZfA1kPSWkrorQNs3eC0fOgD84YKBQGFNd4M8ZBPG3i5jP9ebXqdlWhNpmtNvacSc2tKiaZ1bMr5wmOeuZ4cmVpR0QYt-dtsStA3wBaBwjGvfg5jy-ILFblPr2OFf6y3Z6rob_kFrry9gpA=s4800-w1600-h1200",
             "selectedReason": "slot_wall_score_193",
             "rejectReason": null
           }
@@ -748,46 +650,47 @@
   },
   {
     "sectionId": "ichiran",
-    "subject": "一蘭ラーメン 新宿店：深夜動漫後的美味慰藉",
-    "mapsQuery": "一蘭ラーメン 新宿店 Tokyo",
-    "placeId": "ChIJ8QwFX9qMGGARVm0p0caIeTk",
-    "googleRating": 4.3,
-    "googleAddress": "〒160-0022 東京都新宿区新宿３丁目３４−１１ ピースビル B1F",
-    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjDtOOvdK7Fsjt1EXs3gbIpBxhNteS3irZ5YCsVYH65A4iR3zDhPRZFY32cAkKarc7_p3kuYU2F-4EsHVlBAi3ws8no9qPn4AZmW6076ueoDWEka9Oe2CCHnlsTXm4DAG5HpY36qzPTVf3HrFQpKTGXe=s4800-w1600-h1200",
-    "googleAttribution": "yuka sake",
-    "imageSource": "google_places",
-    "matched": true,
-    "placeName": "一蘭 新宿中央東口店",
-    "photoScore": 139,
-    "photoIndex": 2,
-    "photoCaption": "一蘭新宿中央東口店的外觀與入口清楚可見，方便對照地圖找路。",
-    "photoEvidence": {
-      "primary": "facade",
-      "types": [
-        "facade",
-        "food_dish"
-      ],
-      "signals": [],
-      "subjectType": "venue",
-      "role": "food",
-      "blob": "yuka sake"
-    },
-    "travelPhotoSlot": "storefront",
+    "subject": "一風堂 上野広小路店",
+    "mapsQuery": "一風堂 上野広小路店",
+    "placeId": "ChIJVVVVdNOMGGAR4MxPQAdY3hc",
+    "googleRating": 5,
+    "googleAddress": "〒160-0023 東京都新宿区西新宿２丁目４−１ 新宿NSビル 8F",
+    "googlePhotoUrl": null,
+    "googleAttribution": null,
+    "imageSource": null,
+    "matched": false,
+    "placeName": "株式会社ストアフロント",
+    "photoScore": null,
+    "photoIndex": null,
+    "photoCaption": null,
+    "secondaryGooglePhotoUrl": null,
+    "secondaryGoogleAttribution": null,
+    "secondaryCaption": null,
+    "secondaryPhotoSlot": null,
+    "photoEvidence": null,
+    "travelPhotoSlot": null,
     "copySemantics": {
-      "primary": "dish",
+      "primary": "gachapon",
       "categories": [
+        "gachapon",
         "dish"
       ],
       "hits": [
         {
-          "category": "dish",
-          "score": 5,
+          "category": "gachapon",
+          "score": 1,
           "matched": [
-            "拉麵",
-            "湯頭",
-            "麵",
-            "用餐",
-            "ラーメン"
+            "扭蛋"
+          ],
+          "evidence": [
+            "gachapon_wall"
+          ]
+        },
+        {
+          "category": "dish",
+          "score": 1,
+          "matched": [
+            "補給"
           ],
           "evidence": [
             "food_dish"
@@ -795,36 +698,218 @@
         }
       ],
       "requiredEvidence": [
+        "gachapon_wall",
         "food_dish"
       ],
       "searchBoost": [
-        "拉麵",
-        "湯頭",
-        "麵",
-        "用餐",
-        "ラーメン"
+        "扭蛋",
+        "補給"
       ],
-      "copyExcerpt": "一蘭ラーメン 新宿店：深夜動漫後的美味慰藉 在新宿逛完動漫周邊，深夜飢腸轆轆時，「一蘭ラーメン 新宿店」是個理想選擇。從JR新宿站東口步行約3分鐘，這家店以其獨特的「味集中カウンター」聞名，提供專注的個人用餐空間。你可以透過點餐紙客製化麵條硬度、湯頭濃淡及配料。營業時間至深夜，非常適合在結束動漫活動後，享受一碗熱騰騰的豚骨拉麵，為一天劃下句點。 一蘭ラーメン 新宿店：深夜動漫後的美味慰藉 一蘭ラーメン 新宿店：深夜動漫後的美味慰藉"
+      "copyExcerpt": "上野一風堂：豚骨補給站 逛完池袋扭蛋或上野公園後，可到「一風堂 上野広小路店」吃白丸／赤丸。靠近上野広小路、動線清楚，尖峰仍可能排隊，建議錯開正午時段。 一風堂 上野広小路店 一風堂 上野広小路店"
     },
-    "copyDerivedPhotoIntent": "成品料理、餐點本體",
-    "matchedKeywords": [
-      "一蘭",
-      "一蘭",
-      "一蘭"
-    ],
-    "photoPlaceName": "一蘭 新宿中央東口店",
-    "searchUsed": "一蘭ラーメン 新宿店",
-    "photoSearchUsed": "content_place",
+    "copyDerivedPhotoIntent": "整排扭蛋機、扭蛋牆、成品料理、餐點本體",
+    "matchedKeywords": [],
+    "photoPlaceName": null,
+    "searchUsed": "storefront:relaxed",
+    "photoSearchUsed": null,
+    "photoSearchPhase": null,
     "photoSearchDebug": {
       "sectionId": "ichiran",
       "attempts": [
         {
-          "ts": 1783510989715,
+          "ts": 1783527192122,
           "sectionId": "ichiran",
           "slot": "storefront",
-          "query": "placeId:ChIJ8QwFX9qMGGARVm0p0caIeTk",
+          "query": "placeId:ChIJVVVVdNOMGGAR4MxPQAdY3hc",
           "phase": "place_photos",
-          "candidateCount": 10,
+          "candidateCount": 0,
+          "selectedImageUrl": null,
+          "selectedReason": null,
+          "rejectReason": null
+        },
+        {
+          "ts": 1783527192122,
+          "sectionId": "ichiran",
+          "slot": null,
+          "query": "placeId:ChIJVVVVdNOMGGAR4MxPQAdY3hc",
+          "phase": "review_photos",
+          "candidateCount": 0,
+          "selectedImageUrl": null,
+          "selectedReason": null,
+          "rejectReason": "content_place_no_match"
+        },
+        {
+          "ts": 1783527192291,
+          "sectionId": "ichiran",
+          "slot": null,
+          "query": "一風堂 上野広小路店",
+          "phase": "precise_local",
+          "candidateCount": 1,
+          "selectedImageUrl": null,
+          "selectedReason": null,
+          "rejectReason": null
+        },
+        {
+          "ts": 1783527192451,
+          "sectionId": "ichiran",
+          "slot": null,
+          "query": "Ippudo Ueno",
+          "phase": "precise_local",
+          "candidateCount": 1,
+          "selectedImageUrl": null,
+          "selectedReason": null,
+          "rejectReason": null
+        },
+        {
+          "ts": 1783527192556,
+          "sectionId": "ichiran",
+          "slot": null,
+          "query": "Ippudo Ueno Hirokoji",
+          "phase": "precise_local",
+          "candidateCount": 1,
+          "selectedImageUrl": null,
+          "selectedReason": null,
+          "rejectReason": null
+        },
+        {
+          "ts": 1783527192701,
+          "sectionId": "ichiran",
+          "slot": null,
+          "query": "Ippudo",
+          "phase": "precise_local",
+          "candidateCount": 5,
+          "selectedImageUrl": null,
+          "selectedReason": null,
+          "rejectReason": null
+        },
+        {
+          "ts": 1783527192870,
+          "sectionId": "ichiran",
+          "slot": null,
+          "query": "一風堂",
+          "phase": "precise_local",
+          "candidateCount": 5,
+          "selectedImageUrl": null,
+          "selectedReason": null,
+          "rejectReason": null
+        },
+        {
+          "ts": 1783527193038,
+          "sectionId": "ichiran",
+          "slot": null,
+          "query": "一風堂 上野広小路店 外観",
+          "phase": "local_suffix",
+          "candidateCount": 1,
+          "selectedImageUrl": null,
+          "selectedReason": null,
+          "rejectReason": null
+        },
+        {
+          "ts": 1783527193224,
+          "sectionId": "ichiran",
+          "slot": null,
+          "query": "一風堂 上野広小路店 入口",
+          "phase": "local_suffix",
+          "candidateCount": 1,
+          "selectedImageUrl": null,
+          "selectedReason": null,
+          "rejectReason": null
+        },
+        {
+          "ts": 1783527193406,
+          "sectionId": "ichiran",
+          "slot": null,
+          "query": "一風堂 上野広小路店 店頭",
+          "phase": "local_suffix",
+          "candidateCount": 1,
+          "selectedImageUrl": null,
+          "selectedReason": null,
+          "rejectReason": null
+        },
+        {
+          "ts": 1783527193540,
+          "sectionId": "ichiran",
+          "slot": null,
+          "query": "Ippudo Ueno Hirokoji 外観",
+          "phase": "local_suffix",
+          "candidateCount": 1,
+          "selectedImageUrl": null,
+          "selectedReason": null,
+          "rejectReason": null
+        },
+        {
+          "ts": 1783527193666,
+          "sectionId": "ichiran",
+          "slot": null,
+          "query": "Ippudo Ueno Hirokoji 入口",
+          "phase": "local_suffix",
+          "candidateCount": 1,
+          "selectedImageUrl": null,
+          "selectedReason": null,
+          "rejectReason": null
+        },
+        {
+          "ts": 1783527193850,
+          "sectionId": "ichiran",
+          "slot": null,
+          "query": "Ippudo Ueno Hirokoji 店頭",
+          "phase": "local_suffix",
+          "candidateCount": 1,
+          "selectedImageUrl": null,
+          "selectedReason": null,
+          "rejectReason": null
+        },
+        {
+          "ts": 1783527193982,
+          "sectionId": "ichiran",
+          "slot": null,
+          "query": "Ippudo 外観",
+          "phase": "local_suffix",
+          "candidateCount": 2,
+          "selectedImageUrl": null,
+          "selectedReason": null,
+          "rejectReason": null
+        },
+        {
+          "ts": 1783527194143,
+          "sectionId": "ichiran",
+          "slot": null,
+          "query": "Ippudo 入口",
+          "phase": "local_suffix",
+          "candidateCount": 5,
+          "selectedImageUrl": null,
+          "selectedReason": null,
+          "rejectReason": null
+        },
+        {
+          "ts": 1783527194336,
+          "sectionId": "ichiran",
+          "slot": null,
+          "query": "Ippudo 店頭",
+          "phase": "local_suffix",
+          "candidateCount": 5,
+          "selectedImageUrl": null,
+          "selectedReason": null,
+          "rejectReason": null
+        },
+        {
+          "ts": 1783527194489,
+          "sectionId": "ichiran",
+          "slot": null,
+          "query": "一風堂 外観",
+          "phase": "local_suffix",
+          "candidateCount": 0,
+          "selectedImageUrl": null,
+          "selectedReason": null,
+          "rejectReason": "zero_places"
+        },
+        {
+          "ts": 1783527194696,
+          "sectionId": "ichiran",
+          "slot": null,
+          "query": "一風堂 入口",
+          "phase": "local_suffix",
+          "candidateCount": 3,
           "selectedImageUrl": null,
           "selectedReason": null,
           "rejectReason": null
@@ -833,20 +918,42 @@
     },
     "sectionType": "food",
     "role": null,
-    "rejectReason": null,
+    "rejectReason": "exhausted_retry_plan",
     "editorialQA": {
-      "ok": true,
-      "issues": [],
-      "usePlaceholder": false
+      "ok": false,
+      "issues": [
+        "no_photo"
+      ],
+      "usePlaceholder": true,
+      "pass": false,
+      "recommendation": "use_placeholder",
+      "goldenRule": {
+        "principle": "圖片永遠服務文案；優先選旅遊者最想看到的照片（外觀/街景優先）。",
+        "rules": [
+          "街區/商圈/景點：第一張必須是代表整個區域的廣角街景、地標或全景",
+          "商店：第一張優先店門口或外觀，第二張才是店內",
+          "餐廳：第一張優先店門口、招牌、外觀，第二張才是餐點",
+          "住宿：第一張優先外觀/入口，第二張 Lobby，第三張房型",
+          "街區介紹必須至少有一張街景",
+          "圖片必須直接對應文案描述",
+          "搜尋優先當地語言，驗證不符則重新搜尋，禁止隨機 fallback",
+          "搜尋失敗必須依序 retry：精準店名 → 當地語言+外觀/街景 suffix → 英文 suffix → Place photos → 深度 photo index",
+          "若原訂地點無合格圖，依 venueAlternatives 換成同類型知名地點並改寫文案",
+          "改寫後文案必須與新地點、新圖片一致",
+          "如果仍找不到，寧可 placeholder，也不要放錯圖",
+          "Caption 只能描述圖片中真正看得到的內容",
+          "否則 Editorial QA 一律 FAIL"
+        ]
+      }
     },
     "venueSwapped": false,
     "swappedFrom": null,
     "swappedTo": null,
     "alternativeId": null,
-    "heading": "新宿中央東口一蘭：豚骨拉麵",
-    "content": "新宿中央東口店，JR新宿站東口步行3分即達。下到B1F，獨特味集中座席，客製化豚骨湯頭、麵條硬度與秘製醬汁。深夜覓食或逛街後，來碗熱騰騰拉麵最是滿足。尖峰時段雖需排隊，翻桌率高。",
-    "officialName": "Ichiran Shinjuku Chuo-Higashiguchi",
-    "officialNameLocal": "一蘭 新宿中央東口店",
+    "heading": "上野一風堂：豚骨補給站",
+    "content": "逛完池袋扭蛋或上野公園後，可到「一風堂 上野広小路店」吃白丸／赤丸。靠近上野広小路、動線清楚，尖峰仍可能排隊，建議錯開正午時段。",
+    "officialName": "Ippudo Ueno Hirokoji",
+    "officialNameLocal": "一風堂 上野広小路店",
     "pipeline": {
       "version": "photo-search-retry-v1",
       "steps": [
@@ -863,12 +970,199 @@
         "sectionId": "ichiran",
         "attempts": [
           {
-            "ts": 1783510989715,
+            "ts": 1783527192122,
             "sectionId": "ichiran",
             "slot": "storefront",
-            "query": "placeId:ChIJ8QwFX9qMGGARVm0p0caIeTk",
+            "query": "placeId:ChIJVVVVdNOMGGAR4MxPQAdY3hc",
             "phase": "place_photos",
-            "candidateCount": 10,
+            "candidateCount": 0,
+            "selectedImageUrl": null,
+            "selectedReason": null,
+            "rejectReason": null
+          },
+          {
+            "ts": 1783527192122,
+            "sectionId": "ichiran",
+            "slot": null,
+            "query": "placeId:ChIJVVVVdNOMGGAR4MxPQAdY3hc",
+            "phase": "review_photos",
+            "candidateCount": 0,
+            "selectedImageUrl": null,
+            "selectedReason": null,
+            "rejectReason": "content_place_no_match"
+          },
+          {
+            "ts": 1783527192291,
+            "sectionId": "ichiran",
+            "slot": null,
+            "query": "一風堂 上野広小路店",
+            "phase": "precise_local",
+            "candidateCount": 1,
+            "selectedImageUrl": null,
+            "selectedReason": null,
+            "rejectReason": null
+          },
+          {
+            "ts": 1783527192451,
+            "sectionId": "ichiran",
+            "slot": null,
+            "query": "Ippudo Ueno",
+            "phase": "precise_local",
+            "candidateCount": 1,
+            "selectedImageUrl": null,
+            "selectedReason": null,
+            "rejectReason": null
+          },
+          {
+            "ts": 1783527192556,
+            "sectionId": "ichiran",
+            "slot": null,
+            "query": "Ippudo Ueno Hirokoji",
+            "phase": "precise_local",
+            "candidateCount": 1,
+            "selectedImageUrl": null,
+            "selectedReason": null,
+            "rejectReason": null
+          },
+          {
+            "ts": 1783527192701,
+            "sectionId": "ichiran",
+            "slot": null,
+            "query": "Ippudo",
+            "phase": "precise_local",
+            "candidateCount": 5,
+            "selectedImageUrl": null,
+            "selectedReason": null,
+            "rejectReason": null
+          },
+          {
+            "ts": 1783527192870,
+            "sectionId": "ichiran",
+            "slot": null,
+            "query": "一風堂",
+            "phase": "precise_local",
+            "candidateCount": 5,
+            "selectedImageUrl": null,
+            "selectedReason": null,
+            "rejectReason": null
+          },
+          {
+            "ts": 1783527193038,
+            "sectionId": "ichiran",
+            "slot": null,
+            "query": "一風堂 上野広小路店 外観",
+            "phase": "local_suffix",
+            "candidateCount": 1,
+            "selectedImageUrl": null,
+            "selectedReason": null,
+            "rejectReason": null
+          },
+          {
+            "ts": 1783527193224,
+            "sectionId": "ichiran",
+            "slot": null,
+            "query": "一風堂 上野広小路店 入口",
+            "phase": "local_suffix",
+            "candidateCount": 1,
+            "selectedImageUrl": null,
+            "selectedReason": null,
+            "rejectReason": null
+          },
+          {
+            "ts": 1783527193406,
+            "sectionId": "ichiran",
+            "slot": null,
+            "query": "一風堂 上野広小路店 店頭",
+            "phase": "local_suffix",
+            "candidateCount": 1,
+            "selectedImageUrl": null,
+            "selectedReason": null,
+            "rejectReason": null
+          },
+          {
+            "ts": 1783527193540,
+            "sectionId": "ichiran",
+            "slot": null,
+            "query": "Ippudo Ueno Hirokoji 外観",
+            "phase": "local_suffix",
+            "candidateCount": 1,
+            "selectedImageUrl": null,
+            "selectedReason": null,
+            "rejectReason": null
+          },
+          {
+            "ts": 1783527193666,
+            "sectionId": "ichiran",
+            "slot": null,
+            "query": "Ippudo Ueno Hirokoji 入口",
+            "phase": "local_suffix",
+            "candidateCount": 1,
+            "selectedImageUrl": null,
+            "selectedReason": null,
+            "rejectReason": null
+          },
+          {
+            "ts": 1783527193850,
+            "sectionId": "ichiran",
+            "slot": null,
+            "query": "Ippudo Ueno Hirokoji 店頭",
+            "phase": "local_suffix",
+            "candidateCount": 1,
+            "selectedImageUrl": null,
+            "selectedReason": null,
+            "rejectReason": null
+          },
+          {
+            "ts": 1783527193982,
+            "sectionId": "ichiran",
+            "slot": null,
+            "query": "Ippudo 外観",
+            "phase": "local_suffix",
+            "candidateCount": 2,
+            "selectedImageUrl": null,
+            "selectedReason": null,
+            "rejectReason": null
+          },
+          {
+            "ts": 1783527194143,
+            "sectionId": "ichiran",
+            "slot": null,
+            "query": "Ippudo 入口",
+            "phase": "local_suffix",
+            "candidateCount": 5,
+            "selectedImageUrl": null,
+            "selectedReason": null,
+            "rejectReason": null
+          },
+          {
+            "ts": 1783527194336,
+            "sectionId": "ichiran",
+            "slot": null,
+            "query": "Ippudo 店頭",
+            "phase": "local_suffix",
+            "candidateCount": 5,
+            "selectedImageUrl": null,
+            "selectedReason": null,
+            "rejectReason": null
+          },
+          {
+            "ts": 1783527194489,
+            "sectionId": "ichiran",
+            "slot": null,
+            "query": "一風堂 外観",
+            "phase": "local_suffix",
+            "candidateCount": 0,
+            "selectedImageUrl": null,
+            "selectedReason": null,
+            "rejectReason": "zero_places"
+          },
+          {
+            "ts": 1783527194696,
+            "sectionId": "ichiran",
+            "slot": null,
+            "query": "一風堂 入口",
+            "phase": "local_suffix",
+            "candidateCount": 3,
             "selectedImageUrl": null,
             "selectedReason": null,
             "rejectReason": null
@@ -879,510 +1173,193 @@
   },
   {
     "sectionId": "maid-cafe",
-    "subject": "めいどりーみん 秋葉原 本店：體驗女僕咖啡文化",
-    "mapsQuery": "Maidreamin Akihabara Main Store",
-    "placeId": "ChIJyR7AdR6MGGAROowxIYdMsj0",
-    "googleRating": 4.9,
-    "googleAddress": "〒101-0021 東京都千代田区外神田３丁目１６−１７ 住吉ビル 6階",
-    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjBZTeJFmuRaCmVQC3fgaJDIae93XzPeYbku_5lxB7cER0Pu6XUCKb_O0WPZ9kMG-m798S549P_9g-UPtn5G0aFoW6qMoFbjq20CbVjA0Sg8GR69nl3KgrtxFB0SheEKplfBW_-pVAKXF8T5DKd9z-RBtw=s4800-w543-h345",
-    "googleAttribution": "めいどりーみん 秋葉原 本店",
-    "imageSource": "google_places",
-    "matched": true,
-    "placeName": "めいどりーみん 秋葉原 本店",
-    "photoScore": 129,
-    "photoIndex": 0,
-    "photoCaption": "めいどりーみん秋葉原本店的外觀與入口清楚可見，方便對照地圖找路。",
-    "secondaryGooglePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjAIn-y-iYA00UUl_OLe8h1CLMixhlU5IsgTuVOSJhiODaxvTKslhnS2_s2UL8BoQ0GMsLTzsss-NW07SWHDLF5C4YX1I8PYeWG36YC4Z7mKu5m8MqL4brYFY6qFtj0b4FiUkDyTJXFNDdl7JhyF4ufJ4w=s4800-w1600-h1200",
-    "secondaryGoogleAttribution": "めいどりーみん 秋葉原 本店",
-    "secondaryCaption": "主題內裝與座位區呈現店內氛圍，一眼就知道這是主題咖啡廳。",
-    "secondaryPhotoSlot": "experience",
-    "photoEvidence": {
-      "primary": "facade",
-      "types": [
-        "facade"
-      ],
-      "signals": [],
-      "subjectType": "venue",
-      "role": "cafe",
-      "blob": ""
-    },
-    "travelPhotoSlot": "storefront",
-    "copySemantics": {
-      "primary": "cafe_experience",
-      "categories": [
-        "cafe_experience",
-        "dish",
-        "landmark",
-        "dessert",
-        "activity"
-      ],
-      "hits": [
-        {
-          "category": "cafe_experience",
-          "score": 4,
-          "matched": [
-            "女僕",
-            "咖啡",
-            "氛圍",
-            "體驗"
-          ],
-          "evidence": [
-            "dessert",
-            "cafe_interior"
-          ]
-        },
-        {
-          "category": "dish",
-          "score": 2,
-          "matched": [
-            "餐點",
-            "用餐"
-          ],
-          "evidence": [
-            "food_dish"
-          ]
-        },
-        {
-          "category": "landmark",
-          "score": 1,
-          "matched": [
-            "代表性"
-          ],
-          "evidence": [
-            "landmark_building",
-            "street_landmark"
-          ]
-        },
-        {
-          "category": "dessert",
-          "score": 1,
-          "matched": [
-            "飲品"
-          ],
-          "evidence": [
-            "dessert",
-            "cafe_interior"
-          ]
-        },
-        {
-          "category": "activity",
-          "score": 1,
-          "matched": [
-            "體驗"
-          ],
-          "evidence": [
-            "cafe_interior",
-            "anime_collectible",
-            "shop_interior"
-          ]
-        }
-      ],
-      "requiredEvidence": [
-        "landmark_building",
-        "street_landmark",
-        "food_dish",
-        "dessert",
-        "cafe_interior",
-        "anime_collectible",
-        "shop_interior"
-      ],
-      "searchBoost": [
-        "代表性",
-        "餐點",
-        "用餐",
-        "飲品",
-        "女僕",
-        "咖啡",
-        "氛圍",
-        "體驗"
-      ],
-      "copyExcerpt": "めいどりーみん 秋葉原 本店：體驗女僕咖啡文化 來到秋葉原，不體驗女僕咖啡廳就少了點什麼。「めいどりーみん 秋葉原 本店」是該區最具代表性的女僕咖啡廳之一。從JR秋葉原站電器街口步行約5分鐘，店內女僕會與客人互動，並提供餐點與飲品。這裡的特色是充滿活力的服務與可愛的餐點擺盤，適合想體驗日本獨特次文化氛圍的讀者。建議預約或避開用餐高峰時段，以免排隊。 めいどりーみん 秋葉原 本店：體驗女僕咖啡文化 めいどりーみん 秋葉原 本店：體驗女僕咖啡文化"
-    },
-    "copyDerivedPhotoIntent": "店內氛圍、甜點、主題內裝、成品料理、餐點本體",
-    "matchedKeywords": [
-      "めいどりーみん 秋葉原 本店"
-    ],
-    "photoPlaceName": "めいどりーみん 秋葉原 本店",
-    "searchUsed": "めいどりーみん 秋葉原 本店",
-    "photoSearchUsed": "content_place",
-    "photoSearchDebug": {
-      "sectionId": "maid-cafe",
-      "attempts": [
-        {
-          "ts": 1783510990048,
-          "sectionId": "maid-cafe",
-          "slot": "storefront",
-          "query": "placeId:ChIJyR7AdR6MGGAROowxIYdMsj0",
-          "phase": "place_photos",
-          "candidateCount": 10,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783510990062,
-          "sectionId": "maid-cafe",
-          "slot": "storefront",
-          "query": "content_place",
-          "phase": "place_photos",
-          "candidateCount": 10,
-          "photoIndex": 0,
-          "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjBZTeJFmuRaCmVQC3fgaJDIae93XzPeYbku_5lxB7cER0Pu6XUCKb_O0WPZ9kMG-m798S549P_9g-UPtn5G0aFoW6qMoFbjq20CbVjA0Sg8GR69nl3KgrtxFB0SheEKplfBW_-pVAKXF8T5DKd9z-RBtw=s4800-w543-h345",
-          "selectedReason": "slot_storefront_score_129",
-          "rejectReason": null
-        },
-        {
-          "ts": 1783510990077,
-          "sectionId": "maid-cafe",
-          "slot": "experience",
-          "query": "content_place",
-          "phase": "place_photos",
-          "candidateCount": 10,
-          "photoIndex": 2,
-          "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjAIn-y-iYA00UUl_OLe8h1CLMixhlU5IsgTuVOSJhiODaxvTKslhnS2_s2UL8BoQ0GMsLTzsss-NW07SWHDLF5C4YX1I8PYeWG36YC4Z7mKu5m8MqL4brYFY6qFtj0b4FiUkDyTJXFNDdl7JhyF4ufJ4w=s4800-w1600-h1200",
-          "selectedReason": "slot_experience_score_109",
-          "rejectReason": null
-        }
-      ]
-    },
-    "sectionType": "cafe",
-    "role": null,
-    "rejectReason": null,
-    "editorialQA": {
-      "ok": true,
-      "issues": [],
-      "usePlaceholder": false
-    },
-    "venueSwapped": false,
-    "swappedFrom": null,
-    "swappedTo": null,
-    "alternativeId": null,
-    "heading": "めいどりーみん 秋葉原 本店：體驗女僕咖啡文化",
-    "content": "來到秋葉原，不體驗女僕咖啡廳就少了點什麼。「めいどりーみん 秋葉原 本店」是該區最具代表性的女僕咖啡廳之一。從JR秋葉原站電器街口步行約5分鐘，店內女僕會與客人互動，並提供餐點與飲品。這裡的特色是充滿活力的服務與可愛的餐點擺盤，適合想體驗日本獨特次文化氛圍的讀者。建議預約或避開用餐高峰時段，以免排隊。",
-    "officialName": "Maidreamin Akihabara Main Store",
-    "officialNameLocal": "めいどりーみん 秋葉原 本店",
+    "subject": "アニメイトカフェ 池袋店",
+    "mapsQuery": "アニメイトカフェ 池袋店",
+    "placeId": null,
+    "googleRating": null,
+    "googleAddress": null,
+    "googlePhotoUrl": null,
+    "googleAttribution": null,
+    "imageSource": null,
+    "matched": false,
+    "rejectReason": "no_valid_place",
     "pipeline": {
       "version": "photo-search-retry-v1",
       "steps": [
         "copy_semantic_analysis",
         "derive_photo_intent",
-        "place_verify",
-        "photo_search_retry",
-        "photo_first_pick",
-        "evidence_caption",
-        "rule_qa"
+        "place_verify"
       ],
-      "aiTokens": 0,
-      "photoSearchDebug": {
-        "sectionId": "maid-cafe",
-        "attempts": [
-          {
-            "ts": 1783510990048,
-            "sectionId": "maid-cafe",
-            "slot": "storefront",
-            "query": "placeId:ChIJyR7AdR6MGGAROowxIYdMsj0",
-            "phase": "place_photos",
-            "candidateCount": 10,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783510990062,
-            "sectionId": "maid-cafe",
-            "slot": "storefront",
-            "query": "content_place",
-            "phase": "place_photos",
-            "candidateCount": 10,
-            "photoIndex": 0,
-            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjBZTeJFmuRaCmVQC3fgaJDIae93XzPeYbku_5lxB7cER0Pu6XUCKb_O0WPZ9kMG-m798S549P_9g-UPtn5G0aFoW6qMoFbjq20CbVjA0Sg8GR69nl3KgrtxFB0SheEKplfBW_-pVAKXF8T5DKd9z-RBtw=s4800-w543-h345",
-            "selectedReason": "slot_storefront_score_129",
-            "rejectReason": null
-          },
-          {
-            "ts": 1783510990077,
-            "sectionId": "maid-cafe",
-            "slot": "experience",
-            "query": "content_place",
-            "phase": "place_photos",
-            "candidateCount": 10,
-            "photoIndex": 2,
-            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjAIn-y-iYA00UUl_OLe8h1CLMixhlU5IsgTuVOSJhiODaxvTKslhnS2_s2UL8BoQ0GMsLTzsss-NW07SWHDLF5C4YX1I8PYeWG36YC4Z7mKu5m8MqL4brYFY6qFtj0b4FiUkDyTJXFNDdl7JhyF4ufJ4w=s4800-w1600-h1200",
-            "selectedReason": "slot_experience_score_109",
-            "rejectReason": null
-          }
-        ]
-      }
+      "aiTokens": 0
+    },
+    "editorialQA": {
+      "pass": false,
+      "issues": [
+        "no_valid_place"
+      ],
+      "usePlaceholder": true
     }
   },
   {
     "sectionId": "nui-hostel",
-    "subject": "グリッズ 東京 浅草橋 ホテル & ホステル：文青旅人的基地",
-    "mapsQuery": "グリッズ 東京 浅草橋 ホテル & ホステル Tokyo",
-    "placeId": "ChIJjTWKIa6OGGAR6kmG9UpLIIU",
-    "googleRating": 4.2,
-    "googleAddress": "〒111-0053 東京都台東区浅草橋４丁目１１−６",
-    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZPb6mT4en-v58XQEAi1EHk2n4CX-XKv-g5LjVyWQEkkNbPIz_wRzThp0y22bfqYqMUHDO8O88VkglbtE85BV_VYx2YrIIUYG1XlH0jJC5yzlOtmT9cQletlHlI2bhJHUk3fUDIVilwT7Fbnhrw=s4800-w1600-h1200",
-    "googleAttribution": "百目木陽介",
-    "imageSource": "google_places",
-    "matched": true,
-    "placeName": "グリッズ 東京 浅草橋 ホテル & ホステル",
-    "photoScore": 130,
-    "photoIndex": 0,
-    "photoCaption": "グリッズ東京浅草橋ホテル&ホステル的建築外觀與入口，從街上就能確認位置。",
-    "photoEvidence": {
-      "primary": "facade",
-      "types": [
-        "facade",
-        "facade"
-      ],
-      "signals": [],
-      "subjectType": "venue",
-      "role": "hostel",
-      "blob": "百目木陽介"
-    },
-    "travelPhotoSlot": "exterior",
-    "copySemantics": {
-      "primary": "cafe_experience",
-      "categories": [
-        "cafe_experience",
-        "room",
-        "gachapon",
-        "lobby"
-      ],
-      "hits": [
-        {
-          "category": "cafe_experience",
-          "score": 2,
-          "matched": [
-            "咖啡",
-            "氛圍"
-          ],
-          "evidence": [
-            "dessert",
-            "cafe_interior"
-          ]
-        },
-        {
-          "category": "room",
-          "score": 2,
-          "matched": [
-            "客房",
-            "床位"
-          ],
-          "evidence": [
-            "room"
-          ]
-        },
-        {
-          "category": "gachapon",
-          "score": 1,
-          "matched": [
-            "膠囊"
-          ],
-          "evidence": [
-            "gachapon_wall"
-          ]
-        },
-        {
-          "category": "lobby",
-          "score": 1,
-          "matched": [
-            "交流"
-          ],
-          "evidence": [
-            "lobby_bar"
-          ]
-        }
-      ],
-      "requiredEvidence": [
-        "gachapon_wall",
-        "dessert",
-        "cafe_interior",
-        "lobby_bar",
-        "room"
-      ],
-      "searchBoost": [
-        "膠囊",
-        "咖啡",
-        "氛圍",
-        "交流",
-        "客房",
-        "床位"
-      ],
-      "copyExcerpt": "グリッズ 東京 浅草橋 ホテル & ホステル：文青旅人的基地 尋找兼具設計感與社群氛圍的住宿，「グリッズ 東京 浅草橋 ホテル & ホステル」是個不錯的選擇。從JR淺草橋站東口步行約3分鐘，這家旅店提供多種房型，從膠囊床位到私人客房皆有。一樓的咖啡廳與酒吧是旅人交流的好地方，氣氛輕鬆。淺草橋地區交通便利，前往秋葉原、淺草等地都非常方便，是動漫迷與文青旅人的理想據點。 グリッズ 東京 浅草橋 ホテル & ホステル：文青旅人的基地 グリッズ 東京 浅草橋 ホテル & ホステル：文青旅人的基地"
-    },
-    "copyDerivedPhotoIntent": "店內氛圍、甜點、主題內裝、客房、房間、床位空間",
-    "matchedKeywords": [
-      "グリッズ 東京 浅草橋 ホテル & ホステル",
-      "グリッズ"
-    ],
-    "photoPlaceName": "グリッズ 東京 浅草橋 ホテル & ホステル",
-    "searchUsed": "グリッズ 東京 浅草橋 ホテル & ホステル",
-    "photoSearchUsed": "content_place",
-    "photoSearchDebug": {
-      "sectionId": "nui-hostel",
-      "attempts": [
-        {
-          "ts": 1783510990498,
-          "sectionId": "nui-hostel",
-          "slot": "exterior",
-          "query": "placeId:ChIJjTWKIa6OGGAR6kmG9UpLIIU",
-          "phase": "place_photos",
-          "candidateCount": 10,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        }
-      ]
-    },
-    "sectionType": "hostel",
-    "role": null,
-    "rejectReason": null,
-    "editorialQA": {
-      "ok": true,
-      "issues": [],
-      "usePlaceholder": false
-    },
-    "venueSwapped": false,
-    "swappedFrom": null,
-    "swappedTo": null,
-    "alternativeId": null,
-    "heading": "グリッズ 東京 浅草橋 ホテル & ホステル：文青旅人的基地",
-    "content": "尋找兼具設計感與社群氛圍的住宿，「グリッズ 東京 浅草橋 ホテル & ホステル」是個不錯的選擇。從JR淺草橋站東口步行約3分鐘，這家旅店提供多種房型，從膠囊床位到私人客房皆有。一樓的咖啡廳與酒吧是旅人交流的好地方，氣氛輕鬆。淺草橋地區交通便利，前往秋葉原、淺草等地都非常方便，是動漫迷與文青旅人的理想據點。",
-    "officialName": "Grids Tokyo Asakusabashi Hotel&Hostel",
-    "officialNameLocal": "グリッズ 東京 浅草橋 ホテル & ホステル",
+    "subject": "レム秋葉原",
+    "mapsQuery": "レム秋葉原",
+    "placeId": null,
+    "googleRating": null,
+    "googleAddress": null,
+    "googlePhotoUrl": null,
+    "googleAttribution": null,
+    "imageSource": null,
+    "matched": false,
+    "rejectReason": "no_valid_place",
     "pipeline": {
       "version": "photo-search-retry-v1",
       "steps": [
         "copy_semantic_analysis",
         "derive_photo_intent",
-        "place_verify",
-        "photo_search_retry",
-        "photo_first_pick",
-        "evidence_caption",
-        "rule_qa"
+        "place_verify"
       ],
-      "aiTokens": 0,
-      "photoSearchDebug": {
-        "sectionId": "nui-hostel",
-        "attempts": [
-          {
-            "ts": 1783510990498,
-            "sectionId": "nui-hostel",
-            "slot": "exterior",
-            "query": "placeId:ChIJjTWKIa6OGGAR6kmG9UpLIIU",
-            "phase": "place_photos",
-            "candidateCount": 10,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          }
-        ]
-      }
+      "aiTokens": 0
+    },
+    "editorialQA": {
+      "pass": false,
+      "issues": [
+        "no_valid_place"
+      ],
+      "usePlaceholder": true
     }
   },
   {
     "sectionId": "hotel-gracery",
-    "subject": "ホテルグレイスリー新宿：哥吉拉主題的舒適住宿",
-    "mapsQuery": "Hotel Gracery Shinjuku Tokyo Japan",
-    "placeId": "ChIJzRzI3HSNGGARRwZW6AtJfi0",
+    "subject": "JR九州ホテル ブラッサム新宿",
+    "mapsQuery": "JR Kyushu Hotel Blossom Shinjuku Tokyo",
+    "placeId": "ChIJh7zrtdGMGGARK2IbCPWPqnU",
     "googleRating": 4.4,
-    "googleAddress": "〒160-0021 東京都新宿区歌舞伎町１丁目１９−１",
-    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjAbdKdG3LwLmw0gN6YvsvSbNKXYCTaVSFRdJ2WS5iPqwQwZBZfhzafL02E0F1M7IRbRwK2fCISmU4DG_Mn0fcqo0PKWTviE0bHF6ESMD49rhfJinnjyg-y-EFer3nKGFRf1vrBM0cUL3EUmXQ=s4800-w1600-h1200",
-    "googleAttribution": "S H",
+    "googleAddress": "〒151-0053 東京都渋谷区代々木２丁目６−２ ＪＲ九州ホテルブラッサム新宿 １階",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZMzgOyKODegWMmOQRI1_izJ9k5nGRhjwhidLoHo3P7yWr_o3Z5q6m0UW_dKGbVKwQdq5GJEDOpj-9fMwOn5TZgatdeNcsSkXAsMqqpvFtLosKWQsJE3jEuyzzxYci27nUpe8aWI1B2nAFKvhA=s4800-w1600-h1200",
+    "googleAttribution": "JR九州ホテル ブラッサム新宿",
     "imageSource": "google_places",
     "matched": true,
-    "placeName": "ゴジラヘッド",
-    "photoScore": 148,
+    "placeName": "JR九州ホテル ブラッサム新宿",
+    "photoScore": 166,
     "photoIndex": 0,
-    "photoCaption": "ゴジラヘッド的外觀與入口清楚可見，方便對照地圖找路。",
+    "photoCaption": "JR九州ホテルブラッサム新宿的建築外觀與入口，從街上就能確認位置。",
+    "secondaryGooglePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZNvzg37148aG3Y_atlrMkf8BccDb2nnq-OXGbIcVtkA2l1oYIr0-7jNHK7I7Sv_nI4QhLZF_MVRJGV1rOd_00QjCjnpUsjIal2aQo32GwiwzHgh7OYKky254vQmTAHGvkRn-CCOk3_XRVJ22Kk=s4800-w1600-h1200",
+    "secondaryGoogleAttribution": "JR九州ホテル ブラッサム新宿",
+    "secondaryCaption": "客房採簡約木質設計，採光充足，空間雖緊湊但收納完整。",
+    "secondaryPhotoSlot": "room",
     "photoEvidence": {
       "primary": "facade",
       "types": [
-        "facade",
         "facade"
       ],
       "signals": [],
       "subjectType": "venue",
       "role": "hotel",
-      "blob": "s h"
+      "blob": ""
     },
     "travelPhotoSlot": "exterior",
     "copySemantics": {
-      "primary": "cafe_experience",
+      "primary": "room",
       "categories": [
-        "cafe_experience",
         "room",
-        "activity"
+        "night",
+        "dish"
       ],
       "hits": [
         {
-          "category": "cafe_experience",
-          "score": 1,
-          "matched": [
-            "體驗"
-          ],
-          "evidence": [
-            "dessert",
-            "cafe_interior"
-          ]
-        },
-        {
           "category": "room",
-          "score": 1,
+          "score": 2,
           "matched": [
-            "客房"
+            "客房",
+            "簡潔"
           ],
           "evidence": [
             "room"
           ]
         },
         {
-          "category": "activity",
+          "category": "night",
           "score": 1,
           "matched": [
-            "體驗"
+            "夜景"
           ],
           "evidence": [
-            "cafe_interior",
-            "anime_collectible",
-            "shop_interior"
+            "street_landmark",
+            "landmark_building"
+          ]
+        },
+        {
+          "category": "dish",
+          "score": 1,
+          "matched": [
+            "料理"
+          ],
+          "evidence": [
+            "food_dish"
           ]
         }
       ],
       "requiredEvidence": [
-        "dessert",
-        "cafe_interior",
-        "room",
-        "anime_collectible",
-        "shop_interior"
+        "street_landmark",
+        "landmark_building",
+        "food_dish",
+        "room"
       ],
       "searchBoost": [
-        "體驗",
-        "客房"
+        "夜景",
+        "料理",
+        "客房",
+        "簡潔"
       ],
-      "copyExcerpt": "ホテルグレイスリー新宿：哥吉拉主題的舒適住宿 若想在新宿享受更具主題性的住宿體驗，「ホテルグレイスリー新宿」絕對是首選。從JR新宿站東口步行約5分鐘，位於歌舞伎町中心，最吸睛的是八樓戶外露台的巨型哥吉拉頭像。部分客房甚至能直接看到哥吉拉，是動漫迷的一大亮點。酒店周邊餐飲娛樂設施豐富，交通便捷，適合追求便利與獨特體驗的旅客。建議提早預訂面哥吉拉的房型。 ホテルグレイスリー新宿：哥吉拉主題的舒適住宿 ホテルグレイスリー新宿：哥吉拉主題的舒適住宿"
+      "copyExcerpt": "JR九州ホテル ブラッサム新宿 追求質感與便利性的旅人，可考慮「JR九州ホテル ブラッサム新宿」。從JR新宿站南口步行約3分鐘，其客房設計簡潔雅緻，高樓層能俯瞰城市夜景。早餐的九州特色料理，值得一試。 JR九州ホテル ブラッサム新宿 JR九州ホテル ブラッサム新宿"
     },
-    "copyDerivedPhotoIntent": "店內氛圍、甜點、主題內裝、客房、房間、床位空間",
+    "copyDerivedPhotoIntent": "客房、房間、床位空間、夜景霓虹、傍晚街景",
     "matchedKeywords": [
-      "ゴジラ"
+      "ホテル",
+      "JR九州ホテル ブラッサム新宿",
+      "JR九州ホテル ブラッサム新宿",
+      "JR九州ホテル ブラッサム新宿"
     ],
-    "photoPlaceName": "ゴジラヘッド",
-    "searchUsed": "Hotel Gracery Shinjuku Godzilla head",
+    "photoPlaceName": "JR九州ホテル ブラッサム新宿",
+    "searchUsed": "JR九州ホテル ブラッサム新宿",
     "photoSearchUsed": "content_place",
     "photoSearchDebug": {
       "sectionId": "hotel-gracery",
       "attempts": [
         {
-          "ts": 1783510994373,
+          "ts": 1783527205261,
           "sectionId": "hotel-gracery",
           "slot": "exterior",
-          "query": "placeId:ChIJzRzI3HSNGGARRwZW6AtJfi0",
+          "query": "placeId:ChIJh7zrtdGMGGARK2IbCPWPqnU",
           "phase": "place_photos",
           "candidateCount": 10,
           "selectedImageUrl": null,
           "selectedReason": null,
+          "rejectReason": null
+        },
+        {
+          "ts": 1783527205274,
+          "sectionId": "hotel-gracery",
+          "slot": "exterior",
+          "query": "content_place",
+          "phase": "place_photos",
+          "candidateCount": 10,
+          "photoIndex": 0,
+          "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZMzgOyKODegWMmOQRI1_izJ9k5nGRhjwhidLoHo3P7yWr_o3Z5q6m0UW_dKGbVKwQdq5GJEDOpj-9fMwOn5TZgatdeNcsSkXAsMqqpvFtLosKWQsJE3jEuyzzxYci27nUpe8aWI1B2nAFKvhA=s4800-w1600-h1200",
+          "selectedReason": "slot_exterior_score_166",
+          "rejectReason": null
+        },
+        {
+          "ts": 1783527205289,
+          "sectionId": "hotel-gracery",
+          "slot": "room",
+          "query": "content_place",
+          "phase": "place_photos",
+          "candidateCount": 10,
+          "photoIndex": 1,
+          "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZNvzg37148aG3Y_atlrMkf8BccDb2nnq-OXGbIcVtkA2l1oYIr0-7jNHK7I7Sv_nI4QhLZF_MVRJGV1rOd_00QjCjnpUsjIal2aQo32GwiwzHgh7OYKky254vQmTAHGvkRn-CCOk3_XRVJ22Kk=s4800-w1600-h1200",
+          "selectedReason": "slot_room_score_93",
           "rejectReason": null
         }
       ]
@@ -1399,10 +1376,10 @@
     "swappedFrom": null,
     "swappedTo": null,
     "alternativeId": null,
-    "heading": "ホテルグレイスリー新宿：哥吉拉主題的舒適住宿",
-    "content": "若想在新宿享受更具主題性的住宿體驗，「ホテルグレイスリー新宿」絕對是首選。從JR新宿站東口步行約5分鐘，位於歌舞伎町中心，最吸睛的是八樓戶外露台的巨型哥吉拉頭像。部分客房甚至能直接看到哥吉拉，是動漫迷的一大亮點。酒店周邊餐飲娛樂設施豐富，交通便捷，適合追求便利與獨特體驗的旅客。建議提早預訂面哥吉拉的房型。",
-    "officialName": "Hotel Gracery Shinjuku",
-    "officialNameLocal": "ホテルグレイスリー新宿",
+    "heading": "JR九州ホテル ブラッサム新宿",
+    "content": "追求質感與便利性的旅人，可考慮「JR九州ホテル ブラッサム新宿」。從JR新宿站南口步行約3分鐘，其客房設計簡潔雅緻，高樓層能俯瞰城市夜景。早餐的九州特色料理，值得一試。",
+    "officialName": "JR九州ホテル ブラッサム新宿",
+    "officialNameLocal": "JR九州ホテル ブラッサム新宿",
     "pipeline": {
       "version": "photo-search-retry-v1",
       "steps": [
@@ -1419,14 +1396,38 @@
         "sectionId": "hotel-gracery",
         "attempts": [
           {
-            "ts": 1783510994373,
+            "ts": 1783527205261,
             "sectionId": "hotel-gracery",
             "slot": "exterior",
-            "query": "placeId:ChIJzRzI3HSNGGARRwZW6AtJfi0",
+            "query": "placeId:ChIJh7zrtdGMGGARK2IbCPWPqnU",
             "phase": "place_photos",
             "candidateCount": 10,
             "selectedImageUrl": null,
             "selectedReason": null,
+            "rejectReason": null
+          },
+          {
+            "ts": 1783527205274,
+            "sectionId": "hotel-gracery",
+            "slot": "exterior",
+            "query": "content_place",
+            "phase": "place_photos",
+            "candidateCount": 10,
+            "photoIndex": 0,
+            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZMzgOyKODegWMmOQRI1_izJ9k5nGRhjwhidLoHo3P7yWr_o3Z5q6m0UW_dKGbVKwQdq5GJEDOpj-9fMwOn5TZgatdeNcsSkXAsMqqpvFtLosKWQsJE3jEuyzzxYci27nUpe8aWI1B2nAFKvhA=s4800-w1600-h1200",
+            "selectedReason": "slot_exterior_score_166",
+            "rejectReason": null
+          },
+          {
+            "ts": 1783527205289,
+            "sectionId": "hotel-gracery",
+            "slot": "room",
+            "query": "content_place",
+            "phase": "place_photos",
+            "candidateCount": 10,
+            "photoIndex": 1,
+            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZNvzg37148aG3Y_atlrMkf8BccDb2nnq-OXGbIcVtkA2l1oYIr0-7jNHK7I7Sv_nI4QhLZF_MVRJGV1rOd_00QjCjnpUsjIal2aQo32GwiwzHgh7OYKky254vQmTAHGvkRn-CCOk3_XRVJ22Kk=s4800-w1600-h1200",
+            "selectedReason": "slot_room_score_93",
             "rejectReason": null
           }
         ]
@@ -1511,13 +1512,13 @@
     ],
     "photoPlaceName": "GiGO Akihabara Building 3",
     "searchUsed": "アニメイト 秋葉原",
-    "photoSearchUsed": "秋葉原 GiGO 外観",
+    "photoSearchUsed": "GIGO秋葉原",
     "photoSearchPhase": "precise_local",
     "photoSearchDebug": {
       "sectionId": "hero-anime",
       "attempts": [
         {
-          "ts": 1783510994947,
+          "ts": 1783527205708,
           "sectionId": "hero-anime",
           "slot": "district_panorama",
           "query": "placeId:ChIJAVf7lh2MGGARJylRnQ_3dpI",
@@ -1528,7 +1529,7 @@
           "rejectReason": null
         },
         {
-          "ts": 1783510994947,
+          "ts": 1783527205708,
           "sectionId": "hero-anime",
           "slot": null,
           "query": "placeId:ChIJAVf7lh2MGGARJylRnQ_3dpI",
@@ -1539,7 +1540,7 @@
           "rejectReason": "content_place_no_match"
         },
         {
-          "ts": 1783510995102,
+          "ts": 1783527205811,
           "sectionId": "hero-anime",
           "slot": null,
           "query": "秋葉原 中央通り",
@@ -1550,32 +1551,10 @@
           "rejectReason": null
         },
         {
-          "ts": 1783510995315,
+          "ts": 1783527206053,
           "sectionId": "hero-anime",
           "slot": null,
-          "query": "秋葉原 電気街",
-          "phase": "precise_local",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783510995604,
-          "sectionId": "hero-anime",
-          "slot": null,
-          "query": "Akihabara Electric Town street",
-          "phase": "precise_local",
-          "candidateCount": 1,
-          "selectedImageUrl": null,
-          "selectedReason": null,
-          "rejectReason": null
-        },
-        {
-          "ts": 1783510995831,
-          "sectionId": "hero-anime",
-          "slot": null,
-          "query": "Akihabara Chuo Dori anime signs",
+          "query": "Akihabara Chuo Dori anime street",
           "phase": "precise_local",
           "candidateCount": 5,
           "selectedImageUrl": null,
@@ -1583,21 +1562,98 @@
           "rejectReason": null
         },
         {
-          "ts": 1783510996007,
+          "ts": 1783527206263,
           "sectionId": "hero-anime",
           "slot": null,
-          "query": "秋葉原 GiGO 外観",
+          "query": "秋葉原電気街 夜景",
           "phase": "precise_local",
-          "candidateCount": 3,
+          "candidateCount": 1,
           "selectedImageUrl": null,
           "selectedReason": null,
           "rejectReason": null
         },
         {
-          "ts": 1783510996022,
+          "ts": 1783527206413,
+          "sectionId": "hero-anime",
+          "slot": null,
+          "query": "秋葉原電気街",
+          "phase": "precise_local",
+          "candidateCount": 1,
+          "selectedImageUrl": null,
+          "selectedReason": null,
+          "rejectReason": null
+        },
+        {
+          "ts": 1783527206583,
+          "sectionId": "hero-anime",
+          "slot": null,
+          "query": "Akihabara Electric Town",
+          "phase": "precise_local",
+          "candidateCount": 1,
+          "selectedImageUrl": null,
+          "selectedReason": null,
+          "rejectReason": null
+        },
+        {
+          "ts": 1783527206721,
+          "sectionId": "hero-anime",
+          "slot": null,
+          "query": "秋葉原電氣街",
+          "phase": "precise_local",
+          "candidateCount": 1,
+          "selectedImageUrl": null,
+          "selectedReason": null,
+          "rejectReason": null
+        },
+        {
+          "ts": 1783527206884,
+          "sectionId": "hero-anime",
+          "slot": null,
+          "query": "Radio Kaikan Akihabara",
+          "phase": "precise_local",
+          "candidateCount": 1,
+          "selectedImageUrl": null,
+          "selectedReason": null,
+          "rejectReason": null
+        },
+        {
+          "ts": 1783527206994,
+          "sectionId": "hero-anime",
+          "slot": null,
+          "query": "秋葉原中央通り",
+          "phase": "precise_local",
+          "candidateCount": 1,
+          "selectedImageUrl": null,
+          "selectedReason": null,
+          "rejectReason": null
+        },
+        {
+          "ts": 1783527207164,
+          "sectionId": "hero-anime",
+          "slot": null,
+          "query": "アニメイト秋葉原",
+          "phase": "precise_local",
+          "candidateCount": 1,
+          "selectedImageUrl": null,
+          "selectedReason": null,
+          "rejectReason": null
+        },
+        {
+          "ts": 1783527207335,
+          "sectionId": "hero-anime",
+          "slot": null,
+          "query": "GIGO秋葉原",
+          "phase": "precise_local",
+          "candidateCount": 5,
+          "selectedImageUrl": null,
+          "selectedReason": null,
+          "rejectReason": null
+        },
+        {
+          "ts": 1783527207348,
           "sectionId": "hero-anime",
           "slot": "district_panorama",
-          "query": "秋葉原 GiGO 外観",
+          "query": "GIGO秋葉原",
           "phase": "precise_local",
           "candidateCount": 10,
           "photoIndex": 1,
@@ -1639,7 +1695,7 @@
         "sectionId": "hero-anime",
         "attempts": [
           {
-            "ts": 1783510994947,
+            "ts": 1783527205708,
             "sectionId": "hero-anime",
             "slot": "district_panorama",
             "query": "placeId:ChIJAVf7lh2MGGARJylRnQ_3dpI",
@@ -1650,7 +1706,7 @@
             "rejectReason": null
           },
           {
-            "ts": 1783510994947,
+            "ts": 1783527205708,
             "sectionId": "hero-anime",
             "slot": null,
             "query": "placeId:ChIJAVf7lh2MGGARJylRnQ_3dpI",
@@ -1661,7 +1717,7 @@
             "rejectReason": "content_place_no_match"
           },
           {
-            "ts": 1783510995102,
+            "ts": 1783527205811,
             "sectionId": "hero-anime",
             "slot": null,
             "query": "秋葉原 中央通り",
@@ -1672,32 +1728,10 @@
             "rejectReason": null
           },
           {
-            "ts": 1783510995315,
+            "ts": 1783527206053,
             "sectionId": "hero-anime",
             "slot": null,
-            "query": "秋葉原 電気街",
-            "phase": "precise_local",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783510995604,
-            "sectionId": "hero-anime",
-            "slot": null,
-            "query": "Akihabara Electric Town street",
-            "phase": "precise_local",
-            "candidateCount": 1,
-            "selectedImageUrl": null,
-            "selectedReason": null,
-            "rejectReason": null
-          },
-          {
-            "ts": 1783510995831,
-            "sectionId": "hero-anime",
-            "slot": null,
-            "query": "Akihabara Chuo Dori anime signs",
+            "query": "Akihabara Chuo Dori anime street",
             "phase": "precise_local",
             "candidateCount": 5,
             "selectedImageUrl": null,
@@ -1705,21 +1739,98 @@
             "rejectReason": null
           },
           {
-            "ts": 1783510996007,
+            "ts": 1783527206263,
             "sectionId": "hero-anime",
             "slot": null,
-            "query": "秋葉原 GiGO 外観",
+            "query": "秋葉原電気街 夜景",
             "phase": "precise_local",
-            "candidateCount": 3,
+            "candidateCount": 1,
             "selectedImageUrl": null,
             "selectedReason": null,
             "rejectReason": null
           },
           {
-            "ts": 1783510996022,
+            "ts": 1783527206413,
+            "sectionId": "hero-anime",
+            "slot": null,
+            "query": "秋葉原電気街",
+            "phase": "precise_local",
+            "candidateCount": 1,
+            "selectedImageUrl": null,
+            "selectedReason": null,
+            "rejectReason": null
+          },
+          {
+            "ts": 1783527206583,
+            "sectionId": "hero-anime",
+            "slot": null,
+            "query": "Akihabara Electric Town",
+            "phase": "precise_local",
+            "candidateCount": 1,
+            "selectedImageUrl": null,
+            "selectedReason": null,
+            "rejectReason": null
+          },
+          {
+            "ts": 1783527206721,
+            "sectionId": "hero-anime",
+            "slot": null,
+            "query": "秋葉原電氣街",
+            "phase": "precise_local",
+            "candidateCount": 1,
+            "selectedImageUrl": null,
+            "selectedReason": null,
+            "rejectReason": null
+          },
+          {
+            "ts": 1783527206884,
+            "sectionId": "hero-anime",
+            "slot": null,
+            "query": "Radio Kaikan Akihabara",
+            "phase": "precise_local",
+            "candidateCount": 1,
+            "selectedImageUrl": null,
+            "selectedReason": null,
+            "rejectReason": null
+          },
+          {
+            "ts": 1783527206994,
+            "sectionId": "hero-anime",
+            "slot": null,
+            "query": "秋葉原中央通り",
+            "phase": "precise_local",
+            "candidateCount": 1,
+            "selectedImageUrl": null,
+            "selectedReason": null,
+            "rejectReason": null
+          },
+          {
+            "ts": 1783527207164,
+            "sectionId": "hero-anime",
+            "slot": null,
+            "query": "アニメイト秋葉原",
+            "phase": "precise_local",
+            "candidateCount": 1,
+            "selectedImageUrl": null,
+            "selectedReason": null,
+            "rejectReason": null
+          },
+          {
+            "ts": 1783527207335,
+            "sectionId": "hero-anime",
+            "slot": null,
+            "query": "GIGO秋葉原",
+            "phase": "precise_local",
+            "candidateCount": 5,
+            "selectedImageUrl": null,
+            "selectedReason": null,
+            "rejectReason": null
+          },
+          {
+            "ts": 1783527207348,
             "sectionId": "hero-anime",
             "slot": "district_panorama",
-            "query": "秋葉原 GiGO 外観",
+            "query": "GIGO秋葉原",
             "phase": "precise_local",
             "candidateCount": 10,
             "photoIndex": 1,

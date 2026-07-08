@@ -35,7 +35,7 @@
     "subject": "秋葉原電氣街",
     "sectionPurpose": "anime",
     "editorialAngle": "Hero 要一眼辨識「這就是秋葉原電氣街」",
-    "photoIntent": "秋葉原中央通、Radio Kaikan、Animate、GIGO、動漫招牌、霓虹、廣角街景",
+    "photoIntent": "秋葉原中央通廣角街景、動漫招牌霓虹、Radio Kaikan／GIGO",
     "photoPriority": {
       "primary": [
         "Radio Kaikan",
@@ -76,11 +76,8 @@
     "placeId": "ChIJ__-AdayOGGAR6EGPwvcpzTA",
     "photoPlaceQueries": [
       "秋葉原 中央通り",
-      "秋葉原 電気街",
-      "Akihabara Electric Town street",
-      "Akihabara Chuo Dori anime signs",
-      "秋葉原 GiGO 外観",
-      "ラジオ会館 秋葉原 外観"
+      "Akihabara Chuo Dori anime street",
+      "秋葉原電気街 夜景"
     ],
     "photoAnchorTerms": [
       "Radio Kaikan",
@@ -138,7 +135,17 @@
       "hotel",
       "pod",
       "cinema",
-      "映画館"
+      "映画館",
+      "室內",
+      "店内",
+      "indoor",
+      "video gamer",
+      "tokyo video",
+      "arcade bar",
+      "cozy corner",
+      "コージー",
+      "bakery",
+      "parking"
     ],
     "role": "hero",
     "sectionType": "landmark",
@@ -174,10 +181,10 @@
       "sectionRole": "landmark",
       "subjectType": "district",
       "isSpecificVenue": false,
-      "title": "秋葉原電気街：動漫聖地巡禮的起點",
+      "title": "秋葉原電気街",
       "sectionPurpose": "anime",
       "editorialAngle": "電氣街不是單一景點，而是一整片會讓人自然放慢步調的動漫街區",
-      "photoIntent": "動漫招牌、霓虹、Radio Kaikan、Animate、GIGO、中央通、人潮、廣角街景",
+      "photoIntent": "廣角街景、街區全景、招牌霓虹、中央通／商店街外觀，禁止室內吧台／單店特寫",
       "photoPriority": {
         "primary": [
           "Radio Kaikan",
@@ -203,7 +210,7 @@
         "Akihabara anime street",
         "Akihabara neon sign"
       ],
-      "minChecklistHits": 3,
+      "minChecklistHits": 1,
       "captionIntent": "依圖片實際地標撰寫，例如 Radio Kaikan 或中央通霓虹",
       "sectionType": "landmark",
       "officialName": "Akihabara Electric Town",
@@ -217,24 +224,18 @@
       ],
       "mapsQuery": "Akihabara Electric Town",
       "photoPlaceQueries": [
-        "秋葉原 電気街",
         "秋葉原 中央通り",
+        "秋葉原電気街 街並み",
+        "Akihabara Chuo Dori street",
         "秋葉原 ラジオ会館 外観",
-        "秋葉原 GiGO 外観",
-        "秋葉原 アニメイト 外観",
-        "Akihabara Chuo Dori anime signs",
-        "Akihabara Electric Town street",
-        "ラジオ会館 秋葉原",
-        "GIGO 秋葉原 中央通",
-        "秋葉原中央通り"
+        "Akihabara Electric Town neon street"
       ],
       "photoAnchorTerms": [
-        "Animate",
-        "アニメイト",
-        "Radio Kaikan",
+        "中央通",
+        "電気街",
         "ラジオ会館",
         "GIGO",
-        "ゲーセン"
+        "アニメイト"
       ],
       "allowGenericPhotoFallback": false,
       "visualGroups": [
@@ -274,12 +275,13 @@
         "秋葉原"
       ],
       "imageChecklist": [
-        "Animate",
-        "Radio",
-        "GIGO",
         "中央通",
-        "アニメイト",
-        "ラジオ会館"
+        "電気街",
+        "街",
+        "霓虹",
+        "看板",
+        "Radio",
+        "GIGO"
       ],
       "imageRejectRules": [
         "室內房間",
@@ -289,7 +291,17 @@
         "hotel",
         "hostel",
         "restaurant",
-        "映画館"
+        "映画館",
+        "室內",
+        "店内",
+        "indoor",
+        "video gamer",
+        "tokyo video",
+        "arcade bar",
+        "cozy corner",
+        "コージー",
+        "bakery",
+        "parking"
       ],
       "addressHints": [
         "秋葉原",
@@ -323,24 +335,25 @@
         "pod",
         "映画館"
       ],
-      "heading": "秋葉原電気街：動漫聖地巡禮的起點",
-      "content": "來到秋葉原，直奔中央通與其周邊巷弄，這裡的「秋葉原電気街」是動漫周邊、模型與電子產品的集散地。建議從JR秋葉原站電器街口出站，沿主幹道向北步行，沿途的Animate、Mandarake等大型店鋪值得細逛。尤其假日中央通會實施步行者天國，逛起來更為舒適。記得多預留時間，這裡的店家密度高，很容易一待就是半天。",
+      "heading": "秋葉原電気街",
+      "content": "秋葉原電気街是動漫迷的朝聖地。從JR秋葉原站電氣街口出來，立刻會被琳瑯滿目的電子產品與動漫周邊商店包圍。務必留時間逛「ラジオ会館」，尋找稀有模型與卡牌，這裡總是能挖到寶。",
       "venueAlternatives": [
         {
           "officialName": "Mandarake Complex",
           "officialNameLocal": "",
           "mapsQuery": "Mandarake Complex Akihabara"
         }
-      ]
+      ],
+      "requireStreetscape": true
     },
     {
       "sectionId": "nakano",
       "sectionRole": "anime",
       "subjectType": "district",
-      "title": "中野ブロードウェイ：挖寶天堂的深度探索",
+      "title": "中野ブロードウェイ",
       "sectionPurpose": "anime",
       "editorialAngle": "老玩家公認挖寶聖地，不是普通商場",
-      "photoIntent": "Mandarake、公仔、模型、漫畫、復古玩具、收藏店、玩具櫃",
+      "photoIntent": "廣角街景、街區全景、招牌霓虹、中央通／商店街外觀，禁止室內吧台／單店特寫",
       "photoPriority": {
         "primary": [
           "Mandarake 櫥窗",
@@ -364,7 +377,7 @@
         "Nakano Broadway figure",
         "Nakano Broadway anime"
       ],
-      "minChecklistHits": 3,
+      "minChecklistHits": 1,
       "captionIntent": "描述圖片中實際看到的收藏陳列或店面",
       "sectionType": "landmark",
       "officialName": "Nakano Broadway",
@@ -379,19 +392,15 @@
       "placeId": "ChIJg-7dspDyGGARvvDv4E5-tuE",
       "photoPlaceQueries": [
         "中野ブロードウェイ 外観",
-        "中野ブロードウェイ 入口",
-        "中野ブロードウェイ まんだらけ",
-        "中野 Sun Mall 商店街",
-        "Nakano Broadway entrance",
-        "Nakano Broadway Mandarake",
-        "まんだらけ 中野本店",
-        "Mandarake Nakano Broadway"
+        "中野サンモール 入口",
+        "Nakano Broadway exterior",
+        "Nakano Sun Mall street",
+        "中野ブロードウェイ 商店街"
       ],
       "photoAnchorTerms": [
-        "Mandarake",
-        "まんだらけ",
-        "らしんばん",
-        "Lashinbang"
+        "ブロードウェイ",
+        "サンモール",
+        "中野"
       ],
       "allowGenericPhotoFallback": false,
       "minPhotoIndex": 1,
@@ -431,11 +440,11 @@
         "中野"
       ],
       "imageChecklist": [
-        "まんだらけ",
-        "Mandarake",
-        "フィギュア",
-        "figure",
-        "漫画"
+        "ブロードウェイ",
+        "サンモール",
+        "中野",
+        "街",
+        "外観"
       ],
       "imageRejectRules": [
         "普通走道",
@@ -444,7 +453,17 @@
         "住宅",
         "hotel",
         "lobby",
-        "entrance"
+        "entrance",
+        "室內",
+        "店内",
+        "indoor",
+        "video gamer",
+        "tokyo video",
+        "arcade bar",
+        "cozy corner",
+        "コージー",
+        "bakery",
+        "parking"
       ],
       "addressHints": [
         "中野",
@@ -464,20 +483,22 @@
         "restaurant",
         "apartment"
       ],
-      "heading": "中野ブロードウェイ：挖寶天堂的深度探索",
-      "content": "從JR中野站北口出站，穿越商店街直達「中野ブロードウェイ」。這裡的特色是大量中古動漫周邊、漫畫與收藏品，尤其Mandarake系列店鋪佔據多個樓層，是尋找絕版品的寶庫。建議從二樓開始，沿著蜿蜒的走廊逐一探訪，許多小店藏在深處，需要耐心挖掘。注意，部分店家只收現金，務必準備足夠日幣。",
+      "heading": "中野ブロードウェイ",
+      "content": "中野ブロードウェイ是尋寶者的天堂。從JR中野站北口步行5分鐘，這棟複合式商場內藏著無數古董漫畫、偶像周邊與獨立藝術品小店。建議直接上二樓「まんだらけ」總店，感受時間凝結的次文化氛圍。",
       "venueAlternatives": [
         {
           "officialName": "Nakano Sun Mall",
           "officialNameLocal": "",
           "mapsQuery": "Nakano Sun Mall"
         }
-      ]
+      ],
+      "isSpecificVenue": false,
+      "requireStreetscape": true
     },
     {
       "sectionId": "gachapon",
       "sectionRole": "anime",
-      "title": "ガシャポン百貨店 池袋総本店：扭蛋迷的天堂",
+      "title": "ガシャポン百貨店 池袋総本店",
       "sectionPurpose": "shopping",
       "editorialAngle": "整面牆都是驚喜，不是黃色招牌外觀",
       "photoIntent": "整排扭蛋機、扭蛋牆、膠囊玩具、色彩豐富、ガチャ",
@@ -573,8 +594,8 @@
         "restaurant",
         "cafe"
       ],
-      "heading": "ガシャポン百貨店 池袋総本店：扭蛋迷的天堂",
-      "content": "想體驗最純粹的扭蛋樂趣，務必前往「ガシャポン百貨店 池袋総本店」。從JR池袋站東口步行約5分鐘即可抵達，這間店擁有超過3000台扭蛋機，是全球最大的扭蛋專賣店。從經典動漫角色到搞怪小物，應有盡有。建議事先準備大量百元硬幣，或者直接在店內兌換，以免錯失心儀的款式。這裡的商品更新速度快，每次來都有新發現。",
+      "heading": "ガシャポン百貨店 池袋総本店",
+      "content": "池袋的「ガシャポン百貨店」是扭蛋迷的夢幻據點。從JR池袋站東口步行約7分鐘，這間店擁有超過3000台扭蛋機，涵蓋從經典到最新款的各種主題。準備好零錢，一次滿足你的收藏慾。",
       "venueAlternatives": [
         {
           "officialName": "Shinjuku Gashapon Bandai Official Shop",
@@ -586,44 +607,37 @@
     {
       "sectionId": "ichiran",
       "sectionRole": "food",
-      "title": "一蘭ラーメン 新宿店：深夜動漫後的美味慰藉",
+      "title": "一風堂 上野広小路店",
       "sectionType": "food",
-      "officialName": "Ichiran Ramen Shinjuku",
-      "officialNameLocal": "一蘭ラーメン 新宿店",
+      "officialName": "Ippudo Ueno Hirokoji",
+      "officialNameLocal": "一風堂 上野広小路店",
       "aliases": [
-        "Ichiran",
-        "一蘭",
-        "一蘭ラーメン"
+        "Ippudo",
+        "一風堂",
+        "IPPUDO Ueno"
       ],
-      "mapsQuery": "一蘭ラーメン 新宿店 Tokyo",
+      "mapsQuery": "一風堂 上野広小路店",
       "placeId": null,
       "photoPlaceQueries": [
-        "一蘭ラーメン 新宿店 外観",
-        "Ichiran Ramen Shinjuku exterior",
-        "一蘭 新宿 店舗",
-        "Ichiran Shinjuku storefront"
+        "一風堂 上野広小路店",
+        "Ippudo Ueno"
       ],
       "allowVenueSwap": false,
       "venueAlternatives": [],
       "photoAnchorTerms": [
-        "Ichiran",
-        "一蘭",
-        "一蘭ラーメン"
+        "一風堂",
+        "Ippudo"
       ],
-      "allowGenericPhotoFallback": false,
+      "allowGenericPhotoFallback": true,
       "photoIntent": "店門口、招牌、外觀優先，其次拉麵本體",
       "imageChecklist": [
+        "一風堂",
         "ラーメン",
-        "ramen",
-        "Ichiran",
-        "一蘭",
-        "拉麵",
-        "味集中"
+        "外観"
       ],
       "imageRejectRules": [
-        "空桌",
-        "bathroom",
-        "parking"
+        "parking",
+        "bathroom"
       ],
       "isSpecificVenue": true,
       "addressHints": [
@@ -643,64 +657,46 @@
         "movie_theater",
         "hostel"
       ],
-      "heading": "一蘭ラーメン 新宿店：深夜動漫後的美味慰藉",
-      "content": "在新宿逛完動漫周邊，深夜飢腸轆轆時，「一蘭ラーメン 新宿店」是個理想選擇。從JR新宿站東口步行約3分鐘，這家店以其獨特的「味集中カウンター」聞名，提供專注的個人用餐空間。你可以透過點餐紙客製化麵條硬度、湯頭濃淡及配料。營業時間至深夜，非常適合在結束動漫活動後，享受一碗熱騰騰的豚骨拉麵，為一天劃下句點。"
+      "heading": "上野一風堂：豚骨補給站",
+      "content": "逛完池袋扭蛋或上野公園後，可到「一風堂 上野広小路店」吃白丸／赤丸。靠近上野広小路、動線清楚，尖峰仍可能排隊，建議錯開正午時段。",
+      "googlePhotoUrl": null,
+      "googleAttribution": null,
+      "caption": null
     },
     {
       "sectionId": "maid-cafe",
       "sectionRole": "cafe",
-      "title": "めいどりーみん 秋葉原 本店：體驗女僕咖啡文化",
+      "title": "アニメイトカフェ 池袋店",
       "sectionType": "cafe",
-      "officialName": "Maidreamin Akihabara Main Store",
-      "officialNameLocal": "めいどりーみん 秋葉原 本店",
+      "officialName": "Animate Cafe Ikebukuro",
+      "officialNameLocal": "アニメイトカフェ 池袋店",
       "aliases": [
-        "maidreamin",
-        "メイドリーミン",
-        "Maid Cafe Akihabara",
-        "メイドカフェ 秋葉原"
+        "Animate Cafe",
+        "アニメイトカフェ"
       ],
-      "mapsQuery": "Maidreamin Akihabara Main Store",
+      "mapsQuery": "アニメイトカフェ 池袋店",
       "placeId": null,
       "photoPlaceQueries": [
-        "メイドリーミン 秋葉原 外観",
-        "maidreamin Akihabara exterior",
-        "メイドリーミン 秋葉原 メイド",
-        "maidreamin Akihabara maid cafe"
+        "アニメイトカフェ 池袋店",
+        "Animate Cafe Ikebukuro"
       ],
       "photoAnchorTerms": [
-        "maidreamin",
-        "メイドリーミン",
-        "maid",
-        "メイド"
+        "アニメイトカフェ",
+        "Animate Cafe"
       ],
-      "allowVenueSwap": true,
+      "allowVenueSwap": false,
       "venueSwapIntent": "女僕服裝、店內互動、主題甜點",
-      "venueAlternatives": [
-        {
-          "officialName": "@home cafe",
-          "officialNameLocal": "",
-          "mapsQuery": "@home cafe Akihabara"
-        }
-      ],
-      "allowGenericPhotoFallback": false,
-      "photoIntent": "女僕服裝、店內互動或店門口優先，甜點次之",
+      "venueAlternatives": [],
+      "allowGenericPhotoFallback": true,
+      "photoIntent": "店門口、招牌、外觀優先",
       "imageChecklist": [
-        "maid",
-        "メイド",
-        "costume",
-        "女僕",
-        "cafe",
+        "アニメイト",
         "カフェ",
-        "interior"
+        "外観"
       ],
       "imageRejectRules": [
-        "logo",
-        "招牌のみ",
-        "sign only",
-        "走廊",
-        "hotel",
-        "hostel",
-        "empty table"
+        "parking",
+        "bathroom"
       ],
       "isSpecificVenue": true,
       "addressHints": [
@@ -719,54 +715,48 @@
         "movie_theater",
         "hostel"
       ],
-      "heading": "めいどりーみん 秋葉原 本店：體驗女僕咖啡文化",
-      "content": "來到秋葉原，不體驗女僕咖啡廳就少了點什麼。「めいどりーみん 秋葉原 本店」是該區最具代表性的女僕咖啡廳之一。從JR秋葉原站電器街口步行約5分鐘，店內女僕會與客人互動，並提供餐點與飲品。這裡的特色是充滿活力的服務與可愛的餐點擺盤，適合想體驗日本獨特次文化氛圍的讀者。建議預約或避開用餐高峰時段，以免排隊。"
+      "heading": "池袋アニメイトカフェ：聯名打卡",
+      "content": "池袋的「アニメイトカフェ」常輪替聯名餐與特典，和ガシャポン百貨店可同一天連走。進店前查當期聯名與是否需事先預約。",
+      "googlePhotoUrl": null,
+      "googleAttribution": null,
+      "caption": null,
+      "deniedAttributionPatterns": [
+        "hotel",
+        "hostel"
+      ]
     },
     {
       "sectionId": "nui-hostel",
-      "sectionRole": "hostel",
-      "title": "グリッズ 東京 浅草橋 ホテル & ホステル：文青旅人的基地",
-      "sectionType": "hostel",
-      "officialName": "Grids Tokyo Asakusabashi Hotel&Hostel",
-      "officialNameLocal": "グリッズ 東京 浅草橋 ホテル & ホステル",
+      "sectionRole": "hotel",
+      "title": "レム秋葉原",
+      "sectionType": "hotel",
+      "officialName": "remm Akihabara",
+      "officialNameLocal": "レム秋葉原",
       "aliases": [
-        "Grids Tokyo Asakusabashi",
-        "グリッドホテル浅草橋",
-        "GRIDS HOSTEL"
+        "remm Akihabara",
+        "レム秋葉原"
       ],
-      "mapsQuery": "グリッズ 東京 浅草橋 ホテル & ホステル Tokyo",
+      "mapsQuery": "レム秋葉原",
       "placeId": null,
       "photoPlaceQueries": [
-        "グリッズ 東京 浅草橋 ホテル 外観",
-        "Grids Tokyo Asakusabashi Hotel exterior",
-        "グリッドホテル浅草橋 入口",
-        "GRIDS HOTEL HOSTEL Asakusabashi"
+        "レム秋葉原",
+        "remm Akihabara"
       ],
       "photoAnchorTerms": [
-        "Grids",
-        "グリッド",
-        "グリッズ",
-        "GRIDS"
+        "レム",
+        "remm"
       ],
       "allowVenueSwap": false,
       "venueAlternatives": [],
-      "photoIntent": "旅宿外觀、入口優先，其次交誼廳，最後客房",
+      "photoIntent": "旅宿外觀、入口優先",
       "imageChecklist": [
-        "facade",
-        "exterior",
         "外観",
-        "lounge",
-        "bar",
-        "room",
-        "hostel"
+        "hotel",
+        "レム"
       ],
       "imageRejectRules": [
         "parking",
-        "restaurant only",
-        "resort",
-        "pool",
-        "unmade",
-        "messy bed"
+        "pool"
       ],
       "isSpecificVenue": true,
       "addressHints": [
@@ -784,38 +774,36 @@
       "deniedPlaceTypes": [
         "movie_theater"
       ],
-      "heading": "グリッズ 東京 浅草橋 ホテル & ホステル：文青旅人的基地",
-      "content": "尋找兼具設計感與社群氛圍的住宿，「グリッズ 東京 浅草橋 ホテル & ホステル」是個不錯的選擇。從JR淺草橋站東口步行約3分鐘，這家旅店提供多種房型，從膠囊床位到私人客房皆有。一樓的咖啡廳與酒吧是旅人交流的好地方，氣氛輕鬆。淺草橋地區交通便利，前往秋葉原、淺草等地都非常方便，是動漫迷與文青旅人的理想據點。"
+      "heading": "レム秋葉原：電氣街旁據點",
+      "content": "「レム秋葉原」緊鄰秋葉原商圈，掃街後徒步回房。商務旅館規格乾淨有效率，適合以秋葉原為軸心的一兩晚。",
+      "googlePhotoUrl": null,
+      "googleAttribution": null,
+      "caption": null,
+      "allowGenericPhotoFallback": true
     },
     {
       "sectionId": "hotel-gracery",
       "sectionRole": "hotel",
-      "title": "ホテルグレイスリー新宿：哥吉拉主題的舒適住宿",
+      "title": "JR九州ホテル ブラッサム新宿",
       "sectionType": "hotel",
-      "officialName": "Hotel Gracery Shinjuku",
-      "officialNameLocal": "ホテルグレイスリー新宿",
+      "officialName": "JR九州ホテル ブラッサム新宿",
+      "officialNameLocal": "JR九州ホテル ブラッサム新宿",
       "aliases": [
-        "Gracery Shinjuku",
-        "格拉斯麗",
-        "哥吉拉酒店",
-        "Godzilla Hotel"
+        "JR九州ホテル ブラッサム新宿",
+        "JR九州ホテル ブラッサム新宿"
       ],
-      "mapsQuery": "Hotel Gracery Shinjuku Tokyo Japan",
+      "mapsQuery": "JR Kyushu Hotel Blossom Shinjuku Tokyo",
       "placeId": null,
       "photoPlaceQueries": [
-        "Hotel Gracery Shinjuku Godzilla head",
-        "ホテルグレイスリー新宿 ゴジラ",
-        "Hotel Gracery Shinjuku exterior",
-        "ホテルグレイスリー新宿 外観"
+        "JR九州ホテル ブラッサム新宿 外観",
+        "JR九州ホテル ブラッサム新宿 exterior",
+        "JR Kyushu Hotel Blossom Shinjuku Tokyo"
       ],
       "photoAnchorTerms": [
-        "Gracery",
-        "グレイスリー",
-        "Godzilla",
-        "ゴジラ",
-        "格拉斯麗"
+        "JR九州ホテル ブラッサム新宿",
+        "JR九州ホテル ブラッサム新宿"
       ],
-      "allowVenueSwap": false,
+      "allowVenueSwap": true,
       "venueSwapIntent": "新宿歌舞伎町、哥吉拉地標外觀",
       "venueAlternatives": [],
       "photoIntent": "飯店外觀、建築入口優先，其次 Lobby，最後客房",
@@ -854,8 +842,12 @@
         "restaurant",
         "cafe"
       ],
-      "heading": "ホテルグレイスリー新宿：哥吉拉主題的舒適住宿",
-      "content": "若想在新宿享受更具主題性的住宿體驗，「ホテルグレイスリー新宿」絕對是首選。從JR新宿站東口步行約5分鐘，位於歌舞伎町中心，最吸睛的是八樓戶外露台的巨型哥吉拉頭像。部分客房甚至能直接看到哥吉拉，是動漫迷的一大亮點。酒店周邊餐飲娛樂設施豐富，交通便捷，適合追求便利與獨特體驗的旅客。建議提早預訂面哥吉拉的房型。"
+      "heading": "JR九州ホテル ブラッサム新宿",
+      "content": "追求質感與便利性的旅人，可考慮「JR九州ホテル ブラッサム新宿」。從JR新宿站南口步行約3分鐘，其客房設計簡潔雅緻，高樓層能俯瞰城市夜景。早餐的九州特色料理，值得一試。",
+      "googlePhotoUrl": null,
+      "googleAttribution": null,
+      "caption": null
     }
-  ]
+  ],
+  "issueLabel": "2026年7月號"
 }

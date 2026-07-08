@@ -117,6 +117,8 @@ function metaToEditorialMeta(meta) {
   ].filter(function (m) { return m.value; });
 }
 
+const ROTATING_IDS = ['ichiran', 'maid-cafe', 'nui-hostel', 'hotel-gracery'];
+
 function mergeEditorialWithArticle(existing, article) {
   const existingById = {};
   (existing.sections || []).forEach(function (s) {
@@ -124,7 +126,8 @@ function mergeEditorialWithArticle(existing, article) {
   });
   const sections = (article.sections || []).map(function (gen) {
     const photo = existingById[gen.sectionId] || {};
-    return Object.assign({}, photo, {
+    const rotating = ROTATING_IDS.indexOf(gen.sectionId) !== -1;
+    const base = Object.assign({}, photo, {
       sectionId: gen.sectionId,
       heading: gen.heading,
       content: gen.content,
@@ -132,12 +135,30 @@ function mergeEditorialWithArticle(existing, article) {
       officialName: gen.officialName || photo.officialName,
       officialNameLocal: gen.officialNameLocal || photo.officialNameLocal,
       mapsQuery: gen.mapsQuery || photo.mapsQuery,
-      venueAlternatives: (gen.venueAlternatives && gen.venueAlternatives.length)
+      venueAlternatives: rotating ? [] : ((gen.venueAlternatives && gen.venueAlternatives.length)
         ? gen.venueAlternatives
-        : (photo.venueAlternatives || [])
+        : (photo.venueAlternatives || []))
     });
+    if (rotating) {
+      base.placeId = null;
+      base.googlePhotoUrl = null;
+      base.googleAttribution = null;
+      base.caption = null;
+      base.allowVenueSwap = true;
+      base.aliases = [gen.officialName, gen.officialNameLocal].filter(Boolean);
+      base.photoAnchorTerms = [gen.officialNameLocal, gen.officialName].filter(Boolean);
+      base.photoPlaceQueries = [
+        ((gen.officialNameLocal || gen.officialName) + ' 外観'),
+        ((gen.officialName || '') + ' exterior'),
+        gen.mapsQuery
+      ].filter(Boolean);
+    }
+    return base;
   });
-  return Object.assign({}, existing, { sections: sections });
+  return Object.assign({}, existing, {
+    sections: sections,
+    issueLabel: article.issueLabel || existing.issueLabel
+  });
 }
 
 function enrichArticleForData(article) {

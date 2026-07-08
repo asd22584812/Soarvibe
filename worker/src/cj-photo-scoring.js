@@ -8,12 +8,12 @@ import { evidenceMatchesCopySemantics } from './cj-editorial-semantic.js';
 import { applyTravelScoreBonus } from './cj-travel-photo-rules.js';
 
 var BAD_GLOBAL = /tiger|white tiger|zoo|garden|residential|repair shop|garage|pool|beach|villa|白老虎|修車|住宅|花園|泳池/i;
-var BAD_HERO = /lobby|interior|indoor|entrance|door|reception|室内|入口|大廳|電梯|elevator|corridor|走廊|parking|駐車/i;
+var BAD_HERO = /lobby|interior|indoor|entrance|door|reception|室内|入口|大廳|電梯|elevator|corridor|走廊|parking|駐車|video gamer|arcade bar/i;
 var BAD_FOOD = /bathroom|toilet|restroom|washroom|洗手|廁所|空桌|empty table|counter only/i;
 var BAD_HOTEL = /parking|garage|elevator|corridor|hallway|駐車|走廊|電梯/i;
-var BAD_LANDMARK = /close.?up|column|pillar|wall only|近拍|柱子|牆壁/i;
+var BAD_LANDMARK = /close.?up|column|pillar|wall only|近拍|柱子|牆壁|video gamer|tokyo video|arcade bar|bar counter|店内|indoor bar/i;
 var BAD_GENERIC = /plain|generic|empty street|sidewalk only|普通人行|一般街道/i;
-var STREET_LANDMARK = /radio kaikan|animate|gigo|central|chuo|electric town|neon|霓虹|中央通|街景|street view|akihabara|電氣/i;
+var STREET_LANDMARK = /radio kaikan|animate|gigo|central|chuo|electric town|neon|霓虹|中央通|街景|street view|akihabara|電氣|broadway|ブロードウェイ|sun mall|サンモール|crossing|交差点|歩行者天国/i;
 
 export function photoAttrText(photo) {
   if (!photo || !photo.authorAttributions) return '';

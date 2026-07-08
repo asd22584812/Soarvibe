@@ -1,5 +1,6 @@
 /**
  * Gemini-powered article + per-section copy for City Journal.
+ * Districts stay fixed; food / cafe / lodging rotate each month.
  */
 import { callGeminiJSON, callGeminiText, repairTruncatedJSON } from './cj-gemini-client.js';
 
@@ -12,6 +13,12 @@ const REQUIRED_SECTION_IDS = [
   'nui-hostel',
   'hotel-gracery'
 ];
+
+/** Regional pillars — keep every month */
+const FIXED_DISTRICT_IDS = ['akihabara', 'nakano', 'gachapon'];
+
+/** These must change month-to-month (do NOT lock to previous venue) */
+const ROTATING_VENUE_IDS = ['ichiran', 'maid-cafe', 'nui-hostel', 'hotel-gracery'];
 
 const STYLE_GUIDE = [
   '寫作風格參考：日本觀光局雜誌、樂吃購東京版。',
@@ -35,45 +42,66 @@ function sectionVenueFromExisting(existing, sectionId) {
   };
 }
 
+function previousRotatedVenues(existing) {
+  return ROTATING_VENUE_IDS.map(function (id) {
+    var v = sectionVenueFromExisting(existing, id);
+    return '- 上月 ' + id + '：' + (v.officialNameLocal || v.officialName || '（無）') +
+      '／' + (v.mapsQuery || '');
+  }).join('\n');
+}
+
 function buildGeneratePrompt(opts) {
   var month = opts.month || '7';
   var year = opts.year || '2026';
   var existing = opts.existingEditorial || null;
 
-  var venueLines = REQUIRED_SECTION_IDS.map(function (id) {
+  var fixedLines = FIXED_DISTRICT_IDS.map(function (id) {
     var v = sectionVenueFromExisting(existing, id);
-    return '- ' + id + ': 必須寫「' + (v.officialNameLocal || v.officialName || v.title) + '」，mapsQuery 固定為「' + v.mapsQuery + '」';
+    return '- ' + id + '（固定區域）：必須寫「' + (v.officialNameLocal || v.officialName || v.title) +
+      '」，mapsQuery「' + v.mapsQuery + '」，文案可換角度但地點區域不可換';
   });
 
   return [
-    '你是旅遊雜誌主編。撰寫' + year + '年' + month + '月東京動漫主題專題。',
+    '你是旅遊雜誌主編。撰寫' + year + '年' + month + '月東京動漫主題專題（全新一期，不是改寫上月）。',
     STYLE_GUIDE,
     '',
     '【硬性規定】',
     '1. sections 恰好 7 個，sectionId 依序：' + REQUIRED_SECTION_IDS.join(', '),
-    '2. 每段 heading、content 必須對應下方指定店家／地點，不可寫成其他店名',
-    '3. intro 90–110 字；outro 80–100 字——直接切入主題，不要問候語',
-    '4. 每段 content 75–95 字，含一個具體細節（交通、排隊、必看什麼）',
-    '5. officialName / officialNameLocal / mapsQuery 必須與下方一致，不可改',
-    '6. venueAlternatives 留空陣列 []',
-    '7. 緊湊 JSON，無 markdown',
+    '2. 區域段落固定：akihabara / nakano / gachapon 必須是秋葉原電氣街、中野百老匯、池袋扭蛋；官方地名不可改',
+    '3. 輪替段落本月必須全新店家：ichiran=拉麵、maid-cafe=特色咖啡、nui-hostel=青旅、hotel-gracery=飯店',
+    '4. 輪替店家「禁止」與上月相同，也禁止：一蘭、めいどりーみん、グリッズ浅草橋、ホテルグレイスリー新宿／哥吉拉',
+    '5. 輪替店要真實可查、在東京、適合動漫／次文化旅人（秋葉原・池袋・中野・新宿周邊優先）',
+    '6. intro／outro／各段 content 必須是本月新寫，不可複用上月措辭',
+    '7. intro 90–110 字；outro 80–100 字——直接切入主題',
+    '8. 每段 content 75–95 字，含一個具體細節（交通、排隊、必看）',
+    '9. venueAlternatives 留空陣列 []',
+    '10. 緊湊 JSON，無 markdown',
     '',
-    '【各段指定地點——文案必須寫這些】',
-    venueLines.join('\n'),
+    '【固定區域】',
+    fixedLines.join('\n'),
     '',
-    'JSON：{ title, subtitle, intro, outro, sections:[{ sectionId, heading, content, officialName, officialNameLocal, mapsQuery, meta:{recommendation,stayDuration,nearestStation,priceRange,bestTime}, venueAlternatives:[] }] }'
+    '【上月輪替店家——本月禁止再選】',
+    previousRotatedVenues(existing),
+    '',
+    '【本月輪替請自選真實店家並填 officialName / officialNameLocal / mapsQuery】',
+    '- ichiran: 拉麵（例：AFURI 秋葉原、鬼金棒、一風堂 秋葉原——但不可一蘭）',
+    '- maid-cafe: 主題咖啡（例：@home cafe、アニメイトカフェ——但不可めいどりーみん）',
+    '- nui-hostel: 青旅／設計旅宿（例：remm 秋葉原、unplan——但不可グリッズ浅草橋）',
+    '- hotel-gracery: 飯店（例：Tokyu Stay 秋葉原、Hotel Mystays——但不可グレイスリー／哥吉拉）',
+    '',
+    'JSON：{ title, subtitle, intro, outro, issueLabel, sections:[{ sectionId, heading, content, officialName, officialNameLocal, mapsQuery, meta:{recommendation,stayDuration,nearestStation,priceRange,bestTime}, venueAlternatives:[] }] }'
   ].join('\n');
 }
 
 function buildSectionCopyPrompt(section, place, article, photoCaption) {
   var roleHints = {
-    akihabara: '秋葉原電氣街街區：Radio Kaikan、Animate、GIGO、中央通，寫掃街節奏與必看店面',
-    nakano: '中野百老匯：Mandarake、らしんばん，寫挖寶與中古收藏',
+    akihabara: '秋葉原電氣街街區廣角街景：中央通、招牌霓虹、Radio Kaikan／GIGO 立面——寫掃街節奏，不要寫單一室內店',
+    nakano: '中野百老匯街區／Sun Mall 入口廣角：寫挖寶動線與商場外觀，不要單一家甜點店特寫',
     gachapon: '扭蛋會館：整面扭蛋牆、機台種類、怎麼控制預算',
-    ichiran: '拉麵店：湯頭、點餐方式、尖峰排隊，依實際店名撰寫',
-    'maid-cafe': '女僕咖啡：低消、拍照規則、店內互動，依實際店名撰寫',
-    'nui-hostel': '青年旅館：交通、交誼空間、適合誰住',
-    'hotel-gracery': '飯店：位置、交通、房型特色，依實際店名撰寫'
+    ichiran: '拉麵店：湯頭、點餐、排隊，依實際店名',
+    'maid-cafe': '主題咖啡：低消、拍照規則、互動，依實際店名',
+    'nui-hostel': '旅宿：交通、公共空間、適合誰',
+    'hotel-gracery': '飯店：位置、交通、房型亮點，依實際店名'
   };
   return [
     '你是旅遊雜誌編輯。為已確認的地點重寫 heading + content。',
@@ -110,16 +138,27 @@ function parsePlainSectionCopy(text) {
   };
 }
 
+function isRotating(sectionId) {
+  return ROTATING_VENUE_IDS.indexOf(sectionId) !== -1;
+}
+
 function normalizeSection(raw, sectionId, existing) {
   var locked = sectionVenueFromExisting(existing, sectionId);
   var s = raw && typeof raw === 'object' ? raw : {};
+  var useLock = !isRotating(sectionId);
   return {
     sectionId: sectionId,
     heading: String(s.heading || locked.title || sectionId).trim(),
     content: String(s.content || '').trim(),
-    officialName: locked.officialName || String(s.officialName || '').trim(),
-    officialNameLocal: locked.officialNameLocal || String(s.officialNameLocal || '').trim(),
-    mapsQuery: locked.mapsQuery || String(s.mapsQuery || '').trim(),
+    officialName: useLock
+      ? (locked.officialName || String(s.officialName || '').trim())
+      : (String(s.officialName || '').trim() || locked.officialName),
+    officialNameLocal: useLock
+      ? (locked.officialNameLocal || String(s.officialNameLocal || '').trim())
+      : (String(s.officialNameLocal || '').trim() || locked.officialNameLocal),
+    mapsQuery: useLock
+      ? (locked.mapsQuery || String(s.mapsQuery || '').trim())
+      : (String(s.mapsQuery || '').trim() || locked.mapsQuery),
     meta: {
       recommendation: (s.meta && s.meta.recommendation) || '★★★★☆',
       stayDuration: (s.meta && s.meta.stayDuration) || '',
@@ -155,9 +194,11 @@ function mergePhotoRules(generated, existing) {
     subtitle: generated.subtitle || existing.subtitle,
     intro: generated.intro || existing.intro,
     outro: generated.outro || existing.outro,
+    issueLabel: generated.issueLabel || existing.issueLabel,
     sections: generated.sections.map(function (genSec) {
       var photo = photoById[genSec.sectionId] || {};
-      return Object.assign({}, photo, genSec, {
+      var rotating = isRotating(genSec.sectionId);
+      var merged = Object.assign({}, photo, genSec, {
         sectionId: genSec.sectionId,
         heading: genSec.heading,
         content: genSec.content,
@@ -165,8 +206,29 @@ function mergePhotoRules(generated, existing) {
         officialNameLocal: genSec.officialNameLocal || photo.officialNameLocal,
         mapsQuery: genSec.mapsQuery || photo.mapsQuery,
         meta: genSec.meta,
-        venueAlternatives: photo.venueAlternatives || []
+        venueAlternatives: rotating ? [] : (photo.venueAlternatives || []),
+        placeId: rotating ? null : photo.placeId
       });
+      if (rotating) {
+        // Clear stale photos / place when venue rotates
+        merged.googlePhotoUrl = null;
+        merged.googleAttribution = null;
+        merged.caption = null;
+        merged.aliases = [
+          genSec.officialName,
+          genSec.officialNameLocal
+        ].filter(Boolean);
+        merged.photoAnchorTerms = [
+          genSec.officialNameLocal,
+          genSec.officialName
+        ].filter(Boolean);
+        merged.photoPlaceQueries = [
+          (genSec.officialNameLocal || genSec.officialName) + ' 外観',
+          (genSec.officialName || '') + ' exterior',
+          genSec.mapsQuery
+        ].filter(Boolean);
+      }
+      return merged;
     })
   };
 }
@@ -180,19 +242,18 @@ export function placeCopyNeedsResync(section, placeName) {
   if (!pn.trim() || !blob.trim()) return false;
 
   var conflict = [
-    { copy: /一蘭|ichiran/i, place: /tanaka|田中|そば|soba/i },
-    { copy: /格拉斯麗|gracery|哥吉拉|godzilla/i, place: /remm|レム|washington|ワシントン/i },
-    { copy: /nui|bar lounge/i, place: /グリッズ|grids|浅草橋/i },
-    { copy: /@home|home cafe/i, place: /maidreamin|めいどりーみん/i }
+    { copy: /一蘭|ichiran/i, place: /tanaka|田中|そば|soba|afuri|柚子/i },
+    { copy: /格拉斯麗|gracery|哥吉拉|godzilla/i, place: /remm|レム|washington|ワシントン|mystays/i },
+    { copy: /nui|bar lounge/i, place: /グリッズ|grids|浅草橋|remm|レム/i },
+    { copy: /maidreamin|めいどりーみん/i, place: /@home|home cafe|アニメイトカフェ/i }
   ];
   for (var i = 0; i < conflict.length; i++) {
     if (conflict[i].copy.test(blob) && conflict[i].place.test(pn)) return true;
   }
 
   var tokens = pn.split(/\s+/).filter(function (t) { return t.length > 1; });
-  if (!tokens.length) return false;
-  var hits = tokens.filter(function (t) { return blob.indexOf(t) !== -1; }).length;
-  return hits < 1;
+  var hit = tokens.some(function (t) { return blob.indexOf(t) !== -1; });
+  return !hit && tokens.length >= 2;
 }
 
 function salvageSectionCopy(text) {
@@ -244,7 +305,7 @@ export async function generateEditorialArticle(env, opts) {
   var existing = (opts && opts.existingEditorial) || null;
   var prompt = buildGeneratePrompt(Object.assign({}, opts || {}, { existingEditorial: existing }));
   var result = await callGeminiJSON(prompt, env, {
-    temperature: 0.55,
+    temperature: 0.65,
     maxOutputTokens: 16384
   });
 
@@ -258,6 +319,7 @@ export async function generateEditorialArticle(env, opts) {
     subtitle: String(data.subtitle || '').trim(),
     intro: String(data.intro || '').trim(),
     outro: String(data.outro || '').trim(),
+    issueLabel: String(data.issueLabel || '').trim(),
     sections: normalizeArticleSections(data.sections, existing)
   };
 

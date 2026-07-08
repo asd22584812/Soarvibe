@@ -224,18 +224,31 @@ export function applyTravelScoreBonus(score, photo, evidence, section) {
 
 export function validateDistrictPhotoQuality(evidence, section, placeName) {
   if (resolveTravelProfile(section || {}) !== 'district') return { ok: true, reason: null };
+  var types = (evidence && evidence.types) || [];
   var meta = [
     evidence && evidence.blob,
     (evidence && evidence.signals || []).join(' '),
-    (evidence && evidence.types || []).join(' '),
+    types.join(' '),
     placeName
   ].filter(Boolean).join(' ').toLowerCase();
+
+  // District paragraphs need outdoor streetscape — reject interiors hard.
+  if (types.indexOf('shop_interior') !== -1 || types.indexOf('cafe_interior') !== -1 ||
+      types.indexOf('gachapon_wall') !== -1 || types.indexOf('food_dish') !== -1 ||
+      types.indexOf('dessert') !== -1 || types.indexOf('room') !== -1) {
+    if (types.indexOf('street_landmark') === -1 && types.indexOf('landmark_building') === -1) {
+      return { ok: false, reason: 'travel_district_interior' };
+    }
+  }
+  if (/video gamer|tokyo video|arcade bar|bar counter|室内|indoor|interior|店内|ゲーセン内|ピンボール|bar stool|ネオンバー/i.test(meta)) {
+    return { ok: false, reason: 'travel_district_indoor_bar' };
+  }
   if (/cozy|コージー|cake|ベーカリー|bakery|パン|甜點店|café|cafe|カフェ|food_dish|dessert/i.test(meta)) {
     if (!/broadway|ブロードウェイ|sun mall|サンモール|mandarake|まんだらけ|radio|ラジオ|gigo|ゲーセン|chuo|中央通|neon|霓虹|street|街|electric town|電気街/i.test(meta)) {
       return { ok: false, reason: 'travel_district_bakery_or_cafe' };
     }
   }
-  var multiLandmark = /radio|ラジオ|gigo|ゲーセン|chuo|中央通|street view|street scene|neon|霓虹|crowd|人潮|panorama|kaikan|会館|signage|看板|electric town/i.test(meta);
+  var multiLandmark = /radio|ラジオ|gigo|ゲーセン|chuo|中央通|street view|street scene|neon|霓虹|crowd|人潮|panorama|kaikan|会館|signage|看板|electric town|broadway|ブロードウェイ|sun mall|サンモール|交差点|crossing/i.test(meta);
   var animateOnly = (/animate|アニメイト/i.test(meta) || /animate|アニメイト/i.test(String(placeName || '').toLowerCase())) && !multiLandmark;
   if (animateOnly) {
     return { ok: false, reason: 'travel_district_single_store' };

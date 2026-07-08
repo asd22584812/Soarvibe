@@ -16,7 +16,14 @@ export var PHOTO_FIRST_RULES = {
 var STREET_SIGNALS = [
   'street', '街', 'chuo', '中央通', 'neon', '霓虹', 'crowd', '人潮',
   'radio kaikan', 'ラジオ会館', 'animate', 'アニメイト', 'gigo', 'ゲーセン',
-  'electric town', '電気街', 'signage', '看板', 'panorama', 'landmark'
+  'electric town', '電気街', 'signage', '看板', 'panorama', 'landmark',
+  'broadway', 'ブロードウェイ', 'sun mall', 'サンモール', 'crossing', '交差点',
+  'avenue', '通り', '歩行者天国', 'pedestrian'
+];
+
+var INDOOR_DISTRICT_DENY = [
+  'video gamer', 'tokyo video', 'arcade bar', '店内', 'indoor', 'interior',
+  'bar counter', 'ネオンバー', 'ピンボール'
 ];
 
 var SHOP_INTERIOR_SIGNALS = [
@@ -93,10 +100,11 @@ export function classifyPhotoEvidence(blob, section, options) {
   }
 
   if (has(STREET_SIGNALS)) types.push('street_landmark');
+  if (has(INDOOR_DISTRICT_DENY)) types.push('shop_interior');
   if (
-    has(['hobby', 'ホビー', 'figure shop', '模型店', '店内', 'shop interior', 'toy shop']) ||
+    has(['hobby', 'ホビー', 'figure shop', '模型店', '店内', 'shop interior', 'toy shop', 'arcade']) ||
     (has(['figure', 'フィギュア', '模型', 'mandarake', 'まんだらけ', '公仔', 'collectible']) &&
-      !has(['radio kaikan', 'ラジオ会館', 'animate', 'アニメイト', 'gigo', 'ゲーセン', 'street', '街', 'neon', '霓虹']))
+      !has(['radio kaikan', 'ラジオ会館', 'animate', 'アニメイト', 'gigo', 'ゲーセン', 'street', '街', 'neon', '霓虹', '中央通']))
   ) {
     types.push('shop_interior');
   }
