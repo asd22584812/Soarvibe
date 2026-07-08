@@ -554,13 +554,27 @@
             border-radius: 0.5rem;
             background: #EDEAE4;
             object-fit: cover;
+            object-position: center center;
         }
         #cityJournal .cj-figure-img--wide {
             aspect-ratio: 16 / 10;
+            max-height: 22rem;
         }
         #cityJournal .cj-figure-img--tall {
-            aspect-ratio: 4 / 5;
-            max-height: 28rem;
+            aspect-ratio: 3 / 4;
+            max-height: 32rem;
+            width: 100%;
+            max-width: 26rem;
+            margin-left: auto;
+            margin-right: auto;
+            object-position: center top;
+        }
+        #cityJournal .cj-figure-img--square {
+            aspect-ratio: 1 / 1;
+            max-height: 24rem;
+            max-width: 24rem;
+            margin-left: auto;
+            margin-right: auto;
         }
         #cityJournal .cj-caption {
             margin-top: 0.65rem;
@@ -3967,7 +3981,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
-            const SOARVIBE_APP_BUILD = 'v129';
+            const SOARVIBE_APP_BUILD = 'v130';
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
@@ -14754,6 +14768,22 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 img.src = placeholder;
             }
 
+            function handleCityJournalImageOrientation(img) {
+                if (!img || !img.naturalWidth || !img.naturalHeight) return;
+                if (img.getAttribute('data-cj-orient') === '1') return;
+                img.setAttribute('data-cj-orient', '1');
+                var ratio = img.naturalWidth / img.naturalHeight;
+                img.classList.remove('cj-figure-img--wide', 'cj-figure-img--tall', 'cj-figure-img--square');
+                if (ratio < 0.92) {
+                    img.classList.add('cj-figure-img--tall');
+                } else if (ratio > 1.12) {
+                    img.classList.add('cj-figure-img--wide');
+                } else {
+                    img.classList.add('cj-figure-img--square');
+                }
+            }
+            window.handleCityJournalImageOrientation = handleCityJournalImageOrientation;
+
             function getCityJournalMeta(cityId) {
                 var bundle = getCityJournalBundle();
                 return bundle.meta && bundle.meta[cityId] ? bundle.meta[cityId] : null;
@@ -14869,7 +14899,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 var url = info.url || getJournalPlaceholder();
                 return (
                     '<figure class="cj-figure">' +
-                    '<img class="cj-figure-img cj-figure-img--wide"' + cjJournalImgAttrs() + ' src="' + escapeHtml(url) + '" alt="" role="presentation" loading="lazy" decoding="async" onerror="handleCityJournalImageError(this)">' +
+                    '<img class="cj-figure-img cj-figure-img--wide"' + cjJournalImgAttrs() + ' src="' + escapeHtml(url) + '" alt="" role="presentation" loading="lazy" decoding="async" onload="handleCityJournalImageOrientation(this)" onerror="handleCityJournalImageError(this)">' +
                     (caption ? '<figcaption class="cj-caption">' + escapeHtml(caption) + '</figcaption>' : '') +
                     cjAttributionHtml(info.attribution, info.source) +
                     '</figure>'
