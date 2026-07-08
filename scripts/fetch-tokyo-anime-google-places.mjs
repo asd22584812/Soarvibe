@@ -128,7 +128,8 @@ function buildPayload(editorial, dataSrc) {
     return Object.assign({}, s, {
       subject: s.title || s.subject,
       heading: s.heading || contentBlock.heading || '',
-      content: s.content || contentBlock.content || ''
+      content: s.content || contentBlock.content || '',
+      placeId: s.placeId || null
     });
   });
   return {

@@ -80,9 +80,35 @@ export function placeTypes(place) {
 }
 
 export function nameValidationTerms(item) {
-  var terms = [item.officialNameLocal, item.officialName, item.subject];
+  var terms = [item.officialNameLocal, item.officialName];
+  var specific = item.isSpecificVenue === true ||
+    item.sectionType === 'food' || item.sectionType === 'cafe' ||
+    item.sectionType === 'hotel' || item.sectionType === 'hostel' ||
+    item.sectionRole === 'food' || item.sectionRole === 'cafe' ||
+    item.sectionRole === 'hotel' || item.sectionRole === 'hostel';
+
+  if (specific) {
+    if (item.mapsQuery) terms.push(item.mapsQuery);
+    if (Array.isArray(item.photoAnchorTerms)) terms = terms.concat(item.photoAnchorTerms);
+    return terms.filter(Boolean);
+  }
+
+  terms = terms.concat([item.subject]);
   if (Array.isArray(item.aliases)) terms = terms.concat(item.aliases);
   return terms.filter(Boolean);
+}
+
+export function primaryVenueTerms(item) {
+  return [item.officialNameLocal, item.officialName, item.mapsQuery].filter(Boolean);
+}
+
+export function placeMatchesPrimaryVenue(place, item) {
+  var name = placeDisplayName(place);
+  var addr = place && place.formattedAddress ? place.formattedAddress : '';
+  var blob = name + ' ' + addr;
+  if (containsAny(blob, primaryVenueTerms(item))) return true;
+  if (containsAny(name, item.photoAnchorTerms || [])) return true;
+  return containsAny(name, [item.officialNameLocal, item.officialName].filter(Boolean));
 }
 
 export function validatePlaceResult(place, item) {
@@ -160,10 +186,18 @@ export function validatePhotoAttribution(attribution, item) {
   var looksLikeVenue = /店|館|hotel|hostel|restaurant|cafe|咖啡|旅館|ホテル|カフェ|pod|ポッド|cinema|theater|theatre|映画|メイド|maid/i.test(attr);
   var role = item.sectionRole || item.sectionType;
   var strictLodging = role === 'hotel' || role === 'hostel' || item.sectionType === 'hotel' || item.sectionType === 'hostel';
+  var strictFood = (role === 'food' || item.sectionType === 'food') && item.isSpecificVenue === true;
 
   if (strictLodging) {
     if (!containsAny(attr, terms)) {
       return { ok: false, reason: 'lodging_attribution_strict_mismatch', attribution: attr };
+    }
+    return { ok: true };
+  }
+
+  if (strictFood) {
+    if (!containsAny(attr, terms) && !containsAny(attr, primaryVenueTerms(item))) {
+      return { ok: false, reason: 'food_attribution_strict_mismatch', attribution: attr };
     }
     return { ok: true };
   }
@@ -185,25 +219,38 @@ export async function resolveOfficialPlace(mapsKey, item, deps, articleCtx) {
   var search = deps.searchGooglePlace;
   var regionCode = deps.regionCode || null;
 
-  if (item.placeId) {
-    var byId = await getById(mapsKey, item.placeId);
-    if (byId) {
-      var idVal = validatePlaceResult(byId, item);
-      if (idVal.ok) {
-        return { place: byId, searchUsed: 'placeId:' + item.placeId, validation: idVal };
-      }
-    }
-  }
-
   var sequence = buildSearchSequence(item, articleCtx);
+
   for (var s = 0; s < sequence.length; s++) {
     var step = sequence[s];
     var places = await search(mapsKey, step.query, step.lang, regionCode);
     for (var p = 0; p < places.length; p++) {
       if (!placeInTargetRegion(places[p], item, regionCode || 'JP')) continue;
       var val = validatePlaceResult(places[p], item);
-      if (val.ok) {
+      if (val.ok && placeMatchesPrimaryVenue(places[p], item)) {
         return { place: places[p], searchUsed: step.query, validation: val };
+      }
+    }
+  }
+
+  if (item.placeId) {
+    var byId = await getById(mapsKey, item.placeId);
+    if (byId) {
+      var idVal = validatePlaceResult(byId, item);
+      if (idVal.ok && placeMatchesPrimaryVenue(byId, item)) {
+        return { place: byId, searchUsed: 'placeId:' + item.placeId, validation: idVal };
+      }
+    }
+  }
+
+  for (var s2 = 0; s2 < sequence.length; s2++) {
+    var step2 = sequence[s2];
+    var places2 = await search(mapsKey, step2.query, step2.lang, regionCode);
+    for (var p2 = 0; p2 < places2.length; p2++) {
+      if (!placeInTargetRegion(places2[p2], item, regionCode || 'JP')) continue;
+      var val2 = validatePlaceResult(places2[p2], item);
+      if (val2.ok) {
+        return { place: places2[p2], searchUsed: step2.query + ':relaxed', validation: val2 };
       }
     }
   }

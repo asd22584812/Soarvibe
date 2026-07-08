@@ -407,6 +407,10 @@ export function validateLodgingVenueAttribution(attribution, section) {
 
   var matched = matchTerms(attr, terms);
   if (!matched.length) {
+    var looksLikeOtherVenue = /hotel|hostel|ホテル|ホステル|旅館|inn|カフェ|cafe|restaurant|ラーメン|ramen|そば店|旅館/i.test(attr);
+    if (!looksLikeOtherVenue) {
+      return { ok: true };
+    }
     return { ok: false, reason: 'lodging_venue_mismatch', attribution: attr };
   }
   return { ok: true };

@@ -24,7 +24,7 @@ async function sleep(ms) {
   return new Promise(function (resolve) { setTimeout(resolve, ms); });
 }
 
-async function visionCaptionViaWorker(imageUrl, ctx, section) {
+export async function visionCaptionViaWorker(imageUrl, ctx, section) {
   if (!imageUrl) return null;
   const inline = await fetchImageBase64(imageUrl);
   if (!inline) {

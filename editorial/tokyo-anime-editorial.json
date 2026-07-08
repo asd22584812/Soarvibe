@@ -591,38 +591,34 @@
       "officialName": "Ichiran Ramen Shinjuku",
       "officialNameLocal": "一蘭ラーメン 新宿店",
       "aliases": [
-        "田中そば",
-        "Tanaka Soba Akihabara"
+        "Ichiran",
+        "一蘭",
+        "一蘭ラーメン"
       ],
-      "mapsQuery": "Ichiran Ramen Shinjuku",
-      "placeId": "ChIJXTeLYx6MGGARNivhJ55nYVw",
+      "mapsQuery": "一蘭ラーメン 新宿店 Tokyo",
+      "placeId": null,
       "photoPlaceQueries": [
-        "田中そば店 秋葉原店 外観",
-        "田中そば店 秋葉原店",
-        "Tanaka Soba Akihabara exterior"
+        "一蘭ラーメン 新宿店 外観",
+        "Ichiran Ramen Shinjuku exterior",
+        "一蘭 新宿 店舗",
+        "Ichiran Shinjuku storefront"
       ],
-      "allowVenueSwap": true,
-      "venueAlternatives": [
-        {
-          "officialName": "Afuri Ramen",
-          "officialNameLocal": "",
-          "mapsQuery": "Afuri Ramen Shinjuku"
-        }
-      ],
+      "allowVenueSwap": false,
+      "venueAlternatives": [],
       "photoAnchorTerms": [
-        "田中そば",
-        "Tanaka",
-        "そば"
+        "Ichiran",
+        "一蘭",
+        "一蘭ラーメン"
       ],
       "allowGenericPhotoFallback": false,
       "photoIntent": "店門口、招牌、外觀優先，其次拉麵本體",
       "imageChecklist": [
         "ラーメン",
         "ramen",
-        "soba",
-        "田中",
+        "Ichiran",
+        "一蘭",
         "拉麵",
-        "麺"
+        "味集中"
       ],
       "imageRejectRules": [
         "空桌",
@@ -631,9 +627,9 @@
       ],
       "isSpecificVenue": true,
       "addressHints": [
-        "秋葉原",
-        "Akihabara",
-        "Sotokanda"
+        "新宿",
+        "Shinjuku",
+        "Kabukicho"
       ],
       "allowedPlaceTypes": [
         "restaurant",
@@ -729,36 +725,31 @@
     {
       "sectionId": "nui-hostel",
       "sectionRole": "hostel",
-      "title": "Nui. HOSTEL & BAR LOUNGE：旅人的溫馨港灣",
+      "title": "グリッズ 東京 浅草橋 ホテル & ホステル",
       "sectionType": "hostel",
-      "officialName": "Nui. HOSTEL & BAR LOUNGE",
-      "officialNameLocal": "Nui. HOSTEL & BAR LOUNGE",
+      "officialName": "Grids Tokyo Asakusabashi Hotel&Hostel",
+      "officialNameLocal": "グリッズ 東京 浅草橋 ホテル & ホステル",
       "aliases": [
         "Grids Tokyo Asakusabashi",
-        "Grids Hostel Asakusabashi",
-        "グリッドホテル"
+        "グリッドホテル浅草橋",
+        "GRIDS HOSTEL"
       ],
-      "mapsQuery": "Nui. HOSTEL & BAR LOUNGE",
+      "mapsQuery": "グリッズ 東京 浅草橋 ホテル & ホステル Tokyo",
+      "placeId": null,
       "photoPlaceQueries": [
-        "グリッドホテル浅草橋 外観",
-        "Grids Tokyo Asakusabashi exterior",
-        "グリッドホテル浅草橋 入口"
+        "グリッズ 東京 浅草橋 ホテル 外観",
+        "Grids Tokyo Asakusabashi Hotel exterior",
+        "グリッドホテル浅草橋 入口",
+        "GRIDS HOTEL HOSTEL Asakusabashi"
       ],
       "photoAnchorTerms": [
         "Grids",
         "グリッド",
         "グリッズ",
-        "Asakusabashi"
+        "GRIDS"
       ],
-      "allowVenueSwap": true,
-      "venueSwapIntent": "簡潔客房、公共吧台、交誼空間",
-      "venueAlternatives": [
-        {
-          "officialName": "Grids Tokyo Asakusabashi Hotel&Hostel",
-          "officialNameLocal": "",
-          "mapsQuery": "Grids Tokyo Asakusabashi Hotel&Hostel"
-        }
-      ],
+      "allowVenueSwap": false,
+      "venueAlternatives": [],
       "photoIntent": "旅宿外觀、入口優先，其次交誼廳，最後客房",
       "imageChecklist": [
         "facade",
@@ -773,13 +764,16 @@
         "parking",
         "restaurant only",
         "resort",
-        "pool"
+        "pool",
+        "unmade",
+        "messy bed"
       ],
       "isSpecificVenue": true,
       "addressHints": [
+        "浅草橋",
+        "Asakusabashi",
         "蔵前",
-        "Kuramae",
-        "浅草橋"
+        "Kuramae"
       ],
       "allowedPlaceTypes": [
         "lodging",
@@ -790,8 +784,8 @@
       "deniedPlaceTypes": [
         "movie_theater"
       ],
-      "heading": "Nui. HOSTEL & BAR LOUNGE：旅人的溫馨港灣",
-      "content": "位於藏前，Nui. Hostel以其工業風設計與溫馨氛圍聞名。一樓的酒吧是旅人交流的好地方，能結識來自世界各地的朋友。雖然是青年旅館，但環境整潔舒適，提供高品質的住宿體驗，是預算有限又想體驗東京在地生活的理想選擇。"
+      "heading": "グリッズ 東京 浅草橋 ホテル & ホステル · 設計感旅宿落腳",
+      "content": "淺草橋一帶的グリッズ 東京 浅草橋 ホテル & ホステル，簡潔客房、公共吧台、交誼空間，適合獨旅或預算控管。從淺草橋站步行數分鐘，搭 JR 總武線往秋葉原約 5 分鐘。週末床位記得提早訂。"
     },
     {
       "sectionId": "hotel-gracery",
@@ -801,31 +795,29 @@
       "officialName": "Hotel Gracery Shinjuku",
       "officialNameLocal": "ホテルグレイスリー新宿",
       "aliases": [
-        "remm Akihabara",
-        "レム秋葉原",
-        "remm 秋葉原"
+        "Gracery Shinjuku",
+        "格拉斯麗",
+        "哥吉拉酒店",
+        "Godzilla Hotel"
       ],
-      "mapsQuery": "Hotel Gracery Shinjuku",
+      "mapsQuery": "Hotel Gracery Shinjuku Tokyo Japan",
+      "placeId": null,
       "photoPlaceQueries": [
-        "レム秋葉原 外観",
-        "remm Akihabara exterior",
-        "レム秋葉原 入口",
-        "秋葉原ワシントンホテル 外観"
+        "Hotel Gracery Shinjuku Godzilla head",
+        "ホテルグレイスリー新宿 ゴジラ",
+        "Hotel Gracery Shinjuku exterior",
+        "ホテルグレイスリー新宿 外観"
       ],
       "photoAnchorTerms": [
-        "remm",
-        "レム",
-        "Akihabara"
+        "Gracery",
+        "グレイスリー",
+        "Godzilla",
+        "ゴジラ",
+        "格拉斯麗"
       ],
-      "allowVenueSwap": true,
-      "venueSwapIntent": "步行可達秋葉原站、客房實用、交通方便",
-      "venueAlternatives": [
-        {
-          "officialName": "Shinjuku Prince Hotel",
-          "officialNameLocal": "",
-          "mapsQuery": "Shinjuku Prince Hotel"
-        }
-      ],
+      "allowVenueSwap": false,
+      "venueSwapIntent": "新宿歌舞伎町、哥吉拉地標外觀",
+      "venueAlternatives": [],
       "photoIntent": "飯店外觀、建築入口優先，其次 Lobby，最後客房",
       "imageChecklist": [
         "facade",
@@ -841,13 +833,16 @@
         "garage",
         "restaurant only",
         "resort",
-        "pool"
+        "pool",
+        "unmade",
+        "messy bed"
       ],
       "isSpecificVenue": true,
       "addressHints": [
-        "秋葉原",
-        "Akihabara",
-        "Sakumacho"
+        "新宿",
+        "Shinjuku",
+        "Kabukicho",
+        "歌舞伎町"
       ],
       "allowedPlaceTypes": [
         "lodging",
