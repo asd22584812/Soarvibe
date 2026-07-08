@@ -5,7 +5,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { visionCaptionViaWorker } from './lib/vision-caption.mjs';
+import { visionVerifyLandmarkViaWorker, visionCaptionViaWorker } from './lib/vision-caption.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -81,10 +81,10 @@ function patchSectionRow(src, row) {
     else if (key === 'secondaryGoogleAttribution' && !row.secondaryGoogleAttribution) val = 'null';
     else if (key === 'secondaryCaption') val = jsString(row.secondaryCaption || null);
     else if (key === 'heading') {
-      if (!row.heading) continue;
+      if (!row.heading || process.env.SOARVIBE_SYNC_COPY === '0') continue;
       val = jsString(row.heading);
     } else if (key === 'content') {
-      if (!row.content) continue;
+      if (!row.content || process.env.SOARVIBE_SYNC_COPY === '0') continue;
       val = jsString(row.content);
     } else val = jsString(row[key]);
     out = patchField(out, key, val, start, blockEnd);
@@ -154,36 +154,107 @@ function buildPayload(editorial, dataSrc) {
   };
 }
 
-async function resolveAll(payload) {
+function isDistrictSection(section) {
+  return section && (section.subjectType === 'district' || section.requireStreetscape);
+}
+
+function isStorefrontSection(section) {
+  if (!section) return false;
+  return /外觀|店門口|storefront|招牌|facade|exterior|入口/i.test(String(section.photoIntent || ''));
+}
+
+function isDistrictPhotoMismatch(caption, subjects) {
+  const blob = [caption].concat(subjects || []).join(' ').toLowerCase();
+  return /幸福物産|菜市|grocery|supermarket|食材|物產|vegetable|蔬果|market|video gamer|tokyo video|吧台|bar counter|室內|店内|indoor|海報|poster only|拉麵碗|ramen bowl|浴缸|客房/.test(blob);
+}
+
+async function resolveOneSection(payload, section, excludeUrls) {
   const endpoint = USE_LEGACY_PLACES ? '/api/places/resolve' : '/api/editorial/resolve';
+  const body = USE_LEGACY_PLACES
+    ? {
+      sections: [Object.assign({}, section, { visualKeywords: section.imageChecklist || [], excludeUrls: excludeUrls })]
+    }
+    : {
+      article: payload.article,
+      sections: [Object.assign({}, section, { excludeUrls: excludeUrls })],
+      excludeUrls: excludeUrls
+    };
+  const response = await fetch(API_BASE + endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Origin: ORIGIN },
+    body: JSON.stringify(body)
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error('Worker editorial resolve failed for ' + section.sectionId + ': ' + JSON.stringify(data));
+  return (data.results && data.results[0]) || data;
+}
+
+async function resolveSectionWithVision(payload, section, editorial, excludeUrls) {
+  const editorialRow = (editorial.sections || []).find(function (s) { return s.sectionId === section.sectionId; })
+    || (section.sectionId === 'hero-anime' ? editorial.hero : section);
+  const needsVision = isDistrictSection(editorialRow) || isDistrictSection(section) || isStorefrontSection(editorialRow);
+  const maxTries = needsVision ? 4 : 1;
+
+  for (let tryIdx = 0; tryIdx < maxTries; tryIdx++) {
+    const reqSection = Object.assign({}, section, {
+      minPhotoIndex: tryIdx,
+      placeId: tryIdx > 0 && isDistrictSection(editorialRow) ? null : section.placeId
+    });
+    const row = await resolveOneSection(payload, reqSection, excludeUrls);
+    if (!row.googlePhotoUrl || !row.matched) return row;
+    if (!needsVision || process.env.SOARVIBE_VISION_CAPTIONS === '0') return row;
+
+    const ctx = {
+      heading: row.heading || editorialRow.heading,
+      subject: row.subject || editorialRow.title,
+      placeName: row.placeName || row.photoPlaceName,
+      officialName: row.officialName || editorialRow.officialName,
+      officialNameLocal: row.officialNameLocal || editorialRow.officialNameLocal
+    };
+    try {
+      const verified = await visionVerifyLandmarkViaWorker(row.googlePhotoUrl, ctx, editorialRow);
+      const caption = verified.caption || '';
+      const mismatch = isDistrictSection(editorialRow) && isDistrictPhotoMismatch(caption, verified.visibleSubjects);
+      if (verified.venueMatch === true && !mismatch) {
+        row.photoCaption = caption || row.photoCaption;
+        console.log('[VISION OK]', section.sectionId, 'idx:' + tryIdx, row.photoCaption);
+        return row;
+      }
+      if (verified.apiError) {
+        row.photoCaption = caption || row.photoCaption;
+        row.visionSkipped = verified.apiError;
+        console.warn('[VISION QUOTA]', section.sectionId, verified.apiError);
+        return row;
+      }
+      console.warn('[VISION REJECT]', section.sectionId, 'idx:' + tryIdx, caption.slice(0, 40));
+      excludeUrls.push(row.googlePhotoUrl);
+    } catch (err) {
+      console.warn('[VISION ERR]', section.sectionId, err.message);
+      excludeUrls.push(row.googlePhotoUrl);
+    }
+  }
+
+  return {
+    sectionId: section.sectionId,
+    subject: section.subject || section.title,
+    mapsQuery: section.mapsQuery,
+    matched: false,
+    googlePhotoUrl: null,
+    rejectReason: 'vision_photo_mismatch'
+  };
+}
+
+async function resolveAll(payload, editorial) {
   const sections = payload.sections || [];
   const results = [];
   let excludeUrls = [];
 
   for (let i = 0; i < sections.length; i++) {
     const section = sections[i];
-    const body = USE_LEGACY_PLACES
-      ? {
-        sections: [Object.assign({}, section, { visualKeywords: section.imageChecklist || [], excludeUrls: excludeUrls })]
-      }
-      : {
-        article: payload.article,
-        sections: [Object.assign({}, section, { excludeUrls: excludeUrls })],
-        excludeUrls: excludeUrls
-      };
-
-    const response = await fetch(API_BASE + endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Origin: ORIGIN },
-      body: JSON.stringify(body)
-    });
-    const data = await response.json();
-    if (!response.ok) throw new Error('Worker editorial resolve failed for ' + section.sectionId + ': ' + JSON.stringify(data));
-    const row = (data.results && data.results[0]) || data;
+    const row = await resolveSectionWithVision(payload, section, editorial, excludeUrls);
     results.push(row);
     if (row.googlePhotoUrl) excludeUrls.push(row.googlePhotoUrl);
     if (row.secondaryGooglePhotoUrl) excludeUrls.push(row.secondaryGooglePhotoUrl);
-    if (data.excludeUrls) excludeUrls = data.excludeUrls;
   }
 
   return results;
@@ -264,7 +335,7 @@ async function main() {
   const payload = buildPayload(editorial, dataSrc);
 
   console.log('[PIPELINE]', USE_LEGACY_PLACES ? 'legacy-places' : 'semantic-match');
-  const results = await resolveAll(payload);
+  const results = await resolveAll(payload, editorial);
   if (process.env.SOARVIBE_VISION_CAPTIONS !== '0') {
     await rewriteCaptionsWithVision(results, payload.article, editorial);
   }

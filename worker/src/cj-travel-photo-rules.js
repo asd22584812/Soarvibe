@@ -243,6 +243,13 @@ export function validateDistrictPhotoQuality(evidence, section, placeName) {
   if (/video gamer|tokyo video|arcade bar|bar counter|室内|indoor|interior|店内|ゲーセン内|ピンボール|bar stool|ネオンバー/i.test(meta)) {
     return { ok: false, reason: 'travel_district_indoor_bar' };
   }
+  if (/grocery|supermarket|market|食材|物產|物産|vegetable|菜市|幸福物産|produce|青果|八百屋|スーパー/i.test(meta)) {
+    return { ok: false, reason: 'travel_district_grocery' };
+  }
+  if (/poster|海報|ポスター|flyer|チラシ|menu board only/i.test(meta) &&
+      !/street|街|neon|霓虹|facade|外観|crossing|交差点/i.test(meta)) {
+    return { ok: false, reason: 'travel_district_poster_only' };
+  }
   if (/cozy|コージー|cake|ベーカリー|bakery|パン|甜點店|café|cafe|カフェ|food_dish|dessert/i.test(meta)) {
     if (!/broadway|ブロードウェイ|sun mall|サンモール|mandarake|まんだらけ|radio|ラジオ|gigo|ゲーセン|chuo|中央通|neon|霓虹|street|街|electric town|電気街/i.test(meta)) {
       return { ok: false, reason: 'travel_district_bakery_or_cafe' };

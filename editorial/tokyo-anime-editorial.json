@@ -388,7 +388,7 @@
         "Mandarake Nakano",
         "らしんばん 中野"
       ],
-      "mapsQuery": "Nakano Broadway",
+      "mapsQuery": "Nakano Sun Mall entrance",
       "placeId": "ChIJg-7dspDyGGARvvDv4E5-tuE",
       "photoPlaceQueries": [
         "中野ブロードウェイ 外観",
@@ -403,7 +403,7 @@
         "中野"
       ],
       "allowGenericPhotoFallback": false,
-      "minPhotoIndex": 1,
+      "minPhotoIndex": 2,
       "visualGroups": [
         [
           "Mandarake",
@@ -515,10 +515,10 @@
         ]
       },
       "searchKeywords": [
-        "秋葉原ガチャポン会館",
-        "Akihabara Gachapon Kaikan",
-        "gachapon wall Akihabara",
-        "capsule toy machine Akihabara"
+        "ガシャポンのデパート 池袋",
+        "Gashapon Bandai Official Shop Ikebukuro",
+        "池袋 扭蛋 百貨",
+        "gachapon wall Ikebukuro"
       ],
       "minChecklistHits": 2,
       "captionIntent": "描述扭蛋牆或機台陳列的視覺重點",
@@ -526,21 +526,20 @@
       "officialName": "Gashapon Department Store Ikebukuro",
       "officialNameLocal": "ガシャポン百貨店 池袋総本店",
       "aliases": [
-        "Gachapon Kaikan",
-        "ガチャポン会館",
-        "Akihabara Gachapon Hall"
+        "Gashapon Bandai Official Shop Ikebukuro",
+        "ガシャポンのデパート 池袋本店"
       ],
-      "mapsQuery": "Gashapon Department Store Ikebukuro",
-      "placeId": "ChIJBztW3x2MGGARadHYl5vTEK0",
+      "mapsQuery": "ガシャポンのデパート 池袋本店",
+      "placeId": null,
       "photoPlaceQueries": [
-        "秋葉原ガチャポン会館",
-        "Akihabara Gachapon Kaikan"
+        "ガシャポンのデパート 池袋",
+        "Gashapon Bandai Official Shop Ikebukuro",
+        "池袋 ガシャポン 百貨店"
       ],
       "photoAnchorTerms": [
-        "ガチャポン会館",
-        "Gachapon Kaikan",
-        "ガチャポン",
-        "Gachapon Hall"
+        "ガシャポン",
+        "Gashapon",
+        "池袋"
       ],
       "allowGenericPhotoFallback": false,
       "requireInteriorPhoto": true,
@@ -578,9 +577,10 @@
       ],
       "isSpecificVenue": true,
       "addressHints": [
-        "秋葉原",
-        "Akihabara",
-        "Sotokanda"
+        "池袋",
+        "Ikebukuro",
+        "Toshima",
+        "豊島"
       ],
       "allowedPlaceTypes": [
         "store",
@@ -607,20 +607,21 @@
     {
       "sectionId": "ichiran",
       "sectionRole": "food",
-      "title": "一風堂 上野広小路店",
+      "title": "TOKYO豚骨BASE エキュート秋葉原",
       "sectionType": "food",
-      "officialName": "Ippudo Ueno Hirokoji",
-      "officialNameLocal": "一風堂 上野広小路店",
+      "officialName": "TOKYO Tonkotsu Base Akihabara",
+      "officialNameLocal": "TOKYO豚骨BASE エキュート秋葉原",
       "aliases": [
-        "Ippudo",
-        "一風堂",
-        "IPPUDO Ueno"
+        "TOKYO Tonkotsu Base",
+        "豚骨BASE",
+        "エキュート秋葉原"
       ],
-      "mapsQuery": "一風堂 上野広小路店",
+      "mapsQuery": "TOKYO豚骨BASE エキュート秋葉原",
       "placeId": null,
       "photoPlaceQueries": [
-        "一風堂 上野広小路店",
-        "Ippudo Ueno"
+        "一風堂 秋葉原 外観",
+        "Ippudo Akihabara exterior",
+        "一風堂 秋葉原"
       ],
       "allowVenueSwap": false,
       "venueAlternatives": [],
@@ -632,8 +633,9 @@
       "photoIntent": "店門口、招牌、外觀優先，其次拉麵本體",
       "imageChecklist": [
         "一風堂",
-        "ラーメン",
-        "外観"
+        "IPPUDO",
+        "外観",
+        "ラーメン"
       ],
       "imageRejectRules": [
         "parking",
@@ -641,9 +643,8 @@
       ],
       "isSpecificVenue": true,
       "addressHints": [
-        "新宿",
-        "Shinjuku",
-        "Kabukicho"
+        "秋葉原",
+        "Akihabara"
       ],
       "allowedPlaceTypes": [
         "restaurant",
@@ -657,8 +658,8 @@
         "movie_theater",
         "hostel"
       ],
-      "heading": "上野一風堂：豚骨補給站",
-      "content": "逛完池袋扭蛋或上野公園後，可到「一風堂 上野広小路店」吃白丸／赤丸。靠近上野広小路、動線清楚，尖峰仍可能排隊，建議錯開正午時段。",
+      "heading": "一風堂 秋葉原：豚骨補給站",
+      "content": "秋葉原掃街後的暖胃選擇，「一風堂 秋葉原店」白丸／赤丸選擇多。紅白招牌從街口就認得出，距電氣街口步行約五分鐘；尖峰排隊常見，建議錯開 12:00–13:30。",
       "googlePhotoUrl": null,
       "googleAttribution": null,
       "caption": null
@@ -674,15 +675,17 @@
         "Animate Cafe",
         "アニメイトカフェ"
       ],
-      "mapsQuery": "アニメイトカフェ 池袋店",
+      "mapsQuery": "アニメイト池袋本店",
       "placeId": null,
       "photoPlaceQueries": [
-        "アニメイトカフェ 池袋店",
-        "Animate Cafe Ikebukuro"
+        "アニメイト池袋本店 外観",
+        "Animate Ikebukuro flagship exterior",
+        "アニメイトカフェ 池袋店 外観"
       ],
       "photoAnchorTerms": [
+        "アニメイト",
         "アニメイトカフェ",
-        "Animate Cafe"
+        "Animate"
       ],
       "allowVenueSwap": false,
       "venueSwapIntent": "女僕服裝、店內互動、主題甜點",
@@ -700,8 +703,9 @@
       ],
       "isSpecificVenue": true,
       "addressHints": [
-        "秋葉原",
-        "Akihabara"
+        "池袋",
+        "Ikebukuro",
+        "豊島"
       ],
       "allowedPlaceTypes": [
         "cafe",
@@ -726,60 +730,75 @@
       ]
     },
     {
-      "sectionId": "nui-hostel",
-      "sectionRole": "hotel",
-      "title": "レム秋葉原",
-      "sectionType": "hotel",
-      "officialName": "remm Akihabara",
-      "officialNameLocal": "レム秋葉原",
-      "aliases": [
-        "remm Akihabara",
-        "レム秋葉原"
+      "sectionId": "ikebukuro-route",
+      "sectionRole": "explore",
+      "subjectType": "district",
+      "title": "サンシャインシティ",
+      "sectionPurpose": "anime",
+      "editorialAngle": "池袋動漫熱點串成一條步行動線，先看街景再進店",
+      "photoIntent": "廣角街景、池袋動漫街區步行動線、サンシャイン通り或乙女路外觀，禁止海報特寫或室內",
+      "searchKeywords": [
+        "サンシャインシティ",
+        "Sunshine City Ikebukuro",
+        "池袋 サンシャイン60通り",
+        "池袋乙女路"
       ],
-      "mapsQuery": "レム秋葉原",
+      "minChecklistHits": 1,
+      "captionIntent": "描述圖片中實際看到的街道、建築立面或路口",
+      "sectionType": "landmark",
+      "officialName": "Sunshine City Ikebukuro",
+      "officialNameLocal": "サンシャインシティ",
+      "aliases": [
+        "Sunshine City",
+        "サンシャイン60通り",
+        "池袋乙女路"
+      ],
+      "mapsQuery": "Sunshine City Ikebukuro Tokyo",
       "placeId": null,
       "photoPlaceQueries": [
-        "レム秋葉原",
-        "remm Akihabara"
+        "サンシャインシティ 外観 池袋",
+        "Sunshine 60 Street Ikebukuro",
+        "池袋 サンシャイン60通り 街並み",
+        "池袋乙女路 外観"
       ],
       "photoAnchorTerms": [
-        "レム",
-        "remm"
+        "池袋",
+        "サンシャイン",
+        "アニメイト",
+        "乙女路"
       ],
-      "allowVenueSwap": false,
-      "venueAlternatives": [],
-      "photoIntent": "旅宿外觀、入口優先",
+      "allowGenericPhotoFallback": false,
+      "isSpecificVenue": false,
+      "requireStreetscape": true,
+      "visualGroups": [
+        ["サンシャイン", "sunshine", "60"],
+        ["アニメイト", "animate"],
+        ["乙女路", "otome"],
+        ["街", "street", "通り"]
+      ],
+      "requiredVisualMinGroups": 2,
       "imageChecklist": [
-        "外観",
-        "hotel",
-        "レム"
+        "池袋",
+        "サンシャイン",
+        "アニメイト",
+        "乙女路",
+        "街",
+        "外観"
       ],
       "imageRejectRules": [
-        "parking",
-        "pool"
-      ],
-      "isSpecificVenue": true,
-      "addressHints": [
-        "浅草橋",
-        "Asakusabashi",
-        "蔵前",
-        "Kuramae"
-      ],
-      "allowedPlaceTypes": [
-        "lodging",
-        "hostel",
+        "poster",
+        "海報",
+        "室内",
+        "indoor",
+        "food_dish",
         "hotel",
-        "establishment"
+        "parking"
       ],
-      "deniedPlaceTypes": [
-        "movie_theater"
-      ],
-      "heading": "レム秋葉原：電氣街旁據點",
-      "content": "「レム秋葉原」緊鄰秋葉原商圈，掃街後徒步回房。商務旅館規格乾淨有效率，適合以秋葉原為軸心的一兩晚。",
+      "heading": "池袋動漫聖地：一日巡禮動線",
+      "content": "池袋的動漫熱點適合串成一條步行線：從JR池袋東口出發，沿サンシャイン60通り走向アニメイト池袋本店，再轉進乙女路看角色周邊店。整段約一公里，建議預留兩小時邊走邊拍街景。",
       "googlePhotoUrl": null,
       "googleAttribution": null,
-      "caption": null,
-      "allowGenericPhotoFallback": true
+      "caption": null
     },
     {
       "sectionId": "hotel-gracery",

@@ -8,23 +8,25 @@ const REQUIRED_SECTION_IDS = [
   'akihabara',
   'nakano',
   'gachapon',
+  'ikebukuro-route',
   'ichiran',
   'maid-cafe',
-  'nui-hostel',
   'hotel-gracery'
 ];
 
 /** Regional pillars — keep every month */
-const FIXED_DISTRICT_IDS = ['akihabara', 'nakano', 'gachapon'];
+const FIXED_DISTRICT_IDS = ['akihabara', 'nakano', 'gachapon', 'ikebukuro-route'];
 
 /** These must change month-to-month (do NOT lock to previous venue) */
-const ROTATING_VENUE_IDS = ['ichiran', 'maid-cafe', 'nui-hostel', 'hotel-gracery'];
+const ROTATING_VENUE_IDS = ['ichiran', 'maid-cafe', 'hotel-gracery'];
 
 const STYLE_GUIDE = [
-  '寫作風格參考：日本觀光局雜誌、樂吃購東京版。',
+  '你是資深世界旅遊導遊、旅遊部落客與旅遊雜誌主編，寫作像專業旅遊雜誌專題。',
   '具體、有現場感：店名、街道、交通、為何值得停留。',
+  '介紹地區／商圈／景點時，文案預設讀者會看到廣角街景或地標外觀照片——寫街區氛圍，不寫單一室內店。',
   '禁止：「彷彿置身動畫」「奇幻驚喜」「洗禮」「魔力」「守護」等空泛行銷句。',
   '禁止：「歡迎來到」「準備好」「一同探索」等開場白套話。',
+  '禁止：「與本段介紹的地標一致」「景觀清楚可見」「方便對照地圖找路」等空泛圖說。',
   '用編輯帶路的語氣，像資深記者寫給懂行的讀者。'
 ].join('\n');
 
@@ -62,20 +64,26 @@ function buildGeneratePrompt(opts) {
   });
 
   return [
-    '你是旅遊雜誌主編。撰寫' + year + '年' + month + '月東京動漫主題專題（全新一期，不是改寫上月）。',
+    '你是資深世界旅遊導遊、旅遊部落客與旅遊雜誌主編。撰寫' + year + '年' + month + '月東京動漫主題專題（全新一期，不是改寫上月）。',
     STYLE_GUIDE,
+    '',
+    '【工作流程——必須遵守】',
+    '1. 先寫完整文案（intro、各段 heading + content、outro）',
+    '2. 地區／商圈段落（akihabara、nakano、ikebukuro-route）文案必須對應「廣角街景／地標外觀」，不可寫室內特寫',
+    '3. 圖片將事後以 Google Maps 街景／地標照配對；圖說會依實際照片撰寫',
     '',
     '【硬性規定】',
     '1. sections 恰好 7 個，sectionId 依序：' + REQUIRED_SECTION_IDS.join(', '),
-    '2. 區域段落固定：akihabara / nakano / gachapon 必須是秋葉原電氣街、中野百老匯、池袋扭蛋；官方地名不可改',
-    '3. 輪替段落本月必須全新店家：ichiran=拉麵、maid-cafe=特色咖啡、nui-hostel=青旅、hotel-gracery=飯店',
-    '4. 輪替店家「禁止」與上月相同，也禁止：一蘭、めいどりーみん、グリッズ浅草橋、ホテルグレイスリー新宿／哥吉拉',
-    '5. 輪替店要真實可查、在東京、適合動漫／次文化旅人（秋葉原・池袋・中野・新宿周邊優先）',
+    '2. 固定區域：akihabara=秋葉原電氣街、nakano=中野百老匯、gachapon=池袋扭蛋百貨、ikebukuro-route=池袋動漫聖地巡禮動線',
+    '3. 輪替段落本月必須全新店家：ichiran=拉麵、maid-cafe=特色咖啡、hotel-gracery=飯店（僅一個住宿段落，禁止青旅／hostel）',
+    '4. 輪替店家「禁止」與上月相同，也禁止：一蘭、めいどりーみん、グリッズ浅草橋、レム秋葉原、ホテルグレイスリー新宿／哥吉拉',
+    '5. 輪替店要真實可查、在東京、適合動漫／次文化旅人',
     '6. intro／outro／各段 content 必須是本月新寫，不可複用上月措辭',
     '7. intro 90–110 字；outro 80–100 字——直接切入主題',
     '8. 每段 content 75–95 字，含一個具體細節（交通、排隊、必看）',
-    '9. venueAlternatives 留空陣列 []',
-    '10. 緊湊 JSON，無 markdown',
+    '9. ikebukuro-route 寫一日動線：池袋東口→サンシャイン通り→アニメイト→乙女路，附建議停留時間',
+    '10. venueAlternatives 留空陣列 []',
+    '11. 緊湊 JSON，無 markdown',
     '',
     '【固定區域】',
     fixedLines.join('\n'),
@@ -84,10 +92,9 @@ function buildGeneratePrompt(opts) {
     previousRotatedVenues(existing),
     '',
     '【本月輪替請自選真實店家並填 officialName / officialNameLocal / mapsQuery】',
-    '- ichiran: 拉麵（例：AFURI 秋葉原、鬼金棒、一風堂 秋葉原——但不可一蘭）',
+    '- ichiran: 拉麵（例：AFURI 秋葉原、鬼金棒、一風堂——但不可一蘭）',
     '- maid-cafe: 主題咖啡（例：@home cafe、アニメイトカフェ——但不可めいどりーみん）',
-    '- nui-hostel: 青旅／設計旅宿（例：remm 秋葉原、unplan——但不可グリッズ浅草橋）',
-    '- hotel-gracery: 飯店（例：Tokyu Stay 秋葉原、Hotel Mystays——但不可グレイスリー／哥吉拉）',
+    '- hotel-gracery: 飯店（例：Tokyu Stay 秋葉原、Hotel Mystays、JR九州ホテルブラッサム——但不可グレイスリー／哥吉拉）',
     '',
     'JSON：{ title, subtitle, intro, outro, issueLabel, sections:[{ sectionId, heading, content, officialName, officialNameLocal, mapsQuery, meta:{recommendation,stayDuration,nearestStation,priceRange,bestTime}, venueAlternatives:[] }] }'
   ].join('\n');
@@ -97,10 +104,10 @@ function buildSectionCopyPrompt(section, place, article, photoCaption) {
   var roleHints = {
     akihabara: '秋葉原電氣街街區廣角街景：中央通、招牌霓虹、Radio Kaikan／GIGO 立面——寫掃街節奏，不要寫單一室內店',
     nakano: '中野百老匯街區／Sun Mall 入口廣角：寫挖寶動線與商場外觀，不要單一家甜點店特寫',
-    gachapon: '扭蛋會館：整面扭蛋牆、機台種類、怎麼控制預算',
+    gachapon: '扭蛋百貨：整面扭蛋牆、機台種類、怎麼控制預算',
+    'ikebukuro-route': '池袋動漫聖地一日動線：東口→サンシャイン通り→アニメイト本店→乙女路，寫步行節奏與街景',
     ichiran: '拉麵店：湯頭、點餐、排隊，依實際店名',
     'maid-cafe': '主題咖啡：低消、拍照規則、互動，依實際店名',
-    'nui-hostel': '旅宿：交通、公共空間、適合誰',
     'hotel-gracery': '飯店：位置、交通、房型亮點，依實際店名'
   };
   return [

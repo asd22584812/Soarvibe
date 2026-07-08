@@ -117,7 +117,7 @@ function metaToEditorialMeta(meta) {
   ].filter(function (m) { return m.value; });
 }
 
-const ROTATING_IDS = ['ichiran', 'maid-cafe', 'nui-hostel', 'hotel-gracery'];
+const ROTATING_IDS = ['ichiran', 'maid-cafe', 'hotel-gracery'];
 
 function mergeEditorialWithArticle(existing, article) {
   const existingById = {};

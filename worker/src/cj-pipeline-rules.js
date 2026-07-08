@@ -319,6 +319,61 @@ async function tryPickFromPlace(mapsKey, place, item, photoContext, excludeUrls,
   );
 }
 
+function needsStreetQueryFirst(item) {
+  if (!item) return false;
+  if (item.subjectType === 'district' || item.requireStreetscape) return true;
+  var profile = resolveTravelProfile(item);
+  if (profile === 'district') return true;
+  if (profile === 'restaurant' || profile === 'cafe') {
+    return /外觀|店門口|storefront|招牌|facade|exterior|入口/i.test(String(item.photoIntent || ''));
+  }
+  return false;
+}
+
+async function pickViaRetryPlan(mapsKey, item, photoContext, excludeUrls, deps, retryPlan, debug) {
+  var isDistrict = item.subjectType === 'district';
+  var qi;
+  for (qi = 0; qi < retryPlan.queries.length; qi++) {
+    var queryRow = retryPlan.queries[qi];
+    var places = await deps.searchGooglePlace(mapsKey, queryRow.query, queryRow.lang, deps.regionCode);
+    logPhotoSearchAttempt(debug, {
+      sectionId: item.sectionId,
+      slot: null,
+      query: queryRow.query,
+      phase: queryRow.phase,
+      candidateCount: places.length,
+      selectedImageUrl: null,
+      selectedReason: null,
+      rejectReason: places.length ? null : 'zero_places'
+    });
+
+    var p;
+    for (p = 0; p < places.length && p < 3; p++) {
+      if (!placeInTargetRegion(places[p], item, deps.regionCode || 'JP')) continue;
+      if (isDistrict && isSingleStorePlaceForDistrict(places[p], item)) continue;
+      var placeVal = validatePlaceResult(places[p], item);
+      if (!placeVal.ok) continue;
+
+      var pick = await tryPickFromPlace(
+        mapsKey,
+        places[p],
+        item,
+        photoContext,
+        excludeUrls,
+        deps,
+        { debug: debug, queryMeta: queryRow, deepScan: false }
+      );
+      if (pick && pick.googlePhotoUrl) {
+        pick.photoSearchUsed = queryRow.query;
+        pick.photoSearchPhase = queryRow.phase;
+        pick.photoSearchDebug = debug.toJSON();
+        return pick;
+      }
+    }
+  }
+  return null;
+}
+
 async function resolvePhotoForSection(mapsKey, item, contentPlace, excludeUrls, deps, articleCtx) {
   var photoContext = {
     role: item.role || (String(item.sectionId || '').indexOf('hero') === 0 ? 'hero' : 'section'),
@@ -354,11 +409,19 @@ async function resolvePhotoForSection(mapsKey, item, contentPlace, excludeUrls, 
   }
 
   var isDistrict = item.subjectType === 'district';
+  var queryFirst = needsStreetQueryFirst(item);
 
   var retryPlan = buildPhotoSearchRetryPlan(item, articleCtx, { maxQueries: 28 });
   item._photoSearchPlan = retryPlan;
 
-  if (contentPlace) {
+  if (queryFirst) {
+    var streetFirstPick = await pickViaRetryPlan(
+      mapsKey, item, photoContext, excludeUrls, deps, retryPlan, debug
+    );
+    if (streetFirstPick && streetFirstPick.googlePhotoUrl) return streetFirstPick;
+  }
+
+  if (contentPlace && !isDistrict) {
     logPhotoSearchAttempt(debug, {
       sectionId: item.sectionId,
       slot: getTravelPhotoSlots(item, { primaryOnly: true })[0] && getTravelPhotoSlots(item, { primaryOnly: true })[0].id,
@@ -410,44 +473,11 @@ async function resolvePhotoForSection(mapsKey, item, contentPlace, excludeUrls, 
     }
   }
 
-  var qi;
-  for (qi = 0; qi < retryPlan.queries.length; qi++) {
-    var queryRow = retryPlan.queries[qi];
-    var places = await deps.searchGooglePlace(mapsKey, queryRow.query, queryRow.lang, deps.regionCode);
-    logPhotoSearchAttempt(debug, {
-      sectionId: item.sectionId,
-      slot: null,
-      query: queryRow.query,
-      phase: queryRow.phase,
-      candidateCount: places.length,
-      selectedImageUrl: null,
-      selectedReason: null,
-      rejectReason: places.length ? null : 'zero_places'
-    });
-
-    var p;
-    for (p = 0; p < places.length && p < 3; p++) {
-      if (!placeInTargetRegion(places[p], item, deps.regionCode || 'JP')) continue;
-      if (isDistrict && isSingleStorePlaceForDistrict(places[p], item)) continue;
-      var placeVal = validatePlaceResult(places[p], item);
-      if (!placeVal.ok) continue;
-
-      var pick = await tryPickFromPlace(
-        mapsKey,
-        places[p],
-        item,
-        photoContext,
-        excludeUrls,
-        deps,
-        { debug: debug, queryMeta: queryRow, deepScan: false }
-      );
-      if (pick && pick.googlePhotoUrl) {
-        pick.photoSearchUsed = queryRow.query;
-        pick.photoSearchPhase = queryRow.phase;
-        pick.photoSearchDebug = debug.toJSON();
-        return pick;
-      }
-    }
+  if (!queryFirst) {
+    var latePick = await pickViaRetryPlan(
+      mapsKey, item, photoContext, excludeUrls, deps, retryPlan, debug
+    );
+    if (latePick && latePick.googlePhotoUrl) return latePick;
   }
 
   return {
