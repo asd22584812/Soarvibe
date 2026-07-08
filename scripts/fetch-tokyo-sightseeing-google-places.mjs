@@ -210,8 +210,16 @@ async function resolveOneSection(payload, section, excludeUrls) {
 }
 
 function landmarkFallbackCaption(section, row) {
+  const subjects = Array.isArray(row.visibleSubjects) ? row.visibleSubjects.filter(Boolean) : [];
+  if (subjects.length) {
+    return subjects.slice(0, 2).join('、') + '入鏡，一眼能辨識這座地標。';
+  }
   const name = row.officialNameLocal || row.officialName || row.placeName || section.officialNameLocal || section.officialName || '此地標';
-  return name + '的景觀清楚可見，與本段介紹的地標一致。';
+  return name + '外觀入鏡，主體清楚可辨。';
+}
+
+function isGenericCaption(caption) {
+  return /與本段介紹的地標一致|景觀清楚可見|外觀清楚標示位置|方便對照地圖找路/.test(String(caption || ''));
 }
 
 async function resolveSectionWithLandmarkVision(payload, section, editorial, excludeUrls) {
@@ -243,11 +251,25 @@ async function resolveSectionWithLandmarkVision(payload, section, editorial, exc
     try {
       const verified = await visionVerifyLandmarkViaWorker(row.googlePhotoUrl, ctx, editorialRow);
       if (verified.venueMatch === true) {
-        row.photoCaption = verified.caption || landmarkFallbackCaption(editorialRow, row);
+        row.visibleSubjects = verified.visibleSubjects || [];
+        var caption = verified.caption;
+        if (!caption || isGenericCaption(caption)) {
+          try {
+            caption = await visionCaptionViaWorker(row.googlePhotoUrl, ctx, editorialRow);
+          } catch (capErr) {
+            console.warn('[CAPTION SKIP]', section.sectionId, capErr.message);
+          }
+        }
+        row.photoCaption = (!isGenericCaption(caption) && caption)
+          ? caption
+          : landmarkFallbackCaption(editorialRow, Object.assign({}, row, {
+            visibleSubjects: row.visibleSubjects
+          }));
         console.log('[VISION OK]', section.sectionId, 'idx:' + tryIdx, row.photoCaption);
         return row;
       }
       if (verified.apiError) {
+        row.visibleSubjects = verified.visibleSubjects || [];
         row.photoCaption = landmarkFallbackCaption(editorialRow, row);
         row.visionSkipped = verified.apiError;
         console.warn('[VISION QUOTA]', section.sectionId, verified.apiError, '→ landmark pick kept');

@@ -36,7 +36,7 @@ function sectionVenueFromExisting(existing, sectionId) {
 }
 
 function buildGeneratePrompt(opts) {
-  var month = opts.month || '6';
+  var month = opts.month || '7';
   var year = opts.year || '2026';
   var existing = opts.existingEditorial || null;
 

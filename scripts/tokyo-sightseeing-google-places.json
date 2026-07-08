@@ -66,7 +66,7 @@
       "sectionId": "asakusa",
       "attempts": [
         {
-          "ts": 1783508310414,
+          "ts": 1783511133312,
           "sectionId": "asakusa",
           "slot": "landmark_verified",
           "query": "placeId:仲見世商店街",
@@ -111,7 +111,7 @@
         "sectionId": "asakusa",
         "attempts": [
           {
-            "ts": 1783508310414,
+            "ts": 1783511133312,
             "sectionId": "asakusa",
             "slot": "landmark_verified",
             "query": "placeId:仲見世商店街",
@@ -125,7 +125,9 @@
         ]
       }
     },
-    "photoCaption": "浅草寺的景觀清楚可見，與本段介紹的地標一致。"
+    "visibleSubjects": [],
+    "photoCaption": "浅草寺外觀入鏡，主體清楚可辨。",
+    "visionSkipped": "vision_failed"
   },
   {
     "sectionId": "skytree",
@@ -177,7 +179,7 @@
       "sectionId": "skytree",
       "attempts": [
         {
-          "ts": 1783508315672,
+          "ts": 1783511134626,
           "sectionId": "skytree",
           "slot": "landmark_verified",
           "query": "placeId:東京スカイツリー",
@@ -222,7 +224,7 @@
         "sectionId": "skytree",
         "attempts": [
           {
-            "ts": 1783508315672,
+            "ts": 1783511134626,
             "sectionId": "skytree",
             "slot": "landmark_verified",
             "query": "placeId:東京スカイツリー",
@@ -236,7 +238,9 @@
         ]
       }
     },
-    "photoCaption": "東京スカイツリー的景觀清楚可見，與本段介紹的地標一致。"
+    "visibleSubjects": [],
+    "photoCaption": "東京スカイツリー外觀入鏡，主體清楚可辨。",
+    "visionSkipped": "vision_failed"
   },
   {
     "sectionId": "ueno",
@@ -245,7 +249,7 @@
     "placeId": "ChIJw2qQRZuOGGARWmROEiM2y7E",
     "googleRating": 4.4,
     "googleAddress": "〒110-0007 東京都台東区上野公園４",
-    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjCmxYPRasZe-RukNZpekc5l2s2Ai1xz1-JBlLGc3yIc6nrVevydDspZB3nfPTEv2_1JqnDH_x2_jCyCmib-vst5GMbY1uY6MNuoYaMcW9HrlBq4KYieWKKzLx5_fbrslioIc_lJJndQzR6dhk4=s4800-w1600-h1200",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZMNwPhktyq3vG3x66-_cqa7PVB0EEhateRb2VnoVF9Hk_jX8Oq4P387yGTNvEjKfXarM-PcS-kyGrYm3A3J6rmHUjd4lobk2Z-BSRAdZ5YbUAiPoG-nzkXZV0lSWG5ajvdF4NZ80PoV-FYZJ6M=s4800-w1600-h1200",
     "googleAttribution": "jared lee",
     "imageSource": "google_places",
     "matched": true,
@@ -317,14 +321,14 @@
       "sectionId": "ueno",
       "attempts": [
         {
-          "ts": 1783508320191,
+          "ts": 1783511135178,
           "sectionId": "ueno",
           "slot": "landmark_verified",
           "query": "placeId:上野恩賜公園",
           "phase": "landmark_pick",
           "candidateCount": 10,
           "photoIndex": 0,
-          "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjCmxYPRasZe-RukNZpekc5l2s2Ai1xz1-JBlLGc3yIc6nrVevydDspZB3nfPTEv2_1JqnDH_x2_jCyCmib-vst5GMbY1uY6MNuoYaMcW9HrlBq4KYieWKKzLx5_fbrslioIc_lJJndQzR6dhk4=s4800-w1600-h1200",
+          "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZMNwPhktyq3vG3x66-_cqa7PVB0EEhateRb2VnoVF9Hk_jX8Oq4P387yGTNvEjKfXarM-PcS-kyGrYm3A3J6rmHUjd4lobk2Z-BSRAdZ5YbUAiPoG-nzkXZV0lSWG5ajvdF4NZ80PoV-FYZJ6M=s4800-w1600-h1200",
           "selectedReason": "landmark_verified_index_0",
           "rejectReason": null
         }
@@ -362,21 +366,23 @@
         "sectionId": "ueno",
         "attempts": [
           {
-            "ts": 1783508320191,
+            "ts": 1783511135178,
             "sectionId": "ueno",
             "slot": "landmark_verified",
             "query": "placeId:上野恩賜公園",
             "phase": "landmark_pick",
             "candidateCount": 10,
             "photoIndex": 0,
-            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjCmxYPRasZe-RukNZpekc5l2s2Ai1xz1-JBlLGc3yIc6nrVevydDspZB3nfPTEv2_1JqnDH_x2_jCyCmib-vst5GMbY1uY6MNuoYaMcW9HrlBq4KYieWKKzLx5_fbrslioIc_lJJndQzR6dhk4=s4800-w1600-h1200",
+            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZMNwPhktyq3vG3x66-_cqa7PVB0EEhateRb2VnoVF9Hk_jX8Oq4P387yGTNvEjKfXarM-PcS-kyGrYm3A3J6rmHUjd4lobk2Z-BSRAdZ5YbUAiPoG-nzkXZV0lSWG5ajvdF4NZ80PoV-FYZJ6M=s4800-w1600-h1200",
             "selectedReason": "landmark_verified_index_0",
             "rejectReason": null
           }
         ]
       }
     },
-    "photoCaption": "上野恩賜公園的景觀清楚可見，與本段介紹的地標一致。"
+    "visibleSubjects": [],
+    "photoCaption": "上野恩賜公園外觀入鏡，主體清楚可辨。",
+    "visionSkipped": "vision_failed"
   },
   {
     "sectionId": "shibuya",
@@ -385,7 +391,7 @@
     "placeId": "ChIJx1e971eLGGARum8w_tnpFwI",
     "googleRating": 4.4,
     "googleAddress": "〒150-0043 東京都渋谷区道玄坂２丁目１",
-    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjAd7z4zP7KFm_T2HjW-FaIiwqT_-f7t0phYbzqEjC0Cw0zW3z1B6P_5gtupfnaj7v_Cfymk43WmXVIupimm4NYMNk2cSLRyHLIQRM5peGTSuZ3YX0vD2XwPjE5xTMcnyMQv7HxRerD8xeR78p0=s4800-w1600-h1200",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjDwNgSds7vPQw67dNptpvsCVsmBzyqpEb7BQHG0EKTxjsa3TmpUt0pXSzNetNxXifdFxF4vhZBFxaxzAVp_GYW97Em-YGuQ91xXu2JkcYyM5q_NWvRgbN6bSfQPG1DP5Phfco7OQJ_t2j3iY9I=s4800-w1600-h1200",
     "googleAttribution": "Trip Be Me Travel Stories",
     "imageSource": "google_places",
     "matched": true,
@@ -464,14 +470,14 @@
       "sectionId": "shibuya",
       "attempts": [
         {
-          "ts": 1783508325654,
+          "ts": 1783511136300,
           "sectionId": "shibuya",
           "slot": "landmark_verified",
           "query": "placeId:忠犬ハチ公像",
           "phase": "landmark_pick",
           "candidateCount": 10,
           "photoIndex": 0,
-          "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjAd7z4zP7KFm_T2HjW-FaIiwqT_-f7t0phYbzqEjC0Cw0zW3z1B6P_5gtupfnaj7v_Cfymk43WmXVIupimm4NYMNk2cSLRyHLIQRM5peGTSuZ3YX0vD2XwPjE5xTMcnyMQv7HxRerD8xeR78p0=s4800-w1600-h1200",
+          "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjDwNgSds7vPQw67dNptpvsCVsmBzyqpEb7BQHG0EKTxjsa3TmpUt0pXSzNetNxXifdFxF4vhZBFxaxzAVp_GYW97Em-YGuQ91xXu2JkcYyM5q_NWvRgbN6bSfQPG1DP5Phfco7OQJ_t2j3iY9I=s4800-w1600-h1200",
           "selectedReason": "landmark_verified_index_0",
           "rejectReason": null
         }
@@ -509,21 +515,23 @@
         "sectionId": "shibuya",
         "attempts": [
           {
-            "ts": 1783508325654,
+            "ts": 1783511136300,
             "sectionId": "shibuya",
             "slot": "landmark_verified",
             "query": "placeId:忠犬ハチ公像",
             "phase": "landmark_pick",
             "candidateCount": 10,
             "photoIndex": 0,
-            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjAd7z4zP7KFm_T2HjW-FaIiwqT_-f7t0phYbzqEjC0Cw0zW3z1B6P_5gtupfnaj7v_Cfymk43WmXVIupimm4NYMNk2cSLRyHLIQRM5peGTSuZ3YX0vD2XwPjE5xTMcnyMQv7HxRerD8xeR78p0=s4800-w1600-h1200",
+            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjDwNgSds7vPQw67dNptpvsCVsmBzyqpEb7BQHG0EKTxjsa3TmpUt0pXSzNetNxXifdFxF4vhZBFxaxzAVp_GYW97Em-YGuQ91xXu2JkcYyM5q_NWvRgbN6bSfQPG1DP5Phfco7OQJ_t2j3iY9I=s4800-w1600-h1200",
             "selectedReason": "landmark_verified_index_0",
             "rejectReason": null
           }
         ]
       }
     },
-    "photoCaption": "渋谷スクランブル交差点的景觀清楚可見，與本段介紹的地標一致。"
+    "visibleSubjects": [],
+    "photoCaption": "渋谷スクランブル交差点外觀入鏡，主體清楚可辨。",
+    "visionSkipped": "vision_failed"
   },
   {
     "sectionId": "shinjuku",
@@ -532,7 +540,7 @@
     "placeId": "ChIJoTcat9SMGGAR6GGG8zdcZvE",
     "googleRating": 4.5,
     "googleAddress": "〒163-8001 東京都新宿区西新宿２丁目８−１",
-    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjCEJMUPLumnpHRCE0RCL_11eJVzPFmBPaq888r6JZtDlSqyYOuhdBUFR1bVOph4SjFS4FxlvrdcRgNHYzr9s6Qw7zf4ewxxHTF96yXvuqKW3FkEcly4ctDWAmVUJzHainMeqVnqNiz_eYTGmg=s4800-w1600-h1200",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZPHUQwlEBhkGEUItUU355kcZqBYUpTsZE657gfKW1FHCVBJQ7nTssfI4bBRJziE_BDvwQYdiKrEHDZI5mOfMbnm71uO2QjSfeIjbJZaTxhv0siV_ZPxNowhsUHT9iHs1LsF-BYTDYrbx1Gw9Q=s4800-w1600-h1200",
     "googleAttribution": "Michał Jasnowski",
     "imageSource": "google_places",
     "matched": true,
@@ -591,14 +599,14 @@
       "sectionId": "shinjuku",
       "attempts": [
         {
-          "ts": 1783508330426,
+          "ts": 1783511137326,
           "sectionId": "shinjuku",
           "slot": "landmark_verified",
           "query": "placeId:東京都庁",
           "phase": "landmark_pick",
           "candidateCount": 10,
           "photoIndex": 0,
-          "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjCEJMUPLumnpHRCE0RCL_11eJVzPFmBPaq888r6JZtDlSqyYOuhdBUFR1bVOph4SjFS4FxlvrdcRgNHYzr9s6Qw7zf4ewxxHTF96yXvuqKW3FkEcly4ctDWAmVUJzHainMeqVnqNiz_eYTGmg=s4800-w1600-h1200",
+          "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZPHUQwlEBhkGEUItUU355kcZqBYUpTsZE657gfKW1FHCVBJQ7nTssfI4bBRJziE_BDvwQYdiKrEHDZI5mOfMbnm71uO2QjSfeIjbJZaTxhv0siV_ZPxNowhsUHT9iHs1LsF-BYTDYrbx1Gw9Q=s4800-w1600-h1200",
           "selectedReason": "landmark_verified_index_0",
           "rejectReason": null
         }
@@ -636,21 +644,23 @@
         "sectionId": "shinjuku",
         "attempts": [
           {
-            "ts": 1783508330426,
+            "ts": 1783511137326,
             "sectionId": "shinjuku",
             "slot": "landmark_verified",
             "query": "placeId:東京都庁",
             "phase": "landmark_pick",
             "candidateCount": 10,
             "photoIndex": 0,
-            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjCEJMUPLumnpHRCE0RCL_11eJVzPFmBPaq888r6JZtDlSqyYOuhdBUFR1bVOph4SjFS4FxlvrdcRgNHYzr9s6Qw7zf4ewxxHTF96yXvuqKW3FkEcly4ctDWAmVUJzHainMeqVnqNiz_eYTGmg=s4800-w1600-h1200",
+            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZPHUQwlEBhkGEUItUU355kcZqBYUpTsZE657gfKW1FHCVBJQ7nTssfI4bBRJziE_BDvwQYdiKrEHDZI5mOfMbnm71uO2QjSfeIjbJZaTxhv0siV_ZPxNowhsUHT9iHs1LsF-BYTDYrbx1Gw9Q=s4800-w1600-h1200",
             "selectedReason": "landmark_verified_index_0",
             "rejectReason": null
           }
         ]
       }
     },
-    "photoCaption": "東京都庁的景觀清楚可見，與本段介紹的地標一致。"
+    "visibleSubjects": [],
+    "photoCaption": "東京都庁外觀入鏡，主體清楚可辨。",
+    "visionSkipped": "vision_failed"
   },
   {
     "sectionId": "odaiba",
@@ -659,7 +669,7 @@
     "placeId": "ChIJbWVFlTCKGGARr5l6ox-7_CA",
     "googleRating": 4.5,
     "googleAddress": "〒105-0000 東京都港区海岸３丁目",
-    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZMM-cHj-qPZax969K5-wWlj5-KSUapOor3VI4nab2Nmz_U1FJdQtvNNd9iRvfMdMECaKHhHHDuy5CcgQRZjQuJTZ4hwQBeYbd4V3RNxh88QA3CdFre2NO5MQM5ptiqwhkUGiiIatAknRbYnbhjI1l1X=s4800-w569-h400",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjANroy-9ZNOcykAS0vRf7rQpZdXzg-Be8ermAnz62JHd2yRJKBiqUF5KYQE6xQayr-tkSiEdJzyNjIVVr6as1aYzrjRqPZp8qFsyywM1SGxtKUQeK0c3iK_YfAVXui1LTdXyEsqBWpWBbg7bgFMR77i=s4800-w569-h400",
     "googleAttribution": "浩二",
     "imageSource": "google_places",
     "matched": true,
@@ -718,14 +728,14 @@
       "sectionId": "odaiba",
       "attempts": [
         {
-          "ts": 1783508334831,
+          "ts": 1783511138241,
           "sectionId": "odaiba",
           "slot": "landmark_verified",
           "query": "placeId:レインボーブリッジ",
           "phase": "landmark_pick",
           "candidateCount": 10,
           "photoIndex": 0,
-          "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZMM-cHj-qPZax969K5-wWlj5-KSUapOor3VI4nab2Nmz_U1FJdQtvNNd9iRvfMdMECaKHhHHDuy5CcgQRZjQuJTZ4hwQBeYbd4V3RNxh88QA3CdFre2NO5MQM5ptiqwhkUGiiIatAknRbYnbhjI1l1X=s4800-w569-h400",
+          "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjANroy-9ZNOcykAS0vRf7rQpZdXzg-Be8ermAnz62JHd2yRJKBiqUF5KYQE6xQayr-tkSiEdJzyNjIVVr6as1aYzrjRqPZp8qFsyywM1SGxtKUQeK0c3iK_YfAVXui1LTdXyEsqBWpWBbg7bgFMR77i=s4800-w569-h400",
           "selectedReason": "landmark_verified_index_0",
           "rejectReason": null
         }
@@ -763,21 +773,23 @@
         "sectionId": "odaiba",
         "attempts": [
           {
-            "ts": 1783508334831,
+            "ts": 1783511138241,
             "sectionId": "odaiba",
             "slot": "landmark_verified",
             "query": "placeId:レインボーブリッジ",
             "phase": "landmark_pick",
             "candidateCount": 10,
             "photoIndex": 0,
-            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZMM-cHj-qPZax969K5-wWlj5-KSUapOor3VI4nab2Nmz_U1FJdQtvNNd9iRvfMdMECaKHhHHDuy5CcgQRZjQuJTZ4hwQBeYbd4V3RNxh88QA3CdFre2NO5MQM5ptiqwhkUGiiIatAknRbYnbhjI1l1X=s4800-w569-h400",
+            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjANroy-9ZNOcykAS0vRf7rQpZdXzg-Be8ermAnz62JHd2yRJKBiqUF5KYQE6xQayr-tkSiEdJzyNjIVVr6as1aYzrjRqPZp8qFsyywM1SGxtKUQeK0c3iK_YfAVXui1LTdXyEsqBWpWBbg7bgFMR77i=s4800-w569-h400",
             "selectedReason": "landmark_verified_index_0",
             "rejectReason": null
           }
         ]
       }
     },
-    "photoCaption": "橫跨東京灣的彩虹大橋，是台場海濱公園的標誌性景觀。"
+    "visibleSubjects": [],
+    "photoCaption": "お台場海浜公園外觀入鏡，主體清楚可辨。",
+    "visionSkipped": "vision_failed"
   },
   {
     "sectionId": "tsukiji",
@@ -834,7 +846,7 @@
       "sectionId": "tsukiji",
       "attempts": [
         {
-          "ts": 1783508339833,
+          "ts": 1783511139832,
           "sectionId": "tsukiji",
           "slot": "storefront",
           "query": "placeId:ChIJW2cLzSGLGGARXAKXv6EkbqI",
@@ -878,7 +890,7 @@
         "sectionId": "tsukiji",
         "attempts": [
           {
-            "ts": 1783508339833,
+            "ts": 1783511139832,
             "sectionId": "tsukiji",
             "slot": "storefront",
             "query": "placeId:ChIJW2cLzSGLGGARXAKXv6EkbqI",
@@ -943,7 +955,7 @@
       "sectionId": "hero-sightseeing",
       "attempts": [
         {
-          "ts": 1783508340091,
+          "ts": 1783511140085,
           "sectionId": "hero-sightseeing",
           "slot": "landmark_verified",
           "query": "placeId:雷門",
@@ -988,7 +1000,7 @@
         "sectionId": "hero-sightseeing",
         "attempts": [
           {
-            "ts": 1783508340091,
+            "ts": 1783511140085,
             "sectionId": "hero-sightseeing",
             "slot": "landmark_verified",
             "query": "placeId:雷門",
@@ -1002,6 +1014,8 @@
         ]
       }
     },
-    "photoCaption": "雷門的景觀清楚可見，與本段介紹的地標一致。"
+    "visibleSubjects": [],
+    "photoCaption": "雷門外觀入鏡，主體清楚可辨。",
+    "visionSkipped": "vision_failed"
   }
 ]

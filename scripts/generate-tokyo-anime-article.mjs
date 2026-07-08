@@ -197,7 +197,7 @@ async function generateArticle(existingEditorial) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Origin: ORIGIN },
     body: JSON.stringify({
-      month: '6',
+      month: '7',
       year: '2026',
       styleKey: 'anime',
       existingEditorial: existingEditorial || null

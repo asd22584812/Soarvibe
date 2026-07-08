@@ -1,18 +1,18 @@
 [
   {
     "sectionId": "akihabara",
-    "subject": "秋葉原電氣街：動漫聖地巡禮",
+    "subject": "秋葉原電気街：動漫聖地巡禮的起點",
     "mapsQuery": "Akihabara Electric Town",
     "placeId": "ChIJAVf7lh2MGGARJylRnQ_3dpI",
     "googleRating": 4.2,
     "googleAddress": "〒101-0021 東京都千代田区外神田４丁目３−１",
-    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjCkUBM5EDxK5t554Z6pXDfGzwwQVrozUWcmYcGbIPnYld-RiAPs7eWYV3SWMpHL7EDCdMWA93H9npY3YJCYoeH9Eqtv5T65JwJsEdl9KRIYfSLxC_9EYpZbN7AgvWWvqfR4SwRJ3yDfagUYh8M=s4800-w1600-h1200",
-    "googleAttribution": "Marta",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZN9mOR405czzkCfNO4zPJU7mgFm4Zu7lv7ysBn2AYMCC5qPByvTarMxlfpgvTwuEaxL3DrcVY5uaftmnu1opFYiZYtkWwodgCdeVF4UjIvAGjgf3eYBgBjuLP9H11XBP4h2D7dptqsgqf97fA=s4800-w1600-h1200",
+    "googleAttribution": "Wesley d",
     "imageSource": "google_places",
     "matched": true,
     "placeName": "アニメイト秋葉原",
     "photoScore": 166,
-    "photoIndex": 0,
+    "photoIndex": 1,
     "photoCaption": "街道兩側店招與建築立面清楚可見，街區個性一眼可辨。",
     "photoEvidence": {
       "primary": "street_landmark",
@@ -24,7 +24,7 @@
       ],
       "subjectType": "district",
       "role": "landmark",
-      "blob": "marta 秋葉原電氣街"
+      "blob": "wesley d 秋葉原電氣街"
     },
     "travelPhotoSlot": "district_panorama",
     "copySemantics": {
@@ -32,14 +32,16 @@
       "categories": [
         "street_scene",
         "shop_collectible",
+        "landmark",
         "activity"
       ],
       "hits": [
         {
           "category": "street_scene",
-          "score": 3,
+          "score": 4,
           "matched": [
             "電氣街",
+            "中央通",
             "街區",
             "一整片"
           ],
@@ -52,8 +54,8 @@
           "category": "shop_collectible",
           "score": 2,
           "matched": [
-            "收藏",
-            "漫畫"
+            "mandarake",
+            "模型"
           ],
           "evidence": [
             "anime_collectible",
@@ -61,10 +63,20 @@
           ]
         },
         {
-          "category": "activity",
-          "score": 2,
+          "category": "landmark",
+          "score": 1,
           "matched": [
-            "沉浸",
+            "animate"
+          ],
+          "evidence": [
+            "landmark_building",
+            "street_landmark"
+          ]
+        },
+        {
+          "category": "activity",
+          "score": 1,
+          "matched": [
             "巡禮"
           ],
           "evidence": [
@@ -83,14 +95,15 @@
       ],
       "searchBoost": [
         "電氣街",
+        "中央通",
         "街區",
         "一整片",
-        "收藏",
-        "漫畫",
-        "沉浸",
+        "animate",
+        "mandarake",
+        "模型",
         "巡禮"
       ],
-      "copyExcerpt": "秋葉原電氣街：動漫聖地巡禮 踏入秋葉原，彷彿置身於動漫世界的心臟！這裡不僅有最新電子產品，更是動漫周邊、漫畫、遊戲的天堂。從大型連鎖店到隱密小巷，處處充滿驚喜。感受電波系的熱情，尋找你的專屬收藏，沉浸在二次元的魅力中吧！ 電氣街不是單一景點，而是一整片會讓人自然放慢步調的動漫街區 秋葉原電氣街：動漫聖地巡禮 秋葉原電氣街：動漫聖地巡禮"
+      "copyExcerpt": "秋葉原電気街：動漫聖地巡禮的起點 來到秋葉原，直奔中央通與其周邊巷弄，這裡的「秋葉原電気街」是動漫周邊、模型與電子產品的集散地。建議從JR秋葉原站電器街口出站，沿主幹道向北步行，沿途的Animate、Mandarake等大型店鋪值得細逛。尤其假日中央通會實施步行者天國，逛起來更為舒適。記得多預留時間，這裡的店家密度高，很容易一待就是半天。 電氣街不是單一景點，而是一整片會讓人自然放慢步調的動漫街區 秋葉原電気街：動漫聖地巡禮的起點 秋葉原電気街：動漫聖地巡禮的起點"
     },
     "copyDerivedPhotoIntent": "街景、霓虹、人潮、地標建築外觀、商品陳列、公仔模型、收藏櫥窗",
     "matchedKeywords": [],
@@ -102,7 +115,7 @@
       "sectionId": "akihabara",
       "attempts": [
         {
-          "ts": 1783509219848,
+          "ts": 1783510987539,
           "sectionId": "akihabara",
           "slot": "district_panorama",
           "query": "placeId:ChIJAVf7lh2MGGARJylRnQ_3dpI",
@@ -113,7 +126,7 @@
           "rejectReason": null
         },
         {
-          "ts": 1783509219848,
+          "ts": 1783510987539,
           "sectionId": "akihabara",
           "slot": null,
           "query": "placeId:ChIJAVf7lh2MGGARJylRnQ_3dpI",
@@ -124,7 +137,7 @@
           "rejectReason": "content_place_no_match"
         },
         {
-          "ts": 1783509220055,
+          "ts": 1783510987755,
           "sectionId": "akihabara",
           "slot": null,
           "query": "秋葉原 電気街",
@@ -135,14 +148,14 @@
           "rejectReason": null
         },
         {
-          "ts": 1783509220103,
+          "ts": 1783510987773,
           "sectionId": "akihabara",
           "slot": "district_panorama",
           "query": "秋葉原 電気街",
           "phase": "precise_local",
           "candidateCount": 10,
-          "photoIndex": 0,
-          "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjCkUBM5EDxK5t554Z6pXDfGzwwQVrozUWcmYcGbIPnYld-RiAPs7eWYV3SWMpHL7EDCdMWA93H9npY3YJCYoeH9Eqtv5T65JwJsEdl9KRIYfSLxC_9EYpZbN7AgvWWvqfR4SwRJ3yDfagUYh8M=s4800-w1600-h1200",
+          "photoIndex": 1,
+          "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZN9mOR405czzkCfNO4zPJU7mgFm4Zu7lv7ysBn2AYMCC5qPByvTarMxlfpgvTwuEaxL3DrcVY5uaftmnu1opFYiZYtkWwodgCdeVF4UjIvAGjgf3eYBgBjuLP9H11XBP4h2D7dptqsgqf97fA=s4800-w1600-h1200",
           "selectedReason": "slot_district_panorama_score_166",
           "rejectReason": null
         }
@@ -160,10 +173,10 @@
     "swappedFrom": null,
     "swappedTo": null,
     "alternativeId": null,
-    "heading": "秋葉原Animate：動漫挖寶首站",
-    "content": "「外神田四丁目」交叉口，アニメイト秋葉原的巨型招牌是電氣街的鮮明地標。從漫畫、周邊到限定商品，多層樓面匯集最新動漫資訊，是尋找心頭好的第一站。",
-    "officialName": "Animate Akihabara",
-    "officialNameLocal": "アニメイト秋葉原",
+    "heading": "秋葉原電気街：動漫聖地巡禮的起點",
+    "content": "來到秋葉原，直奔中央通與其周邊巷弄，這裡的「秋葉原電気街」是動漫周邊、模型與電子產品的集散地。建議從JR秋葉原站電器街口出站，沿主幹道向北步行，沿途的Animate、Mandarake等大型店鋪值得細逛。尤其假日中央通會實施步行者天國，逛起來更為舒適。記得多預留時間，這裡的店家密度高，很容易一待就是半天。",
+    "officialName": "Akihabara Electric Town",
+    "officialNameLocal": "秋葉原電気街",
     "pipeline": {
       "version": "photo-search-retry-v1",
       "steps": [
@@ -180,7 +193,7 @@
         "sectionId": "akihabara",
         "attempts": [
           {
-            "ts": 1783509219848,
+            "ts": 1783510987539,
             "sectionId": "akihabara",
             "slot": "district_panorama",
             "query": "placeId:ChIJAVf7lh2MGGARJylRnQ_3dpI",
@@ -191,7 +204,7 @@
             "rejectReason": null
           },
           {
-            "ts": 1783509219848,
+            "ts": 1783510987539,
             "sectionId": "akihabara",
             "slot": null,
             "query": "placeId:ChIJAVf7lh2MGGARJylRnQ_3dpI",
@@ -202,7 +215,7 @@
             "rejectReason": "content_place_no_match"
           },
           {
-            "ts": 1783509220055,
+            "ts": 1783510987755,
             "sectionId": "akihabara",
             "slot": null,
             "query": "秋葉原 電気街",
@@ -213,14 +226,14 @@
             "rejectReason": null
           },
           {
-            "ts": 1783509220103,
+            "ts": 1783510987773,
             "sectionId": "akihabara",
             "slot": "district_panorama",
             "query": "秋葉原 電気街",
             "phase": "precise_local",
             "candidateCount": 10,
-            "photoIndex": 0,
-            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjCkUBM5EDxK5t554Z6pXDfGzwwQVrozUWcmYcGbIPnYld-RiAPs7eWYV3SWMpHL7EDCdMWA93H9npY3YJCYoeH9Eqtv5T65JwJsEdl9KRIYfSLxC_9EYpZbN7AgvWWvqfR4SwRJ3yDfagUYh8M=s4800-w1600-h1200",
+            "photoIndex": 1,
+            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZN9mOR405czzkCfNO4zPJU7mgFm4Zu7lv7ysBn2AYMCC5qPByvTarMxlfpgvTwuEaxL3DrcVY5uaftmnu1opFYiZYtkWwodgCdeVF4UjIvAGjgf3eYBgBjuLP9H11XBP4h2D7dptqsgqf97fA=s4800-w1600-h1200",
             "selectedReason": "slot_district_panorama_score_166",
             "rejectReason": null
           }
@@ -230,7 +243,7 @@
   },
   {
     "sectionId": "nakano",
-    "subject": "中野百老匯：尋寶者的天堂",
+    "subject": "中野ブロードウェイ：挖寶天堂的深度探索",
     "mapsQuery": "Nakano Broadway",
     "placeId": "ChIJg-7dspDyGGARvvDv4E5-tuE",
     "googleRating": 4.2,
@@ -264,12 +277,13 @@
       "hits": [
         {
           "category": "shop_collectible",
-          "score": 4,
+          "score": 5,
           "matched": [
-            "公仔",
+            "mandarake",
             "挖寶",
             "收藏",
-            "漫畫"
+            "漫畫",
+            "中古"
           ],
           "evidence": [
             "anime_collectible",
@@ -282,12 +296,13 @@
         "shop_interior"
       ],
       "searchBoost": [
-        "公仔",
+        "mandarake",
         "挖寶",
         "收藏",
-        "漫畫"
+        "漫畫",
+        "中古"
       ],
-      "copyExcerpt": "中野百老匯：尋寶者的天堂 遠離喧囂，中野百老匯是動漫迷的秘密基地。這棟複合式商場匯集了各式懷舊漫畫、公仔、絕版遊戲與獨立畫廊。漫步其中，彷彿穿越時空，每一次轉角都可能發現意想不到的珍寶，是尋找獨特收藏的絕佳去處。 老玩家公認挖寶聖地，不是普通商場 中野百老匯：尋寶者的天堂 中野百老匯：尋寶者的天堂"
+      "copyExcerpt": "中野ブロードウェイ：挖寶天堂的深度探索 從JR中野站北口出站，穿越商店街直達「中野ブロードウェイ」。這裡的特色是大量中古動漫周邊、漫畫與收藏品，尤其Mandarake系列店鋪佔據多個樓層，是尋找絕版品的寶庫。建議從二樓開始，沿著蜿蜒的走廊逐一探訪，許多小店藏在深處，需要耐心挖掘。注意，部分店家只收現金，務必準備足夠日幣。 老玩家公認挖寶聖地，不是普通商場 中野ブロードウェイ：挖寶天堂的深度探索 中野ブロードウェイ：挖寶天堂的深度探索"
     },
     "copyDerivedPhotoIntent": "商品陳列、公仔模型、收藏櫥窗",
     "matchedKeywords": [],
@@ -299,7 +314,7 @@
       "sectionId": "nakano",
       "attempts": [
         {
-          "ts": 1783509220392,
+          "ts": 1783510988043,
           "sectionId": "nakano",
           "slot": "district_panorama",
           "query": "placeId:ChIJg-7dspDyGGARvvDv4E5-tuE",
@@ -310,7 +325,7 @@
           "rejectReason": null
         },
         {
-          "ts": 1783509220392,
+          "ts": 1783510988043,
           "sectionId": "nakano",
           "slot": null,
           "query": "placeId:ChIJg-7dspDyGGARvvDv4E5-tuE",
@@ -321,7 +336,7 @@
           "rejectReason": "content_place_no_match"
         },
         {
-          "ts": 1783509220606,
+          "ts": 1783510988205,
           "sectionId": "nakano",
           "slot": null,
           "query": "中野ブロードウェイ 外観",
@@ -332,7 +347,7 @@
           "rejectReason": null
         },
         {
-          "ts": 1783509220833,
+          "ts": 1783510988359,
           "sectionId": "nakano",
           "slot": null,
           "query": "中野ブロードウェイ 入口",
@@ -343,7 +358,7 @@
           "rejectReason": null
         },
         {
-          "ts": 1783509221159,
+          "ts": 1783510988637,
           "sectionId": "nakano",
           "slot": null,
           "query": "中野ブロードウェイ まんだらけ",
@@ -354,7 +369,7 @@
           "rejectReason": null
         },
         {
-          "ts": 1783509221343,
+          "ts": 1783510988871,
           "sectionId": "nakano",
           "slot": null,
           "query": "中野 Sun Mall 商店街",
@@ -365,7 +380,7 @@
           "rejectReason": null
         },
         {
-          "ts": 1783509221373,
+          "ts": 1783510988887,
           "sectionId": "nakano",
           "slot": "district_panorama",
           "query": "中野 Sun Mall 商店街",
@@ -390,8 +405,8 @@
     "swappedFrom": null,
     "swappedTo": null,
     "alternativeId": null,
-    "heading": "中野百老匯：老玩家挖寶起點",
-    "content": "從中野車站北口步行，這棟複合式商場是動漫迷公認的挖寶聖地。樓層間藏匿無數中古收藏品，從漫畫、公仔到懷舊周邊，總能找到意想不到的珍品。資深玩家在此細細尋覓，感受獨特的收藏樂趣。",
+    "heading": "中野ブロードウェイ：挖寶天堂的深度探索",
+    "content": "從JR中野站北口出站，穿越商店街直達「中野ブロードウェイ」。這裡的特色是大量中古動漫周邊、漫畫與收藏品，尤其Mandarake系列店鋪佔據多個樓層，是尋找絕版品的寶庫。建議從二樓開始，沿著蜿蜒的走廊逐一探訪，許多小店藏在深處，需要耐心挖掘。注意，部分店家只收現金，務必準備足夠日幣。",
     "officialName": "Nakano Broadway",
     "officialNameLocal": "中野ブロードウェイ",
     "pipeline": {
@@ -410,7 +425,7 @@
         "sectionId": "nakano",
         "attempts": [
           {
-            "ts": 1783509220392,
+            "ts": 1783510988043,
             "sectionId": "nakano",
             "slot": "district_panorama",
             "query": "placeId:ChIJg-7dspDyGGARvvDv4E5-tuE",
@@ -421,7 +436,7 @@
             "rejectReason": null
           },
           {
-            "ts": 1783509220392,
+            "ts": 1783510988043,
             "sectionId": "nakano",
             "slot": null,
             "query": "placeId:ChIJg-7dspDyGGARvvDv4E5-tuE",
@@ -432,7 +447,7 @@
             "rejectReason": "content_place_no_match"
           },
           {
-            "ts": 1783509220606,
+            "ts": 1783510988205,
             "sectionId": "nakano",
             "slot": null,
             "query": "中野ブロードウェイ 外観",
@@ -443,7 +458,7 @@
             "rejectReason": null
           },
           {
-            "ts": 1783509220833,
+            "ts": 1783510988359,
             "sectionId": "nakano",
             "slot": null,
             "query": "中野ブロードウェイ 入口",
@@ -454,7 +469,7 @@
             "rejectReason": null
           },
           {
-            "ts": 1783509221159,
+            "ts": 1783510988637,
             "sectionId": "nakano",
             "slot": null,
             "query": "中野ブロードウェイ まんだらけ",
@@ -465,7 +480,7 @@
             "rejectReason": null
           },
           {
-            "ts": 1783509221343,
+            "ts": 1783510988871,
             "sectionId": "nakano",
             "slot": null,
             "query": "中野 Sun Mall 商店街",
@@ -476,7 +491,7 @@
             "rejectReason": null
           },
           {
-            "ts": 1783509221373,
+            "ts": 1783510988887,
             "sectionId": "nakano",
             "slot": "district_panorama",
             "query": "中野 Sun Mall 商店街",
@@ -493,7 +508,7 @@
   },
   {
     "sectionId": "gachapon",
-    "subject": "扭蛋會館：驚喜轉不停",
+    "subject": "ガシャポン百貨店 池袋総本店：扭蛋迷的天堂",
     "mapsQuery": "Gashapon Department Store Ikebukuro",
     "placeId": "ChIJBztW3x2MGGARadHYl5vTEK0",
     "googleRating": 4,
@@ -524,26 +539,15 @@
     },
     "travelPhotoSlot": "wall",
     "copySemantics": {
-      "primary": "gachapon",
+      "primary": "storefront",
       "categories": [
-        "gachapon",
         "storefront",
         "street_scene",
+        "gachapon",
         "cafe_experience",
         "activity"
       ],
       "hits": [
-        {
-          "category": "gachapon",
-          "score": 2,
-          "matched": [
-            "扭蛋",
-            "膠囊"
-          ],
-          "evidence": [
-            "gachapon_wall"
-          ]
-        },
         {
           "category": "storefront",
           "score": 2,
@@ -565,6 +569,16 @@
           "evidence": [
             "street_landmark",
             "landmark_building"
+          ]
+        },
+        {
+          "category": "gachapon",
+          "score": 1,
+          "matched": [
+            "扭蛋"
+          ],
+          "evidence": [
+            "gachapon_wall"
           ]
         },
         {
@@ -604,13 +618,12 @@
       "searchBoost": [
         "招牌",
         "扭蛋",
-        "膠囊",
         "體驗",
         "外觀"
       ],
-      "copyExcerpt": "扭蛋會館：驚喜轉不停 扭蛋的魅力在於那份未知與期待！東京各地都有扭蛋機，其中扭蛋會館更是種類繁多，從動漫角色到搞怪小物應有盡有。投入硬幣，輕輕一轉，打開膠囊的瞬間，總能帶來無比的驚喜與樂趣，是收集控不可錯過的體驗。 整面牆都是驚喜，不是黃色招牌外觀 扭蛋會館：驚喜轉不停 扭蛋會館：驚喜轉不停"
+      "copyExcerpt": "ガシャポン百貨店 池袋総本店：扭蛋迷的天堂 想體驗最純粹的扭蛋樂趣，務必前往「ガシャポン百貨店 池袋総本店」。從JR池袋站東口步行約5分鐘即可抵達，這間店擁有超過3000台扭蛋機，是全球最大的扭蛋專賣店。從經典動漫角色到搞怪小物，應有盡有。建議事先準備大量百元硬幣，或者直接在店內兌換，以免錯失心儀的款式。這裡的商品更新速度快，每次來都有新發現。 整面牆都是驚喜，不是黃色招牌外觀 ガシャポン百貨店 池袋総本店：扭蛋迷的天堂 ガシャポン百貨店 池袋総本店：扭蛋迷的天堂"
     },
-    "copyDerivedPhotoIntent": "整排扭蛋機、扭蛋牆、店面外觀",
+    "copyDerivedPhotoIntent": "店面外觀、街景、霓虹、人潮、地標建築外觀",
     "matchedKeywords": [
       "ガチャ",
       "ガチャポン",
@@ -627,7 +640,7 @@
       "sectionId": "gachapon",
       "attempts": [
         {
-          "ts": 1783509221790,
+          "ts": 1783510989350,
           "sectionId": "gachapon",
           "slot": "storefront",
           "query": "placeId:ChIJBztW3x2MGGARadHYl5vTEK0",
@@ -638,7 +651,7 @@
           "rejectReason": null
         },
         {
-          "ts": 1783509221805,
+          "ts": 1783510989377,
           "sectionId": "gachapon",
           "slot": "wall",
           "query": "content_place",
@@ -650,7 +663,7 @@
           "rejectReason": null
         },
         {
-          "ts": 1783509221911,
+          "ts": 1783510989406,
           "sectionId": "gachapon",
           "slot": "wall",
           "query": "content_place",
@@ -675,10 +688,10 @@
     "swappedFrom": null,
     "swappedTo": null,
     "alternativeId": null,
-    "heading": "秋葉原扭蛋會館：百機挖寶術",
-    "content": "外神田的秋葉原ガチャポン会館，整面牆逾百台扭蛋機綿延，從最新動漫到奇趣小物，品項豐富。資深玩家會預備大量零錢並設定預算，在此扭蛋叢林中，每次轉動都是挖掘心頭好的樂趣，避免盲目投入。",
-    "officialName": "Akihabara Gachapon Kaikan",
-    "officialNameLocal": "秋葉原ガチャポン会館",
+    "heading": "ガシャポン百貨店 池袋総本店：扭蛋迷的天堂",
+    "content": "想體驗最純粹的扭蛋樂趣，務必前往「ガシャポン百貨店 池袋総本店」。從JR池袋站東口步行約5分鐘即可抵達，這間店擁有超過3000台扭蛋機，是全球最大的扭蛋專賣店。從經典動漫角色到搞怪小物，應有盡有。建議事先準備大量百元硬幣，或者直接在店內兌換，以免錯失心儀的款式。這裡的商品更新速度快，每次來都有新發現。",
+    "officialName": "Gashapon Department Store Ikebukuro",
+    "officialNameLocal": "ガシャポン百貨店 池袋総本店",
     "pipeline": {
       "version": "photo-search-retry-v1",
       "steps": [
@@ -695,7 +708,7 @@
         "sectionId": "gachapon",
         "attempts": [
           {
-            "ts": 1783509221790,
+            "ts": 1783510989350,
             "sectionId": "gachapon",
             "slot": "storefront",
             "query": "placeId:ChIJBztW3x2MGGARadHYl5vTEK0",
@@ -706,7 +719,7 @@
             "rejectReason": null
           },
           {
-            "ts": 1783509221805,
+            "ts": 1783510989377,
             "sectionId": "gachapon",
             "slot": "wall",
             "query": "content_place",
@@ -718,7 +731,7 @@
             "rejectReason": null
           },
           {
-            "ts": 1783509221911,
+            "ts": 1783510989406,
             "sectionId": "gachapon",
             "slot": "wall",
             "query": "content_place",
@@ -735,7 +748,7 @@
   },
   {
     "sectionId": "ichiran",
-    "subject": "一蘭拉麵：獨享美味的秘密",
+    "subject": "一蘭ラーメン 新宿店：深夜動漫後的美味慰藉",
     "mapsQuery": "一蘭ラーメン 新宿店 Tokyo",
     "placeId": "ChIJ8QwFX9qMGGARVm0p0caIeTk",
     "googleRating": 4.3,
@@ -763,65 +776,37 @@
     "copySemantics": {
       "primary": "dish",
       "categories": [
-        "dish",
-        "activity",
-        "cafe_experience"
+        "dish"
       ],
       "hits": [
         {
           "category": "dish",
-          "score": 3,
+          "score": 5,
           "matched": [
             "拉麵",
             "湯頭",
-            "麵"
+            "麵",
+            "用餐",
+            "ラーメン"
           ],
           "evidence": [
             "food_dish"
           ]
-        },
-        {
-          "category": "activity",
-          "score": 2,
-          "matched": [
-            "體驗",
-            "巡禮"
-          ],
-          "evidence": [
-            "cafe_interior",
-            "anime_collectible",
-            "shop_interior"
-          ]
-        },
-        {
-          "category": "cafe_experience",
-          "score": 1,
-          "matched": [
-            "體驗"
-          ],
-          "evidence": [
-            "dessert",
-            "cafe_interior"
-          ]
         }
       ],
       "requiredEvidence": [
-        "food_dish",
-        "dessert",
-        "cafe_interior",
-        "anime_collectible",
-        "shop_interior"
+        "food_dish"
       ],
       "searchBoost": [
         "拉麵",
         "湯頭",
         "麵",
-        "體驗",
-        "巡禮"
+        "用餐",
+        "ラーメン"
       ],
-      "copyExcerpt": "一蘭拉麵：獨享美味的秘密 體驗一蘭獨特的「味集中」座位，享受專屬於你的拉麵時光。從麵條硬度、湯頭濃淡到配料，都能客製化。豚骨湯頭濃郁醇厚，搭配秘製醬汁，每一口都是極致的味蕾享受。即使一個人也能自在品嚐，是動漫巡禮後的最佳慰藉。 一蘭拉麵：獨享美味的秘密 一蘭拉麵：獨享美味的秘密"
+      "copyExcerpt": "一蘭ラーメン 新宿店：深夜動漫後的美味慰藉 在新宿逛完動漫周邊，深夜飢腸轆轆時，「一蘭ラーメン 新宿店」是個理想選擇。從JR新宿站東口步行約3分鐘，這家店以其獨特的「味集中カウンター」聞名，提供專注的個人用餐空間。你可以透過點餐紙客製化麵條硬度、湯頭濃淡及配料。營業時間至深夜，非常適合在結束動漫活動後，享受一碗熱騰騰的豚骨拉麵，為一天劃下句點。 一蘭ラーメン 新宿店：深夜動漫後的美味慰藉 一蘭ラーメン 新宿店：深夜動漫後的美味慰藉"
     },
-    "copyDerivedPhotoIntent": "成品料理、餐點本體、體驗場景、店內活動",
+    "copyDerivedPhotoIntent": "成品料理、餐點本體",
     "matchedKeywords": [
       "一蘭",
       "一蘭",
@@ -834,7 +819,7 @@
       "sectionId": "ichiran",
       "attempts": [
         {
-          "ts": 1783509222346,
+          "ts": 1783510989715,
           "sectionId": "ichiran",
           "slot": "storefront",
           "query": "placeId:ChIJ8QwFX9qMGGARVm0p0caIeTk",
@@ -858,9 +843,9 @@
     "swappedFrom": null,
     "swappedTo": null,
     "alternativeId": null,
-    "heading": "新宿中央東口：一蘭豚骨滋味",
-    "content": "JR新宿站東口步行5分，和平大樓B1F的「一蘭 新宿中央東口店」，以其濃郁豚骨湯頭和客製化點餐紙聞名。從麵條硬度到湯頭濃度皆能自選，打造專屬風味。尖峰時段常有排隊人潮，建議提早或錯峰前往。獨特的味集中座席，讓你專注享受每一口拉麵。",
-    "officialName": "Ichiran Shinjuku Chuo-Higashi-guchi",
+    "heading": "新宿中央東口一蘭：豚骨拉麵",
+    "content": "新宿中央東口店，JR新宿站東口步行3分即達。下到B1F，獨特味集中座席，客製化豚骨湯頭、麵條硬度與秘製醬汁。深夜覓食或逛街後，來碗熱騰騰拉麵最是滿足。尖峰時段雖需排隊，翻桌率高。",
+    "officialName": "Ichiran Shinjuku Chuo-Higashiguchi",
     "officialNameLocal": "一蘭 新宿中央東口店",
     "pipeline": {
       "version": "photo-search-retry-v1",
@@ -878,7 +863,7 @@
         "sectionId": "ichiran",
         "attempts": [
           {
-            "ts": 1783509222346,
+            "ts": 1783510989715,
             "sectionId": "ichiran",
             "slot": "storefront",
             "query": "placeId:ChIJ8QwFX9qMGGARVm0p0caIeTk",
@@ -894,7 +879,7 @@
   },
   {
     "sectionId": "maid-cafe",
-    "subject": "女僕咖啡廳：萌萌的魔法體驗",
+    "subject": "めいどりーみん 秋葉原 本店：體驗女僕咖啡文化",
     "mapsQuery": "Maidreamin Akihabara Main Store",
     "placeId": "ChIJyR7AdR6MGGAROowxIYdMsj0",
     "googleRating": 4.9,
@@ -926,16 +911,19 @@
       "primary": "cafe_experience",
       "categories": [
         "cafe_experience",
-        "activity",
-        "dish"
+        "dish",
+        "landmark",
+        "dessert",
+        "activity"
       ],
       "hits": [
         {
           "category": "cafe_experience",
-          "score": 3,
+          "score": 4,
           "matched": [
             "女僕",
             "咖啡",
+            "氛圍",
             "體驗"
           ],
           "evidence": [
@@ -944,30 +932,54 @@
           ]
         },
         {
-          "category": "activity",
+          "category": "dish",
           "score": 2,
           "matched": [
-            "體驗",
-            "沉浸"
+            "餐點",
+            "用餐"
+          ],
+          "evidence": [
+            "food_dish"
+          ]
+        },
+        {
+          "category": "landmark",
+          "score": 1,
+          "matched": [
+            "代表性"
+          ],
+          "evidence": [
+            "landmark_building",
+            "street_landmark"
+          ]
+        },
+        {
+          "category": "dessert",
+          "score": 1,
+          "matched": [
+            "飲品"
+          ],
+          "evidence": [
+            "dessert",
+            "cafe_interior"
+          ]
+        },
+        {
+          "category": "activity",
+          "score": 1,
+          "matched": [
+            "體驗"
           ],
           "evidence": [
             "cafe_interior",
             "anime_collectible",
             "shop_interior"
           ]
-        },
-        {
-          "category": "dish",
-          "score": 1,
-          "matched": [
-            "餐點"
-          ],
-          "evidence": [
-            "food_dish"
-          ]
         }
       ],
       "requiredEvidence": [
+        "landmark_building",
+        "street_landmark",
         "food_dish",
         "dessert",
         "cafe_interior",
@@ -975,15 +987,18 @@
         "shop_interior"
       ],
       "searchBoost": [
+        "代表性",
         "餐點",
+        "用餐",
+        "飲品",
         "女僕",
         "咖啡",
-        "體驗",
-        "沉浸"
+        "氛圍",
+        "體驗"
       ],
-      "copyExcerpt": "女僕咖啡廳：萌萌的魔法體驗 來到東京，怎能錯過女僕咖啡廳的獨特魅力？穿著可愛制服的女僕們，會用「主人」、「大小姐」稱呼你，並施展「萌萌咒語」讓餐點變得更美味。這不僅是咖啡廳，更是一場充滿歡樂與互動的沉浸式表演，絕對讓你心滿意足。 女僕咖啡廳：萌萌的魔法體驗 女僕咖啡廳：萌萌的魔法體驗"
+      "copyExcerpt": "めいどりーみん 秋葉原 本店：體驗女僕咖啡文化 來到秋葉原，不體驗女僕咖啡廳就少了點什麼。「めいどりーみん 秋葉原 本店」是該區最具代表性的女僕咖啡廳之一。從JR秋葉原站電器街口步行約5分鐘，店內女僕會與客人互動，並提供餐點與飲品。這裡的特色是充滿活力的服務與可愛的餐點擺盤，適合想體驗日本獨特次文化氛圍的讀者。建議預約或避開用餐高峰時段，以免排隊。 めいどりーみん 秋葉原 本店：體驗女僕咖啡文化 めいどりーみん 秋葉原 本店：體驗女僕咖啡文化"
     },
-    "copyDerivedPhotoIntent": "店內氛圍、甜點、主題內裝、體驗場景、店內活動",
+    "copyDerivedPhotoIntent": "店內氛圍、甜點、主題內裝、成品料理、餐點本體",
     "matchedKeywords": [
       "めいどりーみん 秋葉原 本店"
     ],
@@ -994,7 +1009,7 @@
       "sectionId": "maid-cafe",
       "attempts": [
         {
-          "ts": 1783509222581,
+          "ts": 1783510990048,
           "sectionId": "maid-cafe",
           "slot": "storefront",
           "query": "placeId:ChIJyR7AdR6MGGAROowxIYdMsj0",
@@ -1005,7 +1020,7 @@
           "rejectReason": null
         },
         {
-          "ts": 1783509222614,
+          "ts": 1783510990062,
           "sectionId": "maid-cafe",
           "slot": "storefront",
           "query": "content_place",
@@ -1017,7 +1032,7 @@
           "rejectReason": null
         },
         {
-          "ts": 1783509222638,
+          "ts": 1783510990077,
           "sectionId": "maid-cafe",
           "slot": "experience",
           "query": "content_place",
@@ -1042,8 +1057,8 @@
     "swappedFrom": null,
     "swappedTo": null,
     "alternativeId": null,
-    "heading": "秋葉原女僕咖啡：めいどりーみん",
-    "content": "めいどりーみん秋葉原本店，位於外神田三丁目住吉ビル6樓，是女僕咖啡入門經典。入店設低消與時間制，與女僕合照需付費，餐點可自由拍攝。女僕會帶領喊「",
+    "heading": "めいどりーみん 秋葉原 本店：體驗女僕咖啡文化",
+    "content": "來到秋葉原，不體驗女僕咖啡廳就少了點什麼。「めいどりーみん 秋葉原 本店」是該區最具代表性的女僕咖啡廳之一。從JR秋葉原站電器街口步行約5分鐘，店內女僕會與客人互動，並提供餐點與飲品。這裡的特色是充滿活力的服務與可愛的餐點擺盤，適合想體驗日本獨特次文化氛圍的讀者。建議預約或避開用餐高峰時段，以免排隊。",
     "officialName": "Maidreamin Akihabara Main Store",
     "officialNameLocal": "めいどりーみん 秋葉原 本店",
     "pipeline": {
@@ -1062,7 +1077,7 @@
         "sectionId": "maid-cafe",
         "attempts": [
           {
-            "ts": 1783509222581,
+            "ts": 1783510990048,
             "sectionId": "maid-cafe",
             "slot": "storefront",
             "query": "placeId:ChIJyR7AdR6MGGAROowxIYdMsj0",
@@ -1073,7 +1088,7 @@
             "rejectReason": null
           },
           {
-            "ts": 1783509222614,
+            "ts": 1783510990062,
             "sectionId": "maid-cafe",
             "slot": "storefront",
             "query": "content_place",
@@ -1085,7 +1100,7 @@
             "rejectReason": null
           },
           {
-            "ts": 1783509222638,
+            "ts": 1783510990077,
             "sectionId": "maid-cafe",
             "slot": "experience",
             "query": "content_place",
@@ -1102,12 +1117,12 @@
   },
   {
     "sectionId": "nui-hostel",
-    "subject": "グリッズ 東京 浅草橋 ホテル & ホステル",
+    "subject": "グリッズ 東京 浅草橋 ホテル & ホステル：文青旅人的基地",
     "mapsQuery": "グリッズ 東京 浅草橋 ホテル & ホステル Tokyo",
     "placeId": "ChIJjTWKIa6OGGAR6kmG9UpLIIU",
     "googleRating": 4.2,
     "googleAddress": "〒111-0053 東京都台東区浅草橋４丁目１１−６",
-    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjDMX5RrIxhXRNFkdlswweatYZZxUjtOnn9Xfshgnld11aXK7bx7L55YJXtssiDBWwldmV0IMYLHLrG1ERElKmYLBEHfaAyKjIBtju6eSuu4TN5-NSd_7gOJlnMbYYf4cA_QWwZ4ENzTKSfGdAQ=s4800-w1600-h1200",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AJRVUZPb6mT4en-v58XQEAi1EHk2n4CX-XKv-g5LjVyWQEkkNbPIz_wRzThp0y22bfqYqMUHDO8O88VkglbtE85BV_VYx2YrIIUYG1XlH0jJC5yzlOtmT9cQletlHlI2bhJHUk3fUDIVilwT7Fbnhrw=s4800-w1600-h1200",
     "googleAttribution": "百目木陽介",
     "imageSource": "google_places",
     "matched": true,
@@ -1128,30 +1143,52 @@
     },
     "travelPhotoSlot": "exterior",
     "copySemantics": {
-      "primary": "room",
+      "primary": "cafe_experience",
       "categories": [
+        "cafe_experience",
         "room",
+        "gachapon",
         "lobby"
       ],
       "hits": [
         {
+          "category": "cafe_experience",
+          "score": 2,
+          "matched": [
+            "咖啡",
+            "氛圍"
+          ],
+          "evidence": [
+            "dessert",
+            "cafe_interior"
+          ]
+        },
+        {
           "category": "room",
-          "score": 3,
+          "score": 2,
           "matched": [
             "客房",
-            "床位",
-            "簡潔"
+            "床位"
           ],
           "evidence": [
             "room"
           ]
         },
         {
-          "category": "lobby",
-          "score": 2,
+          "category": "gachapon",
+          "score": 1,
           "matched": [
-            "吧台",
-            "交誼"
+            "膠囊"
+          ],
+          "evidence": [
+            "gachapon_wall"
+          ]
+        },
+        {
+          "category": "lobby",
+          "score": 1,
+          "matched": [
+            "交流"
           ],
           "evidence": [
             "lobby_bar"
@@ -1159,19 +1196,23 @@
         }
       ],
       "requiredEvidence": [
+        "gachapon_wall",
+        "dessert",
+        "cafe_interior",
         "lobby_bar",
         "room"
       ],
       "searchBoost": [
-        "吧台",
-        "交誼",
+        "膠囊",
+        "咖啡",
+        "氛圍",
+        "交流",
         "客房",
-        "床位",
-        "簡潔"
+        "床位"
       ],
-      "copyExcerpt": "グリッズ 東京 浅草橋 ホテル & ホステル · 設計感旅宿落腳 淺草橋一帶的グリッズ 東京 浅草橋 ホテル & ホステル，簡潔客房、公共吧台、交誼空間，適合獨旅或預算控管。從淺草橋站步行數分鐘，搭 JR 總武線往秋葉原約 5 分鐘。週末床位記得提早訂。 グリッズ 東京 浅草橋 ホテル & ホステル グリッズ 東京 浅草橋 ホテル & ホステル"
+      "copyExcerpt": "グリッズ 東京 浅草橋 ホテル & ホステル：文青旅人的基地 尋找兼具設計感與社群氛圍的住宿，「グリッズ 東京 浅草橋 ホテル & ホステル」是個不錯的選擇。從JR淺草橋站東口步行約3分鐘，這家旅店提供多種房型，從膠囊床位到私人客房皆有。一樓的咖啡廳與酒吧是旅人交流的好地方，氣氛輕鬆。淺草橋地區交通便利，前往秋葉原、淺草等地都非常方便，是動漫迷與文青旅人的理想據點。 グリッズ 東京 浅草橋 ホテル & ホステル：文青旅人的基地 グリッズ 東京 浅草橋 ホテル & ホステル：文青旅人的基地"
     },
-    "copyDerivedPhotoIntent": "客房、房間、床位空間、Lobby、公共吧台、交誼空間",
+    "copyDerivedPhotoIntent": "店內氛圍、甜點、主題內裝、客房、房間、床位空間",
     "matchedKeywords": [
       "グリッズ 東京 浅草橋 ホテル & ホステル",
       "グリッズ"
@@ -1183,7 +1224,7 @@
       "sectionId": "nui-hostel",
       "attempts": [
         {
-          "ts": 1783509222974,
+          "ts": 1783510990498,
           "sectionId": "nui-hostel",
           "slot": "exterior",
           "query": "placeId:ChIJjTWKIa6OGGAR6kmG9UpLIIU",
@@ -1207,9 +1248,9 @@
     "swappedFrom": null,
     "swappedTo": null,
     "alternativeId": null,
-    "heading": "淺草橋グリッズ：動漫巡禮起點",
-    "content": "位於JR淺草橋站徒步3分鐘的グリッズ 東京 浅草橋 ホテル & ホステル，往秋葉原僅一站，是動漫挖寶者的絕佳基地。寬敞的公共空間設有交誼廳與廚房，方便旅人交流戰利品心得，結識同好。無論是獨自探險或結伴同行，這裡都提供舒適住宿，讓您以最有效率的方式，深入東京電氣街與中野。",
-    "officialName": "GRIDS TOKYO ASAKUSABASHI HOTEL & HOSTEL",
+    "heading": "グリッズ 東京 浅草橋 ホテル & ホステル：文青旅人的基地",
+    "content": "尋找兼具設計感與社群氛圍的住宿，「グリッズ 東京 浅草橋 ホテル & ホステル」是個不錯的選擇。從JR淺草橋站東口步行約3分鐘，這家旅店提供多種房型，從膠囊床位到私人客房皆有。一樓的咖啡廳與酒吧是旅人交流的好地方，氣氛輕鬆。淺草橋地區交通便利，前往秋葉原、淺草等地都非常方便，是動漫迷與文青旅人的理想據點。",
+    "officialName": "Grids Tokyo Asakusabashi Hotel&Hostel",
     "officialNameLocal": "グリッズ 東京 浅草橋 ホテル & ホステル",
     "pipeline": {
       "version": "photo-search-retry-v1",
@@ -1227,7 +1268,7 @@
         "sectionId": "nui-hostel",
         "attempts": [
           {
-            "ts": 1783509222974,
+            "ts": 1783510990498,
             "sectionId": "nui-hostel",
             "slot": "exterior",
             "query": "placeId:ChIJjTWKIa6OGGAR6kmG9UpLIIU",
@@ -1243,7 +1284,7 @@
   },
   {
     "sectionId": "hotel-gracery",
-    "subject": "新宿格拉斯麗酒店：哥吉拉的守護",
+    "subject": "ホテルグレイスリー新宿：哥吉拉主題的舒適住宿",
     "mapsQuery": "Hotel Gracery Shinjuku Tokyo Japan",
     "placeId": "ChIJzRzI3HSNGGARRwZW6AtJfi0",
     "googleRating": 4.4,
@@ -1269,48 +1310,61 @@
     },
     "travelPhotoSlot": "exterior",
     "copySemantics": {
-      "primary": "room",
+      "primary": "cafe_experience",
       "categories": [
+        "cafe_experience",
         "room",
-        "landmark"
+        "activity"
       ],
       "hits": [
         {
-          "category": "room",
-          "score": 2,
+          "category": "cafe_experience",
+          "score": 1,
           "matched": [
-            "客房",
-            "房間"
+            "體驗"
+          ],
+          "evidence": [
+            "dessert",
+            "cafe_interior"
+          ]
+        },
+        {
+          "category": "room",
+          "score": 1,
+          "matched": [
+            "客房"
           ],
           "evidence": [
             "room"
           ]
         },
         {
-          "category": "landmark",
+          "category": "activity",
           "score": 1,
           "matched": [
-            "地標"
+            "體驗"
           ],
           "evidence": [
-            "landmark_building",
-            "street_landmark"
+            "cafe_interior",
+            "anime_collectible",
+            "shop_interior"
           ]
         }
       ],
       "requiredEvidence": [
-        "landmark_building",
-        "street_landmark",
-        "room"
+        "dessert",
+        "cafe_interior",
+        "room",
+        "anime_collectible",
+        "shop_interior"
       ],
       "searchBoost": [
-        "地標",
-        "客房",
-        "房間"
+        "體驗",
+        "客房"
       ],
-      "copyExcerpt": "新宿格拉斯麗酒店：哥吉拉的守護 提到新宿格拉斯麗，最吸睛的莫過於矗立在樓頂的巨大哥吉拉頭像！這不僅是酒店特色，更是新宿的地標。酒店位置優越，房間舒適，部分客房還能近距離欣賞哥吉拉。夜晚，哥吉拉的眼睛會發光，為你的東京之夜增添一份奇幻色彩。 新宿格拉斯麗酒店：哥吉拉的守護 新宿格拉斯麗酒店：哥吉拉的守護"
+      "copyExcerpt": "ホテルグレイスリー新宿：哥吉拉主題的舒適住宿 若想在新宿享受更具主題性的住宿體驗，「ホテルグレイスリー新宿」絕對是首選。從JR新宿站東口步行約5分鐘，位於歌舞伎町中心，最吸睛的是八樓戶外露台的巨型哥吉拉頭像。部分客房甚至能直接看到哥吉拉，是動漫迷的一大亮點。酒店周邊餐飲娛樂設施豐富，交通便捷，適合追求便利與獨特體驗的旅客。建議提早預訂面哥吉拉的房型。 ホテルグレイスリー新宿：哥吉拉主題的舒適住宿 ホテルグレイスリー新宿：哥吉拉主題的舒適住宿"
     },
-    "copyDerivedPhotoIntent": "客房、房間、床位空間、地標建築、代表性招牌、街區辨識點",
+    "copyDerivedPhotoIntent": "店內氛圍、甜點、主題內裝、客房、房間、床位空間",
     "matchedKeywords": [
       "ゴジラ"
     ],
@@ -1321,7 +1375,7 @@
       "sectionId": "hotel-gracery",
       "attempts": [
         {
-          "ts": 1783509227789,
+          "ts": 1783510994373,
           "sectionId": "hotel-gracery",
           "slot": "exterior",
           "query": "placeId:ChIJzRzI3HSNGGARRwZW6AtJfi0",
@@ -1345,8 +1399,8 @@
     "swappedFrom": null,
     "swappedTo": null,
     "alternativeId": null,
-    "heading": "新宿歌舞伎町：哥吉拉頭",
-    "content": "新宿歌舞伎町地標，巨大哥吉拉頭高踞建築頂端，魄力十足。從JR新宿站東口步行約8分鐘，沿途感受街區活力，抬頭便能捕捉其身影。作為日本流行文化象徵，是動漫巡禮不可錯過",
+    "heading": "ホテルグレイスリー新宿：哥吉拉主題的舒適住宿",
+    "content": "若想在新宿享受更具主題性的住宿體驗，「ホテルグレイスリー新宿」絕對是首選。從JR新宿站東口步行約5分鐘，位於歌舞伎町中心，最吸睛的是八樓戶外露台的巨型哥吉拉頭像。部分客房甚至能直接看到哥吉拉，是動漫迷的一大亮點。酒店周邊餐飲娛樂設施豐富，交通便捷，適合追求便利與獨特體驗的旅客。建議提早預訂面哥吉拉的房型。",
     "officialName": "Hotel Gracery Shinjuku",
     "officialNameLocal": "ホテルグレイスリー新宿",
     "pipeline": {
@@ -1365,7 +1419,7 @@
         "sectionId": "hotel-gracery",
         "attempts": [
           {
-            "ts": 1783509227789,
+            "ts": 1783510994373,
             "sectionId": "hotel-gracery",
             "slot": "exterior",
             "query": "placeId:ChIJzRzI3HSNGGARRwZW6AtJfi0",
@@ -1463,7 +1517,7 @@
       "sectionId": "hero-anime",
       "attempts": [
         {
-          "ts": 1783509228378,
+          "ts": 1783510994947,
           "sectionId": "hero-anime",
           "slot": "district_panorama",
           "query": "placeId:ChIJAVf7lh2MGGARJylRnQ_3dpI",
@@ -1474,7 +1528,7 @@
           "rejectReason": null
         },
         {
-          "ts": 1783509228378,
+          "ts": 1783510994947,
           "sectionId": "hero-anime",
           "slot": null,
           "query": "placeId:ChIJAVf7lh2MGGARJylRnQ_3dpI",
@@ -1485,7 +1539,7 @@
           "rejectReason": "content_place_no_match"
         },
         {
-          "ts": 1783509228505,
+          "ts": 1783510995102,
           "sectionId": "hero-anime",
           "slot": null,
           "query": "秋葉原 中央通り",
@@ -1496,7 +1550,7 @@
           "rejectReason": null
         },
         {
-          "ts": 1783509228698,
+          "ts": 1783510995315,
           "sectionId": "hero-anime",
           "slot": null,
           "query": "秋葉原 電気街",
@@ -1507,7 +1561,7 @@
           "rejectReason": null
         },
         {
-          "ts": 1783509228887,
+          "ts": 1783510995604,
           "sectionId": "hero-anime",
           "slot": null,
           "query": "Akihabara Electric Town street",
@@ -1518,7 +1572,7 @@
           "rejectReason": null
         },
         {
-          "ts": 1783509229122,
+          "ts": 1783510995831,
           "sectionId": "hero-anime",
           "slot": null,
           "query": "Akihabara Chuo Dori anime signs",
@@ -1529,7 +1583,7 @@
           "rejectReason": null
         },
         {
-          "ts": 1783509229286,
+          "ts": 1783510996007,
           "sectionId": "hero-anime",
           "slot": null,
           "query": "秋葉原 GiGO 外観",
@@ -1540,7 +1594,7 @@
           "rejectReason": null
         },
         {
-          "ts": 1783509229306,
+          "ts": 1783510996022,
           "sectionId": "hero-anime",
           "slot": "district_panorama",
           "query": "秋葉原 GiGO 外観",
@@ -1585,7 +1639,7 @@
         "sectionId": "hero-anime",
         "attempts": [
           {
-            "ts": 1783509228378,
+            "ts": 1783510994947,
             "sectionId": "hero-anime",
             "slot": "district_panorama",
             "query": "placeId:ChIJAVf7lh2MGGARJylRnQ_3dpI",
@@ -1596,7 +1650,7 @@
             "rejectReason": null
           },
           {
-            "ts": 1783509228378,
+            "ts": 1783510994947,
             "sectionId": "hero-anime",
             "slot": null,
             "query": "placeId:ChIJAVf7lh2MGGARJylRnQ_3dpI",
@@ -1607,7 +1661,7 @@
             "rejectReason": "content_place_no_match"
           },
           {
-            "ts": 1783509228505,
+            "ts": 1783510995102,
             "sectionId": "hero-anime",
             "slot": null,
             "query": "秋葉原 中央通り",
@@ -1618,7 +1672,7 @@
             "rejectReason": null
           },
           {
-            "ts": 1783509228698,
+            "ts": 1783510995315,
             "sectionId": "hero-anime",
             "slot": null,
             "query": "秋葉原 電気街",
@@ -1629,7 +1683,7 @@
             "rejectReason": null
           },
           {
-            "ts": 1783509228887,
+            "ts": 1783510995604,
             "sectionId": "hero-anime",
             "slot": null,
             "query": "Akihabara Electric Town street",
@@ -1640,7 +1694,7 @@
             "rejectReason": null
           },
           {
-            "ts": 1783509229122,
+            "ts": 1783510995831,
             "sectionId": "hero-anime",
             "slot": null,
             "query": "Akihabara Chuo Dori anime signs",
@@ -1651,7 +1705,7 @@
             "rejectReason": null
           },
           {
-            "ts": 1783509229286,
+            "ts": 1783510996007,
             "sectionId": "hero-anime",
             "slot": null,
             "query": "秋葉原 GiGO 外観",
@@ -1662,7 +1716,7 @@
             "rejectReason": null
           },
           {
-            "ts": 1783509229306,
+            "ts": 1783510996022,
             "sectionId": "hero-anime",
             "slot": "district_panorama",
             "query": "秋葉原 GiGO 外観",

@@ -586,7 +586,7 @@ async function handleEditorialGenerate(request, env, auth) {
     return jsonResponse({ error: 'invalid_json' }, 400, auth.origin, env);
   }
   var result = await generateEditorialArticle(env, {
-    month: body.month || '6',
+    month: body.month || '7',
     year: body.year || '2026',
     styleKey: body.styleKey || 'anime',
     existingEditorial: body.existingEditorial || null
@@ -637,19 +637,21 @@ async function handleEditorialVisionCaption(request, env, auth) {
 
   var prompt = verifyMode
     ? [
-      '你是旅遊雜誌圖片審核編輯。只看這張照片。',
+      '你是旅遊雜誌圖片審核與圖說編輯。只看這張照片。',
       '目標地標：' + (section.officialNameLocal || section.officialName || body.placeName || ''),
       '英文名：' + (section.officialName || ''),
       '辨識特徵：' + mustShow.join('、'),
-      '若照片主體清楚是這個地標（全景、外觀、入口、塔身、燈籠等皆可），venueMatch=true。',
+      '若照片主體清楚是這個地標（全景、外觀、入口、塔身、燈籠、雕像等皆可），venueMatch=true。',
       '僅在完全看不出是該地標、或明顯是別家店／室內商品時，venueMatch=false。',
-      '必須只回傳這個 JSON（不要 markdown）：',
-      '{"venueMatch":true,"confidence":0.9,"visibleSubjects":["塔身"],"caption":"14到26字的繁中圖說"}'
+      'caption 必填：14–26 字繁中，只描述照片裡看得見的主體（例：八公銅像、塔身、雷門大燈籠），禁止空話。',
+      '禁止寫：與本段介紹的地標一致、景觀清楚可見、外觀清楚標示位置、氛圍。',
+      '必須只回傳 JSON（不要 markdown）：',
+      '{"venueMatch":true,"confidence":0.9,"visibleSubjects":["塔身"],"caption":"晴空塔塔身直向藍天，金屬骨架清楚可見"}'
     ].join('\n')
     : [
       '你是繁體中文旅遊雜誌圖說編輯。只看這張照片，寫一句圖說。',
-      '14–26 字；只描述看得見的內容；不可寫霓虹、人潮、氛圍除非照片裡真的有。',
-      '不可寫「外觀清楚標示位置」等空話。',
+      '14–26 字；只描述看得見的主體與場景；不可寫霓虹、人潮、氛圍除非照片裡真的有。',
+      '禁止寫：與本段介紹的地標一致、景觀清楚可見、外觀清楚標示位置、空話套句。',
       '段落：' + (section.heading || section.subject || ''),
       '地點：' + (body.placeName || section.officialNameLocal || section.officialName || ''),
       '回傳 JSON: { "caption": "..." }'
