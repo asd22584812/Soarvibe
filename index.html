@@ -14833,15 +14833,42 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 return lib.resolveEditorialFallback(cityId, category, sectionId);
             }
 
-            function resolveSectionImage(section, article, heroUrl) {
+            function resolveSectionImage(section, article, heroUrl, usedUrls) {
+                var used = usedUrls || {};
                 var googleImage = resolveJournalGoogleImage(section);
                 if (googleImage && googleImage.url) {
-                    if (heroUrl && googleImage.url === heroUrl) {
-                        console.warn('[CJ IMAGE DEDUP]', section.sectionId, 'matches hero — fallback');
+                    var dupHero = heroUrl && googleImage.url === heroUrl;
+                    var dupUsed = !!used[googleImage.url];
+                    if (dupHero || dupUsed) {
+                        console.warn('[CJ IMAGE DEDUP]', section.sectionId, dupHero ? 'matches hero' : 'already used', '— fallback');
                     } else {
                         return googleImage;
                     }
                 }
+
+                var cityId = (article && article.cityId) || 'tokyo';
+                if (section.imageKey) {
+                    var manifestUrl = resolveJournalImageKey(section.imageKey, {
+                        cityId: cityId,
+                        styleKey: (article && article.styleKey) || 'anime',
+                        category: 'section',
+                        allowedFor: ['section'],
+                        sectionId: section.sectionId
+                    });
+                    if (manifestUrl && !isPlaceholderJournalImage(manifestUrl) && !used[manifestUrl]) {
+                        return { url: manifestUrl, attribution: null, source: 'manifest' };
+                    }
+                }
+
+                var fallbackUrl = resolveEditorialFallback(
+                    cityId,
+                    section.sectionType || section.sectionRole || 'landmark',
+                    section.sectionId
+                );
+                if (fallbackUrl && !used[fallbackUrl]) {
+                    return { url: fallbackUrl, attribution: null, source: 'editorial_library' };
+                }
+
                 return { url: getJournalPlaceholder(), attribution: null, source: 'placeholder' };
             }
 
@@ -14852,6 +14879,17 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     imageSource: article.heroImageSource
                 });
                 if (googleImage && googleImage.url) return googleImage;
+                if (article.heroImageKey) {
+                    var heroLocal = resolveJournalImageKey(article.heroImageKey, {
+                        cityId: article.cityId || 'tokyo',
+                        styleKey: article.styleKey || 'anime',
+                        category: 'article-hero',
+                        allowedFor: ['article-hero']
+                    });
+                    if (heroLocal && !isPlaceholderJournalImage(heroLocal)) {
+                        return { url: heroLocal, attribution: null, source: 'manifest' };
+                    }
+                }
                 return { url: getJournalPlaceholder(), attribution: null, source: 'placeholder' };
             }
 
@@ -14861,7 +14899,25 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     googleAttribution: article.coverGoogleAttribution,
                     imageSource: article.coverImageSource
                 });
-                if (googleImage && googleImage.url) return googleImage;
+                if (googleImage && googleImage.url) {
+                    // Keep cover distinct from the article hero / intro image
+                    if (article.heroGooglePhotoUrl && googleImage.url === article.heroGooglePhotoUrl) {
+                        console.warn('[CJ IMAGE DEDUP] cover matches hero — use coverImageKey');
+                    } else {
+                        return googleImage;
+                    }
+                }
+                if (article.coverImageKey) {
+                    var coverLocal = resolveJournalImageKey(article.coverImageKey, {
+                        cityId: article.cityId || 'tokyo',
+                        styleKey: article.styleKey || 'anime',
+                        category: 'edition-cover',
+                        allowedFor: ['edition-cover']
+                    });
+                    if (coverLocal && !isPlaceholderJournalImage(coverLocal)) {
+                        return { url: coverLocal, attribution: null, source: 'manifest' };
+                    }
+                }
                 return { url: getJournalPlaceholder(), attribution: null, source: 'placeholder' };
             }
 
@@ -14913,9 +14969,13 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 return section.caption || '';
             }
 
-            function resolveSectionSecondaryImage(section) {
+            function resolveSectionSecondaryImage(section, usedUrls) {
                 if (!section || !section.secondaryGooglePhotoUrl) return null;
                 if (section.imageSource !== 'google_places') return null;
+                if (usedUrls && usedUrls[section.secondaryGooglePhotoUrl]) {
+                    console.warn('[CJ IMAGE DEDUP]', section.sectionId, 'secondary already used — skip');
+                    return null;
+                }
                 return {
                     url: section.secondaryGooglePhotoUrl,
                     attribution: section.secondaryGoogleAttribution || 'Google Maps',
@@ -14923,11 +14983,20 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 };
             }
 
-            function renderMagazineSection(section, article, heroUrl) {
+            function renderMagazineSection(section, article, heroUrl, usedUrls) {
                 if (!section) return '';
-                var imageInfo = resolveSectionImage(section, article, heroUrl);
+                var imageInfo = resolveSectionImage(section, article, heroUrl, usedUrls);
+                if (imageInfo && imageInfo.url && imageInfo.source !== 'placeholder') {
+                    usedUrls[imageInfo.url] = true;
+                }
                 var caption = resolveSectionCaption(section, imageInfo);
-                var secondaryInfo = resolveSectionSecondaryImage(section);
+                var secondaryInfo = resolveSectionSecondaryImage(section, usedUrls);
+                if (secondaryInfo && secondaryInfo.url) {
+                    usedUrls[secondaryInfo.url] = true;
+                }
+                var primaryFigure = (imageInfo && imageInfo.source !== 'placeholder')
+                    ? cjFigureBlock(imageInfo, caption)
+                    : '';
                 var secondaryHtml = secondaryInfo
                     ? cjFigureBlock(secondaryInfo, section.secondaryCaption || '')
                     : '';
@@ -14937,7 +15006,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     (section.heading ? '<h3 class="cj-section-heading">' + escapeHtml(section.heading) + '</h3>' : '') +
                     renderEditorialMetaHtml(section.editorialMeta) +
                     (section.content ? '<p class="cj-section-content">' + escapeHtml(section.content) + '</p>' : '') +
-                    cjFigureBlock(imageInfo, caption) +
+                    primaryFigure +
                     secondaryHtml +
                     '</article>'
                 );
@@ -14961,9 +15030,11 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
                 var heroInfo = resolveArticleHeroImage(article);
                 var heroUrl = heroInfo.url || null;
+                var usedUrls = {};
+                if (heroUrl) usedUrls[heroUrl] = true;
 
                 var sectionsHtml = (article.sections || []).map(function (section) {
-                    return renderMagazineSection(section, article, heroUrl);
+                    return renderMagazineSection(section, article, heroUrl, usedUrls);
                 }).join('');
                 var outroHtml = article.outro
                     ? '<div class="cj-outro"><p class="cj-section-content">' + escapeHtml(article.outro) + '</p></div>'

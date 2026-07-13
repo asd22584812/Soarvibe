@@ -93,6 +93,8 @@ function patchSectionRow(src, row) {
 }
 
 function patchHeroFields(src, row) {
+  // Cover must stay distinct from the article hero / intro image.
+  // Prefer curated coverImageKey in city-journal-data.js over cloning heroGooglePhotoUrl.
   const heroFields = {
     heroSubject: row.subject || row.title,
     heroOfficialName: row.officialName,
@@ -101,11 +103,7 @@ function patchHeroFields(src, row) {
     heroPlaceId: row.placeId,
     heroGooglePhotoUrl: row.googlePhotoUrl,
     heroGoogleAttribution: row.googleAttribution,
-    heroImageSource: row.imageSource,
-    coverPlaceId: row.placeId,
-    coverGooglePhotoUrl: row.googlePhotoUrl,
-    coverGoogleAttribution: row.googleAttribution,
-    coverImageSource: row.imageSource
+    heroImageSource: row.imageSource
   };
   let out = src;
   for (const [key, value] of Object.entries(heroFields)) {

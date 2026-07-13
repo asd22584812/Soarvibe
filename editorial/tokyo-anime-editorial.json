@@ -7,7 +7,7 @@
   "emotion": "興奮、懷舊、驚喜挖到寶",
   "articleGoal": "讓讀者感受到「這就是動漫聖地巡禮」的節奏，而非景點清單",
   "targetReader": "動漫迷、老玩家、想深度逛秋葉原與中野的旅人",
-  "storyline": "上午電氣街朝聖 → 午後中野挖寶 → 傍晚扭蛋補給 → 夜宿交通樞紐",
+  "storyline": "上午電氣街朝聖 → 午後中野挖寶 → 傍晚池袋扭蛋・Animate本店與聯名咖啡 → 夜宿交通樞紐",
   "readingRhythm": [
     "opening",
     "explore",
@@ -19,8 +19,8 @@
   ],
   "editorialPlan": {
     "theme": "東京玩具動漫",
-    "storyArc": "用 1～2 天把秋葉原、中野、扭蛋、拉麵與住宿串成一條有節奏的動漫巡禮路線",
-    "readingRhythm": "上午電氣街朝聖 → 午後中野挖寶 → 傍晚扭蛋與補給 → 夜宿交通樞紐"
+    "storyArc": "用 1～2 天把秋葉原、中野、扭蛋、Animate本店、拉麵與住宿串成一條有節奏的動漫巡禮路線",
+    "readingRhythm": "上午電氣街朝聖 → 午後中野挖寶 → 傍晚扭蛋與 Animate 補給 → 夜宿交通樞紐"
   },
   "destination": {
     "countryCode": "JP",
@@ -731,59 +731,55 @@
     },
     {
       "sectionId": "ikebukuro-route",
-      "sectionRole": "explore",
-      "subjectType": "district",
-      "title": "サンシャインシティ",
+      "sectionRole": "anime",
+      "subjectType": "venue",
+      "title": "アニメイト池袋本店",
       "sectionPurpose": "anime",
-      "editorialAngle": "池袋動漫熱點串成一條步行動線，先看街景再進店",
-      "photoIntent": "廣角街景、池袋動漫街區步行動線、サンシャイン通り或乙女路外觀，禁止海報特寫或室內",
+      "editorialAngle": "扭蛋後直奔 Animate 本店清購物清單，再接聯名咖啡",
+      "photoIntent": "店門口、招牌、外觀優先，禁止室內貨架特寫",
       "searchKeywords": [
-        "サンシャインシティ",
-        "Sunshine City Ikebukuro",
-        "池袋 サンシャイン60通り",
-        "池袋乙女路"
+        "アニメイト池袋本店",
+        "Animate Ikebukuro",
+        "アニメイト 池袋 本店 外観"
       ],
       "minChecklistHits": 1,
-      "captionIntent": "描述圖片中實際看到的街道、建築立面或路口",
-      "sectionType": "landmark",
-      "officialName": "Sunshine City Ikebukuro",
-      "officialNameLocal": "サンシャインシティ",
+      "captionIntent": "描述圖片中實際看到的店門口、招牌或立面",
+      "sectionType": "shopping",
+      "officialName": "Animate Ikebukuro",
+      "officialNameLocal": "アニメイト池袋本店",
       "aliases": [
-        "Sunshine City",
-        "サンシャイン60通り",
-        "池袋乙女路"
+        "アニメイト池袋本店",
+        "Animate Ikebukuro",
+        "Animate Ikebukuro Flagship"
       ],
-      "mapsQuery": "Sunshine City Ikebukuro Tokyo",
-      "placeId": null,
+      "mapsQuery": "アニメイト池袋本店",
+      "placeId": "ChIJi0VhQ2-NGGARGsbajebyPVA",
       "photoPlaceQueries": [
-        "サンシャインシティ 外観 池袋",
-        "Sunshine 60 Street Ikebukuro",
-        "池袋 サンシャイン60通り 街並み",
-        "池袋乙女路 外観"
+        "アニメイト池袋本店 外観",
+        "Animate Ikebukuro exterior",
+        "アニメイト池袋本店"
       ],
       "photoAnchorTerms": [
-        "池袋",
-        "サンシャイン",
         "アニメイト",
-        "乙女路"
+        "animate",
+        "池袋",
+        "外観"
       ],
       "allowGenericPhotoFallback": false,
-      "isSpecificVenue": false,
-      "requireStreetscape": true,
+      "isSpecificVenue": true,
+      "requireStreetscape": false,
       "visualGroups": [
-        ["サンシャイン", "sunshine", "60"],
         ["アニメイト", "animate"],
-        ["乙女路", "otome"],
-        ["街", "street", "通り"]
+        ["外観", "entrance", "入口"],
+        ["池袋", "ikebukuro"]
       ],
-      "requiredVisualMinGroups": 2,
+      "requiredVisualMinGroups": 1,
       "imageChecklist": [
-        "池袋",
-        "サンシャイン",
         "アニメイト",
-        "乙女路",
-        "街",
-        "外観"
+        "animate",
+        "外観",
+        "入口",
+        "池袋"
       ],
       "imageRejectRules": [
         "poster",
@@ -794,11 +790,11 @@
         "hotel",
         "parking"
       ],
-      "heading": "池袋動漫聖地：一日巡禮動線",
-      "content": "池袋的動漫熱點適合串成一條步行線：從JR池袋東口出發，沿サンシャイン60通り走向アニメイト池袋本店，再轉進乙女路看角色周邊店。整段約一公里，建議預留兩小時邊走邊拍街景。",
-      "googlePhotoUrl": null,
-      "googleAttribution": null,
-      "caption": null
+      "heading": "アニメイト池袋本店：週邊補給總店",
+      "content": "扭蛋逛完後，沿池袋東口商圈步行約五分鐘就到「アニメイト池袋本店」。多層樓擺滿新刊、角色周邊與期間限定，是把想買清單一次清掉的地方；隔壁棟的アニメイトカフェ可接著打卡聯名餐。建議預留一小時，先上樓掃限定再下樓結帳。",
+      "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjAbQdgjHHuVG3LpK2XSlUVWevGFFfRDHap1B7uv2irvRcAxn3Y3QuDX5hEZpEr5mbWtWZF8S_FRKaMNB4xhDBxg-OFxKC9Dkf0Tly9T8TbdVNGiFHb6tExYkJ1X-La6fSscl43HgamRoz4vMnQ=s4800-w1600-h1200",
+      "googleAttribution": "F L",
+      "caption": "アニメイト池袋本店門口與招牌並列，是池袋東口動漫巡禮最清楚的地標店面。"
     },
     {
       "sectionId": "hotel-gracery",

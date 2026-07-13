@@ -129,11 +129,7 @@ function patchHeroFields(src, row) {
     heroPlaceId: row.placeId,
     heroGooglePhotoUrl: row.googlePhotoUrl,
     heroGoogleAttribution: row.googleAttribution,
-    heroImageSource: row.imageSource,
-    coverPlaceId: row.placeId,
-    coverGooglePhotoUrl: row.googlePhotoUrl,
-    coverGoogleAttribution: row.googleAttribution,
-    coverImageSource: row.imageSource
+    heroImageSource: row.imageSource
   };
   let block = src.slice(bounds.start, bounds.end);
   for (const [key, value] of Object.entries(heroFields)) {
