@@ -44,6 +44,58 @@
     META.tokyo.editionCoverKeys.anime = 'tokyo-anime-cover';
     META.tokyo.editionCoverKeys.sightseeing = 'tokyo-sightseeing-cover';
 
+    META.tokyo.editionCoverGoogle = {
+        budget: {
+            googlePhotoUrl: 'https://lh3.googleusercontent.com/place-photos/AG9NLjA5WQ85om3os6F4vXLYf9KMe1_uXdK3F_E0QMLyIN56BSc_lPVRaImwsbwhxceyaLei05mLMn13hGa8WZY_iiNdGRzSA1PaZfvFDx9TOnX7hQW41tx4hjdFFN1V-aj2sxuw4eq-CtByZg86Rw=s4800-w1600-h1200',
+            googleAttribution: 'Luigi Iodice',
+            imageSource: 'google_places',
+            subject: '上野 アメ横',
+            mapsQuery: 'Ameya-Yokocho Ueno Tokyo'
+        },
+        sightseeing: {
+            googlePhotoUrl: 'https://lh3.googleusercontent.com/place-photos/AG9NLjCoAdnSSE4tHZh_EeqItgygqYXckBpskbM4ut57_sfOZZKkwlt3D6wRbDWNvTxG0xUFBWdRmwdkA6QoyRIINH42zlaZRWpAuQNvgp-gcBWBDIEv7jpFU-l2YhwbT7SEyDxFfHk6X3o261MvLg=s4800-w1600-h1200',
+            googleAttribution: '쿰척',
+            imageSource: 'google_places',
+            subject: '東京タワー',
+            mapsQuery: 'Tokyo Tower'
+        },
+        trendy: {
+            googlePhotoUrl: 'https://lh3.googleusercontent.com/place-photos/AG9NLjCz3SuJ92AQgxMJtVOSiDUzaqGphfmSSKHuIZIGvH0-R-MehK7_dp98BTNZfDKUbuaAQckiHBF_RY91OgvhnBTEm82pG5b_5Gbk2SGDOCfcxHJDkX-VagCmgXiOU2jHBAa9-Xk8chMqMwV1FA=s4800-w1600-h1200',
+            googleAttribution: '陳德諭',
+            imageSource: 'google_places',
+            subject: '代官山 蔦屋書店',
+            mapsQuery: 'Tsutaya Books Daikanyama'
+        },
+        foodie: {
+            googlePhotoUrl: 'https://lh3.googleusercontent.com/place-photos/AG9NLjBfnWkwU_E6j05l17ZFUnYnuGVvOdE2ROaExM7grlTcRVSMSIRmWWJ_KnfQJLCyK7U_y2yhfNrSzSUVjQ9LH1o3xzeKSZAGwqK55u7iohRI3piyqqwCVDpu4fEtz7bA3kQBiuqyr3dr9kzgUQ=s4800-w1600-h1200',
+            googleAttribution: 'kenichi hatakeyama',
+            imageSource: 'google_places',
+            subject: '築地場外市場',
+            mapsQuery: 'Tsukiji Outer Market Tokyo'
+        },
+        photospot: {
+            googlePhotoUrl: 'https://lh3.googleusercontent.com/place-photos/AG9NLjCmnwgzRUqsSJahzfQNcpMePHS-4FCxx7PqecI42W7jza5MY8P-MRtY30VfISfWSw1bZysdTkRMxDEI9EwacF64_0kUuv68kmISARKixOGz1MdM_qhk5FLROieq1PXjLtYIFS0MmnsOru6x-Lk=s4800-w1600-h1200',
+            googleAttribution: 'Phan Tom',
+            imageSource: 'google_places',
+            subject: 'teamLab Planets',
+            mapsQuery: 'teamLab Planets TOKYO DMM'
+        },
+        anime: {
+            googlePhotoUrl: 'https://lh3.googleusercontent.com/place-photos/AG9NLjCKIf1rKIg2SMA_S2vyrKzTgZWLk4BnNbkpGo4gHNtIvkEzSvqzuZO_pZ7fL3l6F63vS06ra6n7FqpBin8rSb2WN-YZIh-IJw6S2uU3bGBbmBdjABbhNrlI8-8XsKglNMoNcm7tdwf8J3KozNBVNGC6tA=s4800-w1600-h1200',
+            googleAttribution: 'Alvin Leow',
+            imageSource: 'google_places',
+            subject: '秋葉原電気街',
+            mapsQuery: 'Akihabara Electric Town Chuo Dori Tokyo'
+        },
+        streetwear: {
+            googlePhotoUrl: 'https://lh3.googleusercontent.com/place-photos/AG9NLjADHF72vPX52ynPkTyIq8H2q0_97sKH51EmXMBzp_9qr0vjp5UmRqNN-TWFxm4xLmynfrvA1cm_iegH3Jfr88hCLRutwMUjBKKQcEhiZngTWykN6L63kyLak1p664k-SVtcoHzYxcg6PxOeibRSNzSUXw=s4800-w1315-h740',
+            googleAttribution: 'ラフォーレ 原宿',
+            imageSource: 'google_places',
+            subject: 'ラフォーレ原宿',
+            mapsQuery: 'Laforet Harajuku'
+        }
+    };
+
     var ARTICLES = {
         tokyo: {
             anime: {
@@ -79,9 +131,9 @@
                 coverMapsQuery: 'Akihabara Chuo Dori street Tokyo',
                 coverPlaceId: 'ChIJ__-AdayOGGAR6EGPwvcpzTA',
                 // Cover uses curated coverImageKey (tokyo-anime-cover) — must stay distinct from heroGooglePhotoUrl
-                coverGooglePhotoUrl: null,
-                coverGoogleAttribution: null,
-                coverImageSource: null,
+                coverGooglePhotoUrl: 'https://lh3.googleusercontent.com/place-photos/AG9NLjCKIf1rKIg2SMA_S2vyrKzTgZWLk4BnNbkpGo4gHNtIvkEzSvqzuZO_pZ7fL3l6F63vS06ra6n7FqpBin8rSb2WN-YZIh-IJw6S2uU3bGBbmBdjABbhNrlI8-8XsKglNMoNcm7tdwf8J3KozNBVNGC6tA=s4800-w1600-h1200',
+                coverGoogleAttribution: 'Alvin Leow',
+                coverImageSource: 'google_places',
                 issueLabel: '2026年7月號',
                 intro: '七月東京悶熱但不躁，正是走進次文化街區的好時節。本期以兩日節奏安排：先在秋葉原電氣街感受招牌密度，午後移師中野挖二手寶，傍晚轉池袋扭蛋、アニメイト本店與聯名咖啡，夜宿新宿交通樞紐。每一步都對準「看得到街景、找得到店門」的動線。',
                 sections: [
@@ -122,22 +174,22 @@
                     {
                         sectionId: 'nakano',
                         sectionRole: 'anime',
-                        subjectType: 'district',
+                        subjectType: 'venue',
                         sectionType: 'landmark',
                         visualKeywords: ['中野百老匯', 'Nakano Broadway', '公仔', '模型', '復古玩具', '漫畫'],
                         officialName: 'Nakano Broadway',
                         officialNameLocal: '中野ブロードウェイ',
                         aliases: ['Nakano Broadway', 'まんだらけ 中野', 'Mandarake Nakano', 'らしんばん 中野'],
-                        photoIntent: '廣角街景、街區全景、招牌霓虹、中央通／商店街外觀，禁止室內吧台／單店特寫',
-                        imageChecklist: ['ブロードウェイ', 'サンモール', '中野', '街', '外観'],
-                        imageRejectRules: ['普通走道', 'empty corridor', 'corridor', '住宅', 'hotel', 'lobby', 'entrance', '室內', '店内', 'indoor', 'video gamer', 'tokyo video', 'arcade bar', 'cozy corner', 'コージー', 'bakery', 'parking'],
+                        photoIntent: '中野百老匯商場外牆與入口立面，禁止雜貨店／食材店／室內特寫',
+                        imageChecklist: ['ブロードウェイ', '中野', '外観', 'facade'],
+                        imageRejectRules: ['普通走道', 'empty corridor', 'corridor', '住宅', 'hotel', 'lobby', 'entrance', '室內', '店内', 'indoor', 'video gamer', 'tokyo video', 'arcade bar', 'cozy corner', 'コージー', 'bakery', 'parking', 'grocery', 'vegetable', '食材', '中華', '幸福物產', 'market stall', 'produce'],
                         subject: '中野ブロードウェイ',
-                        mapsQuery: 'Nakano Sun Mall entrance',
+                        mapsQuery: 'Nakano Broadway Tokyo',
                         placeId: 'ChIJg-7dspDyGGARvvDv4E5-tuE',
                         googleRating: 4.2,
-                        googleAddress: '〒164-0001 東京都中野区中野５丁目５２−１５',
-                        googlePhotoUrl: 'https://lh3.googleusercontent.com/place-photos/AG9NLjAn1npMVqT_rFm_befRlNsNj5Cm2dy1W3F6LtGa97Atb3j4tyLG4fNkGzrY9hk9MgHHzyCVP5t84_MCuBE1XHwfqKKeESpLwLjxBpz3MoTOpgf4TwDqeubpYvOEVmt1vdT00j4r3Ko_9BV9Azi1_NDcQw=s4800-w1600-h1200',
-                        googleAttribution: 'Loki',
+                        googleAddress: '5-chōme-52-15 Nakano, Nakano City, Tokyo 164-0001',
+                        googlePhotoUrl: 'https://lh3.googleusercontent.com/place-photos/AG9NLjBFYRJp0oi3z0suguKv8GZe2TQNue8n5qOL5TN5Pxl6atz1NzXls5rPfZMiN9tyx8Bzx4eTqKexqhtqjcGl5ujwb4akhXrsm0XCeiq5KtRcYzvQhAcXke-ZMDokcoMgkv7Hu8MI3V1RLUy3r2A=s4800-w1600-h1200',
+                        googleAttribution: '加藤展康',
                         imageSource: 'google_places',
                         imageKey: 'tokyo-section-nakano',
                         caption: '中野百老匯商場外牆與入口，是老玩家公認的挖寶起點。',

@@ -4048,7 +4048,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
-            const SOARVIBE_APP_BUILD = 'v133';
+            const SOARVIBE_APP_BUILD = 'v134';
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
@@ -14999,26 +14999,20 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             function getEditionCoverImage(cityId, editionKey, article) {
+                var meta = getCityJournalMeta(cityId);
+                if (meta && meta.editionCoverGoogle && meta.editionCoverGoogle[editionKey]) {
+                    var editionCover = meta.editionCoverGoogle[editionKey];
+                    if (editionCover.googlePhotoUrl && editionCover.imageSource === 'google_places') {
+                        return editionCover.googlePhotoUrl;
+                    }
+                }
                 if (article) {
                     var googleCover = resolveArticleCoverImage(article);
-                    if (googleCover && googleCover.url && (googleCover.source === 'google_places' || googleCover.source === 'editorial_ai')) {
+                    if (googleCover && googleCover.url && googleCover.source === 'google_places') {
                         return googleCover.url;
                     }
                 }
-                var meta = getCityJournalMeta(cityId);
-                var coverKey = null;
-                if (article && article.coverImageKey) {
-                    coverKey = article.coverImageKey;
-                } else if (meta && meta.editionCoverKeys && meta.editionCoverKeys[editionKey]) {
-                    coverKey = meta.editionCoverKeys[editionKey];
-                }
-                if (!coverKey) return getJournalPlaceholder();
-                return resolveJournalImageKey(coverKey, {
-                    cityId: cityId,
-                    styleKey: editionKey,
-                    category: 'edition-cover',
-                    allowedFor: ['edition-cover']
-                });
+                return getJournalPlaceholder();
             }
 
             function cjJournalImgAttrs() {
@@ -15027,11 +15021,16 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
             function handleCityJournalImageError(img) {
                 if (!img || img.getAttribute('data-cj-fallback') === '1') return;
-                var placeholder = getJournalPlaceholder();
-                var current = img.getAttribute('src') || '';
-                if (current.indexOf('placeholder-city-journal') !== -1) return;
                 img.setAttribute('data-cj-fallback', '1');
-                img.src = placeholder;
+                var figure = img.closest('figure');
+                if (figure) {
+                    figure.style.display = 'none';
+                    return;
+                }
+                var hero = img.closest('.cj-hero');
+                if (hero) {
+                    img.style.display = 'none';
+                }
             }
 
             function handleCityJournalImageOrientation(img) {
@@ -15106,36 +15105,13 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     var dupHero = heroUrl && googleImage.url === heroUrl;
                     var dupUsed = !!used[googleImage.url];
                     if (dupHero || dupUsed) {
-                        console.warn('[CJ IMAGE DEDUP]', section.sectionId, dupHero ? 'matches hero' : 'already used', '— fallback');
+                        console.warn('[CJ IMAGE DEDUP]', section.sectionId, dupHero ? 'matches hero' : 'already used', '— skip image');
                     } else {
                         return googleImage;
                     }
                 }
-
-                var cityId = (article && article.cityId) || 'tokyo';
-                if (section.imageKey) {
-                    var manifestUrl = resolveJournalImageKey(section.imageKey, {
-                        cityId: cityId,
-                        styleKey: (article && article.styleKey) || 'anime',
-                        category: 'section',
-                        allowedFor: ['section'],
-                        sectionId: section.sectionId
-                    });
-                    if (manifestUrl && !isPlaceholderJournalImage(manifestUrl) && !used[manifestUrl]) {
-                        return { url: manifestUrl, attribution: null, source: 'manifest' };
-                    }
-                }
-
-                var fallbackUrl = resolveEditorialFallback(
-                    cityId,
-                    section.sectionType || section.sectionRole || 'landmark',
-                    section.sectionId
-                );
-                if (fallbackUrl && !used[fallbackUrl]) {
-                    return { url: fallbackUrl, attribution: null, source: 'editorial_library' };
-                }
-
-                return { url: getJournalPlaceholder(), attribution: null, source: 'placeholder' };
+                console.warn('[CJ IMAGE MISSING]', section.sectionId, '— no Google Places photo');
+                return { url: null, attribution: null, source: 'missing' };
             }
 
             function resolveArticleHeroImage(article) {
@@ -15145,18 +15121,8 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     imageSource: article.heroImageSource
                 });
                 if (googleImage && googleImage.url) return googleImage;
-                if (article.heroImageKey) {
-                    var heroLocal = resolveJournalImageKey(article.heroImageKey, {
-                        cityId: article.cityId || 'tokyo',
-                        styleKey: article.styleKey || 'anime',
-                        category: 'article-hero',
-                        allowedFor: ['article-hero']
-                    });
-                    if (heroLocal && !isPlaceholderJournalImage(heroLocal)) {
-                        return { url: heroLocal, attribution: null, source: 'manifest' };
-                    }
-                }
-                return { url: getJournalPlaceholder(), attribution: null, source: 'placeholder' };
+                console.warn('[CJ HERO MISSING]', article.id || article.styleKey, '— no Google Places photo');
+                return { url: null, attribution: null, source: 'missing' };
             }
 
             function resolveArticleCoverImage(article) {
@@ -15166,25 +15132,13 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     imageSource: article.coverImageSource
                 });
                 if (googleImage && googleImage.url) {
-                    // Keep cover distinct from the article hero / intro image
                     if (article.heroGooglePhotoUrl && googleImage.url === article.heroGooglePhotoUrl) {
-                        console.warn('[CJ IMAGE DEDUP] cover matches hero — use coverImageKey');
+                        console.warn('[CJ IMAGE DEDUP] cover matches hero — skip cover image');
                     } else {
                         return googleImage;
                     }
                 }
-                if (article.coverImageKey) {
-                    var coverLocal = resolveJournalImageKey(article.coverImageKey, {
-                        cityId: article.cityId || 'tokyo',
-                        styleKey: article.styleKey || 'anime',
-                        category: 'edition-cover',
-                        allowedFor: ['edition-cover']
-                    });
-                    if (coverLocal && !isPlaceholderJournalImage(coverLocal)) {
-                        return { url: coverLocal, attribution: null, source: 'manifest' };
-                    }
-                }
-                return { url: getJournalPlaceholder(), attribution: null, source: 'placeholder' };
+                return { url: null, attribution: null, source: 'missing' };
             }
 
             function cjAttributionHtml(attribution, source) {
@@ -15209,19 +15163,21 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
             function cjHeroBlock(imageInfo, imageAlt, bodyHtml) {
                 var info = typeof imageInfo === 'string'
-                    ? { url: imageInfo, attribution: null, source: 'manifest' }
+                    ? { url: imageInfo, attribution: null, source: 'google_places' }
                     : (imageInfo || {});
-                var url = info.url || getJournalPlaceholder();
-                var imgHtml = '<img class="cj-hero-photo"' + cjJournalImgAttrs() + ' src="' + escapeHtml(url) + '" alt="' + escapeHtml(imageAlt || '') + '" loading="eager" decoding="async" onerror="handleCityJournalImageError(this)">';
+                var url = info.url;
+                var imgHtml = url
+                    ? '<img class="cj-hero-photo"' + cjJournalImgAttrs() + ' src="' + escapeHtml(url) + '" alt="' + escapeHtml(imageAlt || '') + '" loading="eager" decoding="async" onerror="handleCityJournalImageError(this)">'
+                    : '';
                 return '<header class="cj-hero">' + imgHtml + cjAttributionHtml(info.attribution, info.source) + '<div class="cj-hero-body">' + bodyHtml + '</div></header>';
             }
 
             function cjFigureBlock(imageInfo, caption) {
                 var info = imageInfo || {};
-                var url = info.url || getJournalPlaceholder();
+                if (!info.url) return '';
                 return (
                     '<figure class="cj-figure">' +
-                    '<img class="cj-figure-img cj-figure-img--wide"' + cjJournalImgAttrs() + ' src="' + escapeHtml(url) + '" alt="" role="presentation" loading="lazy" decoding="async" onload="handleCityJournalImageOrientation(this)" onerror="handleCityJournalImageError(this)">' +
+                    '<img class="cj-figure-img cj-figure-img--wide"' + cjJournalImgAttrs() + ' src="' + escapeHtml(info.url) + '" alt="" role="presentation" loading="lazy" decoding="async" onload="handleCityJournalImageOrientation(this)" onerror="handleCityJournalImageError(this)">' +
                     (caption ? '<figcaption class="cj-caption">' + escapeHtml(caption) + '</figcaption>' : '') +
                     cjAttributionHtml(info.attribution, info.source) +
                     '</figure>'
@@ -15260,7 +15216,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 if (secondaryInfo && secondaryInfo.url) {
                     usedUrls[secondaryInfo.url] = true;
                 }
-                var primaryFigure = (imageInfo && imageInfo.source !== 'placeholder')
+                var primaryFigure = (imageInfo && imageInfo.url && imageInfo.source === 'google_places')
                     ? cjFigureBlock(imageInfo, caption)
                     : '';
                 var secondaryHtml = secondaryInfo
