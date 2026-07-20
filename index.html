@@ -2388,10 +2388,39 @@
             gap: 0.375rem;
             width: 100%;
         }
+        .flight-airports-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.375rem;
+            width: 100%;
+        }
+        .flight-leg-block {
+            display: flex;
+            flex-direction: column;
+            gap: 0.375rem;
+            width: 100%;
+        }
+        .flight-leg-block + .flight-leg-block {
+            margin-top: 0.125rem;
+        }
+        .flight-leg-title {
+            margin: 0;
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: #546E7A;
+            letter-spacing: 0.02em;
+        }
+        .field-optional {
+            font-weight: 500;
+            color: #90A4AE;
+            font-size: 0.625rem;
+        }
         .flight-times-row label {
             min-width: 0;
         }
         .flight-times-row .date-field,
+        .flight-airports-row .field-input,
+        .flight-leg-block .field-input,
         .hotel-row-full .field-input,
         #advanced-settings .field-select,
         #advanced-settings .field-textarea {
@@ -2858,7 +2887,22 @@
                         <div class="advanced-panel-inner">
                             <div class="pt-2 mt-2 border-t border-white/50 trip-details-stack">
                                 <p id="flight-dates-summary" class="flight-dates-summary" aria-readonly="true">出發日期：— | 回程日期：—</p>
-                                <div class="flight-times-row">
+                                <div class="flight-leg-block">
+                                    <p class="flight-leg-title">去程航班</p>
+                                    <label for="flight-outbound-number">
+                                        <span class="field-label">航班編號 <span class="field-optional">選填・最準</span></span>
+                                        <input type="text" id="flight-outbound-number" class="field-input w-full rounded-lg" placeholder="例：CI100、BR198、JL809" autocomplete="off">
+                                    </label>
+                                    <div class="flight-airports-row">
+                                        <label for="flight-outbound-from">
+                                            <span class="field-label">出發機場</span>
+                                            <input type="text" id="flight-outbound-from" class="field-input w-full rounded-lg" placeholder="例：桃園 TPE" autocomplete="off">
+                                        </label>
+                                        <label for="flight-outbound-to">
+                                            <span class="field-label">抵達機場</span>
+                                            <input type="text" id="flight-outbound-to" class="field-input w-full rounded-lg" placeholder="例：成田 NRT" autocomplete="off">
+                                        </label>
+                                    </div>
                                     <label class="min-w-0">
                                         <span class="field-label">出發時間</span>
                                         <div class="picker-field rounded-lg">
@@ -2867,6 +2911,23 @@
                                             <input type="time" id="flight-departure-time" class="picker-input" value="14:30" aria-label="出發時間">
                                         </div>
                                     </label>
+                                </div>
+                                <div class="flight-leg-block">
+                                    <p class="flight-leg-title">回程航班</p>
+                                    <label for="flight-return-number">
+                                        <span class="field-label">航班編號 <span class="field-optional">選填・最準</span></span>
+                                        <input type="text" id="flight-return-number" class="field-input w-full rounded-lg" placeholder="例：CI101、BR199、JL810" autocomplete="off">
+                                    </label>
+                                    <div class="flight-airports-row">
+                                        <label for="flight-return-from">
+                                            <span class="field-label">出發機場</span>
+                                            <input type="text" id="flight-return-from" class="field-input w-full rounded-lg" placeholder="例：成田 NRT" autocomplete="off">
+                                        </label>
+                                        <label for="flight-return-to">
+                                            <span class="field-label">抵達機場</span>
+                                            <input type="text" id="flight-return-to" class="field-input w-full rounded-lg" placeholder="例：桃園 TPE" autocomplete="off">
+                                        </label>
+                                    </div>
                                     <label class="min-w-0">
                                         <span class="field-label">回程時間</span>
                                         <div class="picker-field rounded-lg">
@@ -3249,7 +3310,7 @@
             const MSG_DATES_INCOMPLETE = '「去幾天？」行程表還是空白！請選好出發與回程日期，天數才算得準喔 📅';
             const MSG_DATES_REVERSED = '時空秩序異常 ⏳！回程日期不能早於出發日期喔，SOARVIBE 還沒解鎖時空倒流功能，請機長重新確認航線日期！';
             const MSG_TRAVEL_STYLE_REQUIRED = '請左右滑動並點選一種「期望的旅遊風格」，我們好為您調配專屬節奏 ✨';
-            const MSG_ADVANCED_INCOMPLETE = '塔台呼叫機長！請填妥 『出發與回程航班時間、住宿飯店、交通工具』，SOARVIBE 準備帶您起飛！';
+            const MSG_ADVANCED_INCOMPLETE = '塔台呼叫機長！請填妥 『去程／回程機場（或航班編號）、航班時間、住宿飯店、交通工具』，SOARVIBE 準備帶您起飛！';
             const MSG_COMING_SOON = '✨ SOARVIBE 專屬功能翱翔準備中！下一階段將全面解鎖此功能，敬請期待！';
             const MSG_AFFILIATE_NO_DESTINATION = '請先在「要去哪裡？」選好旅遊國家與地區，或一鍵生成行程後，再使用獨家精選功能 🌏';
             const MSG_API_ERROR = '塔台訊號中斷 📡！行程生成暫時失敗，請稍後再試，或確認網路連線後重新起飛。';
@@ -3937,6 +3998,12 @@
             const navFavorite = document.getElementById('nav-favorite');
             const flightDepartureTimeInput = document.getElementById('flight-departure-time');
             const flightReturnTimeInput = document.getElementById('flight-return-time');
+            const flightOutboundNumberInput = document.getElementById('flight-outbound-number');
+            const flightReturnNumberInput = document.getElementById('flight-return-number');
+            const flightOutboundFromInput = document.getElementById('flight-outbound-from');
+            const flightOutboundToInput = document.getElementById('flight-outbound-to');
+            const flightReturnFromInput = document.getElementById('flight-return-from');
+            const flightReturnToInput = document.getElementById('flight-return-to');
             const flightDatesSummary = document.getElementById('flight-dates-summary');
             const tripInfoCard = document.getElementById('info-card');
             const kkdayAffiliateMenu = document.getElementById('kkdayAffiliateMenu');
@@ -4957,6 +5024,7 @@
                     if (flightReturnTimeInput && !flightReturnTimeInput.value) {
                         flightReturnTimeInput.value = '18:00';
                     }
+                    suggestFlightAirportsForDestination(dest);
                     updateTimePickerDisplays();
                 }
             }
@@ -6697,6 +6765,7 @@
                     destination: '東京',
                     departureTimes: ['14:30', '11:00'],
                     returnTimes: ['18:30', '21:00'],
+                    airports: { outboundFrom: '桃園 TPE', outboundTo: '成田 NRT', returnFrom: '成田 NRT', returnTo: '桃園 TPE' },
                     hotels: ['淺草飯店', '新宿御苑旅宿', '上野精品青旅'],
                     transports: ['public-transit', 'self-drive']
                 },
@@ -6704,6 +6773,7 @@
                     destination: '京都',
                     departureTimes: ['13:45', '10:20'],
                     returnTimes: ['17:00', '20:30'],
+                    airports: { outboundFrom: '桃園 TPE', outboundTo: '關西 KIX', returnFrom: '關西 KIX', returnTo: '桃園 TPE' },
                     hotels: ['祇園町屋旅館', '京都站前精品飯店', '嵐山溫泉旅宿'],
                     transports: ['public-transit', 'mixed']
                 },
@@ -6711,6 +6781,7 @@
                     destination: '首爾',
                     departureTimes: ['15:30', '09:45'],
                     returnTimes: ['19:00', '22:15'],
+                    airports: { outboundFrom: '桃園 TPE', outboundTo: '仁川 ICN', returnFrom: '仁川 ICN', returnTo: '桃園 TPE' },
                     hotels: ['弘大設計酒店', '明洞精品飯店', '江南商務旅館'],
                     transports: ['public-transit', 'mixed']
                 },
@@ -6718,6 +6789,7 @@
                     destination: '大阪',
                     departureTimes: ['14:00', '11:30'],
                     returnTimes: ['18:00', '21:30'],
+                    airports: { outboundFrom: '桃園 TPE', outboundTo: '關西 KIX', returnFrom: '關西 KIX', returnTo: '桃園 TPE' },
                     hotels: ['道頓堀旁商務旅宿', '難波站姿選飯店', '梅田天空酒店'],
                     transports: ['public-transit', 'self-drive']
                 },
@@ -6725,6 +6797,7 @@
                     destination: '北海道',
                     departureTimes: ['13:20', '16:40'],
                     returnTimes: ['17:30', '20:00'],
+                    airports: { outboundFrom: '桃園 TPE', outboundTo: '新千歲 CTS', returnFrom: '新千歲 CTS', returnTo: '桃園 TPE' },
                     hotels: ['札幌大通飯店', '富良野森林小屋', '函館海景溫泉旅館'],
                     transports: ['self-drive', 'public-transit']
                 },
@@ -6732,6 +6805,7 @@
                     destination: '曼谷',
                     departureTimes: ['16:00', '12:30'],
                     returnTimes: ['20:00', '23:00'],
+                    airports: { outboundFrom: '桃園 TPE', outboundTo: '素萬那普 BKK', returnFrom: '素萬那普 BKK', returnTo: '桃園 TPE' },
                     hotels: ['考山路設計旅店', '暹羅商圈飯店'],
                     transports: ['mixed', 'public-transit']
                 },
@@ -6739,6 +6813,7 @@
                     destination: '倫敦',
                     departureTimes: ['17:00', '12:15'],
                     returnTimes: ['21:00', '10:30'],
+                    airports: { outboundFrom: '桃園 TPE', outboundTo: '希斯洛 LHR', returnFrom: '希斯洛 LHR', returnTo: '桃園 TPE' },
                     hotels: ['肯辛頓精品旅館', '科文特園設計酒店', '倫敦橋畔青旅'],
                     transports: ['public-transit', 'mixed']
                 },
@@ -6746,10 +6821,31 @@
                     destination: '巴黎',
                     departureTimes: ['14:50', '11:40'],
                     returnTimes: ['18:30', '22:00'],
+                    airports: { outboundFrom: '桃園 TPE', outboundTo: '戴高樂 CDG', returnFrom: '戴高樂 CDG', returnTo: '桃園 TPE' },
                     hotels: ['瑪黑區精品飯店', '聖日耳曼左岸旅宿', '蒙馬特景觀酒店'],
                     transports: ['public-transit', 'mixed']
                 }
             };
+
+            const DEFAULT_HOME_AIRPORT = '桃園 TPE';
+
+            const CITY_AIRPORT_HINTS = [
+                { keys: ['東京', 'tokyo'], outboundTo: '成田 NRT', returnFrom: '成田 NRT', alt: '羽田 HND' },
+                { keys: ['大阪', 'osaka'], outboundTo: '關西 KIX', returnFrom: '關西 KIX' },
+                { keys: ['京都', 'kyoto'], outboundTo: '關西 KIX', returnFrom: '關西 KIX' },
+                { keys: ['首爾', 'seoul'], outboundTo: '仁川 ICN', returnFrom: '仁川 ICN' },
+                { keys: ['北海道', '札幌', 'sapporo', 'hokkaido'], outboundTo: '新千歲 CTS', returnFrom: '新千歲 CTS' },
+                { keys: ['曼谷', 'bangkok'], outboundTo: '素萬那普 BKK', returnFrom: '素萬那普 BKK' },
+                { keys: ['新加坡', 'singapore'], outboundTo: '樟宜 SIN', returnFrom: '樟宜 SIN' },
+                { keys: ['倫敦', 'london'], outboundTo: '希斯洛 LHR', returnFrom: '希斯洛 LHR' },
+                { keys: ['巴黎', 'paris'], outboundTo: '戴高樂 CDG', returnFrom: '戴高樂 CDG' },
+                { keys: ['沖繩', '那霸', 'okinawa'], outboundTo: '那霸 OKA', returnFrom: '那霸 OKA' },
+                { keys: ['福岡', 'fukuoka'], outboundTo: '福岡 FUK', returnFrom: '福岡 FUK' },
+                { keys: ['清邁', 'chiang mai'], outboundTo: '清邁 CNX', returnFrom: '清邁 CNX' },
+                { keys: ['峇里', 'bali'], outboundTo: '峇里 DPS', returnFrom: '峇里 DPS' },
+                { keys: ['香港', 'hong kong'], outboundTo: '香港 HKG', returnFrom: '香港 HKG' },
+                { keys: ['澳門', 'macau'], outboundTo: '澳門 MFM', returnFrom: '澳門 MFM' }
+            ];
 
             function pickRandom(list) {
                 return list[Math.floor(Math.random() * list.length)];
@@ -6837,9 +6933,130 @@
 
             function updateFlightDateDisplays() {
                 if (!flightDatesSummary) return;
+                var routeHint = '';
+                var outboundTo = flightOutboundToInput && flightOutboundToInput.value.trim();
+                var returnFrom = flightReturnFromInput && flightReturnFromInput.value.trim();
+                if (outboundTo || returnFrom) {
+                    routeHint = '｜' + (outboundTo || '—') + ' ↔ ' + (returnFrom || outboundTo || '—');
+                }
                 flightDatesSummary.textContent =
                     '出發日期：' + formatSlashDate(tripDateState.dateStart) +
-                    ' | 回程日期：' + formatSlashDate(tripDateState.dateEnd);
+                    ' | 回程日期：' + formatSlashDate(tripDateState.dateEnd) +
+                    routeHint;
+            }
+
+            function resolveAirportHintsForDestination(destination) {
+                var dest = String(destination || '').trim().toLowerCase();
+                if (!dest) return null;
+                for (var i = 0; i < CITY_AIRPORT_HINTS.length; i++) {
+                    var row = CITY_AIRPORT_HINTS[i];
+                    for (var j = 0; j < row.keys.length; j++) {
+                        if (dest.indexOf(String(row.keys[j]).toLowerCase()) !== -1) {
+                            return row;
+                        }
+                    }
+                }
+                return null;
+            }
+
+            function collectFlightAirportFields() {
+                return {
+                    flightOutboundNumber: flightOutboundNumberInput ? flightOutboundNumberInput.value.trim() : '',
+                    flightReturnNumber: flightReturnNumberInput ? flightReturnNumberInput.value.trim() : '',
+                    flightOutboundFrom: flightOutboundFromInput ? flightOutboundFromInput.value.trim() : '',
+                    flightOutboundTo: flightOutboundToInput ? flightOutboundToInput.value.trim() : '',
+                    flightReturnFrom: flightReturnFromInput ? flightReturnFromInput.value.trim() : '',
+                    flightReturnTo: flightReturnToInput ? flightReturnToInput.value.trim() : ''
+                };
+            }
+
+            function setFlightAirportFields(fields) {
+                fields = fields || {};
+                if (flightOutboundNumberInput && fields.flightOutboundNumber != null) {
+                    flightOutboundNumberInput.value = fields.flightOutboundNumber;
+                }
+                if (flightReturnNumberInput && fields.flightReturnNumber != null) {
+                    flightReturnNumberInput.value = fields.flightReturnNumber;
+                }
+                if (flightOutboundFromInput && fields.flightOutboundFrom != null) {
+                    flightOutboundFromInput.value = fields.flightOutboundFrom;
+                }
+                if (flightOutboundToInput && fields.flightOutboundTo != null) {
+                    flightOutboundToInput.value = fields.flightOutboundTo;
+                }
+                if (flightReturnFromInput && fields.flightReturnFrom != null) {
+                    flightReturnFromInput.value = fields.flightReturnFrom;
+                }
+                if (flightReturnToInput && fields.flightReturnTo != null) {
+                    flightReturnToInput.value = fields.flightReturnTo;
+                }
+                updateFlightDateDisplays();
+            }
+
+            function suggestFlightAirportsForDestination(destination, force) {
+                var hints = resolveAirportHintsForDestination(destination);
+                if (!hints) return;
+                var next = {
+                    flightOutboundFrom: DEFAULT_HOME_AIRPORT,
+                    flightOutboundTo: hints.outboundTo,
+                    flightReturnFrom: hints.returnFrom,
+                    flightReturnTo: DEFAULT_HOME_AIRPORT
+                };
+                if (force) {
+                    setFlightAirportFields(next);
+                    return;
+                }
+                var current = collectFlightAirportFields();
+                var patch = {};
+                if (!current.flightOutboundFrom) patch.flightOutboundFrom = next.flightOutboundFrom;
+                if (!current.flightOutboundTo) patch.flightOutboundTo = next.flightOutboundTo;
+                if (!current.flightReturnFrom) patch.flightReturnFrom = next.flightReturnFrom;
+                if (!current.flightReturnTo) patch.flightReturnTo = next.flightReturnTo;
+                if (Object.keys(patch).length) setFlightAirportFields(patch);
+            }
+
+            function hasValidFlightRouteInput() {
+                var fields = collectFlightAirportFields();
+                var hasOutboundNumber = !!fields.flightOutboundNumber;
+                var hasReturnNumber = !!fields.flightReturnNumber;
+                var hasOutboundRoute = !!(fields.flightOutboundFrom && fields.flightOutboundTo);
+                var hasReturnRoute = !!(fields.flightReturnFrom && fields.flightReturnTo);
+                var hasMinimumAirports = !!(fields.flightOutboundTo && fields.flightReturnFrom);
+                return (hasOutboundNumber && hasReturnNumber)
+                    || (hasOutboundRoute && hasReturnRoute)
+                    || hasMinimumAirports;
+            }
+
+            function buildFlightLegSummary(number, fromAirport, toAirport, timeIso) {
+                var parts = [];
+                if (number) parts.push('航班 ' + number);
+                if (fromAirport || toAirport) {
+                    parts.push((fromAirport || '—') + ' → ' + (toAirport || '—'));
+                }
+                if (timeIso) parts.push(formatFlightDateTime(timeIso));
+                return parts.join('｜');
+            }
+
+            function buildFlightPromptDetails(payload) {
+                payload = payload || {};
+                var outbound = buildFlightLegSummary(
+                    payload.flightOutboundNumber,
+                    payload.flightOutboundFrom,
+                    payload.flightOutboundTo,
+                    payload.flightDeparture || payload.departureTime
+                );
+                var inbound = buildFlightLegSummary(
+                    payload.flightReturnNumber,
+                    payload.flightReturnFrom,
+                    payload.flightReturnTo,
+                    payload.flightReturn || payload.returnTime
+                );
+                return {
+                    outbound: outbound || '（未提供）',
+                    inbound: inbound || '（未提供）',
+                    hasFlightNumbers: !!(payload.flightOutboundNumber || payload.flightReturnNumber),
+                    destinationAirport: payload.flightOutboundTo || payload.flightReturnFrom || ''
+                };
             }
 
             function getFlightDepartureIso() {
@@ -6859,6 +7076,14 @@
                 }
                 if (flightReturnTimeInput) {
                     flightReturnTimeInput.value = pickRandom(preset.returnTimes);
+                }
+                if (preset.airports) {
+                    setFlightAirportFields({
+                        flightOutboundFrom: preset.airports.outboundFrom || DEFAULT_HOME_AIRPORT,
+                        flightOutboundTo: preset.airports.outboundTo || '',
+                        flightReturnFrom: preset.airports.returnFrom || preset.airports.outboundTo || '',
+                        flightReturnTo: preset.airports.returnTo || DEFAULT_HOME_AIRPORT
+                    });
                 }
                 updateTimePickerDisplays();
             }
@@ -7270,7 +7495,8 @@
                 var customerSelectedTransport = getCustomerSelectedTransport();
                 var accommodations = collectAccommodationsFromDom();
                 var accommodation = formatAccommodationSummary(accommodations);
-                return {
+                var flightFields = collectFlightAirportFields();
+                return Object.assign({
                     destination: destinationInput.value.trim(),
                     dateStart: tripDateState.dateStart,
                     dateEnd: tripDateState.dateEnd,
@@ -7284,7 +7510,7 @@
                     transport: advancedTransportSelect.value,
                     customerSelectedTransport: customerSelectedTransport,
                     customWishes: document.getElementById('customWishes') ? document.getElementById('customWishes').value.trim() : ''
-                };
+                }, flightFields);
             }
 
             function syncTripInfoBarFields(meta, customerSelectedTransport) {
@@ -7327,6 +7553,14 @@
                     var retParts = meta.flightReturn.split('T');
                     if (retParts[1]) flightReturnTimeInput.value = retParts[1].slice(0, 5);
                 }
+                setFlightAirportFields({
+                    flightOutboundNumber: meta.flightOutboundNumber || '',
+                    flightReturnNumber: meta.flightReturnNumber || '',
+                    flightOutboundFrom: meta.flightOutboundFrom || '',
+                    flightOutboundTo: meta.flightOutboundTo || '',
+                    flightReturnFrom: meta.flightReturnFrom || '',
+                    flightReturnTo: meta.flightReturnTo || ''
+                });
                 if (meta.accommodations && meta.accommodations.length) {
                     setAccommodationsToForm(meta.accommodations);
                 } else if (meta.accommodation) {
@@ -7459,6 +7693,7 @@
                     || TRANSPORT_LABELS[payload.transport]
                     || payload.transport
                     || '搭乘大眾運輸';
+                var flightDetails = buildFlightPromptDetails(payload);
                 var globalCityInstruction = '【🌍 全球目的地 currentCity】：使用者輸入的「' + currentCity + '」為真實旅遊目的地（可能是東京、巴黎、曼谷、冰島、紐約等任意城市/地區）。你必須完全依照該國該城的真實地理、交通、文化、語境規劃【' + selectedStyle + '】風格行程，禁止套用錯誤國家或虛構景點。';
                 return {
                     tripType: tripType,
@@ -7474,7 +7709,11 @@
                     currentCity: currentCity,
                     budget: payload.budget || '適中',
                     departureTimeText: payload.departureTime ? formatFlightDateTime(payload.departureTime) : '',
-                    returnTimeText: payload.returnTime ? formatFlightDateTime(payload.returnTime) : ''
+                    returnTimeText: payload.returnTime ? formatFlightDateTime(payload.returnTime) : '',
+                    flightOutboundSummary: flightDetails.outbound,
+                    flightReturnSummary: flightDetails.inbound,
+                    flightHasNumbers: flightDetails.hasFlightNumbers,
+                    destinationAirport: flightDetails.destinationAirport
                 };
             }
 
@@ -7502,9 +7741,10 @@ ${ctx.typeInstruction}
 【🎯 風格差異化鐵律】
 你正在規劃的是【${ctx.selectedStyle}】，不是其他風格。輸出的景點類型、店名風格、每站停留時間必須與【${ctx.selectedStyle}】高度一致，且與「初次觀光／美食吃貨／玩具動漫」等風格有明顯區隔——禁止七種風格都排成淺草+晴空塔+一蘭的相似動線。
 
-【✈️ 航班時間——必填參數（不可忽略）】
-🛫 departureTime（出發航班，含日期+時間）：${ctx.departureTimeText}
-🛬 returnTime（回程航班，含日期+時間）：${ctx.returnTimeText}
+【✈️ 航班資訊——必填參數（不可忽略）】
+🛫 去程：${ctx.flightOutboundSummary}
+🛬 回程：${ctx.flightReturnSummary}
+${ctx.flightHasNumbers ? '⚠️ 使用者已填寫航班編號：請優先以該航班的實際起降時刻與機場安排 Day 1 抵達、最終日送機，時間欄位僅作輔助。' : '⚠️ 請依上述機場代碼判斷正確的市區距離與交通時間（例：成田 NRT→東京約 60–90 分；羽田 HND→東京約 30–45 分；仁川 ICN→首爾約 60–80 分）。'}
 🏨 住宿飯店／區域：
 ${buildAccommodationPromptBlock(resolvePayloadAccommodations(payload), payload.dateStart, payload.dateEnd)}
 ${buildAccommodationRoutingRulesBlock(resolvePayloadAccommodations(payload), payload.dateStart, payload.dateEnd)}
@@ -7522,11 +7762,12 @@ ${buildAccommodationRoutingRulesBlock(resolvePayloadAccommodations(payload), pay
 範例：禁止寫「飯店附近的超商」→ 必須寫「LAWSON 淺草雷門前店」；禁止寫「淺草在地早餐」→ 必須寫「淺草 珈琲天国」或「Misoojyu 味噌湯專賣店」等明確店名。
 景點亦須使用正式名稱，禁止只寫「知名寺廟」「人氣商圈」。
 
-【⏱️ 首日與最終日接送邏輯——最高優先，必須嚴格遵守 departureTime / returnTime】
-1. Day 1：以 departureTime 為基準，安排「抵達機場 → 入境／提取行李 → 前往住宿 → Check-in」；Check-in 完成前禁止安排一般觀光。
-2. Day ${lastDayNum}（最終日）：以 returnTime 倒推，預留至少 3 小時 Buffer（退房、前往機場、報到、安檢、候機），並明確寫出送機出發時間；上午、下午仍須各有 1–2 個具體行程（採買、午餐、最後打卡），「晚上」時段才安排前往機場，禁止下午空白直接跳機場。
-3. 若 departureTime 或 returnTime 與住宿地點距離機場較遠，必須在行程中寫明【${ctx.customerSelectedTransport}】下的交通方式與預估車程。
-4. 每日起訖點以住宿區域為圓心，符合【${ctx.customerSelectedTransport}】，嚴禁繞路。
+【⏱️ 首日與最終日接送邏輯——最高優先，必須嚴格遵守航班資訊】
+1. Day 1：以去程航班的【抵達機場 ${ctx.destinationAirport || '（依去程抵達機場欄位）'}】與抵達時間為基準，安排「抵達機場 → 入境／提取行李 → 前往住宿 → Check-in」；Check-in 完成前禁止安排一般觀光。
+2. Day ${lastDayNum}（最終日）：以回程航班的【出發機場】與起飛時間倒推，預留至少 3 小時 Buffer（退房、前往機場、報到、安檢、候機），並明確寫出送機出發時間與使用的機場名稱；上午、下午仍須各有 1–2 個具體行程（採買、午餐、最後打卡），「晚上」時段才安排前往機場，禁止下午空白直接跳機場。
+3. 若去程／回程使用不同機場（例如抵達羽田、回程從成田起飛），必須在 note 中寫明，並調整送機動線，禁止假設同一機場。
+4. 若 departureTime 或 returnTime 與住宿地點距離機場較遠，必須在行程中寫明【${ctx.customerSelectedTransport}】下的交通方式與預估車程。
+5. 每日起訖點以住宿區域為圓心，符合【${ctx.customerSelectedTransport}】，嚴禁繞路。
 
 【🗺️ 交通與地理邏輯——嚴禁繞路】
 1. 請發揮你對【${ctx.currentCity}】當地地理結構的精準認知，景點之間的安排「時間與路線一定都要順，絕對不准繞路」！
@@ -7547,9 +7788,9 @@ ${buildGeminiJsonOutputBlock(payload, days)}`;
                 var dateLabel = getDayDateLabel(payload, dayNum);
                 var dayRules = '';
                 if (dayNum === 1) {
-                    dayRules = '【本日為 Day 1——抵達日】以 departureTime 為基準：抵達機場 → 入境／提取行李 → 前往住宿 → Check-in；Check-in 完成前禁止安排一般觀光。Check-in 後可安排輕量晚餐或附近散步。';
+                    dayRules = '【本日為 Day 1——抵達日】以去程航班的抵達機場與抵達時間為基準：抵達機場 → 入境／提取行李 → 前往住宿 → Check-in；Check-in 完成前禁止安排一般觀光。Check-in 後可安排輕量晚餐或附近散步。';
                 } else if (dayNum === totalDays) {
-                    dayRules = '【本日為最終日——送機日】上午、下午仍須各有 1–2 個具體行程（採買、午餐、最後打卡）；「晚上」時段才安排前往機場（依 returnTime 倒推，預留至少 3 小時 Buffer）。禁止下午空白直接跳機場。';
+                    dayRules = '【本日為最終日——送機日】上午、下午仍須各有 1–2 個具體行程（採買、午餐、最後打卡）；「晚上」時段才安排前往【回程出發機場】（依 returnTime 倒推，預留至少 3 小時 Buffer）。禁止下午空白直接跳機場。';
                 } else {
                     dayRules = '【本日為中間日】以「本日住宿基點」為圓心，安排充實的上午、下午、晚上各 2–3 個具體景點或餐廳，動線順向不繞路。嚴禁「自由活動／自由行程／彈性安排／可自行安排」等模糊字眼。';
                 }
@@ -7570,7 +7811,7 @@ ${buildAccommodationPromptBlock(resolvePayloadAccommodations(payload), payload.d
 ${buildAccommodationRoutingRulesBlock(resolvePayloadAccommodations(payload), payload.dateStart, payload.dateEnd)}
 🏨 本日住宿基點：${getHotelForDay(dayNum, payload)}
 🚇 交通方式（100% 遵守）：【${ctx.customerSelectedTransport}】
-🛫 出發航班：${ctx.departureTimeText}｜🛬 回程航班：${ctx.returnTimeText}
+🛫 去程航班：${ctx.flightOutboundSummary}｜🛬 回程航班：${ctx.flightReturnSummary}
 
 ${ctx.timingRules}
 
@@ -13351,8 +13592,20 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 var styleLabel = getSelectedStyleLabel(meta);
                 var dest = (meta && meta.destination) || '目的地';
                 var dateRange = formatDateRange(meta) || '—';
-                var depText = meta && meta.flightDeparture ? formatFlightDateTime(meta.flightDeparture) : '—';
-                var retText = meta && meta.flightReturn ? formatFlightDateTime(meta.flightReturn) : '—';
+                var depText = meta ? buildFlightLegSummary(
+                    meta.flightOutboundNumber,
+                    meta.flightOutboundFrom,
+                    meta.flightOutboundTo,
+                    meta.flightDeparture
+                ) : '';
+                var retText = meta ? buildFlightLegSummary(
+                    meta.flightReturnNumber,
+                    meta.flightReturnFrom,
+                    meta.flightReturnTo,
+                    meta.flightReturn
+                ) : '';
+                depText = depText || (meta && meta.flightDeparture ? formatFlightDateTime(meta.flightDeparture) : '—');
+                retText = retText || (meta && meta.flightReturn ? formatFlightDateTime(meta.flightReturn) : '—');
                 var hotel = (meta && meta.accommodation) || '—';
                 var transport = meta && (meta.customerSelectedTransport || TRANSPORT_LABELS[meta.transport]) || '—';
                 var checklist = (hidden && hidden.checklist && hidden.checklist.length)
@@ -14644,6 +14897,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     || !tripDateState.dateEnd
                     || !getFlightDepartureIso()
                     || !getFlightReturnIso()
+                    || !hasValidFlightRouteInput()
                     || !hasValidAccommodationInput()
                     || !advancedTransportSelect.value;
             }
@@ -14654,6 +14908,18 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     dateStartInput.focus();
                 } else if (!tripDateState.dateEnd) {
                     dateEndInput.focus();
+                } else if (!hasValidFlightRouteInput()) {
+                    if (flightOutboundToInput && !flightOutboundToInput.value.trim()) {
+                        flightOutboundToInput.focus();
+                    } else if (flightReturnFromInput && !flightReturnFromInput.value.trim()) {
+                        flightReturnFromInput.focus();
+                    } else if (flightOutboundFromInput && !flightOutboundFromInput.value.trim()) {
+                        flightOutboundFromInput.focus();
+                    } else if (flightReturnToInput && !flightReturnToInput.value.trim()) {
+                        flightReturnToInput.focus();
+                    } else if (flightOutboundNumberInput) {
+                        flightOutboundNumberInput.focus();
+                    }
                 } else if (!flightDepartureTimeInput || !flightDepartureTimeInput.value) {
                     if (flightDepartureTimeInput) flightDepartureTimeInput.focus();
                 } else if (!flightReturnTimeInput || !flightReturnTimeInput.value) {
@@ -15181,6 +15447,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 closeCityJournal();
                 if (destinationInput && dest) {
                     destinationInput.value = dest;
+                    suggestFlightAirportsForDestination(dest);
                 }
                 var radio = document.querySelector('input[name="travel-style"][value="' + formStyle + '"]');
                 if (radio) {
@@ -15304,8 +15571,32 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             document.querySelectorAll('.quick-tag').forEach(function (tag) {
                 tag.addEventListener('click', function () {
                     destinationInput.value = tag.dataset.city;
+                    suggestFlightAirportsForDestination(tag.dataset.city);
                     destinationInput.focus();
                 });
+            });
+
+            if (destinationInput) {
+                destinationInput.addEventListener('change', function () {
+                    suggestFlightAirportsForDestination(destinationInput.value.trim());
+                });
+                destinationInput.addEventListener('blur', function () {
+                    suggestFlightAirportsForDestination(destinationInput.value.trim());
+                });
+            }
+
+            var flightAirportInputs = [
+                flightOutboundNumberInput,
+                flightReturnNumberInput,
+                flightOutboundFromInput,
+                flightOutboundToInput,
+                flightReturnFromInput,
+                flightReturnToInput
+            ];
+            flightAirportInputs.forEach(function (inputEl) {
+                if (!inputEl) return;
+                inputEl.addEventListener('input', updateFlightDateDisplays);
+                inputEl.addEventListener('change', updateFlightDateDisplays);
             });
 
             initCityJournalCityCards();
@@ -15616,6 +15907,9 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             syncTripDateState();
             initAccommodationsForm();
             updateTimePickerDisplays();
+            if (destinationInput && destinationInput.value.trim()) {
+                suggestFlightAirportsForDestination(destinationInput.value.trim());
+            }
 
             document.querySelectorAll('input[name="travel-style"]').forEach(function (radio) {
                 radio.addEventListener('change', function () {
