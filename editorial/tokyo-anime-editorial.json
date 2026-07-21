@@ -750,44 +750,51 @@
       "sectionRole": "cafe",
       "title": "@home cafe 秋葉原：經典女僕咖啡",
       "sectionType": "cafe",
-      "officialName": "@home cafe Akihabara",
+      "officialName": "at-home cafe 秋葉原本店",
       "officialNameLocal": "＠ほぉ～むカフェ 秋葉原本店",
       "aliases": [
         "@home cafe",
         "@home cafe 秋葉原",
         "アットホームカフェ",
-        "＠ほぉ～むカフェ"
+        "＠ほぉ～むカフェ",
+        "at-home cafe"
       ],
-      "mapsQuery": "＠ほぉ～むカフェ 秋葉原 外観",
-      "placeId": "ChIJN66t88qKGGARy5-l5t2eD68",
-        "@home cafe Akihabara exterior",
-        "アットホームカフェ 秋葉原"
+      "mapsQuery": "at-home cafe 秋葉原本店",
+      "placeId": "ChIJFw0-qR2MGGARK8G9zFZx69w",
+      "photoPlaceQueries": [
+        "at-home cafe 秋葉原本店",
+        "＠ほぉ～むカフェ 秋葉原本店",
+        "at-home cafe Akihabara"
       ],
       "photoAnchorTerms": [
         "@home",
         "home cafe",
-        "アットホーム"
+        "アットホーム",
+        "ほぉ"
       ],
       "allowVenueSwap": true,
       "venueSwapIntent": "女僕服裝、店內互動、主題甜點",
       "venueAlternatives": [],
       "allowGenericPhotoFallback": true,
-      "photoIntent": "店門口、招牌、外觀優先",
+      "photoIntent": "店內主題空間、座位區，其次門口招牌",
       "imageChecklist": [
         "@home",
         "home cafe",
-        "外観",
-        "メイド"
+        "メイド",
+        "cafe",
+        "ほぉ"
       ],
       "imageRejectRules": [
         "parking",
-        "bathroom"
+        "bathroom",
+        "manga shelf"
       ],
       "isSpecificVenue": true,
       "addressHints": [
-        "池袋",
-        "Ikebukuro",
-        "豊島"
+        "秋葉原",
+        "Akihabara",
+        "外神田",
+        "千代田"
       ],
       "allowedPlaceTypes": [
         "cafe",
@@ -802,10 +809,10 @@
         "hostel"
       ],
       "heading": "@home cafe 秋葉原：經典女僕咖啡",
-      "content": "秋葉原電氣街步行可達的「@home cafe 秋葉原店」，是女僕咖啡文化的指標名店之一。深色外觀與樓層招牌在巷口就認得出來；進店前確認低消、拍照規則與是否需排隊，尖峰時段建議預留四十分鐘以上。",
-      "googlePhotoUrl": null,
-      "googleAttribution": null,
-      "caption": null,
+      "content": "外神田ミツワビル的「at-home cafe 秋葉原本店」是女僕咖啡指標店。進店後是粉白主題座位區；先確認低消、拍照規則與排隊情形，尖峰建議預留四十分鐘以上。",
+      "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjAGFZ-ITA7fsI7QZm-9ETxP_ANj1OLe7nvToaIp-m_0aSotQgYNAWLMZBL_OimNm2ArvkYnKb9reUHTyBRz4u6bOvPMqJkZ-m2JeBs1cphTiRmaF0rwTAm8qJ5VFTmEPa3Ncj2cKUrT7r0MPtw=s4800-w1600-h1200",
+      "googleAttribution": "at-home cafe 秋葉原本店",
+      "caption": "＠ほぉ～むカフェ店內：粉色長椅、木桌與牆上女僕相框，主題空間清楚可辨。",
       "deniedAttributionPatterns": [
         "hotel",
         "hostel"
@@ -823,9 +830,12 @@
         "MIMARU東京 上野イースト",
         "MIMARU TOKYO UENO EAST"
       ],
-      "mapsQuery": "MIMARU東京 上野イースト 外観",
-      "placeId": "ChIJy6-38uW3nveARoNL2cvMTFmNXQ5cHZoehAB",
-        "MIMARU 上野イースト exterior"
+      "mapsQuery": "4-26-3 Higashiueno Taito Tokyo MIMARU",
+      "placeId": "ChIJNzPzFlaPGGARy9dNXr557qY",
+      "photoPlaceQueries": [
+        "MIMARU TOKYO UENO EAST 外観",
+        "MIMARU 上野イースト exterior",
+        "4-26-3 Higashiueno MIMARU"
       ],
       "photoAnchorTerms": [
         "MIMARU",
@@ -869,10 +879,6 @@
       ],
       "heading": "MIMARU 上野イースト：家族旅與長住友善",
       "content": "落在上野站東側的「MIMARU東京 上野イースト」，以帶小廚房的房型出名，適合動漫行程連住。從上野步行或搭一兩站就能回秋葉原、池袋；大廳與外觀辨識度高，check-in 前先拍一張入口確認位置。",
-      "googlePhotoUrl": null,
-      "googleAttribution": null,
-      "caption": null
-    }
-  ],
-  "issueLabel": "2026年7月號"
-}
+      "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjDTZCGS2Z5yXOpgrWGYej6ycOQd09AsJ8zBou01gFayAhH2r1el0iE_YP_QXqMtsC-SuBbPtniGnmcEvIjJ_K65f-tPtJT3aeNB7Sv_9c6ahqY1wxjg76If4boV0PolJ9RBr4SpELCq7zhl_a8-KRhHKQ=s4800-w1600-h1200",
+      "googleAttribution": "MIMARU東京 上野EAST",
+      "caption": "MIMARU東京 上野イースト外觀，東上野街區建築立面與入口可辨。"
