@@ -52,10 +52,32 @@ function previousRotatedVenues(existing) {
   }).join('\n');
 }
 
+function forbiddenCopyExcerpts(existing, dataSrc) {
+  var lines = [];
+  if (existing) {
+    if (existing.title) lines.push('標題：' + existing.title);
+    if (existing.intro) lines.push('intro 開頭：' + String(existing.intro).slice(0, 60));
+    if (existing.outro) lines.push('outro 開頭：' + String(existing.outro).slice(0, 60));
+    (existing.sections || []).forEach(function (s) {
+      if (!s || !s.sectionId) return;
+      if (s.heading) lines.push(s.sectionId + ' heading：' + s.heading);
+      if (s.content) lines.push(s.sectionId + ' 首句：' + String(s.content).slice(0, 40));
+    });
+  }
+  if (dataSrc) {
+    var introMatch = /intro:\s*'((?:\\.|[^'])*)'/.exec(dataSrc);
+    if (introMatch && introMatch[1]) {
+      lines.push('現刊 intro：' + introMatch[1].replace(/\\'/g, "'").slice(0, 80));
+    }
+  }
+  return lines.slice(0, 24).join('\n');
+}
+
 function buildGeneratePrompt(opts) {
   var month = opts.month || '7';
   var year = opts.year || '2026';
   var existing = opts.existingEditorial || null;
+  var forbiddenCopy = forbiddenCopyExcerpts(existing, opts.existingDataSrc || '');
 
   var fixedLines = FIXED_DISTRICT_IDS.map(function (id) {
     var v = sectionVenueFromExisting(existing, id);
@@ -76,7 +98,7 @@ function buildGeneratePrompt(opts) {
     '1. sections 恰好 7 個，sectionId 依序：' + REQUIRED_SECTION_IDS.join(', '),
     '2. 固定區域：akihabara=秋葉原電氣街、nakano=中野百老匯、gachapon=池袋扭蛋百貨、ikebukuro-route=アニメイト池袋本店',
     '3. 輪替段落本月必須全新店家：ichiran=拉麵、maid-cafe=特色咖啡、hotel-gracery=飯店（僅一個住宿段落，禁止青旅／hostel）',
-    '4. 輪替店家「禁止」與上月相同，也禁止：一蘭、めいどりーみん、グリッズ浅草橋、レム秋葉原、ホテルグレイスリー新宿／哥吉拉',
+    '4. 輪替店家「禁止」與上月相同，也禁止：一蘭、めいどりーみん、グリッズ浅草橋、レム秋葉原、ホテルグレイスリー新宿／哥吉拉、TOKYO豚骨BASE、JR九州ホテルブラッサム新宿、アニメイトカフェ池袋（若已寫過）',
     '5. 輪替店要真實可查、在東京、適合動漫／次文化旅人',
     '6. intro／outro／各段 content 必須是本月新寫，不可複用上月措辭',
     '7. intro 90–110 字；outro 80–100 字——直接切入主題',
@@ -90,6 +112,14 @@ function buildGeneratePrompt(opts) {
     '',
     '【上月輪替店家——本月禁止再選】',
     previousRotatedVenues(existing),
+    '',
+    '【現刊文案摘要——禁止重複標題、首句、結構與措辭（必須全新 July 專題）】',
+    forbiddenCopy || '（無）',
+    '',
+    '【七月專題角度建議（擇一深化，勿抄舊稿）】',
+    '- 盛夏電氣街：早場掃街、午後冷氣店、夜間霓虹二次入場',
+    '- 中野「冷門樓層」挖寶：外牆辨位 → まんだらけ以外的小樓層',
+    '- 池袋「扭蛋→本店→咖啡」三段補給節奏',
     '',
     '【本月輪替請自選真實店家並填 officialName / officialNameLocal / mapsQuery】',
     '- ichiran: 拉麵（例：AFURI 秋葉原、鬼金棒、一風堂——但不可一蘭）',

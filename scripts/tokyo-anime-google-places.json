@@ -1,56 +1,410 @@
 [
   {
     "sectionId": "akihabara",
-    "subject": "秋葉原電気街",
+    "subject": "秋葉原電気街：御宅族文化發源地",
     "mapsQuery": "Akihabara Electric Town",
-    "matched": false,
-    "googlePhotoUrl": null,
-    "rejectReason": "vision_photo_mismatch"
+    "placeId": "ChIJ__-AdayOGGAR6EGPwvcpzTA",
+    "googleRating": 4.3,
+    "googleAddress": "〒101-0021 東京都千代田区外神田１丁目１５−１６",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjC6q0wsbpfX4F4ShZu2fhR5w-B0w7GHZX9vYYl9ZFJXr0wqDjJLD88uH1KQuieOa7NldS4oa531ZD8HS8afxtR-HwBPnoE6_8_TpbDbHhtSwovG26GIxsbbmfjFZUHnhoUBRrYY4XtwZLtlKds=s4800-w1600-h1200",
+    "googleAttribution": "Marta",
+    "imageSource": "google_places",
+    "matched": true,
+    "placeName": "秋葉原ラジオ会館",
+    "photoScore": 232,
+    "photoIndex": 0,
+    "photoCaption": null,
+    "photoEvidence": {
+      "primary": "street_landmark",
+      "types": [
+        "street_landmark"
+      ],
+      "signals": [
+        "街",
+        "電気街"
+      ],
+      "subjectType": "district",
+      "role": "landmark",
+      "blob": "marta 電気街 街"
+    },
+    "travelPhotoSlot": "district_panorama",
+    "copySemantics": {
+      "primary": "street_scene",
+      "categories": [
+        "street_scene",
+        "storefront"
+      ],
+      "hits": [
+        {
+          "category": "street_scene",
+          "score": 7,
+          "matched": [
+            "街景",
+            "電氣街",
+            "中央通",
+            "街區",
+            "一整片",
+            "兩側",
+            "招牌"
+          ],
+          "evidence": [
+            "street_landmark",
+            "landmark_building"
+          ]
+        },
+        {
+          "category": "storefront",
+          "score": 1,
+          "matched": [
+            "招牌"
+          ],
+          "evidence": [
+            "facade",
+            "landmark_building"
+          ]
+        }
+      ],
+      "requiredEvidence": [
+        "street_landmark",
+        "landmark_building",
+        "facade"
+      ],
+      "searchBoost": [
+        "街景",
+        "電氣街",
+        "中央通",
+        "街區",
+        "一整片",
+        "兩側",
+        "招牌"
+      ],
+      "copyExcerpt": "秋葉原電気街：御宅族文化發源地 穿梭於秋葉原中央通兩側，大型電器行與動漫商店招牌林立，電子音樂與動畫主題曲交織成獨特街景。週末下午中央通會實施步行者天國，務必把握機會漫步其中，感受這股專屬的熱烈氣氛。 電氣街不是單一景點，而是一整片會讓人自然放慢步調的動漫街區 秋葉原電気街：御宅族文化發源地 秋葉原電気街：御宅族文化發源地"
+    },
+    "copyDerivedPhotoIntent": "街景、霓虹、人潮、地標建築外觀、店面外觀",
+    "matchedKeywords": [
+      "電気街",
+      "街",
+      "秋葉原電気街",
+      "電気街"
+    ],
+    "photoPlaceName": "秋葉原電気街",
+    "searchUsed": "ラジオ会館 秋葉原",
+    "photoSearchUsed": "秋葉原電気街 街並み",
+    "photoSearchPhase": "precise_local",
+    "photoSearchDebug": {
+      "sectionId": "akihabara",
+      "attempts": [
+        {
+          "ts": 1784635093497,
+          "sectionId": "akihabara",
+          "slot": null,
+          "query": "秋葉原 中央通り",
+          "phase": "precise_local",
+          "candidateCount": 1,
+          "selectedImageUrl": null,
+          "selectedReason": null,
+          "rejectReason": null
+        },
+        {
+          "ts": 1784635093688,
+          "sectionId": "akihabara",
+          "slot": null,
+          "query": "秋葉原電気街 街並み",
+          "phase": "precise_local",
+          "candidateCount": 2,
+          "selectedImageUrl": null,
+          "selectedReason": null,
+          "rejectReason": null
+        },
+        {
+          "ts": 1784635093708,
+          "sectionId": "akihabara",
+          "slot": "district_panorama",
+          "query": "秋葉原電気街 街並み",
+          "phase": "precise_local",
+          "candidateCount": 10,
+          "photoIndex": 0,
+          "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjC6q0wsbpfX4F4ShZu2fhR5w-B0w7GHZX9vYYl9ZFJXr0wqDjJLD88uH1KQuieOa7NldS4oa531ZD8HS8afxtR-HwBPnoE6_8_TpbDbHhtSwovG26GIxsbbmfjFZUHnhoUBRrYY4XtwZLtlKds=s4800-w1600-h1200",
+          "selectedReason": "slot_district_panorama_score_232",
+          "rejectReason": null
+        }
+      ]
+    },
+    "sectionType": "landmark",
+    "role": null,
+    "rejectReason": null,
+    "editorialQA": {
+      "ok": true,
+      "issues": [],
+      "usePlaceholder": false
+    },
+    "venueSwapped": false,
+    "swappedFrom": null,
+    "swappedTo": null,
+    "alternativeId": null,
+    "heading": "秋葉原電気街：御宅族文化發源地",
+    "content": "穿梭於秋葉原中央通兩側，大型電器行與動漫商店招牌林立，電子音樂與動畫主題曲交織成獨特街景。週末下午中央通會實施步行者天國，務必把握機會漫步其中，感受這股專屬的熱烈氣氛。",
+    "officialName": "Akihabara Electric Town",
+    "officialNameLocal": "秋葉原電気街",
+    "pipeline": {
+      "version": "photo-search-retry-v1",
+      "steps": [
+        "copy_semantic_analysis",
+        "derive_photo_intent",
+        "place_verify",
+        "photo_search_retry",
+        "photo_first_pick",
+        "evidence_caption",
+        "rule_qa"
+      ],
+      "aiTokens": 0,
+      "photoSearchDebug": {
+        "sectionId": "akihabara",
+        "attempts": [
+          {
+            "ts": 1784635093497,
+            "sectionId": "akihabara",
+            "slot": null,
+            "query": "秋葉原 中央通り",
+            "phase": "precise_local",
+            "candidateCount": 1,
+            "selectedImageUrl": null,
+            "selectedReason": null,
+            "rejectReason": null
+          },
+          {
+            "ts": 1784635093688,
+            "sectionId": "akihabara",
+            "slot": null,
+            "query": "秋葉原電気街 街並み",
+            "phase": "precise_local",
+            "candidateCount": 2,
+            "selectedImageUrl": null,
+            "selectedReason": null,
+            "rejectReason": null
+          },
+          {
+            "ts": 1784635093708,
+            "sectionId": "akihabara",
+            "slot": "district_panorama",
+            "query": "秋葉原電気街 街並み",
+            "phase": "precise_local",
+            "candidateCount": 10,
+            "photoIndex": 0,
+            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjC6q0wsbpfX4F4ShZu2fhR5w-B0w7GHZX9vYYl9ZFJXr0wqDjJLD88uH1KQuieOa7NldS4oa531ZD8HS8afxtR-HwBPnoE6_8_TpbDbHhtSwovG26GIxsbbmfjFZUHnhoUBRrYY4XtwZLtlKds=s4800-w1600-h1200",
+            "selectedReason": "slot_district_panorama_score_232",
+            "rejectReason": null
+          }
+        ]
+      }
+    }
   },
   {
     "sectionId": "nakano",
-    "subject": "中野ブロードウェイ",
+    "subject": "中野ブロードウェイ：懷舊寶藏的時光迴廊",
     "mapsQuery": "Nakano Broadway entrance Tokyo",
-    "matched": false,
-    "googlePhotoUrl": null,
-    "rejectReason": "vision_photo_mismatch"
+    "placeId": "ChIJg-7dspDyGGARvvDv4E5-tuE",
+    "googleRating": 4.2,
+    "googleAddress": "〒164-0001 東京都中野区中野５丁目５２−１５",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjDgwCb_1dUwWnDRggKVGqZzFLesGoERepbLbDSYbvKDGcnoVbSf3FnrClD9to5FL0NM-mLF8Drf3j8ei6wShQmhb7FKv6qwpD3-vX5ZhFiR9bzV8qjvx7mIHlUI2FlRXCpWijOyt49uJmLdJH7bciKz2A=s4800-w1600-h1200",
+    "googleAttribution": "zox Tomo",
+    "imageSource": "google_places",
+    "matched": true,
+    "placeName": "中野ブロードウェイ",
+    "photoScore": 242,
+    "photoIndex": 1,
+    "photoCaption": null,
+    "photoEvidence": {
+      "primary": "street_landmark",
+      "types": [
+        "street_landmark"
+      ],
+      "signals": [
+        "ブロードウェイ"
+      ],
+      "subjectType": "district",
+      "role": "anime",
+      "blob": "zox tomo ブロードウェイ 中野"
+    },
+    "travelPhotoSlot": "district_panorama",
+    "copySemantics": {
+      "primary": "shop_collectible",
+      "categories": [
+        "shop_collectible",
+        "storefront"
+      ],
+      "hits": [
+        {
+          "category": "shop_collectible",
+          "score": 2,
+          "matched": [
+            "挖寶",
+            "漫畫"
+          ],
+          "evidence": [
+            "anime_collectible",
+            "shop_interior"
+          ]
+        },
+        {
+          "category": "storefront",
+          "score": 1,
+          "matched": [
+            "外觀"
+          ],
+          "evidence": [
+            "facade",
+            "landmark_building"
+          ]
+        }
+      ],
+      "requiredEvidence": [
+        "anime_collectible",
+        "shop_interior",
+        "facade",
+        "landmark_building"
+      ],
+      "searchBoost": [
+        "挖寶",
+        "漫畫",
+        "外觀"
+      ],
+      "copyExcerpt": "中野ブロードウェイ：懷舊寶藏的時光迴廊 中野車站北口出來，通過陽光商店街直達中野百老匯入口。這座複合式商場外觀樸實，內部卻是動漫、漫畫、偶像周邊的寶庫。建議預留至少半天時間，深入探索各樓層的特色小店。 老玩家公認挖寶聖地，不是普通商場 中野ブロードウェイ：懷舊寶藏的時光迴廊 中野ブロードウェイ：懷舊寶藏的時光迴廊"
+    },
+    "copyDerivedPhotoIntent": "商品陳列、公仔模型、收藏櫥窗、店面外觀",
+    "matchedKeywords": [
+      "ブロードウェイ",
+      "中野",
+      "中野ブロードウェイ",
+      "ブロードウェイ",
+      "中野"
+    ],
+    "photoPlaceName": "中野ブロードウェイ",
+    "searchUsed": "中野ブロードウェイ",
+    "photoSearchUsed": "Nakano Broadway entrance Tokyo",
+    "photoSearchPhase": "precise_local",
+    "photoSearchDebug": {
+      "sectionId": "nakano",
+      "attempts": [
+        {
+          "ts": 1784635094139,
+          "sectionId": "nakano",
+          "slot": null,
+          "query": "Nakano Broadway entrance Tokyo",
+          "phase": "precise_local",
+          "candidateCount": 1,
+          "selectedImageUrl": null,
+          "selectedReason": null,
+          "rejectReason": null
+        },
+        {
+          "ts": 1784635094152,
+          "sectionId": "nakano",
+          "slot": "district_panorama",
+          "query": "Nakano Broadway entrance Tokyo",
+          "phase": "precise_local",
+          "candidateCount": 10,
+          "photoIndex": 1,
+          "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjDgwCb_1dUwWnDRggKVGqZzFLesGoERepbLbDSYbvKDGcnoVbSf3FnrClD9to5FL0NM-mLF8Drf3j8ei6wShQmhb7FKv6qwpD3-vX5ZhFiR9bzV8qjvx7mIHlUI2FlRXCpWijOyt49uJmLdJH7bciKz2A=s4800-w1600-h1200",
+          "selectedReason": "slot_district_panorama_score_242",
+          "rejectReason": null
+        }
+      ]
+    },
+    "sectionType": "landmark",
+    "role": null,
+    "rejectReason": null,
+    "editorialQA": {
+      "ok": true,
+      "issues": [],
+      "usePlaceholder": false
+    },
+    "venueSwapped": false,
+    "swappedFrom": null,
+    "swappedTo": null,
+    "alternativeId": null,
+    "heading": "中野ブロードウェイ：懷舊寶藏的時光迴廊",
+    "content": "中野車站北口出來，通過陽光商店街直達中野百老匯入口。這座複合式商場外觀樸實，內部卻是動漫、漫畫、偶像周邊的寶庫。建議預留至少半天時間，深入探索各樓層的特色小店。",
+    "officialName": "Nakano Broadway",
+    "officialNameLocal": "中野ブロードウェイ",
+    "pipeline": {
+      "version": "photo-search-retry-v1",
+      "steps": [
+        "copy_semantic_analysis",
+        "derive_photo_intent",
+        "place_verify",
+        "photo_search_retry",
+        "photo_first_pick",
+        "evidence_caption",
+        "rule_qa"
+      ],
+      "aiTokens": 0,
+      "photoSearchDebug": {
+        "sectionId": "nakano",
+        "attempts": [
+          {
+            "ts": 1784635094139,
+            "sectionId": "nakano",
+            "slot": null,
+            "query": "Nakano Broadway entrance Tokyo",
+            "phase": "precise_local",
+            "candidateCount": 1,
+            "selectedImageUrl": null,
+            "selectedReason": null,
+            "rejectReason": null
+          },
+          {
+            "ts": 1784635094152,
+            "sectionId": "nakano",
+            "slot": "district_panorama",
+            "query": "Nakano Broadway entrance Tokyo",
+            "phase": "precise_local",
+            "candidateCount": 10,
+            "photoIndex": 1,
+            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjDgwCb_1dUwWnDRggKVGqZzFLesGoERepbLbDSYbvKDGcnoVbSf3FnrClD9to5FL0NM-mLF8Drf3j8ei6wShQmhb7FKv6qwpD3-vX5ZhFiR9bzV8qjvx7mIHlUI2FlRXCpWijOyt49uJmLdJH7bciKz2A=s4800-w1600-h1200",
+            "selectedReason": "slot_district_panorama_score_242",
+            "rejectReason": null
+          }
+        ]
+      }
+    }
   },
   {
     "sectionId": "gachapon",
-    "subject": "ガシャポン百貨店 池袋総本店",
+    "subject": "ガシャポン百貨店 池袋総本店：扭蛋宇宙的無限可能",
     "mapsQuery": "ガシャポンのデパート 池袋本店",
     "matched": false,
     "googlePhotoUrl": null,
     "rejectReason": "vision_photo_mismatch"
   },
   {
+    "sectionId": "ikebukuro-route",
+    "subject": "池袋動漫聖地巡禮動線：乙女路的魅力探索",
+    "mapsQuery": "アニメイト池袋本店",
+    "matched": false,
+    "googlePhotoUrl": null,
+    "rejectReason": "vision_photo_mismatch"
+  },
+  {
     "sectionId": "ichiran",
-    "subject": "TOKYO豚骨BASE エキュート秋葉原",
-    "mapsQuery": "TOKYO豚骨BASE エキュート秋葉原",
+    "subject": "AFURI 恵比寿：柚子香氣的清爽拉麵",
+    "mapsQuery": "AFURI Ebisu",
     "matched": false,
     "googlePhotoUrl": null,
     "rejectReason": "vision_photo_mismatch"
   },
   {
     "sectionId": "maid-cafe",
-    "subject": "アニメイトカフェ 池袋店",
-    "mapsQuery": "アニメイト池袋本店",
-    "matched": false,
-    "googlePhotoUrl": null,
-    "rejectReason": "vision_photo_mismatch"
-  },
-  {
-    "sectionId": "ikebukuro-route",
-    "subject": "アニメイト池袋本店",
-    "mapsQuery": "アニメイト池袋本店",
+    "subject": "SQUARE ENIX CAFE：遊戲主題沉浸體驗",
+    "mapsQuery": "Square Enix Cafe Akihabara",
     "matched": false,
     "googlePhotoUrl": null,
     "rejectReason": "vision_photo_mismatch"
   },
   {
     "sectionId": "hotel-gracery",
-    "subject": "JR九州ホテル ブラッサム新宿",
-    "mapsQuery": "JR Kyushu Hotel Blossom Shinjuku Tokyo",
+    "subject": "NOHGA HOTEL UENO TOKYO：藝術與機能兼具的住宿選擇",
+    "mapsQuery": "NOHGA HOTEL UENO TOKYO",
     "matched": false,
     "googlePhotoUrl": null,
     "rejectReason": "vision_photo_mismatch"
@@ -59,8 +413,364 @@
     "sectionId": "hero-anime",
     "subject": "秋葉原電氣街",
     "mapsQuery": "Akihabara Electric Town Chuo Dori Tokyo",
-    "matched": false,
-    "googlePhotoUrl": null,
-    "rejectReason": "vision_photo_mismatch"
+    "placeId": "ChIJAVf7lh2MGGARJylRnQ_3dpI",
+    "googleRating": 4.2,
+    "googleAddress": "〒101-0021 東京都千代田区外神田４丁目３−１",
+    "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjABoYKWAQAxEWnZwL_SqW1C1vXQVChhP_YEo2NnFUNh3cLNfJMnQuDYfSIarxqDHV4F-7Wxg2xyZ3euCQMckEu12ziZNipobJT9EEDLfzHQ-a8S06z-4Fn4ZiS1c6qOglu_84AVi1KTC9Uu=s4800-w1600-h1200",
+    "googleAttribution": "Blake Bishop",
+    "imageSource": "google_places",
+    "matched": true,
+    "placeName": "アニメイト秋葉原",
+    "photoScore": 255,
+    "photoIndex": 1,
+    "photoCaption": null,
+    "photoEvidence": {
+      "primary": "street_landmark",
+      "types": [
+        "landmark_building",
+        "street_landmark"
+      ],
+      "signals": [
+        "gigo",
+        "gigo"
+      ],
+      "subjectType": "district",
+      "role": "opening",
+      "blob": "blake bishop gigo akihabara building 3 gigo gigo"
+    },
+    "travelPhotoSlot": "district_panorama",
+    "copySemantics": {
+      "primary": "street_scene",
+      "categories": [
+        "street_scene",
+        "landmark"
+      ],
+      "hits": [
+        {
+          "category": "street_scene",
+          "score": 1,
+          "matched": [
+            "電氣街"
+          ],
+          "evidence": [
+            "street_landmark",
+            "landmark_building"
+          ]
+        },
+        {
+          "category": "landmark",
+          "score": 1,
+          "matched": [
+            "一眼"
+          ],
+          "evidence": [
+            "landmark_building",
+            "street_landmark"
+          ]
+        }
+      ],
+      "requiredEvidence": [
+        "street_landmark",
+        "landmark_building"
+      ],
+      "searchBoost": [
+        "電氣街",
+        "一眼"
+      ],
+      "copyExcerpt": "Hero 要一眼辨識「這就是秋葉原電氣街」 秋葉原電氣街 秋葉原電氣街"
+    },
+    "copyDerivedPhotoIntent": "街景、霓虹、人潮、地標建築外觀、地標建築、代表性招牌、街區辨識點",
+    "matchedKeywords": [
+      "GIGO",
+      "GIGO",
+      "GIGO"
+    ],
+    "photoPlaceName": "GiGO Akihabara Building 3",
+    "searchUsed": "アニメイト 秋葉原",
+    "photoSearchUsed": "GIGO秋葉原",
+    "photoSearchPhase": "precise_local",
+    "photoSearchDebug": {
+      "sectionId": "hero-anime",
+      "attempts": [
+        {
+          "ts": 1784635238832,
+          "sectionId": "hero-anime",
+          "slot": null,
+          "query": "秋葉原 中央通り",
+          "phase": "precise_local",
+          "candidateCount": 1,
+          "selectedImageUrl": null,
+          "selectedReason": null,
+          "rejectReason": null
+        },
+        {
+          "ts": 1784635239082,
+          "sectionId": "hero-anime",
+          "slot": null,
+          "query": "Akihabara Chuo Dori anime street",
+          "phase": "precise_local",
+          "candidateCount": 5,
+          "selectedImageUrl": null,
+          "selectedReason": null,
+          "rejectReason": null
+        },
+        {
+          "ts": 1784635239302,
+          "sectionId": "hero-anime",
+          "slot": null,
+          "query": "秋葉原電気街 夜景",
+          "phase": "precise_local",
+          "candidateCount": 1,
+          "selectedImageUrl": null,
+          "selectedReason": null,
+          "rejectReason": null
+        },
+        {
+          "ts": 1784635239672,
+          "sectionId": "hero-anime",
+          "slot": null,
+          "query": "秋葉原電気街",
+          "phase": "precise_local",
+          "candidateCount": 1,
+          "selectedImageUrl": null,
+          "selectedReason": null,
+          "rejectReason": null
+        },
+        {
+          "ts": 1784635239833,
+          "sectionId": "hero-anime",
+          "slot": null,
+          "query": "Akihabara Electric Town",
+          "phase": "precise_local",
+          "candidateCount": 1,
+          "selectedImageUrl": null,
+          "selectedReason": null,
+          "rejectReason": null
+        },
+        {
+          "ts": 1784635239948,
+          "sectionId": "hero-anime",
+          "slot": null,
+          "query": "秋葉原電氣街",
+          "phase": "precise_local",
+          "candidateCount": 1,
+          "selectedImageUrl": null,
+          "selectedReason": null,
+          "rejectReason": null
+        },
+        {
+          "ts": 1784635240140,
+          "sectionId": "hero-anime",
+          "slot": null,
+          "query": "Radio Kaikan Akihabara",
+          "phase": "precise_local",
+          "candidateCount": 1,
+          "selectedImageUrl": null,
+          "selectedReason": null,
+          "rejectReason": null
+        },
+        {
+          "ts": 1784635240262,
+          "sectionId": "hero-anime",
+          "slot": null,
+          "query": "秋葉原中央通り",
+          "phase": "precise_local",
+          "candidateCount": 1,
+          "selectedImageUrl": null,
+          "selectedReason": null,
+          "rejectReason": null
+        },
+        {
+          "ts": 1784635240437,
+          "sectionId": "hero-anime",
+          "slot": null,
+          "query": "アニメイト秋葉原",
+          "phase": "precise_local",
+          "candidateCount": 1,
+          "selectedImageUrl": null,
+          "selectedReason": null,
+          "rejectReason": null
+        },
+        {
+          "ts": 1784635240651,
+          "sectionId": "hero-anime",
+          "slot": null,
+          "query": "GIGO秋葉原",
+          "phase": "precise_local",
+          "candidateCount": 5,
+          "selectedImageUrl": null,
+          "selectedReason": null,
+          "rejectReason": null
+        },
+        {
+          "ts": 1784635240668,
+          "sectionId": "hero-anime",
+          "slot": "district_panorama",
+          "query": "GIGO秋葉原",
+          "phase": "precise_local",
+          "candidateCount": 10,
+          "photoIndex": 1,
+          "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjABoYKWAQAxEWnZwL_SqW1C1vXQVChhP_YEo2NnFUNh3cLNfJMnQuDYfSIarxqDHV4F-7Wxg2xyZ3euCQMckEu12ziZNipobJT9EEDLfzHQ-a8S06z-4Fn4ZiS1c6qOglu_84AVi1KTC9Uu=s4800-w1600-h1200",
+          "selectedReason": "slot_district_panorama_score_255",
+          "rejectReason": null
+        }
+      ]
+    },
+    "sectionType": "landmark",
+    "role": "hero",
+    "rejectReason": null,
+    "editorialQA": {
+      "ok": true,
+      "issues": [],
+      "usePlaceholder": false
+    },
+    "venueSwapped": false,
+    "swappedFrom": null,
+    "swappedTo": null,
+    "alternativeId": null,
+    "heading": null,
+    "content": null,
+    "officialName": "Akihabara Electric Town",
+    "officialNameLocal": "秋葉原電気街",
+    "pipeline": {
+      "version": "photo-search-retry-v1",
+      "steps": [
+        "copy_semantic_analysis",
+        "derive_photo_intent",
+        "place_verify",
+        "photo_search_retry",
+        "photo_first_pick",
+        "evidence_caption",
+        "rule_qa"
+      ],
+      "aiTokens": 0,
+      "photoSearchDebug": {
+        "sectionId": "hero-anime",
+        "attempts": [
+          {
+            "ts": 1784635238832,
+            "sectionId": "hero-anime",
+            "slot": null,
+            "query": "秋葉原 中央通り",
+            "phase": "precise_local",
+            "candidateCount": 1,
+            "selectedImageUrl": null,
+            "selectedReason": null,
+            "rejectReason": null
+          },
+          {
+            "ts": 1784635239082,
+            "sectionId": "hero-anime",
+            "slot": null,
+            "query": "Akihabara Chuo Dori anime street",
+            "phase": "precise_local",
+            "candidateCount": 5,
+            "selectedImageUrl": null,
+            "selectedReason": null,
+            "rejectReason": null
+          },
+          {
+            "ts": 1784635239302,
+            "sectionId": "hero-anime",
+            "slot": null,
+            "query": "秋葉原電気街 夜景",
+            "phase": "precise_local",
+            "candidateCount": 1,
+            "selectedImageUrl": null,
+            "selectedReason": null,
+            "rejectReason": null
+          },
+          {
+            "ts": 1784635239672,
+            "sectionId": "hero-anime",
+            "slot": null,
+            "query": "秋葉原電気街",
+            "phase": "precise_local",
+            "candidateCount": 1,
+            "selectedImageUrl": null,
+            "selectedReason": null,
+            "rejectReason": null
+          },
+          {
+            "ts": 1784635239833,
+            "sectionId": "hero-anime",
+            "slot": null,
+            "query": "Akihabara Electric Town",
+            "phase": "precise_local",
+            "candidateCount": 1,
+            "selectedImageUrl": null,
+            "selectedReason": null,
+            "rejectReason": null
+          },
+          {
+            "ts": 1784635239948,
+            "sectionId": "hero-anime",
+            "slot": null,
+            "query": "秋葉原電氣街",
+            "phase": "precise_local",
+            "candidateCount": 1,
+            "selectedImageUrl": null,
+            "selectedReason": null,
+            "rejectReason": null
+          },
+          {
+            "ts": 1784635240140,
+            "sectionId": "hero-anime",
+            "slot": null,
+            "query": "Radio Kaikan Akihabara",
+            "phase": "precise_local",
+            "candidateCount": 1,
+            "selectedImageUrl": null,
+            "selectedReason": null,
+            "rejectReason": null
+          },
+          {
+            "ts": 1784635240262,
+            "sectionId": "hero-anime",
+            "slot": null,
+            "query": "秋葉原中央通り",
+            "phase": "precise_local",
+            "candidateCount": 1,
+            "selectedImageUrl": null,
+            "selectedReason": null,
+            "rejectReason": null
+          },
+          {
+            "ts": 1784635240437,
+            "sectionId": "hero-anime",
+            "slot": null,
+            "query": "アニメイト秋葉原",
+            "phase": "precise_local",
+            "candidateCount": 1,
+            "selectedImageUrl": null,
+            "selectedReason": null,
+            "rejectReason": null
+          },
+          {
+            "ts": 1784635240651,
+            "sectionId": "hero-anime",
+            "slot": null,
+            "query": "GIGO秋葉原",
+            "phase": "precise_local",
+            "candidateCount": 5,
+            "selectedImageUrl": null,
+            "selectedReason": null,
+            "rejectReason": null
+          },
+          {
+            "ts": 1784635240668,
+            "sectionId": "hero-anime",
+            "slot": "district_panorama",
+            "query": "GIGO秋葉原",
+            "phase": "precise_local",
+            "candidateCount": 10,
+            "photoIndex": 1,
+            "selectedImageUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjABoYKWAQAxEWnZwL_SqW1C1vXQVChhP_YEo2NnFUNh3cLNfJMnQuDYfSIarxqDHV4F-7Wxg2xyZ3euCQMckEu12ziZNipobJT9EEDLfzHQ-a8S06z-4Fn4ZiS1c6qOglu_84AVi1KTC9Uu=s4800-w1600-h1200",
+            "selectedReason": "slot_district_panorama_score_255",
+            "rejectReason": null
+          }
+        ]
+      }
+    }
   }
 ]

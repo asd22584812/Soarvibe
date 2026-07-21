@@ -415,6 +415,8 @@ export function validateCaptionMatchesEvidence(caption, evidence) {
 export function validateLodgingVenueAttribution(attribution, section) {
   var role = resolveSectionRole(section || {});
   if (role !== 'hotel' && role !== 'hostel') return { ok: true };
+  // Place ID–anchored photos are from the verified listing; attribution is often a guest name.
+  if (section && section.placeId) return { ok: true };
   var attr = String(attribution || '');
   if (!attr) return { ok: false, reason: 'lodging_no_attribution' };
 

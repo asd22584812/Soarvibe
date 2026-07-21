@@ -186,6 +186,10 @@ function isExteriorSlotMismatch(row, editorialRow) {
   return false;
 }
 
+async function sleep(ms) {
+  return new Promise(function (resolve) { setTimeout(resolve, ms); });
+}
+
 async function resolveOneSection(payload, section, excludeUrls) {
   const endpoint = USE_LEGACY_PLACES ? '/api/places/resolve' : '/api/editorial/resolve';
   const body = USE_LEGACY_PLACES
@@ -197,14 +201,23 @@ async function resolveOneSection(payload, section, excludeUrls) {
       sections: [Object.assign({}, section, { excludeUrls: excludeUrls })],
       excludeUrls: excludeUrls
     };
-  const response = await fetch(API_BASE + endpoint, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Origin: ORIGIN },
-    body: JSON.stringify(body)
-  });
-  const data = await response.json();
-  if (!response.ok) throw new Error('Worker editorial resolve failed for ' + section.sectionId + ': ' + JSON.stringify(data));
-  return (data.results && data.results[0]) || data;
+  for (let attempt = 0; attempt < 5; attempt++) {
+    if (attempt > 0) await sleep(8000 * attempt);
+    const response = await fetch(API_BASE + endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Origin: ORIGIN },
+      body: JSON.stringify(body)
+    });
+    const text = await response.text();
+    if (text.startsWith('<!')) {
+      console.warn('[RESOLVE HTML]', section.sectionId, 'attempt', attempt + 1);
+      continue;
+    }
+    const data = JSON.parse(text);
+    if (!response.ok) throw new Error('Worker editorial resolve failed for ' + section.sectionId + ': ' + JSON.stringify(data));
+    return (data.results && data.results[0]) || data;
+  }
+  throw new Error('Worker editorial resolve unavailable for ' + section.sectionId);
 }
 
 async function resolveSectionWithVision(payload, section, editorial, excludeUrls) {
@@ -250,6 +263,14 @@ async function resolveSectionWithVision(payload, section, editorial, excludeUrls
       }
       if (verified.apiError) {
         console.warn('[VISION QUOTA]', section.sectionId, 'idx:' + tryIdx, verified.apiError);
+        try {
+          const fallbackCap = await visionCaptionViaWorker(row.googlePhotoUrl, ctx, editorialRow);
+          if (fallbackCap && !isDistrictPhotoMismatch(fallbackCap, [])) {
+            row.photoCaption = fallbackCap;
+            console.log('[VISION CAPTION FALLBACK]', section.sectionId, fallbackCap.slice(0, 36));
+            return row;
+          }
+        } catch (_capErr) { /* continue trying next index */ }
         excludeUrls.push(row.googlePhotoUrl);
         continue;
       }

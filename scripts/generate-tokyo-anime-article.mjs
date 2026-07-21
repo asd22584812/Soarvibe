@@ -83,7 +83,17 @@ function patchSectionCopy(src, section) {
     photoIntent: section.photoIntent,
     aliases: section.aliases,
     imageChecklist: section.imageChecklist,
-    imageRejectRules: section.imageRejectRules
+    imageRejectRules: section.imageRejectRules,
+    placeId: section.placeId,
+    googlePhotoUrl: section.googlePhotoUrl,
+    googleAttribution: section.googleAttribution,
+    imageSource: section.imageSource,
+    caption: section.caption,
+    googleRating: section.googleRating,
+    googleAddress: section.googleAddress,
+    secondaryGooglePhotoUrl: section.secondaryGooglePhotoUrl,
+    secondaryGoogleAttribution: section.secondaryGoogleAttribution,
+    secondaryCaption: section.secondaryCaption
   };
   for (const [key, value] of Object.entries(replacements)) {
     if (value == null) continue;
@@ -143,7 +153,14 @@ function mergeEditorialWithArticle(existing, article) {
       base.placeId = null;
       base.googlePhotoUrl = null;
       base.googleAttribution = null;
+      base.imageSource = null;
       base.caption = null;
+      base.googleRating = null;
+      base.googleAddress = null;
+      base.secondaryGooglePhotoUrl = null;
+      base.secondaryGoogleAttribution = null;
+      base.secondaryCaption = null;
+      base.subject = gen.heading || gen.officialNameLocal || gen.officialName;
       base.allowVenueSwap = true;
       base.aliases = [gen.officialName, gen.officialNameLocal].filter(Boolean);
       base.photoAnchorTerms = [gen.officialNameLocal, gen.officialName].filter(Boolean);
@@ -212,7 +229,7 @@ function buildEditorialJson(existing, article) {
   };
 }
 
-async function generateArticle(existingEditorial) {
+async function generateArticle(existingEditorial, existingDataSrc) {
   console.log('[GENERATE] Calling', API_BASE + '/api/editorial/generate');
   const response = await fetch(API_BASE + '/api/editorial/generate', {
     method: 'POST',
@@ -221,7 +238,8 @@ async function generateArticle(existingEditorial) {
       month: '7',
       year: '2026',
       styleKey: 'anime',
-      existingEditorial: existingEditorial || null
+      existingEditorial: existingEditorial || null,
+      existingDataSrc: existingDataSrc || null
     })
   });
   const data = await response.json();
@@ -242,8 +260,10 @@ async function main() {
   }
 
   let article;
+  const existingDataSrc = fs.existsSync(DATA_PATH) ? fs.readFileSync(DATA_PATH, 'utf8') : '';
+
   if (!skipGenerate) {
-    article = await generateArticle(existingEditorial);
+    article = await generateArticle(existingEditorial, existingDataSrc);
     console.log('[GENERATE] Title:', article.title);
     const editorial = buildEditorialJson(existingEditorial, article);
     fs.writeFileSync(EDITORIAL_PATH, JSON.stringify(editorial, null, 2) + '\n', 'utf8');
@@ -260,11 +280,15 @@ async function main() {
   }
 
   if (!skipFetch) {
-    console.log('[FETCH] Running Google Places pipeline...');
+    console.log('[FETCH] Running Google Places pipeline (copy preserved, vision captions)...');
     const result = spawnSync(process.execPath, ['scripts/fetch-tokyo-anime-google-places.mjs'], {
       cwd: ROOT,
       stdio: 'inherit',
-      env: Object.assign({}, process.env, { SOARVIBE_API_BASE: API_BASE, SOARVIBE_ORIGIN: ORIGIN })
+      env: Object.assign({}, process.env, {
+        SOARVIBE_API_BASE: API_BASE,
+        SOARVIBE_ORIGIN: ORIGIN,
+        SOARVIBE_SYNC_COPY: '0'
+      })
     });
     if (result.status !== 0) process.exit(result.status || 1);
   }

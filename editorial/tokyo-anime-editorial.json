@@ -1,6 +1,6 @@
 {
   "articleId": "tokyo-anime",
-  "articleTheme": "東京動漫聖地巡禮——電氣街與中野的挖寶節奏",
+  "articleTheme": "七月動漫聖地巡禮——街景、挖寶與池袋補給",
   "editorialAngle": "不是購物清單，而是動漫迷的朝聖路線：從 Radio Kaikan 到 Mandarake 深處",
   "readerPersona": "動漫迷、老玩家、想深度逛秋葉原與中野的旅人",
   "travelStyle": "步行掃街、深度挖寶、夜宿交通樞紐",
@@ -19,8 +19,8 @@
   ],
   "editorialPlan": {
     "theme": "東京玩具動漫",
-    "storyArc": "用 1～2 天把秋葉原、中野、扭蛋、Animate本店、拉麵與住宿串成一條有節奏的動漫巡禮路線",
-    "readingRhythm": "上午電氣街朝聖 → 午後中野挖寶 → 傍晚扭蛋與 Animate 補給 → 夜宿交通樞紐"
+    "storyArc": "秋葉原→中野→池袋→上野住宿",
+    "readingRhythm": "上午電氣街 → 午後中野 → 傍晚池袋 → 夜宿上野"
   },
   "destination": {
     "countryCode": "JP",
@@ -181,7 +181,7 @@
       "sectionRole": "landmark",
       "subjectType": "district",
       "isSpecificVenue": false,
-      "title": "秋葉原電気街",
+      "title": "秋葉原電気街：御宅族文化發源地",
       "sectionPurpose": "anime",
       "editorialAngle": "電氣街不是單一景點，而是一整片會讓人自然放慢步調的動漫街區",
       "photoIntent": "廣角街景、街區全景、招牌霓虹、中央通／商店街外觀，禁止室內吧台／單店特寫",
@@ -335,8 +335,8 @@
         "pod",
         "映画館"
       ],
-      "heading": "秋葉原電気街",
-      "content": "秋葉原電気街是動漫迷的朝聖地。從JR秋葉原站電氣街口出來，立刻會被琳瑯滿目的電子產品與動漫周邊商店包圍。務必留時間逛「ラジオ会館」，尋找稀有模型與卡牌，這裡總是能挖到寶。",
+      "heading": "秋葉原電気街：御宅族文化發源地",
+      "content": "穿梭於秋葉原中央通兩側，大型電器行與動漫商店招牌林立，電子音樂與動畫主題曲交織成獨特街景。週末下午中央通會實施步行者天國，務必把握機會漫步其中，感受這股專屬的熱烈氣氛。",
       "venueAlternatives": [
         {
           "officialName": "Mandarake Complex",
@@ -352,7 +352,7 @@
       "subjectType": "district",
       "isSpecificVenue": false,
       "requireStreetscape": true,
-      "title": "中野ブロードウェイ",
+      "title": "中野ブロードウェイ：懷舊寶藏的時光迴廊",
       "sectionPurpose": "anime",
       "editorialAngle": "老玩家公認挖寶聖地，不是普通商場",
       "photoIntent": "中野百老匯商場外牆、入口招牌、NAKANO BROADWAY 立面，禁止雜貨店／食材店／室內走道",
@@ -488,22 +488,20 @@
         "restaurant",
         "apartment"
       ],
-      "heading": "中野ブロードウェイ",
-      "content": "中野ブロードウェイ是尋寶者的天堂。從JR中野站北口步行5分鐘，這棟複合式商場內藏著無數古董漫畫、偶像周邊與獨立藝術品小店。建議直接上二樓「まんだらけ」總店，感受時間凝結的次文化氛圍。",
+      "heading": "中野ブロードウェイ：懷舊寶藏的時光迴廊",
+      "content": "中野車站北口出來，通過陽光商店街直達中野百老匯入口。這座複合式商場外觀樸實，內部卻是動漫、漫畫、偶像周邊的寶庫。建議預留至少半天時間，深入探索各樓層的特色小店。",
       "venueAlternatives": [
         {
           "officialName": "Nakano Sun Mall",
           "officialNameLocal": "",
           "mapsQuery": "Nakano Sun Mall"
         }
-      ],
-      "isSpecificVenue": false,
-      "requireStreetscape": true
+      ]
     },
     {
       "sectionId": "gachapon",
       "sectionRole": "anime",
-      "title": "ガシャポン百貨店 池袋総本店",
+      "title": "ガシャポン百貨店 池袋総本店：扭蛋宇宙的無限可能",
       "sectionPurpose": "shopping",
       "editorialAngle": "整面牆都是驚喜，不是黃色招牌外觀",
       "photoIntent": "整排扭蛋機、扭蛋牆、膠囊玩具、色彩豐富、ガチャ",
@@ -599,8 +597,8 @@
         "restaurant",
         "cafe"
       ],
-      "heading": "ガシャポン百貨店 池袋総本店",
-      "content": "池袋的「ガシャポン百貨店」是扭蛋迷的夢幻據點。從JR池袋站東口步行約7分鐘，這間店擁有超過3000台扭蛋機，涵蓋從經典到最新款的各種主題。準備好零錢，一次滿足你的收藏慾。",
+      "heading": "ガシャポン百貨店 池袋総本店：扭蛋宇宙的無限可能",
+      "content": "池袋太陽城購物中心三樓的ガシャポン百貨店，門口數百台扭蛋機一字排開，視覺效果震撼。這裡匯集了最新動漫角色到經典懷舊款，是尋找獨特小物的最佳地點，建議準備足夠零錢。",
       "venueAlternatives": [
         {
           "officialName": "Shinjuku Gashapon Bandai Official Shop",
@@ -610,135 +608,10 @@
       ]
     },
     {
-      "sectionId": "ichiran",
-      "sectionRole": "food",
-      "title": "TOKYO豚骨BASE エキュート秋葉原",
-      "sectionType": "food",
-      "officialName": "TOKYO Tonkotsu Base Akihabara",
-      "officialNameLocal": "TOKYO豚骨BASE エキュート秋葉原",
-      "aliases": [
-        "TOKYO Tonkotsu Base",
-        "豚骨BASE",
-        "エキュート秋葉原"
-      ],
-      "mapsQuery": "TOKYO豚骨BASE エキュート秋葉原",
-      "placeId": null,
-      "photoPlaceQueries": [
-        "一風堂 秋葉原 外観",
-        "Ippudo Akihabara exterior",
-        "一風堂 秋葉原"
-      ],
-      "allowVenueSwap": false,
-      "venueAlternatives": [],
-      "photoAnchorTerms": [
-        "一風堂",
-        "Ippudo"
-      ],
-      "allowGenericPhotoFallback": true,
-      "photoIntent": "店門口、招牌、外觀優先，其次拉麵本體",
-      "imageChecklist": [
-        "一風堂",
-        "IPPUDO",
-        "外観",
-        "ラーメン"
-      ],
-      "imageRejectRules": [
-        "parking",
-        "bathroom"
-      ],
-      "isSpecificVenue": true,
-      "addressHints": [
-        "秋葉原",
-        "Akihabara"
-      ],
-      "allowedPlaceTypes": [
-        "restaurant",
-        "food",
-        "meal_takeaway",
-        "ramen_restaurant",
-        "establishment"
-      ],
-      "deniedPlaceTypes": [
-        "lodging",
-        "movie_theater",
-        "hostel"
-      ],
-      "heading": "一風堂 秋葉原：豚骨補給站",
-      "content": "秋葉原掃街後的暖胃選擇，「一風堂 秋葉原店」白丸／赤丸選擇多。紅白招牌從街口就認得出，距電氣街口步行約五分鐘；尖峰排隊常見，建議錯開 12:00–13:30。",
-      "googlePhotoUrl": null,
-      "googleAttribution": null,
-      "caption": null
-    },
-    {
-      "sectionId": "maid-cafe",
-      "sectionRole": "cafe",
-      "title": "アニメイトカフェ 池袋店",
-      "sectionType": "cafe",
-      "officialName": "Animate Cafe Ikebukuro",
-      "officialNameLocal": "アニメイトカフェ 池袋店",
-      "aliases": [
-        "Animate Cafe",
-        "アニメイトカフェ"
-      ],
-      "mapsQuery": "アニメイト池袋本店",
-      "placeId": "ChIJi0VhQ2-NGGARGsbajebyPVA",
-      "photoPlaceQueries": [
-        "アニメイト池袋本店 外観",
-        "Animate Ikebukuro flagship exterior",
-        "アニメイトカフェ 池袋店 外観"
-      ],
-      "photoAnchorTerms": [
-        "アニメイト",
-        "アニメイトカフェ",
-        "Animate"
-      ],
-      "allowVenueSwap": false,
-      "venueSwapIntent": "女僕服裝、店內互動、主題甜點",
-      "venueAlternatives": [],
-      "allowGenericPhotoFallback": true,
-      "photoIntent": "店門口、招牌、外觀優先",
-      "imageChecklist": [
-        "アニメイト",
-        "カフェ",
-        "外観"
-      ],
-      "imageRejectRules": [
-        "parking",
-        "bathroom"
-      ],
-      "isSpecificVenue": true,
-      "addressHints": [
-        "池袋",
-        "Ikebukuro",
-        "豊島"
-      ],
-      "allowedPlaceTypes": [
-        "cafe",
-        "restaurant",
-        "food",
-        "establishment",
-        "point_of_interest"
-      ],
-      "deniedPlaceTypes": [
-        "lodging",
-        "movie_theater",
-        "hostel"
-      ],
-      "heading": "池袋アニメイトカフェ：聯名打卡",
-      "content": "池袋的「アニメイトカフェ」常輪替聯名餐與特典，和ガシャポン百貨店可同一天連走。進店前查當期聯名與是否需事先預約。",
-      "googlePhotoUrl": null,
-      "googleAttribution": null,
-      "caption": null,
-      "deniedAttributionPatterns": [
-        "hotel",
-        "hostel"
-      ]
-    },
-    {
       "sectionId": "ikebukuro-route",
       "sectionRole": "anime",
       "subjectType": "venue",
-      "title": "アニメイト池袋本店",
+      "title": "池袋動漫聖地巡禮動線：乙女路的魅力探索",
       "sectionPurpose": "anime",
       "editorialAngle": "扭蛋後直奔 Animate 本店清購物清單，再接聯名咖啡",
       "photoIntent": "店門口、招牌、外觀優先，禁止室內貨架特寫",
@@ -774,9 +647,19 @@
       "isSpecificVenue": true,
       "requireStreetscape": false,
       "visualGroups": [
-        ["アニメイト", "animate"],
-        ["外観", "entrance", "入口"],
-        ["池袋", "ikebukuro"]
+        [
+          "アニメイト",
+          "animate"
+        ],
+        [
+          "外観",
+          "entrance",
+          "入口"
+        ],
+        [
+          "池袋",
+          "ikebukuro"
+        ]
       ],
       "requiredVisualMinGroups": 1,
       "imageChecklist": [
@@ -795,46 +678,169 @@
         "hotel",
         "parking"
       ],
-      "heading": "アニメイト池袋本店：週邊補給總店",
-      "content": "扭蛋逛完後，沿池袋東口商圈步行約五分鐘就到「アニメイト池袋本店」。多層樓擺滿新刊、角色周邊與期間限定，是把想買清單一次清掉的地方；隔壁棟的アニメイトカフェ可接著打卡聯名餐。建議預留一小時，先上樓掃限定再下樓結帳。",
+      "heading": "池袋動漫聖地巡禮動線：乙女路的魅力探索",
+      "content": "從池袋東口出發，沿サンシャイン通り步行至アニメイト池袋本店，約15分鐘。接著轉入乙女路，探索販售BL漫畫與女性向周邊的特色店鋪。建議停留3-4小時，感受這裡獨特的文化氛圍。",
       "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjAbQdgjHHuVG3LpK2XSlUVWevGFFfRDHap1B7uv2irvRcAxn3Y3QuDX5hEZpEr5mbWtWZF8S_FRKaMNB4xhDBxg-OFxKC9Dkf0Tly9T8TbdVNGiFHb6tExYkJ1X-La6fSscl43HgamRoz4vMnQ=s4800-w1600-h1200",
       "googleAttribution": "F L",
-      "caption": "アニメイト池袋本店門口與招牌並列，是池袋東口動漫巡禮最清楚的地標店面。"
+      "caption": "アニメイト池袋本店門口與招牌並列，是池袋東口動漫巡禮最清楚的地標店面。",
+      "venueAlternatives": []
+    },
+    {
+      "sectionId": "ichiran",
+      "sectionRole": "food",
+      "title": "AFURI 恵比寿：柚子香氣的清爽拉麵",
+      "sectionType": "food",
+      "officialName": "AFURI Ebisu",
+      "officialNameLocal": "AFURI 恵比寿",
+      "aliases": [
+        "AFURI 恵比寿",
+        "阿夫利 恵比寿",
+        "AFURI Ebisu"
+      ],
+      "mapsQuery": "AFURI 恵比寿 Tokyo",
+      "placeId": "ChIJgYtUxUGLGGAR2LLtCdmLFbs",
+      "photoPlaceQueries": [
+        "AFURI 恵比寿",
+        "阿夫利 恵比寿",
+        "AFURI Ebisu ramen"
+      ],
+      "allowVenueSwap": true,
+      "venueAlternatives": [],
+      "photoAnchorTerms": [
+        "AFURI 恵比寿",
+        "AFURI 恵比寿"
+      ],
+      "allowGenericPhotoFallback": true,
+      "photoIntent": "店門口、招牌、外觀優先，其次拉麵本體",
+      "imageChecklist": [
+        "AFURI",
+        "阿夫利",
+        "外観",
+        "ラーメン"
+      ],
+      "imageRejectRules": [
+        "parking",
+        "bathroom"
+      ],
+      "isSpecificVenue": true,
+      "addressHints": [
+        "秋葉原",
+        "Akihabara"
+      ],
+      "allowedPlaceTypes": [
+        "restaurant",
+        "food",
+        "meal_takeaway",
+        "ramen_restaurant",
+        "establishment"
+      ],
+      "deniedPlaceTypes": [
+        "lodging",
+        "movie_theater",
+        "hostel"
+      ],
+      "heading": "AFURI 恵比寿：柚子香氣的清爽拉麵",
+      "content": "位於惠比壽車站附近，以清爽的柚子鹽拉麵聞名。店內採開放式廚房設計，可見師傅烹煮過程。高峰時段常需排隊20-30分鐘，建議避開用餐尖峰，體驗其獨特的炭烤豬肉與柑橘香氣。",
+      "googlePhotoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjAygEOt4rhiPMnP-vmpRsTM-C6rIFQOeQXEc3736ZgqMeBG29bIk0ZgQM_mjM3RMabq9spC13JKslzet7ZiNnm8O9qL0Srj1jbbagAYeqNmSTa5h5YJt6wPP1hEYwpWGOcCIvEHkl6GwTzN=s4800-w1600-h1200",
+      "googleAttribution": "AFURI 恵比寿",
+      "caption": "AFURI 恵比寿 117ビル一樓店門口，黑色招牌與簡約外觀清楚可辨。"
+    },
+    {
+      "sectionId": "maid-cafe",
+      "sectionRole": "cafe",
+      "title": "@home cafe 秋葉原：經典女僕咖啡",
+      "sectionType": "cafe",
+      "officialName": "@home cafe Akihabara",
+      "officialNameLocal": "＠ほぉ～むカフェ 秋葉原本店",
+      "aliases": [
+        "@home cafe",
+        "@home cafe 秋葉原",
+        "アットホームカフェ",
+        "＠ほぉ～むカフェ"
+      ],
+      "mapsQuery": "＠ほぉ～むカフェ 秋葉原 外観",
+      "placeId": "ChIJN66t88qKGGARy5-l5t2eD68",
+        "@home cafe Akihabara exterior",
+        "アットホームカフェ 秋葉原"
+      ],
+      "photoAnchorTerms": [
+        "@home",
+        "home cafe",
+        "アットホーム"
+      ],
+      "allowVenueSwap": true,
+      "venueSwapIntent": "女僕服裝、店內互動、主題甜點",
+      "venueAlternatives": [],
+      "allowGenericPhotoFallback": true,
+      "photoIntent": "店門口、招牌、外觀優先",
+      "imageChecklist": [
+        "@home",
+        "home cafe",
+        "外観",
+        "メイド"
+      ],
+      "imageRejectRules": [
+        "parking",
+        "bathroom"
+      ],
+      "isSpecificVenue": true,
+      "addressHints": [
+        "池袋",
+        "Ikebukuro",
+        "豊島"
+      ],
+      "allowedPlaceTypes": [
+        "cafe",
+        "restaurant",
+        "food",
+        "establishment",
+        "point_of_interest"
+      ],
+      "deniedPlaceTypes": [
+        "lodging",
+        "movie_theater",
+        "hostel"
+      ],
+      "heading": "@home cafe 秋葉原：經典女僕咖啡",
+      "content": "秋葉原電氣街步行可達的「@home cafe 秋葉原店」，是女僕咖啡文化的指標名店之一。深色外觀與樓層招牌在巷口就認得出來；進店前確認低消、拍照規則與是否需排隊，尖峰時段建議預留四十分鐘以上。",
+      "googlePhotoUrl": null,
+      "googleAttribution": null,
+      "caption": null,
+      "deniedAttributionPatterns": [
+        "hotel",
+        "hostel"
+      ]
     },
     {
       "sectionId": "hotel-gracery",
       "sectionRole": "hotel",
-      "title": "JR九州ホテル ブラッサム新宿",
+      "title": "MIMARU 上野イースト：家族旅與長住友善",
       "sectionType": "hotel",
-      "officialName": "JR九州ホテル ブラッサム新宿",
-      "officialNameLocal": "JR九州ホテル ブラッサム新宿",
+      "officialName": "MIMARU TOKYO UENO EAST",
+      "officialNameLocal": "MIMARU東京 上野イースト",
       "aliases": [
-        "JR九州ホテル ブラッサム新宿",
-        "JR九州ホテル ブラッサム新宿"
+        "MIMARU UENO EAST",
+        "MIMARU東京 上野イースト",
+        "MIMARU TOKYO UENO EAST"
       ],
-      "mapsQuery": "JR Kyushu Hotel Blossom Shinjuku Tokyo",
-      "placeId": null,
-      "photoPlaceQueries": [
-        "JR九州ホテル ブラッサム新宿 外観",
-        "JR九州ホテル ブラッサム新宿 exterior",
-        "JR Kyushu Hotel Blossom Shinjuku Tokyo"
+      "mapsQuery": "MIMARU東京 上野イースト 外観",
+      "placeId": "ChIJy6-38uW3nveARoNL2cvMTFmNXQ5cHZoehAB",
+        "MIMARU 上野イースト exterior"
       ],
       "photoAnchorTerms": [
-        "JR九州ホテル ブラッサム新宿",
-        "JR九州ホテル ブラッサム新宿"
+        "MIMARU",
+        "ミマル"
       ],
       "allowVenueSwap": true,
-      "venueSwapIntent": "新宿歌舞伎町、哥吉拉地標外觀",
+      "venueSwapIntent": "上野公園周邊、藝術感住宿外觀",
       "venueAlternatives": [],
       "photoIntent": "飯店外觀、建築入口優先，其次 Lobby，最後客房",
       "imageChecklist": [
-        "facade",
-        "exterior",
+        "MIMARU",
+        "ミマル",
         "外観",
-        "entrance",
-        "lobby",
-        "room",
-        "ホテル"
+        "facade",
+        "entrance"
       ],
       "imageRejectRules": [
         "parking",
@@ -847,10 +853,9 @@
       ],
       "isSpecificVenue": true,
       "addressHints": [
-        "新宿",
-        "Shinjuku",
-        "Kabukicho",
-        "歌舞伎町"
+        "上野",
+        "Ueno",
+        "東上野"
       ],
       "allowedPlaceTypes": [
         "lodging",
@@ -862,8 +867,8 @@
         "restaurant",
         "cafe"
       ],
-      "heading": "JR九州ホテル ブラッサム新宿",
-      "content": "追求質感與便利性的旅人，可考慮「JR九州ホテル ブラッサム新宿」。從JR新宿站南口步行約3分鐘，其客房設計簡潔雅緻，高樓層能俯瞰城市夜景。早餐的九州特色料理，值得一試。",
+      "heading": "MIMARU 上野イースト：家族旅與長住友善",
+      "content": "落在上野站東側的「MIMARU東京 上野イースト」，以帶小廚房的房型出名，適合動漫行程連住。從上野步行或搭一兩站就能回秋葉原、池袋；大廳與外觀辨識度高，check-in 前先拍一張入口確認位置。",
       "googlePhotoUrl": null,
       "googleAttribution": null,
       "caption": null

@@ -589,7 +589,8 @@ async function handleEditorialGenerate(request, env, auth) {
     month: body.month || '7',
     year: body.year || '2026',
     styleKey: body.styleKey || 'anime',
-    existingEditorial: body.existingEditorial || null
+    existingEditorial: body.existingEditorial || null,
+    existingDataSrc: body.existingDataSrc || null
   });
   if (!result.ok) {
     return jsonResponse({ error: result.error, detail: result.detail || null }, 502, auth.origin, env);
