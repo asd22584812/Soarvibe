@@ -28,7 +28,13 @@ var INDOOR_DISTRICT_DENY = [
 
 var SHOP_INTERIOR_SIGNALS = [
   'hobby', 'ホビー', 'figure', 'フィギュア', '模型', 'toy', 'mandarake', 'まんだらけ',
-  'collectible', 'shop interior', '店内', 'shelf', '櫥窗', 'display case', '公仔'
+  'collectible', 'shop interior', '店内', 'shelf', '櫥窗', 'display case', '公仔',
+  'manga', '漫画', 'comic', '新刊', 'new releases', 'bookshelf', '書架', '書店'
+];
+
+var ROOM_INTERIOR_SIGNALS = [
+  'bathroom', 'bathtub', 'tub', 'toilet', 'shower', '浴缸', '浴室', 'バスルーム',
+  'bathtub', '客房', 'guest room', 'bedroom', 'bed ', 'pillow', 'duvet', 'hotel room'
 ];
 
 var LOGO_ONLY_SIGNALS = ['logo', 'sign only', '招牌のみ', 'storefront only'];
@@ -112,6 +118,8 @@ export function classifyPhotoEvidence(blob, section, options) {
     types.unshift('landmark_building');
   }
   if (has(['room', '客房', 'dorm', 'bed', 'suite', '寝室', 'guest room', 'bedroom'])) types.push('room');
+  if (has(ROOM_INTERIOR_SIGNALS)) types.push('room');
+  if (has(['manga', '漫画', 'comic', '新刊', 'new releases', 'bookshelf', '書架', '書店'])) types.push('shop_interior');
   if (has(['lobby', 'reception desk', '大廳', 'front desk', '交誼廳', '公共吧台', '公共空間'])) types.push('lobby_bar');
   if (hasSafeTerm(text, 'lounge') && has(['bartender', 'cocktail', 'bar counter', 'drink menu', 'カウンター', '吧台', 'カクテル', '調酒'])) {
     types.push('lobby_bar');
@@ -144,7 +152,7 @@ export function classifyPhotoEvidence(blob, section, options) {
   }
 
   if ((role === 'hotel' || role === 'hostel') && types.indexOf('room') === -1 && types.indexOf('lobby_bar') === -1) {
-    if (photoIndex >= 1 && !has(['facade', 'exterior', '外観', 'building front', '外觀'])) {
+    if ((photoIndex >= 1 || has(ROOM_INTERIOR_SIGNALS)) && !has(['facade', 'exterior', '外観', 'building front', '外觀'])) {
       types.push('room');
     }
   }
@@ -169,11 +177,14 @@ export function classifyPhotoEvidence(blob, section, options) {
   var interiorEvidence = ['food_dish', 'dessert', 'cafe_interior', 'room', 'lobby_bar', 'gachapon_wall', 'shop_interior'];
   var hasInteriorEvidence = interiorEvidence.some(function (t) { return types.indexOf(t) !== -1; });
   if (photoIndex === 0 && (role === 'food' || role === 'cafe' || role === 'hotel' || role === 'hostel')) {
-    if (!hasInteriorEvidence || types.indexOf('logo_only') !== -1) {
+    if (!hasInteriorEvidence && types.indexOf('logo_only') !== -1) {
       types = types.filter(function (t) {
         return t !== 'logo_only' && t !== 'unknown';
       });
-      if (types.indexOf('facade') === -1) types.unshift('facade');
+      if (types.indexOf('facade') === -1 && (has(['facade', 'exterior', '外観', 'storefront', 'building front', 'entrance', '入口']) ||
+          has(STREET_SIGNALS))) {
+        types.unshift('facade');
+      }
     }
   }
 

@@ -349,27 +349,23 @@
     {
       "sectionId": "nakano",
       "sectionRole": "anime",
-      "subjectType": "venue",
-      "isSpecificVenue": true,
-      "requireStreetscape": false,
+      "subjectType": "district",
+      "isSpecificVenue": false,
+      "requireStreetscape": true,
       "title": "中野ブロードウェイ",
       "sectionPurpose": "anime",
       "editorialAngle": "老玩家公認挖寶聖地，不是普通商場",
-      "photoIntent": "中野百老匯商場外牆與入口立面，禁止雜貨店／食材店／室內特寫",
+      "photoIntent": "中野百老匯商場外牆、入口招牌、NAKANO BROADWAY 立面，禁止雜貨店／食材店／室內走道",
       "photoPriority": {
         "primary": [
-          "Mandarake 櫥窗",
-          "公仔模型牆",
-          "漫畫收藏架"
+          "NAKANO BROADWAY 入口",
+          "百老匯外牆",
+          "Sun Mall 入口街景"
         ],
         "secondary": [
-          "Sun Mall 中庭",
-          "らしんばん",
-          "動漫商店內景"
+          "中野站北口動線"
         ],
-        "tertiary": [
-          "百老匯走道"
-        ]
+        "tertiary": []
       },
       "searchKeywords": [
         "中野ブロードウェイ",
@@ -380,7 +376,7 @@
         "Nakano Broadway anime"
       ],
       "minChecklistHits": 1,
-      "captionIntent": "描述圖片中實際看到的收藏陳列或店面",
+      "captionIntent": "描述圖片中實際看到的中野百老匯外牆、入口招牌或 Sun Mall 街景",
       "sectionType": "landmark",
       "officialName": "Nakano Broadway",
       "officialNameLocal": "中野ブロードウェイ",
@@ -390,13 +386,14 @@
         "Mandarake Nakano",
         "らしんばん 中野"
       ],
-      "mapsQuery": "Nakano Broadway Tokyo",
+      "mapsQuery": "Nakano Broadway entrance Tokyo",
       "placeId": "ChIJg-7dspDyGGARvvDv4E5-tuE",
       "photoPlaceQueries": [
-        "Nakano Broadway Tokyo",
-        "Nakano Broadway exterior",
+        "Nakano Broadway entrance Tokyo",
+        "中野ブロードウェイ 入口",
+        "Nakano Broadway facade",
         "中野ブロードウェイ 外観",
-        "中野ブロードウェイ 商店街"
+        "Nakano Sun Mall street"
       ],
       "photoAnchorTerms": [
         "ブロードウェイ",
@@ -684,7 +681,7 @@
         "アニメイトカフェ"
       ],
       "mapsQuery": "アニメイト池袋本店",
-      "placeId": null,
+      "placeId": "ChIJi0VhQ2-NGGARGsbajebyPVA",
       "photoPlaceQueries": [
         "アニメイト池袋本店 外観",
         "Animate Ikebukuro flagship exterior",

@@ -163,7 +163,27 @@ function isStorefrontSection(section) {
 
 function isDistrictPhotoMismatch(caption, subjects) {
   const blob = [caption].concat(subjects || []).join(' ').toLowerCase();
-  return /幸福物産|菜市|grocery|supermarket|食材|物產|vegetable|蔬果|market|video gamer|tokyo video|吧台|bar counter|室內|店内|indoor|海報|poster only|拉麵碗|ramen bowl|浴缸|客房/.test(blob);
+  return /幸福物産|菜市|grocery|supermarket|食材|物產|vegetable|蔬果|market stall|dried fish|乾燥|吊掛|video gamer|tokyo video|吧台|bar counter|室內|店内|indoor|corridor|走道|hallway|海報|poster only|拉麵碗|ramen bowl|浴缸|bathroom|bathtub|客房|bookshelf|書架|manga shelf|新刊|new releases|漫畫架|watch shop|鐘錶|rolex/.test(blob);
+}
+
+function isExteriorSlotMismatch(row, editorialRow) {
+  const ev = row.photoEvidence;
+  if (!ev || !ev.primary) return false;
+  const blob = String(ev.blob || row.googleAttribution || '').toLowerCase();
+  const interiorTypes = ['shop_interior', 'room', 'lobby_bar', 'cafe_interior', 'food_dish', 'dessert', 'gachapon_wall', 'anime_collectible'];
+  const slot = String(row.travelPhotoSlot || '');
+  const wantsExterior = isDistrictSection(editorialRow) || isStorefrontSection(editorialRow) ||
+    slot === 'exterior' || slot === 'storefront' || slot === 'district_panorama' ||
+    editorialRow.sectionRole === 'hotel';
+  if (!wantsExterior) return false;
+  if (/bathroom|bathtub|浴缸|浴室|manga|漫画|新刊|bookshelf|書架|corridor|hallway|走道|watch|rolex|幸福物產|grocery|dried fish|乾燥|吊掛|indoor|店内|interior|video gamer|loki ブロードウェイ/.test(blob)) {
+    return true;
+  }
+  if (interiorTypes.indexOf(ev.primary) !== -1) return true;
+  if (isDistrictSection(editorialRow) && ev.primary !== 'street_landmark' && ev.primary !== 'landmark_building' && ev.primary !== 'facade') {
+    return true;
+  }
+  return false;
 }
 
 async function resolveOneSection(payload, section, excludeUrls) {
@@ -190,8 +210,9 @@ async function resolveOneSection(payload, section, excludeUrls) {
 async function resolveSectionWithVision(payload, section, editorial, excludeUrls) {
   const editorialRow = (editorial.sections || []).find(function (s) { return s.sectionId === section.sectionId; })
     || (section.sectionId === 'hero-anime' ? editorial.hero : section);
-  const needsVision = isDistrictSection(editorialRow) || isDistrictSection(section) || isStorefrontSection(editorialRow);
-  const maxTries = needsVision ? 4 : 1;
+  const needsVision = isDistrictSection(editorialRow) || isDistrictSection(section) || isStorefrontSection(editorialRow) ||
+    editorialRow.sectionRole === 'hotel';
+  const maxTries = needsVision ? 8 : 1;
 
   for (let tryIdx = 0; tryIdx < maxTries; tryIdx++) {
     const reqSection = Object.assign({}, section, {
@@ -199,8 +220,16 @@ async function resolveSectionWithVision(payload, section, editorial, excludeUrls
       placeId: tryIdx > 0 && isDistrictSection(editorialRow) ? null : section.placeId
     });
     const row = await resolveOneSection(payload, reqSection, excludeUrls);
-    if (!row.googlePhotoUrl || !row.matched) return row;
-    if (!needsVision || process.env.SOARVIBE_VISION_CAPTIONS === '0') return row;
+    if (!row.googlePhotoUrl || !row.matched) continue;
+    if (isExteriorSlotMismatch(row, editorialRow)) {
+      console.warn('[EVIDENCE REJECT]', section.sectionId, 'idx:' + tryIdx, row.photoEvidence && row.photoEvidence.primary);
+      excludeUrls.push(row.googlePhotoUrl);
+      continue;
+    }
+    if (!needsVision || process.env.SOARVIBE_VISION_CAPTIONS === '0') {
+      row.photoCaption = null;
+      return row;
+    }
 
     const ctx = {
       heading: row.heading || editorialRow.heading,
@@ -212,17 +241,17 @@ async function resolveSectionWithVision(payload, section, editorial, excludeUrls
     try {
       const verified = await visionVerifyLandmarkViaWorker(row.googlePhotoUrl, ctx, editorialRow);
       const caption = verified.caption || '';
-      const mismatch = isDistrictSection(editorialRow) && isDistrictPhotoMismatch(caption, verified.visibleSubjects);
-      if (verified.venueMatch === true && !mismatch) {
-        row.photoCaption = caption || row.photoCaption;
+      const mismatch = (isDistrictSection(editorialRow) || isStorefrontSection(editorialRow) || editorialRow.sectionRole === 'hotel') &&
+        (isDistrictPhotoMismatch(caption, verified.visibleSubjects) || verified.venueMatch === false);
+      if (verified.venueMatch === true && !mismatch && caption) {
+        row.photoCaption = caption;
         console.log('[VISION OK]', section.sectionId, 'idx:' + tryIdx, row.photoCaption);
         return row;
       }
       if (verified.apiError) {
-        row.photoCaption = caption || row.photoCaption;
-        row.visionSkipped = verified.apiError;
-        console.warn('[VISION QUOTA]', section.sectionId, verified.apiError);
-        return row;
+        console.warn('[VISION QUOTA]', section.sectionId, 'idx:' + tryIdx, verified.apiError);
+        excludeUrls.push(row.googlePhotoUrl);
+        continue;
       }
       console.warn('[VISION REJECT]', section.sectionId, 'idx:' + tryIdx, caption.slice(0, 40));
       excludeUrls.push(row.googlePhotoUrl);
@@ -348,6 +377,10 @@ async function main() {
   const sections = results.filter(function (r) { return r.sectionId !== 'hero-anime'; });
 
   for (const row of sections) {
+    if (!row.matched && row.rejectReason) {
+      console.warn('[KEEP EXISTING]', row.sectionId, row.rejectReason);
+      continue;
+    }
     const editorialRow = editorial.sections.find(function (s) { return s.sectionId === row.sectionId; }) || {};
     Object.assign(row, {
       aliases: row.venueSwapped ? (row.aliases || editorialRow.aliases) : editorialRow.aliases,

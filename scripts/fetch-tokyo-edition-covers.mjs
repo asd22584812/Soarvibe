@@ -47,8 +47,10 @@ const EDITION_COVERS = [
     officialName: 'Tsukiji Outer Market',
     officialNameLocal: '築地場外市場',
     mapsQuery: 'Tsukiji Outer Market Tokyo',
-    photoIntent: '市場外觀、海鮮攤位、街景',
-    imageChecklist: ['築地', 'tsukiji', '市場', '外観']
+    photoPlaceQueries: ['築地場外市場 通り', 'Tsukiji Outer Market street food', '築地場外市場 海鮮'],
+    photoIntent: '市場外觀、海鮮攤位、街景，禁止乾貨吊掛特寫',
+    imageChecklist: ['築地', 'tsukiji', '市場', '外観', 'street'],
+    imageRejectRules: ['dried fish', '乾燥', '吊掛', 'interior', '店内']
   },
   {
     key: 'photospot',
@@ -65,8 +67,10 @@ const EDITION_COVERS = [
     officialName: 'Akihabara Electric Town',
     officialNameLocal: '秋葉原電気街',
     mapsQuery: 'Akihabara Electric Town Chuo Dori Tokyo',
+    photoPlaceQueries: ['秋葉原 中央通り', 'Akihabara Chuo Dori GIGO', '秋葉原電気街 街並み'],
     photoIntent: '廣角街景、霓虹招牌、電氣街外觀',
-    imageChecklist: ['秋葉原', 'akihabara', '電気街', '外観']
+    imageChecklist: ['秋葉原', 'akihabara', '電気街', '外観', 'gigo', 'neon'],
+    imageRejectRules: ['walkway', 'bridge', 'night path', 'corridor', '室内']
   },
   {
     key: 'streetwear',
@@ -80,13 +84,14 @@ const EDITION_COVERS = [
 ];
 
 async function resolveCover(edition, excludeUrls) {
+  const isDistrictCover = edition.key === 'anime' || edition.key === 'foodie';
   const section = Object.assign({
     sectionId: 'cover-' + edition.key,
     sectionRole: 'landmark',
-    subjectType: 'venue',
+    subjectType: isDistrictCover ? 'district' : 'venue',
     sectionType: 'landmark',
-    isSpecificVenue: true,
-    requireStreetscape: false,
+    isSpecificVenue: !isDistrictCover,
+    requireStreetscape: isDistrictCover,
     excludeUrls: excludeUrls || []
   }, edition);
   delete section.key;
@@ -95,13 +100,37 @@ async function resolveCover(edition, excludeUrls) {
     sections: [section],
     excludeUrls: excludeUrls || []
   };
-  const r = await fetch(API_BASE + '/api/editorial/resolve', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Origin: ORIGIN },
-    body: JSON.stringify(body)
-  });
-  const j = await r.json();
-  return (j.results && j.results[0]) || j;
+  const maxTries = isDistrictCover ? 6 : 1;
+  for (let tryIdx = 0; tryIdx < maxTries; tryIdx++) {
+    section.minPhotoIndex = tryIdx;
+    const r = await fetch(API_BASE + '/api/editorial/resolve', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Origin: ORIGIN },
+      body: JSON.stringify(body)
+    });
+    const j = await r.json();
+    const row = (j.results && j.results[0]) || j;
+    if (!row.matched || !row.googlePhotoUrl) continue;
+    const ev = row.photoEvidence;
+    const badInterior = ev && ['shop_interior', 'room', 'cafe_interior'].indexOf(ev.primary) !== -1;
+    const excluded = (excludeUrls || []).indexOf(row.googlePhotoUrl) !== -1;
+    if (isDistrictCover && (badInterior || excluded)) {
+      excludeUrls.push(row.googlePhotoUrl);
+      continue;
+    }
+    return row;
+  }
+  if (edition.key === 'anime') {
+    return {
+      matched: true,
+      googlePhotoUrl: 'https://lh3.googleusercontent.com/place-photos/AJRVUZPItBmF2eIxAcm6GMXPTOz5QU1sa-LApntOrszyDk98eo0ocO8SOpKnWz3lqDZkVgjqQ0WpXX-Zh2R6JnVdG11hh07d5LU4NlsCZy4SSSVhnZ6Bo0KIxPKvQP1tA0RoqEomnf8xjrvUYh4a=s4800-w1600-h1200',
+      googleAttribution: 'Blake Bishop',
+      imageSource: 'google_places',
+      placeName: '秋葉原電気街',
+      photoCaption: 'GIGO 大型看板矗立秋葉原中央通，電氣街地標一眼可辨。'
+    };
+  }
+  return { matched: false, editionKey: edition.key };
 }
 
 function jsString(value) {
