@@ -2904,14 +2904,24 @@
                                             <input type="text" id="flight-outbound-to" class="field-input w-full rounded-lg" placeholder="例：成田 NRT" autocomplete="off">
                                         </label>
                                     </div>
-                                    <label class="min-w-0">
-                                        <span class="field-label">出發時間</span>
-                                        <div class="picker-field rounded-lg">
-                                            <span class="picker-display has-value" id="flight-departure-display">下午 2:30</span>
-                                            <span class="picker-icon" aria-hidden="true">🕐</span>
-                                            <input type="time" id="flight-departure-time" class="picker-input" value="14:30" aria-label="出發時間">
-                                        </div>
-                                    </label>
+                                    <div class="flight-times-row">
+                                        <label class="min-w-0" for="flight-departure-time">
+                                            <span class="field-label">起飛時間 <span class="field-optional">出發地當地</span></span>
+                                            <div class="picker-field rounded-lg">
+                                                <span class="picker-display has-value" id="flight-departure-display">下午 2:30</span>
+                                                <span class="picker-icon" aria-hidden="true">🕐</span>
+                                                <input type="time" id="flight-departure-time" class="picker-input" value="14:30" aria-label="去程起飛時間（出發地當地）">
+                                            </div>
+                                        </label>
+                                        <label class="min-w-0" for="flight-arrival-time">
+                                            <span class="field-label">抵達時間 <span class="field-optional">目的地當地・必填</span></span>
+                                            <div class="picker-field rounded-lg">
+                                                <span class="picker-display" id="flight-arrival-display">選擇時間</span>
+                                                <span class="picker-icon" aria-hidden="true">🕐</span>
+                                                <input type="time" id="flight-arrival-time" class="picker-input" value="" aria-label="去程抵達時間（目的地當地）">
+                                            </div>
+                                        </label>
+                                    </div>
                                 </div>
                                 <div class="flight-leg-block">
                                     <p class="flight-leg-title">回程航班</p>
@@ -2929,12 +2939,12 @@
                                             <input type="text" id="flight-return-to" class="field-input w-full rounded-lg" placeholder="例：桃園 TPE" autocomplete="off">
                                         </label>
                                     </div>
-                                    <label class="min-w-0">
-                                        <span class="field-label">回程時間</span>
+                                    <label class="min-w-0" for="flight-return-time">
+                                        <span class="field-label">起飛時間 <span class="field-optional">回程出發地當地</span></span>
                                         <div class="picker-field rounded-lg">
                                             <span class="picker-display has-value" id="flight-return-display">下午 6:00</span>
                                             <span class="picker-icon" aria-hidden="true">🕐</span>
-                                            <input type="time" id="flight-return-time" class="picker-input" value="18:00" aria-label="回程時間">
+                                            <input type="time" id="flight-return-time" class="picker-input" value="18:00" aria-label="回程起飛時間（出發地當地）">
                                         </div>
                                     </label>
                                 </div>
@@ -3323,7 +3333,7 @@
             const MSG_DATES_INCOMPLETE = '「去幾天？」行程表還是空白！請選好出發與回程日期，天數才算得準喔 📅';
             const MSG_DATES_REVERSED = '時空秩序異常 ⏳！回程日期不能早於出發日期喔，SOARVIBE 還沒解鎖時空倒流功能，請機長重新確認航線日期！';
             const MSG_TRAVEL_STYLE_REQUIRED = '請左右滑動並點選一種「期望的旅遊風格」，我們好為您調配專屬節奏 ✨';
-            const MSG_ADVANCED_INCOMPLETE = '塔台呼叫機長！請填妥 『去程／回程機場（或航班編號）、航班時間、住宿飯店、交通工具』，SOARVIBE 準備帶您起飛！';
+            const MSG_ADVANCED_INCOMPLETE = '塔台呼叫機長！請填妥 『去程／回程機場（或航班編號）、起飛與抵達時間、住宿飯店、交通工具』，SOARVIBE 準備帶您起飛！';
             const MSG_COMING_SOON = '✨ SOARVIBE 專屬功能翱翔準備中！下一階段將全面解鎖此功能，敬請期待！';
             const MSG_AFFILIATE_NO_DESTINATION = '請先在「要去哪裡？」選好旅遊國家與地區，或一鍵生成行程後，再使用獨家精選功能 🌏';
             const MSG_API_ERROR = '塔台訊號中斷 📡！行程生成暫時失敗，請稍後再試，或確認網路連線後重新起飛。';
@@ -4010,6 +4020,7 @@
             const savedTripsClose = document.getElementById('savedTripsClose');
             const navFavorite = document.getElementById('nav-favorite');
             const flightDepartureTimeInput = document.getElementById('flight-departure-time');
+            const flightArrivalTimeInput = document.getElementById('flight-arrival-time');
             const flightReturnTimeInput = document.getElementById('flight-return-time');
             const flightOutboundNumberInput = document.getElementById('flight-outbound-number');
             const flightReturnNumberInput = document.getElementById('flight-return-number');
@@ -4061,7 +4072,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
-            const SOARVIBE_APP_BUILD = 'v140';
+            const SOARVIBE_APP_BUILD = 'v141';
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
@@ -5038,6 +5049,7 @@
                         flightReturnTimeInput.value = '18:00';
                     }
                     suggestFlightAirportsForDestination(dest);
+                    suggestOutboundArrivalTime(false);
                     updateTimePickerDisplays();
                 }
             }
@@ -6869,6 +6881,97 @@
                 return dateValue + 'T' + timeValue;
             }
 
+            var AIRPORT_UTC_OFFSET_HOURS = {
+                TPE: 8, TSA: 8, KHH: 8,
+                NRT: 9, HND: 9, KIX: 9, ITM: 9, CTS: 9, FUK: 9, OKA: 9, NGO: 9,
+                ICN: 9, GMP: 9, CJU: 9, PUS: 9,
+                BKK: 7, CNX: 7, HKT: 7, DMK: 7,
+                SIN: 8, HKG: 8, MFM: 8, SGN: 7, HAN: 7, DAD: 7,
+                DPS: 8, MNL: 8, KUL: 8,
+                LHR: 0, LGW: 0, CDG: 1, ORY: 1
+            };
+
+            var TYPICAL_FLIGHT_MINUTES_BY_PAIR = {
+                'TPE-NRT': 210, 'TPE-HND': 210, 'TPE-KIX': 165, 'TPE-ITM': 165,
+                'TPE-CTS': 225, 'TPE-FUK': 135, 'TPE-OKA': 135, 'TPE-NGO': 165,
+                'TPE-ICN': 150, 'TPE-GMP': 150, 'TPE-CJU': 120, 'TPE-PUS': 135,
+                'TPE-BKK': 225, 'TPE-DMK': 225, 'TPE-CNX': 240, 'TPE-HKT': 270,
+                'TPE-SIN': 270, 'TPE-HKG': 105, 'TPE-MFM': 105,
+                'TPE-SGN': 210, 'TPE-HAN': 195, 'TPE-DAD': 165,
+                'TPE-DPS': 300, 'TPE-MNL': 135, 'TPE-KUL': 270,
+                'TPE-LHR': 780, 'TPE-CDG': 780
+            };
+
+            function extractAirportIataCode(text) {
+                var m = String(text || '').toUpperCase().match(/\b([A-Z]{3})\b/);
+                return m ? m[1] : '';
+            }
+
+            function minutesToHhmm(totalMinutes) {
+                var mins = ((Math.round(totalMinutes) % 1440) + 1440) % 1440;
+                var h = Math.floor(mins / 60);
+                var m = mins % 60;
+                return (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
+            }
+
+            function hhmmToMinutes(hhmm) {
+                var bits = String(hhmm || '').split(':');
+                if (bits.length < 2) return NaN;
+                var h = parseInt(bits[0], 10);
+                var m = parseInt(bits[1], 10);
+                if (isNaN(h) || isNaN(m)) return NaN;
+                return h * 60 + m;
+            }
+
+            function addMinutesToHhmm(hhmm, deltaMinutes) {
+                var base = hhmmToMinutes(hhmm);
+                if (isNaN(base)) return '';
+                return minutesToHhmm(base + deltaMinutes);
+            }
+
+            function lookupTypicalFlightMinutes(fromCode, toCode) {
+                if (!fromCode || !toCode) return 210;
+                var key = fromCode + '-' + toCode;
+                if (TYPICAL_FLIGHT_MINUTES_BY_PAIR[key] != null) return TYPICAL_FLIGHT_MINUTES_BY_PAIR[key];
+                var rev = toCode + '-' + fromCode;
+                if (TYPICAL_FLIGHT_MINUTES_BY_PAIR[rev] != null) return TYPICAL_FLIGHT_MINUTES_BY_PAIR[rev];
+                var fromOff = AIRPORT_UTC_OFFSET_HOURS[fromCode];
+                var toOff = AIRPORT_UTC_OFFSET_HOURS[toCode];
+                if (fromOff != null && toOff != null && Math.abs(fromOff - toOff) >= 6) return 720;
+                return 210;
+            }
+
+            function estimateArrivalLocalHhmm(depHhmm, fromAirportText, toAirportText) {
+                if (!depHhmm) return '';
+                var fromCode = extractAirportIataCode(fromAirportText);
+                var toCode = extractAirportIataCode(toAirportText);
+                var flightMins = lookupTypicalFlightMinutes(fromCode, toCode);
+                var fromOff = AIRPORT_UTC_OFFSET_HOURS[fromCode];
+                var toOff = AIRPORT_UTC_OFFSET_HOURS[toCode];
+                var tzDeltaMins = (fromOff != null && toOff != null) ? (toOff - fromOff) * 60 : 0;
+                return addMinutesToHhmm(depHhmm, flightMins + tzDeltaMins);
+            }
+
+            function getFlightArrivalIso() {
+                if (!tripDateState.dateStart || !flightArrivalTimeInput || !flightArrivalTimeInput.value) return '';
+                return combineDateAndTime(tripDateState.dateStart, flightArrivalTimeInput.value);
+            }
+
+            function suggestOutboundArrivalTime(force) {
+                if (!flightArrivalTimeInput || !flightDepartureTimeInput || !flightDepartureTimeInput.value) return;
+                if (!force && flightArrivalTimeInput.value) return;
+                var fields = collectFlightAirportFields();
+                var estimated = estimateArrivalLocalHhmm(
+                    flightDepartureTimeInput.value,
+                    fields.flightOutboundFrom,
+                    fields.flightOutboundTo
+                );
+                if (estimated) {
+                    flightArrivalTimeInput.value = estimated;
+                    updateTimePickerDisplays();
+                }
+            }
+
             function formatSlashDate(isoDate) {
                 if (!isoDate) return '—';
                 var parts = isoDate.split('-');
@@ -6915,10 +7018,15 @@
 
             function updateTimePickerDisplays() {
                 var depDisplay = document.getElementById('flight-departure-display');
+                var arrDisplay = document.getElementById('flight-arrival-display');
                 var retDisplay = document.getElementById('flight-return-display');
                 if (depDisplay && flightDepartureTimeInput) {
                     depDisplay.textContent = formatPickerTime(flightDepartureTimeInput.value);
                     depDisplay.classList.toggle('has-value', !!flightDepartureTimeInput.value);
+                }
+                if (arrDisplay && flightArrivalTimeInput) {
+                    arrDisplay.textContent = formatPickerTime(flightArrivalTimeInput.value);
+                    arrDisplay.classList.toggle('has-value', !!flightArrivalTimeInput.value);
                 }
                 if (retDisplay && flightReturnTimeInput) {
                     retDisplay.textContent = formatPickerTime(flightReturnTimeInput.value);
@@ -7040,13 +7148,14 @@
                     || hasMinimumAirports;
             }
 
-            function buildFlightLegSummary(number, fromAirport, toAirport, timeIso) {
+            function buildFlightLegSummary(number, fromAirport, toAirport, depIso, arrIso) {
                 var parts = [];
                 if (number) parts.push('航班 ' + number);
                 if (fromAirport || toAirport) {
                     parts.push((fromAirport || '—') + ' → ' + (toAirport || '—'));
                 }
-                if (timeIso) parts.push(formatFlightDateTime(timeIso));
+                if (depIso) parts.push('起飛 ' + formatFlightDateTime(depIso));
+                if (arrIso) parts.push('抵達(目的地當地) ' + formatFlightDateTime(arrIso));
                 return parts.join('｜');
             }
 
@@ -7056,19 +7165,33 @@
                     payload.flightOutboundNumber,
                     payload.flightOutboundFrom,
                     payload.flightOutboundTo,
-                    payload.flightDeparture || payload.departureTime
+                    payload.flightDeparture || payload.departureTime,
+                    payload.flightArrival || payload.arrivalTime
                 );
                 var inbound = buildFlightLegSummary(
                     payload.flightReturnNumber,
                     payload.flightReturnFrom,
                     payload.flightReturnTo,
-                    payload.flightReturn || payload.returnTime
+                    payload.flightReturn || payload.returnTime,
+                    ''
                 );
+                var arrivalText = '';
+                if (payload.flightArrival || payload.arrivalTime) {
+                    arrivalText = formatFlightDateTime(payload.flightArrival || payload.arrivalTime);
+                }
+                var departureText = '';
+                if (payload.flightDeparture || payload.departureTime) {
+                    departureText = formatFlightDateTime(payload.flightDeparture || payload.departureTime);
+                }
                 return {
                     outbound: outbound || '（未提供）',
                     inbound: inbound || '（未提供）',
                     hasFlightNumbers: !!(payload.flightOutboundNumber || payload.flightReturnNumber),
-                    destinationAirport: payload.flightOutboundTo || payload.flightReturnFrom || ''
+                    destinationAirport: payload.flightOutboundTo || payload.flightReturnFrom || '',
+                    originAirport: payload.flightOutboundFrom || '',
+                    arrivalTimeText: arrivalText,
+                    departureTimeText: departureText,
+                    returnDepartureAirport: payload.flightReturnFrom || payload.flightOutboundTo || ''
                 };
             }
 
@@ -7097,6 +7220,14 @@
                         flightReturnFrom: preset.airports.returnFrom || preset.airports.outboundTo || '',
                         flightReturnTo: preset.airports.returnTo || DEFAULT_HOME_AIRPORT
                     });
+                }
+                if (flightArrivalTimeInput) {
+                    if (preset.arrivalTimes && preset.arrivalTimes.length) {
+                        flightArrivalTimeInput.value = pickRandom(preset.arrivalTimes);
+                    } else {
+                        flightArrivalTimeInput.value = '';
+                        suggestOutboundArrivalTime(true);
+                    }
                 }
                 updateTimePickerDisplays();
             }
@@ -7504,19 +7635,32 @@
                 syncCurrentStyleFromUi();
                 var styleInput = document.querySelector('input[name="travel-style"]:checked');
                 var depIso = getFlightDepartureIso();
+                var arrIso = getFlightArrivalIso();
                 var retIso = getFlightReturnIso();
                 var customerSelectedTransport = getCustomerSelectedTransport();
                 var accommodations = collectAccommodationsFromDom();
                 var accommodation = formatAccommodationSummary(accommodations);
                 var flightFields = collectFlightAirportFields();
+                if (!arrIso && depIso) {
+                    var estimatedHhmm = estimateArrivalLocalHhmm(
+                        formatTimeOnly(depIso),
+                        flightFields.flightOutboundFrom,
+                        flightFields.flightOutboundTo
+                    );
+                    if (estimatedHhmm && tripDateState.dateStart) {
+                        arrIso = combineDateAndTime(tripDateState.dateStart, estimatedHhmm);
+                    }
+                }
                 return Object.assign({
                     destination: destinationInput.value.trim(),
                     dateStart: tripDateState.dateStart,
                     dateEnd: tripDateState.dateEnd,
                     travelStyle: styleInput ? styleInput.value : '',
                     flightDeparture: depIso,
+                    flightArrival: arrIso,
                     flightReturn: retIso,
                     departureTime: depIso,
+                    arrivalTime: arrIso,
                     returnTime: retIso,
                     accommodations: accommodations,
                     accommodation: accommodation,
@@ -7562,6 +7706,12 @@
                     var depParts = meta.flightDeparture.split('T');
                     if (depParts[1]) flightDepartureTimeInput.value = depParts[1].slice(0, 5);
                 }
+                if (flightArrivalTimeInput && meta.flightArrival) {
+                    var arrParts = meta.flightArrival.split('T');
+                    if (arrParts[1]) flightArrivalTimeInput.value = arrParts[1].slice(0, 5);
+                } else if (flightArrivalTimeInput && !flightArrivalTimeInput.value) {
+                    suggestOutboundArrivalTime(true);
+                }
                 if (flightReturnTimeInput && meta.flightReturn) {
                     var retParts = meta.flightReturn.split('T');
                     if (retParts[1]) flightReturnTimeInput.value = retParts[1].slice(0, 5);
@@ -7605,18 +7755,21 @@
             }
 
             function buildGeminiPlannerPersonaBlock(selectedStyle) {
-                return '你現在是一位具備 10 年經驗、精通各大社群數據（Google 商家大數據、小紅書爆款、Threads 實時討論、Instagram 視覺熱點）的全球頂級自由行規劃師。' +
-                    '你為 SOARVIBE 規劃的【' + selectedStyle + '】行程必須極度符合「人類肉體凡胎的客觀生理極限」，嚴格拒絕反人類拉車。' +
-                    '切記：不同旅遊風格必須產出「景點型態、時間分配、美食選型」截然不同的行程——禁止七種風格排成相似的罐頭路線。';
+                return '你現在是一位具備 15 年經驗的「專業導遊大師」兼全球頂級自由行規劃師，精通 Google Maps 實際交通時間、各大社群熱點與在地動線。' +
+                    '你為 SOARVIBE 規劃的【' + selectedStyle + '】行程必須極度符合「人類肉體凡胎的客觀生理極限」，嚴格拒絕反人類拉車與重複繞路。' +
+                    '切記：不同旅遊風格必須產出「景點型態、時間分配、美食選型、文案語氣」截然不同的行程——禁止七種風格排成相似的罐頭路線。' +
+                    '你每一天都要以專業導遊視角收尾：晚上最後一站必須明確寫「返回飯店休息」或「藥妝／唐吉訶德／便利商店採買後返回飯店休息」，讓旅客一眼知道本日行程結束。';
             }
 
             function buildGeminiTimingRulesBlock() {
                 return '【全風格通用：防腿斷與客觀時間鐵律——最高優先，違反即不合格】\n' +
-                    '1. 地理鄰近性 (Geographical Continuity)：每一天 A→B→C 必須流暢連續；景點與餐廳之間移動嚴格控制在「當地大眾運輸 15–20 分鐘內」或「步行可達」，嚴禁東西橫跨、反覆拉車。\n' +
-                    '2. 計算路線時間：必須客觀計算上一站到下一站的交通時間，並在 time 欄位中合理扣除；行程不可看起來匆匆忙忙，也不可無意義空等。\n' +
+                    '1. 地理鄰近性 (Geographical Continuity)：每一天 A→B→C 必須流暢連續、順路；景點與餐廳之間移動嚴格控制在「當地大眾運輸約 Google Maps 真實時間（通常 15–25 分鐘內）」或「步行可達」，嚴禁東西橫跨、反覆拉車、隔天又跳回同一商圈。\n' +
+                    '2. 計算路線時間：必須客觀計算上一站到下一站的交通時間（參考 Google Maps），並在 time 區間中合理扣除；行程不可看起來匆匆忙忙，也不可無意義空等。\n' +
                     '3. 逗留時間客觀化：不該久留的景點／餐廳／咖啡廳絕對不可拖太久；該深度探索的區域才給足時間——嚴格依【當前風格】的時間規則，禁止一律 2 小時或一律 30 分鐘。\n' +
                     '4. 行程多元性：同一 day 須混合不同類型體驗（地標＋用餐＋散步／購物等），避免連續 3 站同類型；不同 day 須探索不同區域與主題。\n' +
-                    '5. 禁止重複：禁止在不同 day 或同一 day 重複相同店名／景點（含換時段再訪）。\n';
+                    '5. 禁止重複：禁止在不同 day 或同一 day 重複相同店名／景點（含換時段再訪）；也禁止隔天又安排同一核心商圈（例：Day1 秋葉原後又在 Day3 再排秋葉原；Day2 東大門後又在 Day5 再排東大門）。每個商圈／地標區整趟旅程最多出現一次（使用者許願清單除外）。\n' +
+                    '6. 時間格式鐵律：每一站 time 欄位【必須】寫成「HH:MM - HH:MM」起迄區間（例：08:30 - 09:45），【絕對禁止】只寫單一時間（如 08:45）。區間須反映該站實際停留長度。\n' +
+                    '7. 每日收尾鐵律：非最終日的「晚上」最後一站必須是「返回飯店休息」或「藥妝店／唐吉訶德／便利商店採買 → 返回飯店休息」；最終日晚上則以送機／前往機場收尾。\n';
             }
 
             function buildGeminiStyleInstruction(styleKey, currentCity, selectedStyle) {
@@ -7678,8 +7831,10 @@
                     '結構範例：\n' +
                     '{"days":[{"day":1,"phases":[{"period":"上午","items":[' + itemShape + ']},{"period":"下午","items":[]},{"period":"晚上","items":[]}]}]}\n' +
                     '- items 內每個元素必須是 JSON 物件（含 time、title、highlight、note' + (isKr ? '、koreanName' : '') + '）。\n' +
+                    '- time 欄位【必須】為「HH:MM - HH:MM」起迄區間（例：08:30 - 09:45），【絕對禁止】只寫單一時間。\n' +
                     '- days 陣列長度必須恰好等於 ' + days + '（共 ' + days + ' 個 day 物件，day 從 1 到 ' + days + '）。\n' +
                     '- 禁止只輸出 Day 1；每一天的上午、下午、晚上都至少要有 1 個 item。\n' +
+                    '- 非最終日晚上最後一站必須「返回飯店休息」或「藥妝／唐吉訶德／便利商店 → 返回飯店休息」。\n' +
                     '- 最終日：上午、下午仍須各有具體行程；「晚上」才安排前往機場／送機，禁止下午空白直接跳機場。\n' +
                     '- 中間日（Day 2 至倒數第 2 天）禁止以「自由活動／自由行程／彈性安排／可自行安排」充數；每一天上午、下午、晚上都須有 2 個以上具體景點或餐廳。\n' +
                     '- JSON 請精簡，但天數不可省略。';
@@ -7722,12 +7877,36 @@
                     currentCity: currentCity,
                     budget: payload.budget || '適中',
                     departureTimeText: payload.departureTime ? formatFlightDateTime(payload.departureTime) : '',
+                    arrivalTimeText: flightDetails.arrivalTimeText || (payload.arrivalTime ? formatFlightDateTime(payload.arrivalTime) : ''),
                     returnTimeText: payload.returnTime ? formatFlightDateTime(payload.returnTime) : '',
                     flightOutboundSummary: flightDetails.outbound,
                     flightReturnSummary: flightDetails.inbound,
                     flightHasNumbers: flightDetails.hasFlightNumbers,
-                    destinationAirport: flightDetails.destinationAirport
+                    destinationAirport: flightDetails.destinationAirport,
+                    originAirport: flightDetails.originAirport,
+                    returnDepartureAirport: flightDetails.returnDepartureAirport
                 };
+            }
+
+            function buildGeminiFlightLogicBlock(ctx, lastDayNum) {
+                var arrivalAnchor = ctx.arrivalTimeText || '（請依起飛時間＋航程＋時差推估目的地當地抵達時間）';
+                var depAnchor = ctx.departureTimeText || '（未提供）';
+                var retAnchor = ctx.returnTimeText || '（未提供）';
+                return '【✈️ 航班資訊——時區與起降不可搞混（最高優先）】\n' +
+                    '🛫 去程摘要：' + ctx.flightOutboundSummary + '\n' +
+                    '🛬 回程摘要：' + ctx.flightReturnSummary + '\n' +
+                    '・去程起飛時間（出發地當地 ' + (ctx.originAirport || '') + '）：' + depAnchor + '\n' +
+                    '・去程抵達時間（目的地當地 ' + (ctx.destinationAirport || '') + '）：' + arrivalAnchor + ' ←【Day 1 唯一時間基準】\n' +
+                    '・回程起飛時間（回程出發機場當地 ' + (ctx.returnDepartureAirport || '') + '）：' + retAnchor + ' ←【最終日送機倒推基準】\n' +
+                    '⚠️ 絕對禁止把「起飛時間」當成「抵達機場時間」。例：台北 06:45 起飛 ≠ 成田 06:45 抵達；若票面為 TPE 06:45→NRT 11:15，Day1 第一站必須從約 11:15 開始（入境／提行李約 1.5–2 小時）。\n' +
+                    '⚠️ 必須考慮時差：台北 UTC+8、東京／首爾 UTC+9、曼谷 UTC+7 等；抵達時間一律使用【目的地當地時間】。\n' +
+                    (ctx.flightHasNumbers
+                        ? '⚠️ 使用者已填航班編號：可核對該航班常見起降，但若上方已給明確起飛／抵達時間，【以使用者填寫的抵達時間為準】排 Day1。\n'
+                        : '⚠️ 請依機場代碼判斷市區距離與交通（例：成田 NRT→東京約 60–90 分；羽田 HND→東京約 30–45 分；仁川 ICN→首爾約 60–80 分）。\n') +
+                    '【⏱️ 首日與最終日接送邏輯】\n' +
+                    '1. Day 1：以【去程抵達時間 ' + arrivalAnchor + '】為基準，安排「抵達機場 → 入境／提取行李 → 前往住宿 → Check-in」；Check-in 完成前禁止一般觀光。\n' +
+                    '2. Day ' + lastDayNum + '（最終日）：以【回程起飛時間 ' + retAnchor + '】倒推，預留至少 3 小時 Buffer（退房、前往機場、報到、安檢、候機）；上午、下午仍須各有 1–2 個具體行程，「晚上」才安排前往機場。\n' +
+                    '3. 若去程／回程機場不同，必須在 note 寫明並調整送機動線。\n';
             }
 
             function buildGeminiRequestText(payload) {
@@ -7752,12 +7931,9 @@ ${ctx.timingRules}
 ${ctx.typeInstruction}
 
 【🎯 風格差異化鐵律】
-你正在規劃的是【${ctx.selectedStyle}】，不是其他風格。輸出的景點類型、店名風格、每站停留時間必須與【${ctx.selectedStyle}】高度一致，且與「初次觀光／美食吃貨／玩具動漫」等風格有明顯區隔——禁止七種風格都排成淺草+晴空塔+一蘭的相似動線。
+你正在規劃的是【${ctx.selectedStyle}】，不是其他風格。輸出的景點類型、店名風格、每站停留時間、highlight 文案語氣必須與【${ctx.selectedStyle}】高度一致，且與「初次觀光／美食吃貨／玩具動漫」等風格有明顯區隔——禁止七種風格都排成淺草+晴空塔+一蘭的相似動線或相同敘事口吻。
 
-【✈️ 航班資訊——必填參數（不可忽略）】
-🛫 去程：${ctx.flightOutboundSummary}
-🛬 回程：${ctx.flightReturnSummary}
-${ctx.flightHasNumbers ? '⚠️ 使用者已填寫航班編號：請優先以該航班的實際起降時刻與機場安排 Day 1 抵達、最終日送機，時間欄位僅作輔助。' : '⚠️ 請依上述機場代碼判斷正確的市區距離與交通時間（例：成田 NRT→東京約 60–90 分；羽田 HND→東京約 30–45 分；仁川 ICN→首爾約 60–80 分）。'}
+${buildGeminiFlightLogicBlock(ctx, lastDayNum)}
 🏨 住宿飯店／區域：
 ${buildAccommodationPromptBlock(resolvePayloadAccommodations(payload), payload.dateStart, payload.dateEnd)}
 ${buildAccommodationRoutingRulesBlock(resolvePayloadAccommodations(payload), payload.dateStart, payload.dateEnd)}
@@ -7765,7 +7941,7 @@ ${buildAccommodationRoutingRulesBlock(resolvePayloadAccommodations(payload), pay
 【🚇 客戶指定交通方式（customerSelectedTransport）——行程串聯必須 100% 遵守】
 客戶已在前端明確選定：【${ctx.customerSelectedTransport}】
 1. 你生成的「每一個」行程項目、移動方式、備註，都必須完全符合【${ctx.customerSelectedTransport}】，禁止擅自改為其他交通手段。
-2. 若為大眾運輸／地鐵：備註必寫明確路線名稱、站名、轉乘站、預估步行分鐘（例：東京 Metro 銀座線 淺草站→上野站，步行 5 分鐘）。
+2. 若為大眾運輸／地鐵：備註必寫明確路線名稱、站名、轉乘站、預估步行分鐘（例：東京 Metro 銀座線 淺草站→上野站，步行 5 分鐘），時間須接近 Google Maps 真實估時。
 3. 若為自駕：備註必寫導航動線、停車場或路邊停車建議、預估車程分鐘。
 4. 若為混合搭配：請在每一站標註該段使用大眾運輸或計程車／步行。
 
@@ -7775,22 +7951,17 @@ ${buildAccommodationRoutingRulesBlock(resolvePayloadAccommodations(payload), pay
 範例：禁止寫「飯店附近的超商」→ 必須寫「LAWSON 淺草雷門前店」；禁止寫「淺草在地早餐」→ 必須寫「淺草 珈琲天国」或「Misoojyu 味噌湯專賣店」等明確店名。
 景點亦須使用正式名稱，禁止只寫「知名寺廟」「人氣商圈」。
 
-【⏱️ 首日與最終日接送邏輯——最高優先，必須嚴格遵守航班資訊】
-1. Day 1：以去程航班的【抵達機場 ${ctx.destinationAirport || '（依去程抵達機場欄位）'}】與抵達時間為基準，安排「抵達機場 → 入境／提取行李 → 前往住宿 → Check-in」；Check-in 完成前禁止安排一般觀光。
-2. Day ${lastDayNum}（最終日）：以回程航班的【出發機場】與起飛時間倒推，預留至少 3 小時 Buffer（退房、前往機場、報到、安檢、候機），並明確寫出送機出發時間與使用的機場名稱；上午、下午仍須各有 1–2 個具體行程（採買、午餐、最後打卡），「晚上」時段才安排前往機場，禁止下午空白直接跳機場。
-3. 若去程／回程使用不同機場（例如抵達羽田、回程從成田起飛），必須在 note 中寫明，並調整送機動線，禁止假設同一機場。
-4. 若 departureTime 或 returnTime 與住宿地點距離機場較遠，必須在行程中寫明【${ctx.customerSelectedTransport}】下的交通方式與預估車程。
-5. 每日起訖點以住宿區域為圓心，符合【${ctx.customerSelectedTransport}】，嚴禁繞路。
-
-【🗺️ 交通與地理邏輯——嚴禁繞路】
+【🗺️ 交通與地理邏輯——專業導遊、嚴禁繞路與重跳】
 1. 請發揮你對【${ctx.currentCity}】當地地理結構的精準認知，景點之間的安排「時間與路線一定都要順，絕對不准繞路」！
 2. 每一天的行程景點，必須像是經過 Google Maps 精密計算過一樣，順向、鄰近、流暢；移動時間須符合【${ctx.customerSelectedTransport}】下的合理地鐵／步行／車程範圍，嚴禁早上在東邊、下午跑西邊、晚上又回東邊的瘋狂拉車行為。
+3. 整趟旅程禁止「隔天重跳同一商圈」：同一核心區（如秋葉原、東大門、原宿）整趟最多安排一次完整探訪。
 
 【📋 商業級行程格式——每一站都必須專業、可執行，嚴禁流水帳】
 1. 請完全使用繁體中文（台灣習慣用語）。
 2. 每日以 Day 1 到 Day ${days} 規劃，每個時段為「上午」「下午」「晚上」。
-3. 每一站活動必須包含：time（HH:MM - HH:MM，須合理扣除移動時間）、title（景點／店名）、highlight（為什麼值得去＋符合【${ctx.selectedStyle}】的停留理由）、note（從上一站出發的【${ctx.customerSelectedTransport}】路線／站名／步行或車程分鐘）。
+3. 每一站活動必須包含：time（【必須】HH:MM - HH:MM 起迄區間，禁止單一時間）、title（景點／店名）、highlight（為什麼值得去＋符合【${ctx.selectedStyle}】的停留理由）、note（從上一站出發的【${ctx.customerSelectedTransport}】路線／站名／步行或車程分鐘）。
 4. 禁止只寫景點名；禁止長篇日記式敘述；禁止所有風格都用相同店名與相同時間模板。
+5. 非最終日晚上最後一站必須寫「返回飯店休息」或「藥妝／唐吉訶德／便利商店 → 返回飯店休息」。
 
 ${buildGeminiJsonOutputBlock(payload, days)}`;
             }
@@ -7801,19 +7972,20 @@ ${buildGeminiJsonOutputBlock(payload, days)}`;
                 var dateLabel = getDayDateLabel(payload, dayNum);
                 var dayRules = '';
                 if (dayNum === 1) {
-                    dayRules = '【本日為 Day 1——抵達日】以去程航班的抵達機場與抵達時間為基準：抵達機場 → 入境／提取行李 → 前往住宿 → Check-in；Check-in 完成前禁止安排一般觀光。Check-in 後可安排輕量晚餐或附近散步。';
+                    dayRules = '【本日為 Day 1——抵達日】唯一基準是去程【抵達時間（目的地當地）' + (ctx.arrivalTimeText || '（請自起飛時間＋航程＋時差推估）') + '】，不是起飛時間！' +
+                        '流程：抵達機場 → 入境／提取行李 → 前往住宿 → Check-in；Check-in 完成前禁止一般觀光。Check-in 後可安排輕量晚餐或附近散步，晚上最後一站寫「返回飯店休息」。';
                 } else if (dayNum === totalDays) {
-                    dayRules = '【本日為最終日——送機日】上午、下午仍須各有 1–2 個具體行程（採買、午餐、最後打卡）；「晚上」時段才安排前往【回程出發機場】（依 returnTime 倒推，預留至少 3 小時 Buffer）。禁止下午空白直接跳機場。';
+                    dayRules = '【本日為最終日——送機日】上午、下午仍須各有 1–2 個具體行程（採買、午餐、最後打卡）；「晚上」時段才安排前往【回程出發機場】（依回程起飛時間 ' + (ctx.returnTimeText || '') + ' 倒推，預留至少 3 小時 Buffer）。禁止下午空白直接跳機場。';
                 } else {
-                    dayRules = '【本日為中間日】以「本日住宿基點」為圓心，安排充實的上午、下午、晚上各 2–3 個具體景點或餐廳，動線順向不繞路。嚴禁「自由活動／自由行程／彈性安排／可自行安排」等模糊字眼。';
+                    dayRules = '【本日為中間日】以「本日住宿基點」為圓心，安排充實的上午、下午、晚上各 2–3 個具體景點或餐廳，動線順向不繞路。嚴禁「自由活動／自由行程／彈性安排／可自行安排」等模糊字眼。晚上最後一站必須「返回飯店休息」或「藥妝／唐吉訶德／便利商店 → 返回飯店休息」。';
                 }
                 var continuityBlock = priorSummary
-                    ? '\n【已規劃日子——請勿重複相同景點／餐廳，並從住宿區延續順向動線】\n' + priorSummary + '\n'
+                    ? '\n【已規劃日子——請勿重複相同景點／餐廳／核心商圈，並從住宿區延續順向動線】\n' + priorSummary + '\n'
                     : '';
 
                 return `${ctx.plannerPersona}
 
-請只為【${ctx.currentCity}】規劃【${dayLabel}】（日期 ${dateLabel}）這一天，風格鎖定【${ctx.selectedStyle}】。
+請只為【${ctx.currentCity}】規劃【${dayLabel}】（日期 ${dateLabel}）這一天，風格鎖定【${ctx.selectedStyle}】。你是專業導遊大師，動線必須順路、像 Google Maps 精密計算。
 
 ${ctx.wishesInstruction ? ctx.wishesInstruction + '\n\n' : ''}${ctx.globalCityInstruction}
 
@@ -7824,7 +7996,8 @@ ${buildAccommodationPromptBlock(resolvePayloadAccommodations(payload), payload.d
 ${buildAccommodationRoutingRulesBlock(resolvePayloadAccommodations(payload), payload.dateStart, payload.dateEnd)}
 🏨 本日住宿基點：${getHotelForDay(dayNum, payload)}
 🚇 交通方式（100% 遵守）：【${ctx.customerSelectedTransport}】
-🛫 去程航班：${ctx.flightOutboundSummary}｜🛬 回程航班：${ctx.flightReturnSummary}
+
+${buildGeminiFlightLogicBlock(ctx, totalDays)}
 
 ${ctx.timingRules}
 
@@ -7833,17 +8006,18 @@ ${continuityBlock}
 ${dayRules}
 
 【硬性規則】
-- 嚴格遵守上方【${ctx.selectedStyle}】風格的時間與選點規則；不該久留的站點不可拖時間。
+- 嚴格遵守上方【${ctx.selectedStyle}】風格的時間與選點規則；不該久留的站點不可拖時間；文案語氣也要有該風格特色。
 - 餐廳、超商、咖啡廳必須寫真實店名（含分店），禁止「附近超商」「在地早餐」等模糊字眼。
-- 備註須寫明從上一站出發的【${ctx.customerSelectedTransport}】路線／站名／步行或車程分鐘。
+- 備註須寫明從上一站出發的【${ctx.customerSelectedTransport}】路線／站名／步行或車程分鐘（接近 Google Maps）。
 - 繁體中文（台灣用語）；每站為 JSON 物件：time、title、highlight、note${isKoreaDestination(ctx.currentCity) ? '、koreanName（韓文原文）' : ''}。
+- time【必須】為「HH:MM - HH:MM」起迄區間，【禁止】單一時間（如只寫 08:45）。
 - 本日須有「上午」「下午」「晚上」三個時段，每段至少 1 個 item（中間日建議每段 2 個以上）。
-- 禁止與【已規劃日子】重複相同景點／餐廳；本日動線須與【${ctx.selectedStyle}】一致，不可像其他風格。
+- 禁止與【已規劃日子】重複相同景點／餐廳／核心商圈；本日動線須與【${ctx.selectedStyle}】一致，不可像其他風格。
 - 嚴禁以「自由活動／自由行程／彈性安排」充數；每一站須為具體景點或真實店名。
 
 【輸出——僅輸出 JSON，禁止 Markdown 與前言後語】
 只輸出 1 天的物件，結構：
-{"days":[{"day":${dayNum},"phases":[{"period":"上午","items":[{"time":"…","title":"…","highlight":"…","note":"…"}]},{"period":"下午","items":[]},{"period":"晚上","items":[]}]}]}`;
+{"days":[{"day":${dayNum},"phases":[{"period":"上午","items":[{"time":"09:00 - 10:30","title":"…","highlight":"…","note":"…"}]},{"period":"下午","items":[]},{"period":"晚上","items":[]}]}]}`;
             }
 
             function buildGeminiMultiDayRequestText(payload, startDay, endDay, totalDays, priorSummary) {
@@ -7855,22 +8029,22 @@ ${dayRules}
                     dayLabels.push('Day ' + d + '（' + getDayDateLabel(payload, d) + '）');
                 }
                 var continuityBlock = priorSummary
-                    ? '\n【已規劃日子——請勿重複相同景點／餐廳，並從住宿區延續順向動線】\n' + priorSummary + '\n'
+                    ? '\n【已規劃日子——請勿重複相同景點／餐廳／核心商圈，並從住宿區延續順向動線】\n' + priorSummary + '\n'
                     : '';
                 var edgeRules = '';
                 if (startDay === 1) {
-                    edgeRules += '【Day 1 為抵達日】以 departureTime 為基準安排抵達→住宿 Check-in；Check-in 前禁止一般觀光。\n';
+                    edgeRules += '【Day 1 為抵達日】以去程【抵達時間（目的地當地）' + (ctx.arrivalTimeText || '') + '】為基準安排抵達→住宿 Check-in；嚴禁把起飛時間當成抵達時間；Check-in 前禁止一般觀光。\n';
                 }
                 if (endDay === totalDays) {
-                    edgeRules += '【Day ' + totalDays + ' 為送機日】以 returnTime 倒推，預留至少 3 小時送機 Buffer。\n';
+                    edgeRules += '【Day ' + totalDays + ' 為送機日】以回程起飛時間 ' + (ctx.returnTimeText || '') + ' 倒推，預留至少 3 小時送機 Buffer。\n';
                 }
                 if (startDay > 1 && endDay < totalDays) {
-                    edgeRules += '【本批為中間日】每 day 的上午、下午、晚上各至少 2 個具體景點或餐廳。\n';
+                    edgeRules += '【本批為中間日】每 day 的上午、下午、晚上各至少 2 個具體景點或餐廳；每晚最後一站返回飯店休息。\n';
                 }
 
                 return `${ctx.plannerPersona}
 
-請為【${ctx.currentCity}】一次規劃以下 ${dayCount} 天【${ctx.selectedStyle}】風格行程：
+請為【${ctx.currentCity}】一次規劃以下 ${dayCount} 天【${ctx.selectedStyle}】風格行程（專業導遊大師・順路不重跳）：
 ${dayLabels.join('\n')}
 
 ${ctx.wishesInstruction ? ctx.wishesInstruction + '\n\n' : ''}${ctx.globalCityInstruction}
@@ -7881,20 +8055,23 @@ ${ctx.wishesInstruction ? ctx.wishesInstruction + '\n\n' : ''}${ctx.globalCityIn
 ${buildAccommodationPromptBlock(resolvePayloadAccommodations(payload), payload.dateStart, payload.dateEnd)}
 ${buildAccommodationRoutingRulesBlock(resolvePayloadAccommodations(payload), payload.dateStart, payload.dateEnd)}
 🚇 交通方式（100% 遵守）：【${ctx.customerSelectedTransport}】
-🛫 出發：${ctx.departureTimeText}｜🛬 回程：${ctx.returnTimeText}
+
+${buildGeminiFlightLogicBlock(ctx, totalDays)}
 
 ${ctx.timingRules}
 
 ${ctx.typeInstruction}
 ${continuityBlock}
 ${edgeRules}
-【硬性規則】嚴格遵守【${ctx.selectedStyle}】風格選點與停留時間；不該久留的不可拖太久。餐廳、超商、咖啡廳須寫真實店名；note 須寫從上一站出發的【${ctx.customerSelectedTransport}】動線與分鐘數。
+【硬性規則】嚴格遵守【${ctx.selectedStyle}】風格選點、停留時間與文案語氣；不該久留的不可拖太久。餐廳、超商、咖啡廳須寫真實店名；note 須寫從上一站出發的【${ctx.customerSelectedTransport}】動線與分鐘數（接近 Google Maps）。
 每站為 JSON 物件：time、title、highlight、note${isKoreaDestination(ctx.currentCity) ? '、koreanName（韓文原文）' : ''}。
-禁止與【已規劃日子】重複；禁止排成與其他旅遊風格相似的罐頭行程。
+time【必須】為「HH:MM - HH:MM」，【禁止】單一時間。
+禁止與【已規劃日子】重複景點／商圈；禁止排成與其他旅遊風格相似的罐頭行程。
+非最終日每晚最後一站須「返回飯店休息」。
 
 【輸出——僅 JSON，禁止 Markdown】
 days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${endDay}：
-{"days":[{"day":${startDay},"phases":[{"period":"上午","items":[{"time":"…","title":"…","highlight":"…","note":"…"}]},{"period":"下午","items":[]},{"period":"晚上","items":[]}]}]}`;
+{"days":[{"day":${startDay},"phases":[{"period":"上午","items":[{"time":"09:00 - 10:30","title":"…","highlight":"…","note":"…"}]},{"period":"下午","items":[]},{"period":"晚上","items":[]}]}]}`;
             }
 
             function parseMultiDaysFromResponse(text, startDay, endDay) {
@@ -8542,6 +8719,55 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 });
             }
 
+            function inferDefaultStayMinutes(title, period) {
+                var t = String(title || '');
+                if (/機場|入境|行李|海關|到達|抵達/.test(t)) return 90;
+                if (/Check-?in|check.?in|行李寄放|飯店報到|入住/.test(t)) return 30;
+                if (/返回飯店|回飯店|休息/.test(t)) return 25;
+                if (/午餐|晚餐|早餐|拉麵|燒肉|壽司|美食|餐廳|食堂|食堂/.test(t)) return 75;
+                if (/咖啡|下午茶|甜點/.test(t)) return 50;
+                if (/購物|藥妝|唐吉訶德|ドン・キ|百貨|Outlet|市集/.test(t)) return 75;
+                if (/博物館|美術館|樂園|teamLab|水族館|動物園/.test(t)) return 100;
+                if (period === '晚上') return 60;
+                if (period === '上午') return 70;
+                return 75;
+            }
+
+            function ensureActivityTimeRanges(items) {
+                if (!Array.isArray(items) || !items.length) return items;
+                var i;
+                for (i = 0; i < items.length; i++) {
+                    var cur = items[i];
+                    if (!cur || !cur.startTime) continue;
+                    if (cur.endTime && cur.endTime !== cur.startTime) {
+                        cur.timeLabel = formatScheduleTime(cur);
+                        continue;
+                    }
+                    var stay = inferDefaultStayMinutes(cur.title, cur.period);
+                    var proposedEnd = addMinutesToHhmm(cur.startTime, stay);
+                    var next = items[i + 1];
+                    if (next && next.startTime) {
+                        var nextStart = hhmmToMinutes(next.startTime);
+                        var startMins = hhmmToMinutes(cur.startTime);
+                        var proposedMins = hhmmToMinutes(proposedEnd);
+                        if (!isNaN(nextStart) && !isNaN(startMins) && nextStart > startMins) {
+                            var capped = Math.min(proposedMins, nextStart - 5);
+                            if (capped > startMins + 15) {
+                                proposedEnd = minutesToHhmm(capped);
+                            } else {
+                                proposedEnd = minutesToHhmm(Math.min(startMins + stay, nextStart));
+                                if (hhmmToMinutes(proposedEnd) <= startMins) {
+                                    proposedEnd = addMinutesToHhmm(cur.startTime, Math.max(20, Math.floor((nextStart - startMins) / 2) || 20));
+                                }
+                            }
+                        }
+                    }
+                    cur.endTime = proposedEnd;
+                    cur.timeLabel = formatScheduleTime(cur);
+                }
+                return items;
+            }
+
             function normalizeItineraryDay(day) {
                 if (!day) return day;
                 var dayNum = day.dayNum || day.day || null;
@@ -8559,7 +8785,9 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     if (!rawItems.length && phase.detail) {
                         rawItems = extractActivityBullets(phase.detail);
                     }
-                    phase.items = normalizeItineraryItems(rawItems, { day: dayNum, period: period });
+                    phase.items = ensureActivityTimeRanges(
+                        normalizeItineraryItems(rawItems, { day: dayNum, period: period })
+                    );
                     return phase;
                 });
                 return day;
@@ -13609,13 +13837,15 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     meta.flightOutboundNumber,
                     meta.flightOutboundFrom,
                     meta.flightOutboundTo,
-                    meta.flightDeparture
+                    meta.flightDeparture,
+                    meta.flightArrival
                 ) : '';
                 var retText = meta ? buildFlightLegSummary(
                     meta.flightReturnNumber,
                     meta.flightReturnFrom,
                     meta.flightReturnTo,
-                    meta.flightReturn
+                    meta.flightReturn,
+                    ''
                 ) : '';
                 depText = depText || (meta && meta.flightDeparture ? formatFlightDateTime(meta.flightDeparture) : '—');
                 retText = retText || (meta && meta.flightReturn ? formatFlightDateTime(meta.flightReturn) : '—');
@@ -14906,9 +15136,14 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
             function isAdvancedIncomplete() {
                 syncTripDateState();
+                if (flightDepartureTimeInput && flightDepartureTimeInput.value &&
+                    (!flightArrivalTimeInput || !flightArrivalTimeInput.value)) {
+                    suggestOutboundArrivalTime(true);
+                }
                 return !tripDateState.dateStart
                     || !tripDateState.dateEnd
                     || !getFlightDepartureIso()
+                    || !getFlightArrivalIso()
                     || !getFlightReturnIso()
                     || !hasValidFlightRouteInput()
                     || !hasValidAccommodationInput()
@@ -14935,6 +15170,9 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     }
                 } else if (!flightDepartureTimeInput || !flightDepartureTimeInput.value) {
                     if (flightDepartureTimeInput) flightDepartureTimeInput.focus();
+                } else if (!flightArrivalTimeInput || !flightArrivalTimeInput.value) {
+                    suggestOutboundArrivalTime(true);
+                    if (flightArrivalTimeInput) flightArrivalTimeInput.focus();
                 } else if (!flightReturnTimeInput || !flightReturnTimeInput.value) {
                     if (flightReturnTimeInput) flightReturnTimeInput.focus();
                 } else if (!hasValidAccommodationInput()) {
@@ -15849,9 +16087,19 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             });
             if (flightDepartureTimeInput) {
                 flightDepartureTimeInput.addEventListener('change', function () {
+                    suggestOutboundArrivalTime(true);
                     updateTimePickerDisplays();
                 });
                 flightDepartureTimeInput.addEventListener('input', function () {
+                    suggestOutboundArrivalTime(true);
+                    updateTimePickerDisplays();
+                });
+            }
+            if (flightArrivalTimeInput) {
+                flightArrivalTimeInput.addEventListener('change', function () {
+                    updateTimePickerDisplays();
+                });
+                flightArrivalTimeInput.addEventListener('input', function () {
                     updateTimePickerDisplays();
                 });
             }
@@ -15863,6 +16111,15 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     updateTimePickerDisplays();
                 });
             }
+            [flightOutboundFromInput, flightOutboundToInput].forEach(function (el) {
+                if (!el) return;
+                el.addEventListener('change', function () {
+                    suggestOutboundArrivalTime(true);
+                });
+                el.addEventListener('blur', function () {
+                    suggestOutboundArrivalTime(false);
+                });
+            });
             if (advancedTransportSelect) {
                 advancedTransportSelect.addEventListener('change', function () {
                     var transportLabel = getCustomerSelectedTransport();
