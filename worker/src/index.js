@@ -12,6 +12,13 @@ import { generateEditorialArticle, generateSectionCopy, placeCopyNeedsResync } f
 import { generateAICaption } from './cj-ai-caption.js';
 import { callGeminiVisionInlineJSON } from './cj-gemini-client.js';
 import { resolveRegionCode } from './cj-locale-search.js';
+import {
+  FEATURE_FLAGS,
+  editorialDisabledResponse,
+  placesPhotoDisabledResponse,
+  assertPlacesTextSearchEnabled,
+  assertPlacesPhotoFetchEnabled
+} from './feature-flags.js';
 
 const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta/models/';
 const DEFAULT_MODEL = 'gemini-2.5-flash';
@@ -323,6 +330,7 @@ async function googlePlacesFetch(mapsKey, url, init) {
 }
 
 async function resolveGooglePhotoUri(mapsKey, photoName) {
+  assertPlacesPhotoFetchEnabled();
   var resource = String(photoName || '').trim();
   if (!resource || resource.indexOf('places/') !== 0) return '';
   var mediaUrl =
@@ -350,6 +358,7 @@ async function getGooglePlaceById(mapsKey, placeId) {
 }
 
 async function searchGooglePlace(mapsKey, mapsQuery, languageCode, regionCode) {
+  assertPlacesTextSearchEnabled();
   var response = await googlePlacesFetch(mapsKey, 'https://places.googleapis.com/v1/places:searchText', {
     method: 'POST',
     headers: {
@@ -807,26 +816,44 @@ export default {
     }
 
     if (url.pathname === '/api/places/resolve' && request.method === 'POST') {
+      if (!FEATURE_FLAGS.PLACES_RESOLVE_ENABLED) {
+        return jsonResponse(placesPhotoDisabledResponse(), 410, auth.origin, env);
+      }
       return handlePlacesResolve(request, env, auth);
     }
 
     if (url.pathname === '/api/editorial/resolve' && request.method === 'POST') {
+      if (!FEATURE_FLAGS.EDITORIAL_RESOLVE_ENABLED) {
+        return jsonResponse(editorialDisabledResponse(), 410, auth.origin, env);
+      }
       return handleEditorialResolve(request, env, auth);
     }
 
     if (url.pathname === '/api/editorial/generate' && request.method === 'POST') {
+      if (!FEATURE_FLAGS.EDITORIAL_GENERATE_ENABLED) {
+        return jsonResponse(editorialDisabledResponse(), 410, auth.origin, env);
+      }
       return handleEditorialGenerate(request, env, auth);
     }
 
     if (url.pathname === '/api/editorial/section-copy' && request.method === 'POST') {
+      if (!FEATURE_FLAGS.EDITORIAL_GENERATE_ENABLED) {
+        return jsonResponse(editorialDisabledResponse(), 410, auth.origin, env);
+      }
       return handleEditorialSectionCopy(request, env, auth);
     }
 
     if (url.pathname === '/api/editorial/vision-caption' && request.method === 'POST') {
+      if (!FEATURE_FLAGS.EDITORIAL_VISION_ENABLED) {
+        return jsonResponse(editorialDisabledResponse(), 410, auth.origin, env);
+      }
       return handleEditorialVisionCaption(request, env, auth);
     }
 
     if (url.pathname === '/api/editorial/caption' && request.method === 'POST') {
+      if (!FEATURE_FLAGS.EDITORIAL_VISION_ENABLED) {
+        return jsonResponse(editorialDisabledResponse(), 410, auth.origin, env);
+      }
       return handleEditorialCaption(request, env, auth);
     }
 
