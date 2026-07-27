@@ -2,3 +2,11 @@ worker/.dev.vars
 worker/.wrangler/
 .env
 *.local
+
+# Probe / script temp output (do not commit)
+scripts/probe-out.txt
+scripts/*-out.txt
+*.probe-out.txt
+
+# City shares image probe / temp downloads
+assets/city-shares/**/_probe/

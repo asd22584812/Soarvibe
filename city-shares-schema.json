@@ -1,0 +1,201 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://soarvibe.app/schemas/city-share-post.json",
+  "title": "SoarVibe City Share Post",
+  "description": "Official and UGC city share posts — single schema for all sources.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "postId",
+    "cityId",
+    "type",
+    "source",
+    "status",
+    "title",
+    "body",
+    "author",
+    "place",
+    "visitMeta",
+    "stats",
+    "publishedAt",
+    "updatedAt"
+  ],
+  "properties": {
+    "postId": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{2,80}$",
+      "description": "Unique slug, e.g. tokyo-akihabara-radio-kaikan-001"
+    },
+    "cityId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{1,40}$"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "sightseeing",
+        "food",
+        "lodging",
+        "shopping",
+        "anime",
+        "cafe",
+        "nightview",
+        "family",
+        "photospot"
+      ]
+    },
+    "source": {
+      "type": "string",
+      "enum": ["official", "user"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "published", "hidden", "removed"]
+    },
+    "title": {
+      "type": "string",
+      "minLength": 4,
+      "maxLength": 80
+    },
+    "body": {
+      "type": "string",
+      "minLength": 80,
+      "maxLength": 600
+    },
+    "author": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authorId", "displayName"],
+      "properties": {
+        "authorId": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "displayName": { "type": "string", "minLength": 1, "maxLength": 40 },
+        "avatarUrl": { "type": "string", "maxLength": 512 }
+      }
+    },
+    "place": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["placeId", "displayName"],
+      "properties": {
+        "placeId": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "googlePlaceId": { "type": ["string", "null"], "maxLength": 128 },
+        "displayName": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "displayNameLocal": { "type": "string", "maxLength": 120 },
+        "formattedAddress": { "type": ["string", "null"], "maxLength": 240 },
+        "latitude": { "type": ["number", "null"], "minimum": -90, "maximum": 90 },
+        "longitude": { "type": ["number", "null"], "minimum": -180, "maximum": 180 },
+        "mapsUrl": { "type": "string", "maxLength": 512 }
+      }
+    },
+    "media": {
+      "type": "array",
+      "maxItems": 10,
+      "items": { "$ref": "#/$defs/mediaItem" }
+    },
+    "mediaPlaceholder": {
+      "type": "boolean",
+      "description": "True when no verified local images yet; media may be empty in Phase 1 official seeds."
+    },
+    "visitMeta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["recommendLevel"],
+      "properties": {
+        "stayDuration": { "type": "string", "maxLength": 40 },
+        "budget": { "type": "string", "maxLength": 60 },
+        "recommendLevel": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "bestTime": { "type": "string", "maxLength": 40 },
+        "tips": {
+          "type": "array",
+          "maxItems": 6,
+          "items": { "type": "string", "minLength": 2, "maxLength": 120 }
+        }
+      }
+    },
+    "stats": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "likeCount",
+        "commentCount",
+        "saveCount",
+        "beenCount",
+        "wantCount",
+        "avoidCount"
+      ],
+      "properties": {
+        "likeCount": { "type": "integer", "minimum": 0 },
+        "commentCount": { "type": "integer", "minimum": 0 },
+        "saveCount": { "type": "integer", "minimum": 0 },
+        "beenCount": { "type": "integer", "minimum": 0 },
+        "wantCount": { "type": "integer", "minimum": 0 },
+        "avoidCount": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "tags": {
+      "type": "array",
+      "maxItems": 12,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1, "maxLength": 24 }
+    },
+    "publishedAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "mediaPlaceholder": { "const": true } },
+        "required": ["mediaPlaceholder"]
+      },
+      "then": {
+        "properties": {
+          "media": { "maxItems": 10 }
+        }
+      },
+      "else": {
+        "required": ["media"],
+        "properties": {
+          "media": { "minItems": 1, "maxItems": 10 }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "mediaItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mediaId", "src", "slot", "sortOrder"],
+      "properties": {
+        "mediaId": { "type": "string", "minLength": 1, "maxLength": 40 },
+        "src": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^(\\./assets/|\\./cover-photos/)"
+        },
+        "thumbSrc": { "type": "string", "maxLength": 512 },
+        "slot": {
+          "type": "string",
+          "enum": [
+            "streetscape",
+            "exterior",
+            "entrance",
+            "landmark",
+            "interior",
+            "food",
+            "lobby",
+            "room",
+            "public_space",
+            "other"
+          ]
+        },
+        "caption": { "type": "string", "minLength": 4, "maxLength": 160 },
+        "alt": { "type": "string", "minLength": 4, "maxLength": 160 },
+        "width": { "type": "integer", "minimum": 1, "maximum": 8000 },
+        "height": { "type": "integer", "minimum": 1, "maximum": 8000 },
+        "sortOrder": { "type": "integer", "minimum": 0, "maximum": 99 },
+        "attribution": { "type": "string", "maxLength": 120 }
+      }
+    }
+  }
+}

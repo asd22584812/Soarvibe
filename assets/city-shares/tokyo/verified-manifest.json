@@ -1,0 +1,97 @@
+{
+  "version": 1,
+  "updatedAt": "2026-07-27T12:00:00+08:00",
+  "notes": "Phase 1A.5 verified image packages. Sources must match place + slot. No Google Places / Unsplash proxy.",
+  "packages": [
+    {
+      "postId": "tokyo-akihabara-radio-kaikan-001",
+      "status": "verified",
+      "assets": [
+        {
+          "mediaId": "cover",
+          "localFile": "tokyo-akihabara-radio-kaikan-001-exterior-0.jpg",
+          "slot": "exterior",
+          "commonsFile": "Akihabara Radio Kaikan, Sotokanda 1 in 2023 (2023-01-21 11.05.26 by nakashi).jpg",
+          "commonsUrl": "https://commons.wikimedia.org/wiki/File:Akihabara_Radio_Kaikan,_Sotokanda_1_in_2023_(2023-01-21_11.05.26_by_nakashi).jpg",
+          "downloadUrl": "https://upload.wikimedia.org/wikipedia/commons/a/ad/Akihabara_Radio_Kaikan%2C_Sotokanda_1_in_2023_%282023-01-21_11.05.26_by_nakashi%29.jpg",
+          "author": "nakashi",
+          "license": "CC BY-SA 2.0",
+          "width": 3024,
+          "height": 4032,
+          "verifiedSubject": "秋葉原ラジオ会館外觀"
+        }
+      ]
+    },
+    {
+      "postId": "tokyo-nakano-broadway-001",
+      "status": "verified",
+      "assets": [
+        {
+          "mediaId": "cover",
+          "localFile": "tokyo-nakano-broadway-001-exterior-0.jpg",
+          "slot": "exterior",
+          "commonsFile": "Nakano broadway entrance.JPG",
+          "commonsUrl": "https://commons.wikimedia.org/wiki/File:Nakano_broadway_entrance.JPG",
+          "downloadUrl": "https://upload.wikimedia.org/wikipedia/commons/3/35/Nakano_broadway_entrance.JPG",
+          "author": "Kentin",
+          "license": "CC BY-SA 3.0",
+          "width": 1944,
+          "height": 2592,
+          "verifiedSubject": "中野ブロードウェイ入口"
+        }
+      ]
+    },
+    {
+      "postId": "tokyo-sensoji-001",
+      "status": "verified",
+      "assets": [
+        {
+          "mediaId": "cover",
+          "localFile": "tokyo-sensoji-001-landmark-0.jpg",
+          "slot": "landmark",
+          "commonsFile": "Senso-ji Kaminarimon 201503b.jpg",
+          "commonsUrl": "https://commons.wikimedia.org/wiki/File:Senso-ji_Kaminarimon_201503b.jpg",
+          "downloadUrl": "https://upload.wikimedia.org/wikipedia/commons/4/47/Senso-ji_Kaminarimon_201503b.jpg",
+          "author": "Tak1701d",
+          "license": "CC BY-SA 3.0",
+          "width": 2000,
+          "height": 1500,
+          "verifiedSubject": "浅草寺雷門"
+        }
+      ]
+    },
+    {
+      "postId": "tokyo-shinjuku-gyoen-001",
+      "status": "verified",
+      "assets": [
+        {
+          "mediaId": "cover",
+          "localFile": "tokyo-shinjuku-gyoen-001-landmark-0.jpg",
+          "slot": "landmark",
+          "commonsFile": "Green trees and shrubs in Shinjuku Gyoen National Garden, Tokyo, Japan, a sunny day with blue sky.jpg",
+          "commonsUrl": "https://commons.wikimedia.org/wiki/File:Green_trees_and_shrubs_in_Shinjuku_Gyoen_National_Garden,_Tokyo,_Japan,_a_sunny_day_with_blue_sky.jpg",
+          "downloadUrl": "https://upload.wikimedia.org/wikipedia/commons/6/6e/Green_trees_and_shrubs_in_Shinjuku_Gyoen_National_Garden%2C_Tokyo%2C_Japan%2C_a_sunny_day_with_blue_sky.jpg",
+          "author": "Ibex73",
+          "license": "CC BY-SA 4.0",
+          "width": 4164,
+          "height": 2776,
+          "verifiedSubject": "新宿御苑園內綠地"
+        }
+      ]
+    },
+    {
+      "postId": "tokyo-ramen-afuri-ebisu-001",
+      "status": "awaiting_verified_source",
+      "blocker": "No CC-licensed AFURI 恵比寿 exterior/entrance found on Wikimedia Commons or Openverse. Existing AFURI Ebisu Flickr set is food/interior only.",
+      "requiredSlots": ["exterior", "entrance"],
+      "assets": []
+    },
+    {
+      "postId": "tokyo-lodging-mimaru-ueno-001",
+      "status": "awaiting_verified_source",
+      "blocker": "No CC-licensed MIMARU東京 上野イースト exterior/entrance found on Wikimedia Commons or Openverse.",
+      "requiredSlots": ["exterior", "entrance"],
+      "assets": []
+    }
+  ]
+}
