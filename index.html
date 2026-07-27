@@ -39,6 +39,7 @@
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="./city-shares-ui.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;900&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         html, body {
@@ -2974,56 +2975,56 @@
                     <h2 class="text-base font-black text-[#37474F]">還沒規劃去哪嗎？跟著 SoarVibe 這樣玩 ✈️</h2>
                     <span class="text-black text-xl leading-none" aria-hidden="true">❯</span>
                 </div>
-                <div id="mag-city-list" class="recommend-scroll hide-scrollbar snap-x snap-proximity h-[9rem] items-stretch gap-2.5 -mx-0.5 px-0.5" role="list" aria-label="城市靈感誌推薦">
-                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" onclick="openCityJournal('tokyo')" aria-label="開啟東京城市靈感誌">
+                <div id="mag-city-list" class="recommend-scroll hide-scrollbar snap-x snap-proximity h-[9rem] items-stretch gap-2.5 -mx-0.5 px-0.5" role="list" aria-label="城市旅人分享推薦">
+                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" onclick="openCityDestination('tokyo')" aria-label="開啟東京旅人分享">
                         <img src="https://images.unsplash.com/photo-1648301184879-28c6ed4964d7?auto=format&fit=crop&w=600&q=85" alt="東京鐵塔夜景" loading="lazy" class="absolute inset-0 w-full h-full object-cover pointer-events-none">
                         <div class="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/75 to-transparent pointer-events-none">
                             <span class="text-white font-bold text-sm">東京</span>
                         </div>
                     </article>
-                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" onclick="openCityJournal('kyoto')" aria-label="開啟京都城市靈感誌">
+                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" onclick="openCityDestination('kyoto')" aria-label="開啟京都旅人分享">
                         <img src="https://images.unsplash.com/photo-1573047330192-4e6bb1594325?auto=format&fit=crop&w=600&q=85" alt="京都祇園傳統街道" loading="lazy" class="absolute inset-0 w-full h-full object-cover pointer-events-none">
                         <div class="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/75 to-transparent pointer-events-none">
                             <span class="text-white font-bold text-sm">京都</span>
                         </div>
                     </article>
-                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" onclick="openCityJournal('osaka')" aria-label="開啟大阪城市靈感誌">
+                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" onclick="openCityDestination('osaka')" aria-label="開啟大阪旅人分享">
                         <img src="https://images.unsplash.com/photo-1773467223754-b9f3eb4d2c0f?auto=format&fit=crop&w=600&q=85" alt="大阪城黃昏夜景" loading="lazy" class="absolute inset-0 w-full h-full object-cover pointer-events-none">
                         <div class="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/75 to-transparent pointer-events-none">
                             <span class="text-white font-bold text-sm">大阪</span>
                         </div>
                     </article>
-                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" onclick="openCityJournal('seoul')" aria-label="開啟首爾城市靈感誌">
+                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" onclick="openCityDestination('seoul')" aria-label="開啟首爾旅人分享">
                         <img src="https://images.unsplash.com/photo-1517154421773-0529f29ea451?auto=format&fit=crop&w=600&q=85" alt="首爾潮流城市夜景" loading="lazy" class="absolute inset-0 w-full h-full object-cover pointer-events-none">
                         <div class="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/75 to-transparent pointer-events-none">
                             <span class="text-white font-bold text-sm">首爾</span>
                         </div>
                     </article>
-                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" onclick="openCityJournal('hokkaido')" aria-label="開啟北海道城市靈感誌">
+                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" onclick="openCityDestination('hokkaido')" aria-label="開啟北海道旅人分享">
                         <img src="https://images.unsplash.com/photo-1741225241678-0c7f8fa07917?auto=format&fit=crop&w=600&q=85" alt="北海道札幌雪景" loading="lazy" class="absolute inset-0 w-full h-full object-cover pointer-events-none">
                         <div class="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/75 to-transparent pointer-events-none">
                             <span class="text-white font-bold text-sm">北海道</span>
                         </div>
                     </article>
-                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" onclick="openCityJournal('bangkok')" aria-label="開啟曼谷城市靈感誌">
+                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" onclick="openCityDestination('bangkok')" aria-label="開啟曼谷旅人分享">
                         <img src="https://images.unsplash.com/photo-1768392810963-017c92313d79?auto=format&fit=crop&w=600&q=85" alt="曼谷鄭王廟泰式建築" loading="lazy" class="absolute inset-0 w-full h-full object-cover pointer-events-none">
                         <div class="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/75 to-transparent pointer-events-none">
                             <span class="text-white font-bold text-sm">曼谷</span>
                         </div>
                     </article>
-                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" data-city-id="vietnam" onclick="openCityJournal('vietnam')" aria-label="開啟越南城市靈感誌">
+                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" data-city-id="vietnam" onclick="openCityDestination('vietnam')" aria-label="開啟越南旅人分享">
                         <img src="./cover-photos/vietnam.jpg" alt="越南下龍灣景色" loading="lazy" class="mag-city-card-img absolute inset-0 w-full h-full object-cover pointer-events-none" onerror="if(!this.dataset.magCardFb){this.dataset.magCardFb='1';this.src='./cover-photos/default.jpg';}else{this.src='./assets/city-journal/placeholder-city-journal.jpg';}">
                         <div class="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/75 to-transparent pointer-events-none">
                             <span class="text-white font-bold text-sm">越南</span>
                         </div>
                     </article>
-                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" onclick="openCityJournal('london')" aria-label="開啟倫敦城市靈感誌">
+                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" onclick="openCityDestination('london')" aria-label="開啟倫敦旅人分享">
                         <img src="https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=600&q=85" alt="倫敦泰晤士河天際線" loading="lazy" class="absolute inset-0 w-full h-full object-cover pointer-events-none">
                         <div class="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/75 to-transparent pointer-events-none">
                             <span class="text-white font-bold text-sm">倫敦</span>
                         </div>
                     </article>
-                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" onclick="openCityJournal('paris')" aria-label="開啟巴黎城市靈感誌">
+                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" onclick="openCityDestination('paris')" aria-label="開啟巴黎旅人分享">
                         <img src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=600&q=85" alt="巴黎艾菲爾鐵塔" loading="lazy" class="absolute inset-0 w-full h-full object-cover pointer-events-none">
                         <div class="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/75 to-transparent pointer-events-none">
                             <span class="text-white font-bold text-sm">巴黎</span>
@@ -3253,6 +3254,14 @@
         </header>
     </div>
 
+    <div id="cityShares" class="fixed inset-0 hidden" role="dialog" aria-modal="true" aria-label="城市旅人分享" aria-hidden="true">
+        <main id="csViewport" class="cs-viewport"></main>
+        <header class="cs-chrome">
+            <button type="button" id="csBackBtn" class="cs-chrome-btn is-hidden" aria-label="返回分享列表">← 返回</button>
+            <button type="button" id="csCloseBtn" class="cs-chrome-btn" aria-label="關閉城市旅人分享">✕</button>
+        </header>
+    </div>
+
     <script src="./feature-flags.js"></script>
     <script src="./city-journal-editorial-engine.js"></script>
     <script src="./city-journal-image-manifest.js"></script>
@@ -3260,6 +3269,9 @@
     <script src="./city-journal-image-library.js"></script>
     <script src="./city-journal-caption.js"></script>
     <script src="./city-journal-data.js"></script>
+    <script src="./city-shares-config.js"></script>
+    <script src="./city-shares-data.js"></script>
+    <script src="./city-shares-ui.js"></script>
     <script>
         (function () {
             const TRAVEL_STYLE_LABELS = {
@@ -4049,7 +4061,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
-            const SOARVIBE_APP_BUILD = 'v139';
+            const SOARVIBE_APP_BUILD = 'v140';
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';

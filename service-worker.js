@@ -1,6 +1,11 @@
-const CACHE_NAME = 'soarvibe-v134';
+const CACHE_NAME = 'soarvibe-v140';
 const STATIC_ASSETS = [
   './manifest.json',
+  './feature-flags.js',
+  './city-shares-config.js',
+  './city-shares-data.js',
+  './city-shares-ui.js',
+  './city-shares-ui.css',
   './city-journal-data.js',
   './city-journal-image-manifest.js',
   './city-journal-photo-scoring.js',
@@ -19,7 +24,11 @@ const STATIC_ASSETS = [
   './assets/city-journal/tokyo/ichiran-ramen.jpg',
   './assets/city-journal/tokyo/maid-cafe.jpg',
   './assets/city-journal/tokyo/japanese-curry.jpg',
-  './assets/city-journal/tokyo/hotel-gracery.jpg'
+  './assets/city-journal/tokyo/hotel-gracery.jpg',
+  './assets/city-shares/tokyo/tokyo-akihabara-radio-kaikan-001-exterior-0.jpg',
+  './assets/city-shares/tokyo/tokyo-nakano-broadway-001-exterior-0.jpg',
+  './assets/city-shares/tokyo/tokyo-sensoji-001-landmark-0.jpg',
+  './assets/city-shares/tokyo/tokyo-shinjuku-gyoen-001-landmark-0.jpg'
 ];
 
 self.addEventListener('message', function (event) {
