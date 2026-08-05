@@ -1648,6 +1648,18 @@
             line-height: 1;
             filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.08));
         }
+        .kkday-affiliate-card .kkday-card-label {
+            line-height: 1.2;
+        }
+        .kkday-affiliate-card .kkday-card-subtitle {
+            display: block;
+            margin-top: 0.15rem;
+            font-size: 0.65rem;
+            font-weight: 700;
+            line-height: 1.35;
+            color: #78909c;
+            max-width: 8.5rem;
+        }
         .kkday-affiliate-close {
             margin-top: 1rem;
             width: 100%;
@@ -3085,21 +3097,22 @@
                 <div id="exclusive-hub-main">
                     <h2 id="kkdayAffiliateTitle" class="kkday-affiliate-title">SOARVIBE行程獨家精選</h2>
                     <div class="kkday-affiliate-grid">
-                        <button type="button" class="kkday-affiliate-card" data-affiliate-type="foodspot">
-                            <span class="kkday-card-emoji" aria-hidden="true">🍱</span>
-                            <span>景點＆美食</span>
-                        </button>
                         <button type="button" class="kkday-affiliate-card" data-affiliate-type="attractions">
                             <span class="kkday-card-emoji" aria-hidden="true">🎫</span>
-                            <span>票券</span>
+                            <span class="kkday-card-label">票券</span>
                         </button>
-                        <button type="button" class="kkday-affiliate-card" data-affiliate-type="esim">
-                            <span class="kkday-card-emoji" aria-hidden="true">📶</span>
-                            <span>eSIM</span>
+                        <button type="button" class="kkday-affiliate-card" data-affiliate-type="travel-ledger">
+                            <span class="kkday-card-emoji" aria-hidden="true">📒</span>
+                            <span class="kkday-card-label">旅行帳本</span>
+                            <span class="kkday-card-subtitle">記錄每一趟旅行的花費</span>
                         </button>
                         <button type="button" class="kkday-affiliate-card" data-affiliate-type="forex">
                             <span class="kkday-card-emoji" aria-hidden="true">💱</span>
-                            <span>匯率</span>
+                            <span class="kkday-card-label">匯率</span>
+                        </button>
+                        <button type="button" class="kkday-affiliate-card" data-affiliate-type="foodspot">
+                            <span class="kkday-card-emoji" aria-hidden="true">📍</span>
+                            <span class="kkday-card-label">地圖</span>
                         </button>
                     </div>
                 </div>
@@ -4386,7 +4399,8 @@
                 { label: '景點門票', emoji: '🏛️', suffix: '門票 景點' },
                 { label: '交通票券', emoji: '🚇', suffix: '交通卡 車票' },
                 { label: '一日遊', emoji: '🚌', suffix: '一日遊 包車' },
-                { label: '體驗行程', emoji: '🎯', suffix: '體驗 門票' }
+                { label: '體驗行程', emoji: '🎯', suffix: '體驗 門票' },
+                { label: 'eSIM', emoji: '🛜', suffix: 'eSIM', placeholder: true }
             ];
 
             const KKDAY_ESIM_CATALOG = {
@@ -4538,6 +4552,20 @@
 
             function buildKkdayCategoryBrowseLinks(city) {
                 return KKDAY_TICKET_CATEGORY_SEARCH.map(function (cat, idx) {
+                    if (cat.placeholder) {
+                        return {
+                            id: 'kkday-browse-' + idx,
+                            name: cat.emoji + ' ' + cat.label,
+                            rating: '即將開放',
+                            address: '未來將接入 KKday／Trip.com eSIM 分潤方案',
+                            tag: '分類',
+                            emoji: cat.emoji,
+                            photoUrl: '',
+                            url: '',
+                            isPlaceholder: true,
+                            placeholderMessage: 'eSIM 方案即將開放，敬請期待'
+                        };
+                    }
                     return {
                         id: 'kkday-browse-' + idx,
                         name: city + ' · ' + cat.label,
@@ -5758,21 +5786,33 @@
                 showExclusiveResultsPanel(city + ' KKday 票券專區');
                 setExclusiveLoading(false);
 
+                var esimCategory = {
+                    id: 'ticket-cat-esim',
+                    name: '🛜 eSIM',
+                    rating: '即將開放',
+                    address: '未來將接入 KKday／Trip.com eSIM 分潤方案',
+                    tag: '分類',
+                    emoji: '🛜',
+                    photoUrl: '',
+                    url: '',
+                    isPlaceholder: true,
+                    placeholderMessage: 'eSIM 方案即將開放，敬請期待'
+                };
+
                 var tickets = buildKkdayTicketsForTrip(city);
-                var items = tickets
+                var ticketItems = tickets
                     .filter(function (ticket) {
                         return ticket.productUrl && isKkdaySingleProductUrl(ticket.productUrl);
                     })
                     .map(ticketToResultCard);
 
-                if (!items.length) {
-                    exclusiveResultsList.innerHTML =
-                        '<p class="exclusive-results-loading">「' + escapeHtml(city) +
-                        '」暫無可預訂的 KKday 單品票券，請先一鍵生成行程或稍後再試。</p>';
-                    return;
-                }
+                var items = [esimCategory].concat(ticketItems);
 
                 renderExclusiveResultCards(items, function (item) {
+                    if (item.isPlaceholder) {
+                        showModal(item.placeholderMessage || '即將開放，敬請期待', item.emoji || '🛜');
+                        return;
+                    }
                     openAffiliateUrl(item.url);
                 }, { mode: 'affiliate', actionLabel: '前往 KKday' });
             }
@@ -6026,6 +6066,16 @@
             }
 
             function handleKkdayAffiliateClick(type) {
+                if (type === 'travel-ledger') {
+                    closeKkdayAffiliateMenu();
+                    if (typeof openTravelLedger === 'function') {
+                        openTravelLedger();
+                    } else if (window.SOARVIBE_TRAVEL_LEDGER_UI &&
+                        typeof window.SOARVIBE_TRAVEL_LEDGER_UI.openTravelLedger === 'function') {
+                        window.SOARVIBE_TRAVEL_LEDGER_UI.openTravelLedger();
+                    }
+                    return;
+                }
                 if (!hasSelectedTripDestination()) {
                     closeKkdayAffiliateMenu();
                     showModal(MSG_AFFILIATE_NO_DESTINATION, '📍');
