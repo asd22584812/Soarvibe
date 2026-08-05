@@ -40,6 +40,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="./city-shares-ui.css">
+    <link rel="stylesheet" href="./travel-ledger.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;900&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         html, body {
@@ -3272,6 +3273,37 @@
         </header>
     </div>
 
+    <div id="travelLedger" class="hidden" role="dialog" aria-modal="true" aria-label="旅行帳本" aria-hidden="true">
+        <header id="travelLedgerHeader" class="tl-header">
+            <div class="tl-header-main">
+                <p class="tl-kicker">SOARVIBE</p>
+                <h2 id="travelLedgerTitle" class="tl-title">旅行帳本</h2>
+                <p id="travelLedgerSubtitle" class="tl-subtitle">每趟旅行，都有一本自己的花費紀錄</p>
+            </div>
+            <div class="tl-header-actions">
+                <button type="button" id="travelLedgerBackBtn" class="tl-icon-btn is-hidden" aria-label="返回">← 返回</button>
+                <button type="button" id="travelLedgerCloseBtn" class="tl-icon-btn" aria-label="關閉旅行帳本">✕</button>
+            </div>
+        </header>
+        <main id="travelLedgerViewport" class="tl-viewport">
+            <div id="travelLedgerListView" class="tl-view"></div>
+            <div id="travelLedgerCreateView" class="tl-view hidden"></div>
+            <div id="travelLedgerEditView" class="tl-view hidden"></div>
+            <div id="travelLedgerDetailView" class="tl-view hidden"></div>
+        </main>
+        <div id="travelLedgerToast" class="tl-toast hidden" role="status" aria-live="polite"></div>
+        <div id="travelLedgerConfirm" class="tl-confirm hidden" role="alertdialog" aria-modal="true" aria-labelledby="travelLedgerConfirmTitle">
+            <div class="tl-confirm-card">
+                <h3 id="travelLedgerConfirmTitle" class="tl-confirm-title">確認</h3>
+                <p id="travelLedgerConfirmCopy" class="tl-confirm-copy"></p>
+                <div class="tl-confirm-actions">
+                    <button type="button" id="travelLedgerConfirmOk" class="tl-danger-btn">確認</button>
+                    <button type="button" id="travelLedgerConfirmCancel" class="tl-secondary-btn">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="./feature-flags.js"></script>
     <script src="./city-journal-editorial-engine.js"></script>
     <script src="./city-journal-image-manifest.js"></script>
@@ -3282,6 +3314,10 @@
     <script src="./city-shares-config.js"></script>
     <script src="./city-shares-data.js"></script>
     <script src="./city-shares-ui.js"></script>
+    <script src="./travel-ledger-config.js"></script>
+    <script src="./travel-ledger-forex.js"></script>
+    <script src="./travel-ledger-data.js"></script>
+    <script src="./travel-ledger-ui.js"></script>
     <script>
         (function () {
             const TRAVEL_STYLE_LABELS = {
