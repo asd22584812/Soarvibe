@@ -1,4 +1,5 @@
 const CACHE_NAME = 'soarvibe-v142';
+/* Phase 1C.1 cache bust — travel ledger network-first */
 const STATIC_ASSETS = [
   './index.html',
   './manifest.json',
