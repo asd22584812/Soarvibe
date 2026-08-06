@@ -1,5 +1,6 @@
-const CACHE_NAME = 'soarvibe-v141';
+const CACHE_NAME = 'soarvibe-v142';
 const STATIC_ASSETS = [
+  './index.html',
   './manifest.json',
   './feature-flags.js',
   './city-shares-config.js',
@@ -11,6 +12,11 @@ const STATIC_ASSETS = [
   './city-journal-photo-scoring.js',
   './city-journal-image-library.js',
   './city-journal-caption.js',
+  './travel-ledger.css',
+  './travel-ledger-config.js',
+  './travel-ledger-forex.js',
+  './travel-ledger-data.js',
+  './travel-ledger-ui.js',
   './assets/city-journal/manifest.json',
   './assets/city-journal/placeholder-city-journal.svg',
   './cover-photos/vietnam.jpg',
@@ -75,6 +81,54 @@ function isHtmlRequest(request, url) {
   return path.endsWith('/') || path.endsWith('/index.html') || path.endsWith('/Soarvibe') || path.endsWith('/Soarvibe/');
 }
 
+function isTravelLedgerAsset(url) {
+  var path = url.pathname;
+  return (
+    /\/travel-ledger(-(config|forex|data|ui))?\.js$/i.test(path) ||
+    /\/travel-ledger\.css$/i.test(path) ||
+    /\/index\.html$/i.test(path)
+  );
+}
+
+function networkFirst(request, fallbackUrl) {
+  return fetch(request)
+    .then(function (response) {
+      if (response && response.status === 200 && response.type === 'basic') {
+        var copy = response.clone();
+        caches.open(CACHE_NAME).then(function (cache) {
+          cache.put(request, copy);
+        });
+      }
+      return response;
+    })
+    .catch(function () {
+      return caches.match(request).then(function (cached) {
+        if (cached) return cached;
+        if (fallbackUrl) return caches.match(fallbackUrl);
+        return undefined;
+      });
+    });
+}
+
+function staleWhileRevalidate(request) {
+  return caches.match(request).then(function (cached) {
+    var networkPromise = fetch(request)
+      .then(function (response) {
+        if (response && response.status === 200 && response.type === 'basic') {
+          var copy = response.clone();
+          caches.open(CACHE_NAME).then(function (cache) {
+            cache.put(request, copy);
+          });
+        }
+        return response;
+      })
+      .catch(function () {
+        return cached;
+      });
+    return cached || networkPromise;
+  });
+}
+
 self.addEventListener('fetch', function (event) {
   var request = event.request;
   if (request.method !== 'GET') return;
@@ -84,29 +138,10 @@ self.addEventListener('fetch', function (event) {
     return;
   }
 
-  if (isHtmlRequest(request, url)) {
-    event.respondWith(
-      fetch(request).then(function (response) {
-        return response;
-      }).catch(function () {
-        return caches.match('./index.html');
-      })
-    );
+  if (isHtmlRequest(request, url) || isTravelLedgerAsset(url)) {
+    event.respondWith(networkFirst(request, './index.html'));
     return;
   }
 
-  event.respondWith(
-    caches.match(request).then(function (cached) {
-      if (cached) return cached;
-      return fetch(request).then(function (response) {
-        if (response && response.status === 200 && response.type === 'basic') {
-          var copy = response.clone();
-          caches.open(CACHE_NAME).then(function (cache) {
-            cache.put(request, copy);
-          });
-        }
-        return response;
-      });
-    })
-  );
+  event.respondWith(staleWhileRevalidate(request));
 });
