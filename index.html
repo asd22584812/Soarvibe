@@ -3305,6 +3305,13 @@
             <div id="travelLedgerDetailView" class="tl-view hidden"></div>
         </main>
         <div id="travelLedgerToast" class="tl-toast hidden" role="status" aria-live="polite"></div>
+        <div id="travelLedgerExpenseSheet" class="tl-expense-sheet hidden" aria-hidden="true">
+            <button type="button" class="tl-expense-sheet-backdrop" data-tl-action="close-expense-sheet" aria-label="關閉新增花費"></button>
+            <div class="tl-expense-sheet-panel" role="dialog" aria-modal="true" aria-labelledby="travelLedgerExpenseSheetTitle">
+                <div class="tl-expense-sheet-handle" aria-hidden="true"></div>
+                <div id="travelLedgerExpenseSheetBody" class="tl-expense-sheet-body"></div>
+            </div>
+        </div>
         <div id="travelLedgerConfirm" class="tl-confirm hidden" role="alertdialog" aria-modal="true" aria-labelledby="travelLedgerConfirmTitle">
             <div class="tl-confirm-card">
                 <h3 id="travelLedgerConfirmTitle" class="tl-confirm-title">確認</h3>

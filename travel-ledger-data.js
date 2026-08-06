@@ -581,20 +581,54 @@
   }
 
   function parseMoneyToMinor(input, currencyCode) {
-    if (input == null || input === '') return null;
+    var result = validateMoneyInput(input, currencyCode);
+    return result.ok ? result.minor : null;
+  }
+
+  function validateMoneyInput(input, currencyCode) {
+    if (input == null || input === '') {
+      return { ok: false, minor: null, error: 'empty' };
+    }
     var code = String(currencyCode || '').toUpperCase();
     var digits = CONFIG.getMinorUnitDigits(code);
     var factor = minorUnitFactor(code);
     var str = String(input).replace(/,/g, '').trim();
-    if (!str) return null;
+    if (!str) {
+      return { ok: false, minor: null, error: 'empty' };
+    }
+    if (digits === 0) {
+      if (!/^\d+$/.test(str)) {
+        return { ok: false, minor: null, error: 'integer_only' };
+      }
+    } else if (!/^\d+(\.\d+)?$/.test(str)) {
+      return { ok: false, minor: null, error: 'invalid_format' };
+    } else {
+      var decimalPart = str.split('.')[1];
+      if (decimalPart && decimalPart.length > digits) {
+        return { ok: false, minor: null, error: 'too_many_decimals' };
+      }
+    }
     var num = Number(str);
-    if (!isFinite(num) || num < 0) return null;
-    return Math.round(num * factor);
+    if (!isFinite(num) || num <= 0) {
+      return { ok: false, minor: null, error: num === 0 ? 'zero' : 'invalid' };
+    }
+    var minor = Math.round(num * factor);
+    if (!Number.isSafeInteger(minor)) {
+      return { ok: false, minor: null, error: 'unsafe_integer' };
+    }
+    return { ok: true, minor: minor, error: null };
+  }
+
+  function getLocalDateKeyFromIso(iso) {
+    if (!iso || typeof iso !== 'string') return '';
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return '';
+    return formatDateOnly(d);
   }
 
   function expenseDateKey(expense) {
     if (!expense || !expense.occurredAt) return '';
-    return String(expense.occurredAt).slice(0, 10);
+    return getLocalDateKeyFromIso(expense.occurredAt);
   }
 
   function isCashPayment(method) {
@@ -809,6 +843,9 @@
     calculateProjectedFinalSpend: calculateProjectedFinalSpend,
     formatMoneyMinor: formatMoneyMinor,
     parseMoneyToMinor: parseMoneyToMinor,
+    validateMoneyInput: validateMoneyInput,
+    getLocalDateKeyFromIso: getLocalDateKeyFromIso,
+    expenseDateKey: expenseDateKey,
     convertMinorUnits: FOREX.convertMinorUnits,
     deriveLedgerStatus: deriveLedgerStatus,
     normalizeLedger: normalizeLedger,

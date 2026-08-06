@@ -54,10 +54,18 @@
     openMenuId: null,
     phoneScrollTop: 0,
     createStep: 0,
-    createDraft: null
+    createDraft: null,
+    expenseMode: null,
+    expenseId: null,
+    expenseCategory: 'food',
+    expensePayment: 'cash',
+    swipeOpenId: null,
+    expenseSheetScrollTop: 0,
+    expenseSheetLockedView: null
   };
 
   var toastTimer = null;
+  var LAST_EXPENSE_PAYMENT_KEY = 'tlLastExpensePayment';
 
   function escapeHtml(str) {
     if (str == null) return '';
@@ -223,6 +231,100 @@
     }
   }
 
+  function getLastExpensePayment() {
+    try {
+      var stored = localStorage.getItem(LAST_EXPENSE_PAYMENT_KEY);
+      if (stored && CONFIG.isValidPaymentMethod(stored)) return stored;
+    } catch (e) {}
+    return 'cash';
+  }
+
+  function saveLastExpensePayment(method) {
+    if (!CONFIG.isValidPaymentMethod(method)) return;
+    try {
+      localStorage.setItem(LAST_EXPENSE_PAYMENT_KEY, method);
+    } catch (e) {}
+  }
+
+  function formatExpenseTime(iso) {
+    if (!iso) return '';
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return '';
+    var h = String(d.getHours()).padStart(2, '0');
+    var m = String(d.getMinutes()).padStart(2, '0');
+    return h + ':' + m;
+  }
+
+  function lockActiveViewScroll() {
+    var view = document.querySelector('#travelLedger .tl-view:not(.hidden)');
+    if (!view) return;
+    tlState.expenseSheetScrollTop = view.scrollTop;
+    view.style.overflow = 'hidden';
+    tlState.expenseSheetLockedView = view;
+  }
+
+  function unlockActiveViewScroll() {
+    var view = tlState.expenseSheetLockedView;
+    if (!view) return;
+    view.style.overflow = '';
+    view.scrollTop = tlState.expenseSheetScrollTop || 0;
+    tlState.expenseSheetLockedView = null;
+  }
+
+  function bindExpenseSheetDismissGestures(sheet) {
+    if (!sheet || sheet._tlDismissBound) return;
+    sheet._tlDismissBound = true;
+    var panel = sheet.querySelector('.tl-expense-sheet-panel');
+    var body = sheet.querySelector('.tl-expense-sheet-body');
+    if (!panel) return;
+    var startY = 0;
+    var tracking = false;
+    panel.addEventListener(
+      'touchstart',
+      function (e) {
+        if (!e.touches || !e.touches[0]) return;
+        if (body && body.scrollTop > 0) {
+          tracking = false;
+          return;
+        }
+        startY = e.touches[0].clientY;
+        tracking = true;
+      },
+      { passive: true }
+    );
+    panel.addEventListener(
+      'touchmove',
+      function (e) {
+        if (!tracking || !e.touches || !e.touches[0]) return;
+        var dy = e.touches[0].clientY - startY;
+        if (dy > 72) {
+          tracking = false;
+          closeExpenseSheet();
+        }
+      },
+      { passive: true }
+    );
+    panel.addEventListener(
+      'touchend',
+      function () {
+        tracking = false;
+      },
+      { passive: true }
+    );
+  }
+
+  function moneyInputErrorMessage(code, errorKey) {
+    var digits = CONFIG.getMinorUnitDigits(code);
+    if (errorKey === 'empty') return '請輸入金額';
+    if (errorKey === 'zero') return '金額必須大於 0';
+    if (errorKey === 'integer_only') return '此幣別不接受小數';
+    if (errorKey === 'too_many_decimals') {
+      return digits === 2 ? '最多接受兩位小數' : '小數位數超出限制';
+    }
+    if (errorKey === 'unsafe_integer') return '金額超出可接受範圍';
+    return '請輸入有效金額';
+  }
+
   function showToast(message) {
     var el = $('travelLedgerToast');
     if (!el) return;
@@ -236,6 +338,18 @@
 
   function showComingSoon() {
     showToast('新增花費即將開放，敬請期待');
+  }
+
+  function addExpenseButtonHtml(ledgerId) {
+    return (
+      '<button type="button" class="tl-add-expense-btn" data-tl-action="add-expense" data-ledger-id="' +
+      escapeHtml(ledgerId || '') +
+      '">＋ 新增花費</button>'
+    );
+  }
+
+  function comingSoonButtonHtml() {
+    return addExpenseButtonHtml(tlState.ledgerId || '');
   }
 
   function showConfirm(title, copy) {
@@ -617,14 +731,6 @@
     });
   }
 
-  function comingSoonButtonHtml(extraClass) {
-    return (
-      '<button type="button" class="tl-coming-soon-btn' +
-      (extraClass ? ' ' + extraClass : '') +
-      '" data-tl-action="coming-soon">＋ 新增花費<span class="tl-soon-chip">Coming Soon</span></button>'
-    );
-  }
-
   function renderMenu(ledger) {
     return (
       '<div class="tl-menu">' +
@@ -701,7 +807,7 @@
       escapeHtml(remainingText) +
       '</p></div>' +
       '</div>' +
-      comingSoonButtonHtml() +
+      addExpenseButtonHtml(ledger.id) +
       '</section>'
     );
   }
@@ -806,6 +912,453 @@
     container.innerHTML = html;
   }
 
+  function yesterdayDateOnly(today) {
+    var d = parseDateOnly(today || todayDateOnly());
+    if (!d) return '';
+    d.setDate(d.getDate() - 1);
+    return formatDateOnly(d);
+  }
+
+  function expenseOccurredDate(expense) {
+    return DATA.getLocalDateKeyFromIso(expense && expense.occurredAt);
+  }
+
+  function paymentIcon(method) {
+    var meta = CONFIG.getPaymentMethodMeta(method);
+    return (meta && meta.icon) || '💸';
+  }
+
+  function paymentLabel(method) {
+    var meta = CONFIG.getPaymentMethodMeta(method);
+    return (meta && meta.label) || method || '';
+  }
+
+  function sortExpensesDesc(expenses) {
+    return (expenses || []).slice().sort(function (a, b) {
+      return String(b.occurredAt || '').localeCompare(String(a.occurredAt || ''));
+    });
+  }
+
+  function groupExpensesForDisplay(expenses, today) {
+    today = today || todayDateOnly();
+    var yesterday = yesterdayDateOnly(today);
+    var groups = { today: [], yesterday: [], earlier: [] };
+    sortExpensesDesc(expenses).forEach(function (exp) {
+      var key = expenseOccurredDate(exp);
+      if (key === today) groups.today.push(exp);
+      else if (key === yesterday) groups.yesterday.push(exp);
+      else groups.earlier.push(exp);
+    });
+    return groups;
+  }
+
+  function isExpenseSheetOpen() {
+    var sheet = $('travelLedgerExpenseSheet');
+    return !!(sheet && !sheet.classList.contains('hidden'));
+  }
+
+  function closeExpenseSheet() {
+    var sheet = $('travelLedgerExpenseSheet');
+    if (sheet) {
+      sheet.classList.add('hidden');
+      sheet.setAttribute('aria-hidden', 'true');
+    }
+    unlockActiveViewScroll();
+    tlState.expenseMode = null;
+    tlState.expenseId = null;
+    tlState.expenseCategory = 'food';
+    tlState.expensePayment = getLastExpensePayment();
+  }
+
+  function renderExpenseRow(expense, ledger) {
+    var primaryCode =
+      (expense && expense.currencyCode) ||
+      (ledger.primaryCurrency && ledger.primaryCurrency.code);
+    var rowTitle = expense.title
+      ? expense.title
+      : expense.categoryLabel || expense.category || '花費';
+    var noteHtml = expense.note
+      ? '<p class="tl-expense-row-note">' + escapeHtml(expense.note) + '</p>'
+      : '';
+    var timeText = formatExpenseTime(expense.occurredAt);
+    var swiped = tlState.swipeOpenId === expense.id ? ' is-swiped' : '';
+    return (
+      '<div class="tl-expense-swipe" data-expense-swipe="' +
+      escapeHtml(expense.id) +
+      '">' +
+      '<button type="button" class="tl-expense-delete-reveal" data-tl-action="delete-expense" data-ledger-id="' +
+      escapeHtml(ledger.id) +
+      '" data-expense-id="' +
+      escapeHtml(expense.id) +
+      '">刪除</button>' +
+      '<button type="button" class="tl-expense-row' +
+      swiped +
+      '" data-tl-action="edit-expense" data-ledger-id="' +
+      escapeHtml(ledger.id) +
+      '" data-expense-id="' +
+      escapeHtml(expense.id) +
+      '">' +
+      '<div class="tl-expense-row-icon" aria-hidden="true">' +
+      escapeHtml(expense.categoryIcon || '📦') +
+      '</div>' +
+      '<div class="tl-expense-row-main">' +
+      '<p class="tl-expense-row-title">' +
+      escapeHtml(rowTitle) +
+      '</p>' +
+      noteHtml +
+      '<p class="tl-expense-row-meta">' +
+      escapeHtml(paymentIcon(expense.paymentMethod) + ' ' + paymentLabel(expense.paymentMethod)) +
+      (timeText ? ' · ' + escapeHtml(timeText) : '') +
+      '</p></div>' +
+      '<p class="tl-expense-row-amount">' +
+      escapeHtml(DATA.formatMoneyMinor(expense.amountMinor, primaryCode)) +
+      '</p></button></div>'
+    );
+  }
+
+  function renderExpenseGroup(title, expenses, ledger, emptyCopy) {
+    var html = '<section class="tl-expense-group"><h3 class="tl-expense-group-title">' + escapeHtml(title) + '</h3>';
+    if (!expenses.length) {
+      html += '<p class="tl-expense-empty">' + escapeHtml(emptyCopy) + '</p>';
+    } else {
+      expenses.forEach(function (exp) {
+        html += renderExpenseRow(exp, ledger);
+      });
+    }
+    html += '</section>';
+    return html;
+  }
+
+  function renderExpenseLists(ledger, today) {
+    var groups = groupExpensesForDisplay(ledger.expenses || [], today);
+    return (
+      '<div class="tl-expense-groups">' +
+      renderExpenseGroup('今天', groups.today, ledger, '今天還沒有花費，點上方按鈕記一筆吧。') +
+      renderExpenseGroup('昨天', groups.yesterday, ledger, '昨天沒有花費紀錄。') +
+      (groups.earlier.length
+        ? renderExpenseGroup('更早', groups.earlier, ledger, '')
+        : '') +
+      '</div>'
+    );
+  }
+
+  function bindExpenseSwipeHandlers(container) {
+    if (!container) return;
+    var startX = 0;
+    var startY = 0;
+    var activeRow = null;
+    var locked = false;
+
+    container.querySelectorAll('.tl-expense-row').forEach(function (row) {
+      row.addEventListener(
+        'touchstart',
+        function (e) {
+          if (!e.touches || !e.touches[0]) return;
+          startX = e.touches[0].clientX;
+          startY = e.touches[0].clientY;
+          activeRow = row;
+          locked = false;
+        },
+        { passive: true }
+      );
+      row.addEventListener(
+        'touchmove',
+        function (e) {
+          if (!activeRow || !e.touches || !e.touches[0]) return;
+          var dx = e.touches[0].clientX - startX;
+          var dy = e.touches[0].clientY - startY;
+          if (!locked) {
+            if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+            if (Math.abs(dy) > Math.abs(dx)) {
+              activeRow = null;
+              return;
+            }
+            locked = true;
+          }
+          if (dx < -40) {
+            container.querySelectorAll('.tl-expense-row.is-swiped').forEach(function (el) {
+              if (el !== activeRow) el.classList.remove('is-swiped');
+            });
+            activeRow.classList.add('is-swiped');
+            tlState.swipeOpenId = activeRow.getAttribute('data-expense-id');
+          } else if (dx > 24) {
+            activeRow.classList.remove('is-swiped');
+            if (tlState.swipeOpenId === activeRow.getAttribute('data-expense-id')) {
+              tlState.swipeOpenId = null;
+            }
+          }
+        },
+        { passive: true }
+      );
+      row.addEventListener(
+        'touchend',
+        function () {
+          activeRow = null;
+          locked = false;
+        },
+        { passive: true }
+      );
+    });
+  }
+
+  function renderExpenseSheetBody(ledger, expense) {
+    var isEdit = !!expense;
+    var primaryCode = ledger.primaryCurrency && ledger.primaryCurrency.code;
+    var symbol = CONFIG.getCurrencySymbol(primaryCode) || primaryCode || '';
+    var amountValue = isEdit ? minorToMajorInputValue(expense.amountMinor, primaryCode) : '';
+    var category = isEdit ? expense.category : tlState.expenseCategory;
+    var payment = isEdit ? expense.paymentMethod : tlState.expensePayment;
+    var note = isEdit ? expense.note || '' : '';
+    tlState.expenseCategory = category || 'food';
+    tlState.expensePayment = payment || 'cash';
+
+    var catKeys = CONFIG.EXPENSE_ENTRY_CATEGORY_KEYS || [];
+    var catHtml = '<div class="tl-expense-cat-grid">';
+    catKeys.forEach(function (key) {
+      var meta = CONFIG.getCategoryMeta(key);
+      if (!meta) return;
+      catHtml +=
+        '<button type="button" class="tl-expense-cat-chip' +
+        (key === tlState.expenseCategory ? ' is-selected' : '') +
+        '" data-tl-action="pick-expense-category" data-category="' +
+        escapeHtml(key) +
+        '"><span class="tl-expense-cat-icon" aria-hidden="true">' +
+        escapeHtml(meta.icon) +
+        '</span>' +
+        escapeHtml(meta.label) +
+        '</button>';
+    });
+    catHtml += '</div>';
+
+    var payKeys = CONFIG.EXPENSE_ENTRY_PAYMENT_KEYS || ['cash', 'credit_card', 'electronic'];
+    var payHtml = '<div class="tl-expense-pay-row">';
+    payKeys.forEach(function (key) {
+      var meta = CONFIG.getPaymentMethodMeta(key);
+      if (!meta) return;
+      payHtml +=
+        '<button type="button" class="tl-expense-pay-chip' +
+        (key === tlState.expensePayment ? ' is-selected' : '') +
+        '" data-tl-action="pick-expense-payment" data-payment="' +
+        escapeHtml(key) +
+        '"><span class="tl-expense-pay-icon" aria-hidden="true">' +
+        escapeHtml(meta.icon || '') +
+        '</span>' +
+        escapeHtml(meta.label) +
+        '</button>';
+    });
+    payHtml += '</div>';
+
+    return (
+      '<form id="tlExpenseForm" novalidate>' +
+      '<h3 id="travelLedgerExpenseSheetTitle" class="tl-expense-sheet-title">' +
+      (isEdit ? '編輯花費' : '新增花費') +
+      '</h3>' +
+      '<div class="tl-expense-amount-wrap">' +
+      '<p class="tl-expense-currency">' +
+      escapeHtml(primaryCode || '') +
+      '</p>' +
+      '<div class="tl-expense-amount-row">' +
+      '<span class="tl-expense-symbol">' +
+      escapeHtml(symbol) +
+      '</span>' +
+      '<input id="tlExpenseAmount" class="tl-expense-amount-input" name="amount" inputmode="decimal" type="text" autocomplete="off" placeholder="0" value="' +
+      escapeHtml(amountValue) +
+      '"></div></div>' +
+      '<p class="tl-expense-section-label">分類</p>' +
+      catHtml +
+      '<p class="tl-expense-section-label">付款方式</p>' +
+      payHtml +
+      '<p class="tl-expense-section-label">備註 <span class="tl-optional">選填</span></p>' +
+      '<input class="tl-expense-note-input" name="note" type="text" maxlength="120" placeholder="例如：一蘭拉麵" value="' +
+      escapeHtml(note) +
+      '">' +
+      '<p id="tlExpenseFormError" class="tl-expense-error"></p>' +
+      '<div class="tl-expense-sheet-actions">' +
+      '<button type="submit" class="tl-primary-btn">' +
+      (isEdit ? '儲存變更' : '新增花費') +
+      '</button>' +
+      (isEdit
+        ? '<button type="button" class="tl-danger-btn" data-tl-action="delete-expense" data-ledger-id="' +
+          escapeHtml(ledger.id) +
+          '" data-expense-id="' +
+          escapeHtml(expense.id) +
+          '">刪除這筆花費</button>'
+        : '') +
+      '<button type="button" class="tl-secondary-btn" data-tl-action="close-expense-sheet">取消</button>' +
+      '</div></form>'
+    );
+  }
+
+  function openExpenseSheet(ledgerId, expenseId) {
+    var ledger = DATA.getTravelLedgerById(ledgerId);
+    if (!ledger) {
+      showToast('找不到這本旅行帳本');
+      return;
+    }
+    tlState.ledgerId = ledgerId;
+    var expense = null;
+    if (expenseId) {
+      for (var i = 0; i < (ledger.expenses || []).length; i++) {
+        if (ledger.expenses[i].id === expenseId) {
+          expense = ledger.expenses[i];
+          break;
+        }
+      }
+      if (!expense) {
+        showToast('找不到這筆花費');
+        return;
+      }
+      tlState.expenseMode = 'edit';
+      tlState.expenseId = expenseId;
+    } else {
+      tlState.expenseMode = 'create';
+      tlState.expenseId = null;
+      tlState.expenseCategory = 'food';
+      tlState.expensePayment = getLastExpensePayment();
+    }
+
+    var body = $('travelLedgerExpenseSheetBody');
+    var sheet = $('travelLedgerExpenseSheet');
+    if (!body || !sheet) return;
+    body.innerHTML = renderExpenseSheetBody(ledger, expense);
+    sheet.classList.remove('hidden');
+    sheet.setAttribute('aria-hidden', 'false');
+    lockActiveViewScroll();
+    bindExpenseSheetDismissGestures(sheet);
+    var amountInput = $('tlExpenseAmount');
+    if (amountInput) {
+      setTimeout(function () {
+        amountInput.focus();
+        amountInput.select && amountInput.select();
+      }, 80);
+    }
+  }
+
+  function openAddExpenseSheet(ledgerId) {
+    openExpenseSheet(ledgerId || tlState.ledgerId, null);
+  }
+
+  function openEditExpenseSheet(ledgerId, expenseId) {
+    openExpenseSheet(ledgerId, expenseId);
+  }
+
+  function setExpenseSheetError(message) {
+    var el = $('tlExpenseFormError');
+    if (el) el.textContent = message || '';
+  }
+
+  function submitExpenseForm() {
+    var form = $('tlExpenseForm');
+    if (!form || !tlState.ledgerId) return;
+    setExpenseSheetError('');
+    var ledger = DATA.getTravelLedgerById(tlState.ledgerId);
+    if (!ledger) {
+      showToast('找不到這本旅行帳本');
+      return;
+    }
+    var primaryCode = ledger.primaryCurrency && ledger.primaryCurrency.code;
+    var amountRaw = form.querySelector('[name="amount"]')
+      ? form.querySelector('[name="amount"]').value.trim()
+      : '';
+    var note = form.querySelector('[name="note"]') ? form.querySelector('[name="note"]').value.trim() : '';
+    var amountCheck = DATA.validateMoneyInput(amountRaw, primaryCode);
+    if (!amountCheck.ok) {
+      setExpenseSheetError(moneyInputErrorMessage(primaryCode, amountCheck.error));
+      return;
+    }
+    var amountMinor = amountCheck.minor;
+    if (!CONFIG.isValidCategory(tlState.expenseCategory)) {
+      setExpenseSheetError('請選擇分類');
+      return;
+    }
+    if (!CONFIG.isValidPaymentMethod(tlState.expensePayment)) {
+      setExpenseSheetError('請選擇付款方式');
+      return;
+    }
+    if (!isStorageAvailable()) {
+      showToast('目前無法儲存資料');
+      return;
+    }
+
+    var payload = {
+      amountMinor: amountMinor,
+      currencyCode: primaryCode,
+      category: tlState.expenseCategory,
+      paymentMethod: tlState.expensePayment,
+      note: note
+    };
+
+    try {
+      if (tlState.expenseMode === 'edit' && tlState.expenseId) {
+        var updated = DATA.updateTravelExpense(tlState.ledgerId, tlState.expenseId, payload);
+        if (!updated) {
+          showToast('更新失敗，請稍後再試');
+          return;
+        }
+        showToast('花費已更新');
+      } else {
+        payload.occurredAt = new Date().toISOString();
+        var created = DATA.addTravelExpense(tlState.ledgerId, payload);
+        if (!created) {
+          showToast('新增失敗，請稍後再試');
+          return;
+        }
+        showToast('已記下一筆花費');
+      }
+      saveLastExpensePayment(tlState.expensePayment);
+      closeExpenseSheet();
+      tlState.swipeOpenId = null;
+      if (tlState.view === 'detail') {
+        renderDetailView(tlState.ledgerId);
+      } else if (tlState.view === 'list') {
+        renderTravelLedgerList();
+      }
+    } catch (e) {
+      showToast('儲存失敗，請稍後再試');
+    }
+  }
+
+  function confirmDeleteExpense(ledgerId, expenseId) {
+    var ledger = DATA.getTravelLedgerById(ledgerId);
+    if (!ledger) {
+      showToast('找不到這本旅行帳本');
+      return Promise.resolve(false);
+    }
+    var expense = null;
+    for (var i = 0; i < (ledger.expenses || []).length; i++) {
+      if (ledger.expenses[i].id === expenseId) {
+        expense = ledger.expenses[i];
+        break;
+      }
+    }
+    if (!expense) {
+      showToast('找不到這筆花費');
+      return Promise.resolve(false);
+    }
+    var label = (expense.categoryLabel || '花費') + ' ' + DATA.formatMoneyMinor(expense.amountMinor, expense.currencyCode);
+    return showConfirm('刪除這筆花費？', '將刪除「' + label + '」，此操作無法復原。').then(function (ok) {
+      if (!ok) return false;
+      if (!isStorageAvailable()) {
+        showToast('目前無法儲存資料');
+        return false;
+      }
+      var deleted = DATA.deleteTravelExpense(ledgerId, expenseId);
+      if (!deleted) {
+        showToast('刪除失敗，請稍後再試');
+        return false;
+      }
+      showToast('花費已刪除');
+      tlState.swipeOpenId = null;
+      closeExpenseSheet();
+      if (tlState.view === 'detail') {
+        renderDetailView(ledgerId);
+      } else if (tlState.view === 'list') {
+        renderTravelLedgerList();
+      }
+      return true;
+    });
+  }
+
   function renderDetailView(ledgerId) {
     var container = $('travelLedgerDetailView');
     if (!container) return;
@@ -855,13 +1408,8 @@
       '<p class="tl-today-amount">' +
       escapeHtml(DATA.formatMoneyMinor(summary.todaySpendMinor, primaryCode)) +
       '</p></div>' +
-      comingSoonButtonHtml() +
-      '<div class="tl-placeholder-block" style="margin-top:0.85rem;">' +
-      '<p class="tl-placeholder-title">今天紀錄</p>' +
-      '<p class="tl-placeholder-copy">Phase 1C 開放後，這裡會列出今天的每一筆花費。</p></div>' +
-      '<div class="tl-placeholder-block">' +
-      '<p class="tl-placeholder-title">昨天紀錄</p>' +
-      '<p class="tl-placeholder-copy">昨天的花費會收在這裡，方便快速回顧。</p></div>' +
+      addExpenseButtonHtml(ledger.id) +
+      renderExpenseLists(ledger, today) +
       '<div class="tl-summary-card">' +
       '<h3 class="tl-summary-title">旅行摘要</h3>' +
       '<div class="tl-summary-row"><span class="tl-summary-label">總花費</span><span class="tl-summary-value">' +
@@ -886,6 +1434,8 @@
       '">編輯帳本</button>' +
       '<button type="button" class="tl-secondary-btn" data-tl-action="back-list">返回帳本列表</button>' +
       '</div></div>';
+
+    bindExpenseSwipeHandlers(container);
   }
 
   function captureCreateStepValues() {
@@ -1263,7 +1813,28 @@
     tlState.openMenuId = null;
   }
 
+  function syncExpenseChipSelection() {
+    var body = $('travelLedgerExpenseSheetBody');
+    if (!body) return;
+    body.querySelectorAll('.tl-expense-cat-chip').forEach(function (chip) {
+      chip.classList.toggle(
+        'is-selected',
+        chip.getAttribute('data-category') === tlState.expenseCategory
+      );
+    });
+    body.querySelectorAll('.tl-expense-pay-chip').forEach(function (chip) {
+      chip.classList.toggle(
+        'is-selected',
+        chip.getAttribute('data-payment') === tlState.expensePayment
+      );
+    });
+  }
+
   function handleBack() {
+    if (isExpenseSheetOpen()) {
+      closeExpenseSheet();
+      return;
+    }
     if (tlState.view === 'list' || tlState.view === 'closed') {
       closeTravelLedger();
       return;
@@ -1296,6 +1867,8 @@
   function closeTravelLedger() {
     var shell = $('travelLedger');
     if (!shell) return;
+    closeExpenseSheet();
+    unlockActiveViewScroll();
     shell.classList.add('hidden');
     shell.setAttribute('aria-hidden', 'true');
     unlockPageScroll();
@@ -1305,6 +1878,7 @@
     tlState.editId = null;
     tlState.createStep = 0;
     tlState.createDraft = null;
+    tlState.swipeOpenId = null;
   }
 
   function openWithFixture() {
@@ -1362,6 +1936,41 @@
         renderCreateStep();
         return;
       }
+      if (action === 'add-expense' && ledgerId) {
+        e.preventDefault();
+        e.stopPropagation();
+        openAddExpenseSheet(ledgerId);
+        return;
+      }
+      if (action === 'close-expense-sheet') {
+        e.preventDefault();
+        closeExpenseSheet();
+        return;
+      }
+      if (action === 'pick-expense-category') {
+        e.preventDefault();
+        tlState.expenseCategory = actionEl.getAttribute('data-category') || 'food';
+        syncExpenseChipSelection();
+        return;
+      }
+      if (action === 'pick-expense-payment') {
+        e.preventDefault();
+        tlState.expensePayment = actionEl.getAttribute('data-payment') || 'cash';
+        syncExpenseChipSelection();
+        return;
+      }
+      if (action === 'edit-expense' && ledgerId) {
+        e.preventDefault();
+        e.stopPropagation();
+        openEditExpenseSheet(ledgerId, actionEl.getAttribute('data-expense-id'));
+        return;
+      }
+      if (action === 'delete-expense' && ledgerId) {
+        e.preventDefault();
+        e.stopPropagation();
+        confirmDeleteExpense(ledgerId, actionEl.getAttribute('data-expense-id'));
+        return;
+      }
       if (action === 'coming-soon') {
         e.preventDefault();
         e.stopPropagation();
@@ -1408,7 +2017,7 @@
     }
 
     var card = target.closest('[data-ledger-id][role="button"]');
-    if (card && !target.closest('.tl-menu') && !target.closest('[data-tl-action="coming-soon"]')) {
+    if (card && !target.closest('.tl-menu') && !target.closest('[data-tl-action="add-expense"]') && !target.closest('[data-tl-action="coming-soon"]')) {
       e.preventDefault();
       openTravelLedgerDetail(card.getAttribute('data-ledger-id'));
     }
@@ -1425,6 +2034,11 @@
     if (form.id === 'tlEditForm') {
       e.preventDefault();
       submitEditTravelLedger();
+      return;
+    }
+    if (form.id === 'tlExpenseForm') {
+      e.preventDefault();
+      submitExpenseForm();
     }
   }
 
@@ -1443,6 +2057,10 @@
     document.addEventListener('keydown', function (e) {
       if (e.key !== 'Escape' || shell.classList.contains('hidden')) return;
       if (!$('travelLedgerConfirm') || !$('travelLedgerConfirm').classList.contains('hidden')) return;
+      if (isExpenseSheetOpen()) {
+        closeExpenseSheet();
+        return;
+      }
       handleBack();
     });
   }
@@ -1458,6 +2076,11 @@
     submitEditTravelLedger: submitEditTravelLedger,
     confirmDeleteTravelLedger: confirmDeleteTravelLedger,
     archiveTravelLedgerFromUI: archiveTravelLedgerFromUI,
+    openAddExpenseSheet: openAddExpenseSheet,
+    openEditExpenseSheet: openEditExpenseSheet,
+    submitExpenseForm: submitExpenseForm,
+    confirmDeleteExpense: confirmDeleteExpense,
+    closeExpenseSheet: closeExpenseSheet,
     getLedgerDisplayStatus: getLedgerDisplayStatus,
     getLedgerDayProgress: getLedgerDayProgress,
     getLedgerDayShort: getLedgerDayShort,
@@ -1475,6 +2098,10 @@
   global.submitEditTravelLedger = submitEditTravelLedger;
   global.confirmDeleteTravelLedger = confirmDeleteTravelLedger;
   global.archiveTravelLedgerFromUI = archiveTravelLedgerFromUI;
+  global.openAddExpenseSheet = openAddExpenseSheet;
+  global.openEditExpenseSheet = openEditExpenseSheet;
+  global.submitExpenseForm = submitExpenseForm;
+  global.confirmDeleteExpense = confirmDeleteExpense;
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initTravelLedgerUi);

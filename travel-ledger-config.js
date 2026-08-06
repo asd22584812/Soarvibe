@@ -7,25 +7,43 @@
 
   var EXPENSE_CATEGORIES = Object.freeze({
     food: { label: '美食', icon: '🍜' },
-    cafe: { label: '咖啡甜點', icon: '☕' },
+    cafe: { label: '咖啡', icon: '☕' },
     shopping: { label: '購物', icon: '🛍️' },
     souvenir: { label: '伴手禮', icon: '🎁' },
-    transport: { label: '交通', icon: '🚃' },
+    transport: { label: '交通', icon: '🚇' },
     lodging: { label: '住宿', icon: '🏨' },
-    ticket: { label: '門票活動', icon: '🎫' },
-    entertainment: { label: '動漫娛樂', icon: '🎮' },
+    ticket: { label: '門票', icon: '🎫' },
+    entertainment: { label: '娛樂', icon: '🎮' },
     nightlife: { label: '酒吧夜生活', icon: '🍺' },
     drugstore: { label: '藥妝', icon: '💊' },
     communication: { label: '網路通訊', icon: '📱' },
-    other: { label: '其他', icon: '🧳' }
+    other: { label: '其他', icon: '📦' }
   });
 
   var PAYMENT_METHODS = Object.freeze({
-    cash: { label: '現金' },
-    credit_card: { label: '信用卡' },
-    electronic: { label: '電子支付' },
-    other: { label: '其他' }
+    cash: { label: '現金', icon: '💴' },
+    credit_card: { label: '信用卡', icon: '💳' },
+    electronic: { label: '電子支付', icon: '📱' },
+    other: { label: '其他', icon: '💸' }
   });
+
+  /** Phase 1C expense sheet icon grid order (matches schema enum) */
+  var EXPENSE_ENTRY_CATEGORY_KEYS = Object.freeze([
+    'food',
+    'cafe',
+    'shopping',
+    'souvenir',
+    'transport',
+    'lodging',
+    'ticket',
+    'entertainment',
+    'nightlife',
+    'drugstore',
+    'communication',
+    'other'
+  ]);
+
+  var EXPENSE_ENTRY_PAYMENT_KEYS = Object.freeze(['cash', 'credit_card', 'electronic']);
 
   var MOODS = Object.freeze({
     great: { label: '超值得', icon: '😍' },
@@ -170,6 +188,8 @@
     DEFAULT_DISPLAY_CURRENCY_CODE: DEFAULT_DISPLAY_CURRENCY_CODE,
     EXPENSE_CATEGORIES: EXPENSE_CATEGORIES,
     PAYMENT_METHODS: PAYMENT_METHODS,
+    EXPENSE_ENTRY_CATEGORY_KEYS: EXPENSE_ENTRY_CATEGORY_KEYS,
+    EXPENSE_ENTRY_PAYMENT_KEYS: EXPENSE_ENTRY_PAYMENT_KEYS,
     MOODS: MOODS,
     LEDGER_STATUSES: LEDGER_STATUSES,
     CASH_ADJUSTMENT_TYPES: CASH_ADJUSTMENT_TYPES,

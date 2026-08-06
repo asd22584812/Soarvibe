@@ -96,6 +96,9 @@ function runTests() {
   // 10. currency minor unit parse / format
   assertEqual(DATA.parseMoneyToMinor('980', 'JPY'), 980, 'parse JPY integer');
   assertEqual(DATA.parseMoneyToMinor('12.50', 'USD'), 1250, 'parse USD decimal');
+  assertEqual(DATA.parseMoneyToMinor('980.5', 'JPY'), null, 'reject JPY decimal');
+  assertEqual(DATA.parseMoneyToMinor('0', 'JPY'), null, 'reject zero amount');
+  assertEqual(DATA.validateMoneyInput('12.501', 'USD').error, 'too_many_decimals', 'USD max 2 decimals');
   assertEqual(DATA.formatMoneyMinor(1250, 'USD'), '$12.50', 'format USD decimal');
   assertEqual(DATA.formatMoneyMinor(980, 'JPY'), '¥980', 'format JPY integer');
 
