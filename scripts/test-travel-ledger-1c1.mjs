@@ -113,7 +113,7 @@ assert(DATA.getLedgerTemporalState(ledger, todayAfterTrip) === 'ended', 'after e
 
 assert(
   DATA.getDefaultExpenseDateKey(ledger, null, todayAfterTrip) === '2026-08-04',
-  'ended default date is endDate'
+  'ended default date is trip last day'
 );
 
 DATA.addTravelExpense(ledger.id, {
@@ -124,8 +124,8 @@ DATA.addTravelExpense(ledger.id, {
 });
 let ledgerWithExp = DATA.getTravelLedgerById(ledger.id);
 assert(
-  DATA.getDefaultExpenseDateKey(ledgerWithExp, null, todayAfterTrip) === '2026-08-03',
-  'ended default uses last expense date'
+  DATA.getDefaultExpenseDateKey(ledgerWithExp, null, todayAfterTrip) === '2026-08-04',
+  'ended default stays on trip last day'
 );
 
 assert(DATA.validateExpenseDateInTrip('2026-08-04', ledger).ok, 'endDate allowed');
@@ -148,7 +148,8 @@ assert(endedSummary.remainingBudgetMinor === 148000, 'remaining budget still com
 
 const endedHeroHtml = UI.renderDetailPrimarySummary(ledgerWithExp, todayAfterTrip, endedSummary, 'JPY');
 assert(endedHeroHtml.includes('旅程已結束'), 'ended hero shows ended kicker');
-assert(endedHeroHtml.includes('旅行總花費'), 'ended hero shows total label');
+assert(endedHeroHtml.includes('總花費'), 'ended hero shows total label');
+assert(endedHeroHtml.includes('現金剩餘'), 'ended hero shows cash balance');
 assert(!endedHeroHtml.includes('今天已花'), 'ended hero hides today spend');
 
 const activeLedger = DATA.createTravelLedger({
@@ -177,6 +178,7 @@ const activeHeroHtml = UI.renderDetailPrimarySummary(
 );
 assert(activeHeroHtml.includes('今天已花'), 'active hero shows today');
 assert(activeHeroHtml.includes('剩餘預算'), 'active hero shows remaining');
+assert(activeHeroHtml.includes('現金剩餘'), 'active hero shows cash balance');
 
 const endedGroups = UI.groupExpensesForDisplay(ledgerWithExp.expenses, todayAfterTrip, 'ended');
 assert(Array.isArray(endedGroups), 'ended groups is array');
@@ -205,7 +207,7 @@ assert(over.label === '已超出預算', 'over budget label');
 assert(over.modifier === 'is-over', 'over budget modifier');
 
 const endedBtn = UI.addExpenseButtonHtml(ledger.id, ledgerWithExp, todayAfterTrip);
-assert(endedBtn.includes('補記花費'), 'ended uses 補記花費 button');
+assert(endedBtn.includes('補登花費'), 'ended uses 補登花費 button');
 assert(!endedBtn.includes('disabled'), 'ended button not disabled');
 
 assert(DATA.formatMoneyMinor(25400, 'JPY') === '¥25,400', '¥25,400 format');

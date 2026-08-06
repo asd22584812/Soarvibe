@@ -152,7 +152,7 @@
     if (summary.budgetMinor == null) {
       return {
         label: '剩餘預算',
-        amountHtml: escapeHtml('尚未設定預算'),
+        amountHtml: escapeHtml('尚未設定'),
         modifier: 'is-unset'
       };
     }
@@ -170,52 +170,56 @@
     };
   }
 
+  function renderHeroMetricCol(label, amountHtml, modifier, labelModifier) {
+    return (
+      '<div class="tl-hero-summary-col">' +
+      '<p class="tl-hero-summary-label' +
+      (labelModifier ? ' ' + labelModifier : '') +
+      '">' +
+      escapeHtml(label) +
+      '</p>' +
+      '<p class="tl-hero-summary-amount' +
+      (modifier ? ' ' + modifier : '') +
+      '">' +
+      amountHtml +
+      '</p></div>'
+    );
+  }
+
   function renderDetailPrimarySummary(ledger, today, summary, primaryCode) {
     var state = getLedgerTemporalState(ledger, today);
     var budget = formatRemainingBudgetHero(summary, primaryCode);
+    var cashHtml = escapeHtml(DATA.formatMoneyMinor(summary.cashBalanceMinor, primaryCode));
+    var budgetLabelMod = budget.modifier === 'is-over' ? 'is-warning' : '';
 
     if (state === 'active') {
       return (
-        '<div class="tl-hero-summary tl-hero-summary-dual">' +
-        '<div class="tl-hero-summary-col">' +
-        '<p class="tl-hero-summary-label">今天已花</p>' +
-        '<p class="tl-hero-summary-amount">' +
-        escapeHtml(DATA.formatMoneyMinor(summary.todaySpendMinor, primaryCode)) +
-        '</p></div>' +
-        '<div class="tl-hero-summary-col">' +
-        '<p class="tl-hero-summary-label' +
-        (budget.modifier === 'is-over' ? ' is-warning' : '') +
-        '">' +
-        escapeHtml(budget.label) +
-        '</p>' +
-        '<p class="tl-hero-summary-amount ' +
-        budget.modifier +
-        '">' +
-        budget.amountHtml +
-        '</p></div></div>'
+        '<div class="tl-hero-summary tl-hero-summary-triple">' +
+        '<div class="tl-hero-summary-grid">' +
+        renderHeroMetricCol(
+          '今天已花',
+          escapeHtml(DATA.formatMoneyMinor(summary.todaySpendMinor, primaryCode)),
+          ''
+        ) +
+        renderHeroMetricCol(budget.label, budget.amountHtml, budget.modifier, budgetLabelMod) +
+        renderHeroMetricCol('現金剩餘', cashHtml, '') +
+        '</div></div>'
       );
     }
 
     if (state === 'ended') {
       return (
-        '<div class="tl-hero-summary tl-hero-summary-ended">' +
+        '<div class="tl-hero-summary tl-hero-summary-triple is-ended">' +
         '<p class="tl-hero-summary-kicker">旅程已結束</p>' +
-        '<div class="tl-hero-summary-col">' +
-        '<p class="tl-hero-summary-label">旅行總花費</p>' +
-        '<p class="tl-hero-summary-amount">' +
-        escapeHtml(DATA.formatMoneyMinor(summary.totalSpendMinor, primaryCode)) +
-        '</p></div>' +
-        '<div class="tl-hero-summary-col">' +
-        '<p class="tl-hero-summary-label' +
-        (budget.modifier === 'is-over' ? ' is-warning' : '') +
-        '">' +
-        escapeHtml(budget.label) +
-        '</p>' +
-        '<p class="tl-hero-summary-amount ' +
-        budget.modifier +
-        '">' +
-        budget.amountHtml +
-        '</p></div></div>'
+        '<div class="tl-hero-summary-grid">' +
+        renderHeroMetricCol(
+          '總花費',
+          escapeHtml(DATA.formatMoneyMinor(summary.totalSpendMinor, primaryCode)),
+          ''
+        ) +
+        renderHeroMetricCol(budget.label, budget.amountHtml, budget.modifier, budgetLabelMod) +
+        renderHeroMetricCol('現金剩餘', cashHtml, '') +
+        '</div></div>'
       );
     }
 
@@ -254,7 +258,7 @@
   function expenseSheetTitle(ledger, isEdit) {
     var state = getLedgerTemporalState(ledger);
     if (isEdit) return '編輯花費';
-    if (state === 'ended') return '補記花費';
+    if (state === 'ended') return '補登花費';
     if (state === 'upcoming') return '預先記錄';
     return '新增花費';
   }
@@ -262,7 +266,7 @@
   function expenseSubmitLabel(ledger, isEdit) {
     if (isEdit) return '儲存變更';
     var state = getLedgerTemporalState(ledger);
-    if (state === 'ended') return '補記花費';
+    if (state === 'ended') return '補登花費';
     if (state === 'upcoming') return '預先記錄';
     return '新增花費';
   }
@@ -280,10 +284,10 @@
     today = today || todayDateOnly();
     var state = ledger ? getLedgerTemporalState(ledger, today) : 'active';
     if (state === 'archived') {
-      return '<p class="tl-detail-note tl-archived-expense-note">解除封存後才能補記花費</p>';
+      return '<p class="tl-detail-note tl-archived-expense-note">解除封存後才能補登花費</p>';
     }
     var label = '＋ 新增花費';
-    if (state === 'ended') label = '＋ 補記花費';
+    if (state === 'ended') label = '＋ 補登花費';
     if (state === 'upcoming') label = '＋ 預先記錄';
     return (
       '<button type="button" class="tl-add-expense-btn" data-tl-action="add-expense" data-ledger-id="' +
@@ -946,11 +950,11 @@
       '<div class="tl-current-metric is-hero"><p class="tl-current-metric-label">今天已花</p><p class="tl-current-metric-value">' +
       escapeHtml(DATA.formatMoneyMinor(summary.todaySpendMinor, primaryCode)) +
       '</p></div>' +
-      '<div class="tl-current-metric"><p class="tl-current-metric-label">旅行累計</p><p class="tl-current-metric-value">' +
-      escapeHtml(DATA.formatMoneyMinor(summary.totalSpendMinor, primaryCode)) +
-      '</p></div>' +
       '<div class="tl-current-metric"><p class="tl-current-metric-label">剩餘預算</p><p class="tl-current-metric-value">' +
       escapeHtml(remainingText) +
+      '</p></div>' +
+      '<div class="tl-current-metric"><p class="tl-current-metric-label">現金剩餘</p><p class="tl-current-metric-value">' +
+      escapeHtml(DATA.formatMoneyMinor(summary.cashBalanceMinor, primaryCode)) +
       '</p></div>' +
       '</div>' +
       addExpenseButtonHtml(ledger.id, ledger, today) +
@@ -1154,6 +1158,11 @@
     tlState.expensePayment = getLastExpensePayment();
   }
 
+  function expenseAmountCategoryClass(category) {
+    var key = CONFIG.isValidCategory(category) ? category : 'other';
+    return 'tl-expense-amount-cat-' + key;
+  }
+
   function renderExpenseRow(expense, ledger) {
     var primaryCode =
       (expense && expense.currencyCode) ||
@@ -1190,17 +1199,16 @@
       escapeHtml(paymentIcon(expense.paymentMethod) + ' ' + paymentLabel(expense.paymentMethod)) +
       (timeText ? ' · ' + escapeHtml(timeText) : '') +
       '</p></div>' +
-      '<p class="tl-expense-row-amount">' +
+      '<span class="tl-expense-row-amount ' +
+      expenseAmountCategoryClass(expense.category) +
+      '">' +
       escapeHtml(DATA.formatMoneyMinor(expense.amountMinor, primaryCode)) +
-      '</p></button>' +
+      '</span></button>' +
       '<button type="button" class="tl-expense-delete-reveal" data-tl-action="delete-expense" data-ledger-id="' +
       escapeHtml(ledger.id) +
       '" data-expense-id="' +
       escapeHtml(expense.id) +
-      '" aria-label="刪除花費">' +
-      '<span class="tl-expense-delete-icon" aria-hidden="true">🗑️</span>' +
-      '<span class="tl-expense-delete-label">刪除</span>' +
-      '</button></div></div>'
+      '" aria-label="刪除花費">刪除</button></div></div>'
     );
   }
 
@@ -1234,7 +1242,7 @@
 
   function bindExpenseSwipeHandlers(container) {
     if (!container) return;
-    var deleteWidth = 0;
+    var deleteWidth = 80;
     var startX = 0;
     var startY = 0;
     var activeSwipe = null;
@@ -1404,6 +1412,11 @@
     });
     payHtml += '</div>';
 
+    var introHtml =
+      !isEdit && getLedgerTemporalState(ledger) === 'ended'
+        ? '<p class="tl-expense-sheet-intro">哎呀，好像還有漏記？可以補登旅行期間的花費。</p>'
+        : '';
+
     var dateHtml = showDate
       ? '<p class="tl-expense-section-label">消費日期</p>' +
         '<input class="tl-expense-date-input" name="expenseDate" type="date" min="' +
@@ -1420,6 +1433,7 @@
       '<h3 id="travelLedgerExpenseSheetTitle" class="tl-expense-sheet-title">' +
       escapeHtml(expenseSheetTitle(ledger, isEdit)) +
       '</h3>' +
+      introHtml +
       '<div class="tl-expense-amount-wrap">' +
       '<p class="tl-expense-currency">' +
       escapeHtml(primaryCode || '') +
@@ -1505,7 +1519,7 @@
   function openAddExpenseSheet(ledgerId) {
     var ledger = DATA.getTravelLedgerById(ledgerId || tlState.ledgerId);
     if (ledger && getLedgerTemporalState(ledger) === 'archived') {
-      showToast('請先解除封存才能補記花費');
+      showToast('請先解除封存才能補登花費');
       return;
     }
     openExpenseSheet(ledgerId || tlState.ledgerId, null);

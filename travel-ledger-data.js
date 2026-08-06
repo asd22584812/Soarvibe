@@ -125,7 +125,7 @@
     }
     var state = getLedgerTemporalState(ledger, referenceDate);
     if (state === 'ended') {
-      return getLastExpenseDateKey(ledger) || ledger.endDate || resolveReferenceDate(referenceDate);
+      return ledger.endDate || resolveReferenceDate(referenceDate);
     }
     if (state === 'upcoming') {
       return ledger.startDate || resolveReferenceDate(referenceDate);
