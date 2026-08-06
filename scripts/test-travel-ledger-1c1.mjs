@@ -124,8 +124,8 @@ DATA.addTravelExpense(ledger.id, {
 });
 let ledgerWithExp = DATA.getTravelLedgerById(ledger.id);
 assert(
-  DATA.getDefaultExpenseDateKey(ledgerWithExp, null, todayAfterTrip) === '2026-08-04',
-  'ended default stays on trip last day'
+  DATA.getDefaultExpenseDateKey(ledgerWithExp, null, todayAfterTrip) === '2026-08-03',
+  'ended default prefers last expense date'
 );
 
 assert(DATA.validateExpenseDateInTrip('2026-08-04', ledger).ok, 'endDate allowed');
@@ -177,8 +177,10 @@ const activeHeroHtml = UI.renderDetailPrimarySummary(
   'JPY'
 );
 assert(activeHeroHtml.includes('今天已花'), 'active hero shows today');
-assert(activeHeroHtml.includes('剩餘預算'), 'active hero shows remaining');
+assert(!activeHeroHtml.includes('剩餘預算'), 'active hero hides remaining budget');
 assert(activeHeroHtml.includes('現金剩餘'), 'active hero shows cash balance');
+assert(activeHeroHtml.includes('tl-hero-summary-dual'), 'active hero uses dual layout');
+assert(!activeHeroHtml.includes('tl-hero-summary-triple'), 'active hero not triple');
 
 const endedGroups = UI.groupExpensesForDisplay(ledgerWithExp.expenses, todayAfterTrip, 'ended');
 assert(Array.isArray(endedGroups), 'ended groups is array');
@@ -207,8 +209,26 @@ assert(over.label === '已超出預算', 'over budget label');
 assert(over.modifier === 'is-over', 'over budget modifier');
 
 const endedBtn = UI.addExpenseButtonHtml(ledger.id, ledgerWithExp, todayAfterTrip);
-assert(endedBtn.includes('補登花費'), 'ended uses 補登花費 button');
+assert(endedBtn.includes('馬上記帳'), 'ended uses 馬上記帳 button');
+assert(!endedBtn.includes('補登花費'), 'ended button no longer says 補登花費');
 assert(!endedBtn.includes('disabled'), 'ended button not disabled');
+
+assert(UI.expenseSheetTitle(ledgerWithExp, false) === '補登花費', 'ended sheet title stays 補登花費');
+assert(UI.expenseSubmitLabel(ledgerWithExp, false) === '馬上記帳', 'ended sheet submit is 馬上記帳');
+
+const noCashLedger = DATA.createTravelLedger({
+  ...trip,
+  name: 'No Cash',
+  initialCashMinor: null
+});
+const noCashSum = DATA.calculateLedgerSummary(noCashLedger, todayAfterTrip);
+const noCashHero = UI.renderDetailPrimarySummary(noCashLedger, todayAfterTrip, noCashSum, 'JPY');
+assert(noCashHero.includes('未設定'), 'no initial cash shows 未設定');
+assert(!/\b¥0\b/.test(noCashHero.split('現金剩餘')[1] || ''), 'no initial cash does not show misleading ¥0');
+
+assert(endedHeroHtml.includes('tl-hero-summary-dual'), 'ended hero uses dual layout');
+assert(!endedHeroHtml.includes('剩餘預算'), 'ended hero hides remaining budget');
+assert(!endedHeroHtml.includes('已超出預算'), 'ended hero hides budget over');
 
 assert(DATA.formatMoneyMinor(25400, 'JPY') === '¥25,400', '¥25,400 format');
 assert(DATA.formatMoneyMinor(1250000, 'JPY') === '¥1,250,000', '¥1,250,000 format');

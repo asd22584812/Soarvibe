@@ -1,4 +1,4 @@
-const CACHE_NAME = 'soarvibe-v142';
+const CACHE_NAME = 'soarvibe-v143';
 /* Phase 1C.1 cache bust — travel ledger network-first */
 const STATIC_ASSETS = [
   './index.html',

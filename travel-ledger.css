@@ -560,27 +560,37 @@
     background: rgba(255, 255, 255, 0.88);
     border: 1px solid rgba(255, 255, 255, 0.75);
     box-shadow: 0 10px 28px rgba(80, 60, 50, 0.07);
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow-x: hidden;
 }
-#travelLedger .tl-hero-summary-triple .tl-hero-summary-grid {
+#travelLedger .tl-hero-summary-dual .tl-hero-summary-grid,
+#travelLedger .tl-hero-summary-archived .tl-hero-summary-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.55rem;
-    align-items: start;
-}
-#travelLedger .tl-hero-summary-triple.is-ended .tl-hero-summary-kicker {
-    grid-column: 1 / -1;
-    margin-bottom: 0.35rem;
-}
-#travelLedger .tl-hero-summary-dual {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.75rem;
     align-items: start;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+}
+#travelLedger .tl-hero-summary-dual.is-ended .tl-hero-summary-kicker,
+#travelLedger .tl-hero-summary-archived .tl-hero-summary-kicker {
+    margin-bottom: 0.45rem;
+}
+#travelLedger .tl-hero-summary-col {
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+}
+#travelLedger .tl-hero-summary-dual {
+    display: block;
 }
 #travelLedger .tl-hero-summary-ended,
 #travelLedger .tl-hero-summary-archived {
-    display: grid;
-    gap: 0.65rem;
+    display: block;
 }
 #travelLedger .tl-hero-summary-kicker {
     margin: 0 0 0.15rem;
@@ -602,18 +612,22 @@
 }
 #travelLedger .tl-hero-summary-amount {
     margin: 0;
-    font-size: clamp(1.45rem, 6vw, 2rem);
+    font-size: clamp(1.05rem, 5.2vw, 1.85rem);
     font-weight: 900;
     letter-spacing: -0.02em;
     color: #37474f;
-    line-height: 1.1;
+    line-height: 1.15;
     font-variant-numeric: tabular-nums;
-    word-break: keep-all;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
 }
 #travelLedger .tl-hero-summary-amount.is-unset {
     font-size: 1rem;
     font-weight: 800;
     color: #90a4ae;
+    white-space: nowrap;
 }
 #travelLedger .tl-hero-summary-amount.is-over {
     color: #c62828;
@@ -949,6 +963,9 @@
     display: flex;
     align-items: flex-end;
     justify-content: center;
+    overflow-x: hidden;
+    overscroll-behavior-x: none;
+    touch-action: pan-y;
 }
 #travelLedger .tl-expense-sheet.hidden {
     display: none;
@@ -968,7 +985,9 @@
     position: relative;
     z-index: 1;
     width: 100%;
-    max-width: 28rem;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
     max-height: min(92dvh, 42rem);
     display: flex;
     flex-direction: column;
@@ -977,10 +996,15 @@
     box-shadow: 0 -12px 40px rgba(55, 71, 79, 0.18);
     padding: 0.35rem 0 calc(env(safe-area-inset-bottom, 0px) + 0.75rem);
     animation: tlSheetUp 0.28s ease;
+    overflow-x: hidden;
+    overscroll-behavior-x: none;
+    overscroll-behavior-y: contain;
+    touch-action: pan-y;
+    transform: translateX(0);
 }
 @keyframes tlSheetUp {
-    from { transform: translateY(100%); }
-    to { transform: translateY(0); }
+    from { transform: translateY(100%) translateX(0); }
+    to { transform: translateY(0) translateX(0); }
 }
 #travelLedger .tl-expense-sheet-handle {
     width: 2.5rem;
@@ -988,13 +1012,32 @@
     margin: 0.35rem auto 0.55rem;
     border-radius: 9999px;
     background: rgba(55, 71, 79, 0.18);
+    flex-shrink: 0;
+    touch-action: none;
+    cursor: grab;
 }
 #travelLedger .tl-expense-sheet-body {
+    overflow-x: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
+    overscroll-behavior-x: none;
+    overscroll-behavior-y: contain;
+    touch-action: pan-y;
     padding: 0 1rem 0.5rem;
     min-height: 0;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    transform: translateX(0);
+}
+#travelLedger .tl-expense-sheet-body form,
+#travelLedger .tl-expense-sheet-body #tlExpenseForm {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow-x: hidden;
 }
 #travelLedger .tl-expense-sheet-title {
     margin: 0 0 0.85rem;
@@ -1050,9 +1093,14 @@
 }
 #travelLedger .tl-expense-cat-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 0.45rem;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.4rem;
     margin-bottom: 1rem;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow-x: hidden;
 }
 #travelLedger .tl-expense-cat-chip {
     display: flex;
@@ -1061,7 +1109,11 @@
     justify-content: center;
     gap: 0.2rem;
     min-height: 4.1rem;
-    padding: 0.45rem 0.2rem;
+    min-width: 0;
+    max-width: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.45rem 0.15rem;
     border-radius: 1rem;
     border: 1.5px solid rgba(55, 71, 79, 0.1);
     background: rgba(255, 255, 255, 0.9);
@@ -1082,9 +1134,14 @@
 }
 #travelLedger .tl-expense-pay-row {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.45rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.4rem;
     margin-bottom: 1rem;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow-x: hidden;
 }
 #travelLedger .tl-expense-pay-chip {
     display: flex;
@@ -1093,6 +1150,10 @@
     justify-content: center;
     gap: 0.2rem;
     min-height: 3.6rem;
+    min-width: 0;
+    max-width: 100%;
+    width: 100%;
+    box-sizing: border-box;
     border-radius: 1rem;
     border: 1.5px solid rgba(55, 71, 79, 0.1);
     background: rgba(255, 255, 255, 0.9);
@@ -1112,6 +1173,9 @@
 }
 #travelLedger .tl-expense-note-input {
     width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
     min-height: 48px;
     padding: 0.75rem 0.9rem;
     border-radius: 1rem;
@@ -1121,16 +1185,52 @@
     font-size: 16px;
     margin-bottom: 0.35rem;
 }
+#travelLedger .tl-expense-date-block {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    margin: 0 0 1rem;
+    padding: 0.95rem 0.9rem 1rem;
+    border-radius: 1.15rem;
+    background: rgba(227, 242, 253, 0.72);
+    border: 1.5px solid rgba(25, 118, 210, 0.18);
+    overflow-x: hidden;
+}
+#travelLedger .tl-expense-date-title {
+    margin: 0 0 0.35rem;
+    font-size: 18px;
+    font-weight: 800;
+    color: #37474f;
+    letter-spacing: 0.01em;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+#travelLedger .tl-expense-date-hint {
+    margin: 0 0 0.7rem;
+    font-size: 0.82rem;
+    line-height: 1.4;
+    color: #546e7a;
+    font-weight: 600;
+}
 #travelLedger .tl-expense-date-input {
     width: 100%;
-    min-height: 48px;
-    padding: 0.75rem 0.9rem;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    min-height: 58px;
+    height: 58px;
+    padding: 0.75rem 0.95rem;
     border-radius: 1rem;
-    border: 1px solid rgba(55, 71, 79, 0.12);
-    background: rgba(255, 255, 255, 0.96);
-    color: #37474f;
-    font-size: 16px;
-    margin-bottom: 0.85rem;
+    border: 2px solid rgba(25, 118, 210, 0.28);
+    background: #ffffff;
+    color: #263238;
+    font-size: 18px;
+    font-weight: 700;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    margin-bottom: 0;
 }
 #travelLedger .tl-expense-sheet-intro {
     margin: -0.35rem 0 0.85rem;

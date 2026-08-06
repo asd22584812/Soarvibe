@@ -170,6 +170,21 @@
     };
   }
 
+  function formatCashHero(ledger, summary, primaryCode) {
+    if (ledger.initialCashMinor == null) {
+      return {
+        label: '現金剩餘',
+        amountHtml: escapeHtml('未設定'),
+        modifier: 'is-unset'
+      };
+    }
+    return {
+      label: '現金剩餘',
+      amountHtml: escapeHtml(DATA.formatMoneyMinor(summary.cashBalanceMinor, primaryCode)),
+      modifier: ''
+    };
+  }
+
   function renderHeroMetricCol(label, amountHtml, modifier, labelModifier) {
     return (
       '<div class="tl-hero-summary-col">' +
@@ -188,28 +203,25 @@
 
   function renderDetailPrimarySummary(ledger, today, summary, primaryCode) {
     var state = getLedgerTemporalState(ledger, today);
-    var budget = formatRemainingBudgetHero(summary, primaryCode);
-    var cashHtml = escapeHtml(DATA.formatMoneyMinor(summary.cashBalanceMinor, primaryCode));
-    var budgetLabelMod = budget.modifier === 'is-over' ? 'is-warning' : '';
+    var cash = formatCashHero(ledger, summary, primaryCode);
 
     if (state === 'active') {
       return (
-        '<div class="tl-hero-summary tl-hero-summary-triple">' +
+        '<div class="tl-hero-summary tl-hero-summary-dual">' +
         '<div class="tl-hero-summary-grid">' +
         renderHeroMetricCol(
           '今天已花',
           escapeHtml(DATA.formatMoneyMinor(summary.todaySpendMinor, primaryCode)),
           ''
         ) +
-        renderHeroMetricCol(budget.label, budget.amountHtml, budget.modifier, budgetLabelMod) +
-        renderHeroMetricCol('現金剩餘', cashHtml, '') +
+        renderHeroMetricCol(cash.label, cash.amountHtml, cash.modifier) +
         '</div></div>'
       );
     }
 
     if (state === 'ended') {
       return (
-        '<div class="tl-hero-summary tl-hero-summary-triple is-ended">' +
+        '<div class="tl-hero-summary tl-hero-summary-dual is-ended">' +
         '<p class="tl-hero-summary-kicker">旅程已結束</p>' +
         '<div class="tl-hero-summary-grid">' +
         renderHeroMetricCol(
@@ -217,8 +229,7 @@
           escapeHtml(DATA.formatMoneyMinor(summary.totalSpendMinor, primaryCode)),
           ''
         ) +
-        renderHeroMetricCol(budget.label, budget.amountHtml, budget.modifier, budgetLabelMod) +
-        renderHeroMetricCol('現金剩餘', cashHtml, '') +
+        renderHeroMetricCol(cash.label, cash.amountHtml, cash.modifier) +
         '</div></div>'
       );
     }
@@ -238,20 +249,14 @@
     return (
       '<div class="tl-hero-summary tl-hero-summary-archived">' +
       '<p class="tl-hero-summary-kicker">已封存</p>' +
-      '<div class="tl-hero-summary-col">' +
-      '<p class="tl-hero-summary-label">旅行總花費</p>' +
-      '<p class="tl-hero-summary-amount">' +
-      escapeHtml(DATA.formatMoneyMinor(summary.totalSpendMinor, primaryCode)) +
-      '</p></div>' +
-      '<div class="tl-hero-summary-col">' +
-      '<p class="tl-hero-summary-label">' +
-      escapeHtml(budget.label) +
-      '</p>' +
-      '<p class="tl-hero-summary-amount ' +
-      budget.modifier +
-      '">' +
-      budget.amountHtml +
-      '</p></div></div>'
+      '<div class="tl-hero-summary-grid">' +
+      renderHeroMetricCol(
+        '總花費',
+        escapeHtml(DATA.formatMoneyMinor(summary.totalSpendMinor, primaryCode)),
+        ''
+      ) +
+      renderHeroMetricCol(cash.label, cash.amountHtml, cash.modifier) +
+      '</div></div>'
     );
   }
 
@@ -266,7 +271,7 @@
   function expenseSubmitLabel(ledger, isEdit) {
     if (isEdit) return '儲存變更';
     var state = getLedgerTemporalState(ledger);
-    if (state === 'ended') return '補登花費';
+    if (state === 'ended') return '馬上記帳';
     if (state === 'upcoming') return '預先記錄';
     return '新增花費';
   }
@@ -287,7 +292,7 @@
       return '<p class="tl-detail-note tl-archived-expense-note">解除封存後才能補登花費</p>';
     }
     var label = '＋ 新增花費';
-    if (state === 'ended') label = '＋ 補登花費';
+    if (state === 'ended') label = '＋ 馬上記帳';
     if (state === 'upcoming') label = '＋ 預先記錄';
     return (
       '<button type="button" class="tl-add-expense-btn" data-tl-action="add-expense" data-ledger-id="' +
@@ -433,39 +438,76 @@
     if (!sheet || sheet._tlDismissBound) return;
     sheet._tlDismissBound = true;
     var panel = sheet.querySelector('.tl-expense-sheet-panel');
+    var handle = sheet.querySelector('.tl-expense-sheet-handle');
     var body = sheet.querySelector('.tl-expense-sheet-body');
     if (!panel) return;
+
+    function lockHorizontal() {
+      if (body) body.scrollLeft = 0;
+      panel.scrollLeft = 0;
+    }
+
+    lockHorizontal();
+
+    var startX = 0;
     var startY = 0;
     var tracking = false;
+    var fromHandle = false;
+
+    function onTouchStart(e, isHandle) {
+      if (!e.touches || !e.touches[0]) return;
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+      fromHandle = !!isHandle;
+      tracking = true;
+      lockHorizontal();
+    }
+
+    if (handle) {
+      handle.addEventListener(
+        'touchstart',
+        function (e) {
+          onTouchStart(e, true);
+        },
+        { passive: true }
+      );
+    }
+
     panel.addEventListener(
       'touchstart',
       function (e) {
-        if (!e.touches || !e.touches[0]) return;
-        if (body && body.scrollTop > 0) {
-          tracking = false;
-          return;
-        }
-        startY = e.touches[0].clientY;
-        tracking = true;
+        if (handle && e.target && (e.target === handle || handle.contains(e.target))) return;
+        onTouchStart(e, false);
       },
       { passive: true }
     );
+
     panel.addEventListener(
       'touchmove',
       function (e) {
         if (!tracking || !e.touches || !e.touches[0]) return;
+        var dx = e.touches[0].clientX - startX;
         var dy = e.touches[0].clientY - startY;
+        lockHorizontal();
+        if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 6) {
+          if (e.cancelable) e.preventDefault();
+          return;
+        }
+        if (!fromHandle) return;
         if (dy > 72) {
           tracking = false;
           closeExpenseSheet();
         }
       },
-      { passive: true }
+      { passive: false }
     );
+
     panel.addEventListener(
       'touchend',
       function () {
         tracking = false;
+        fromHandle = false;
+        lockHorizontal();
       },
       { passive: true }
     );
@@ -954,7 +996,11 @@
       escapeHtml(remainingText) +
       '</p></div>' +
       '<div class="tl-current-metric"><p class="tl-current-metric-label">現金剩餘</p><p class="tl-current-metric-value">' +
-      escapeHtml(DATA.formatMoneyMinor(summary.cashBalanceMinor, primaryCode)) +
+      escapeHtml(
+        ledger.initialCashMinor == null
+          ? '未設定'
+          : DATA.formatMoneyMinor(summary.cashBalanceMinor, primaryCode)
+      ) +
       '</p></div>' +
       '</div>' +
       addExpenseButtonHtml(ledger.id, ledger, today) +
@@ -1285,7 +1331,7 @@
       }
     }
 
-    container.querySelectorAll('.tl-expense-swipe').forEach(function (swipeEl) {
+    container.querySelectorAll('.tl-expense-groups .tl-expense-swipe').forEach(function (swipeEl) {
       var track = swipeEl.querySelector('.tl-expense-track');
       if (!track) return;
       setTrackOffset(track, 0, false);
@@ -1414,18 +1460,21 @@
 
     var introHtml =
       !isEdit && getLedgerTemporalState(ledger) === 'ended'
-        ? '<p class="tl-expense-sheet-intro">哎呀，好像還有漏記？可以補登旅行期間的花費。</p>'
+        ? '<p class="tl-expense-sheet-intro">哎呀，好像還有漏記？選擇旅行期間的日期，馬上補上吧。</p>'
         : '';
 
     var dateHtml = showDate
-      ? '<p class="tl-expense-section-label">消費日期</p>' +
+      ? '<section class="tl-expense-date-block">' +
+        '<p class="tl-expense-date-title"><span aria-hidden="true">📅</span> 消費日期</p>' +
+        '<p class="tl-expense-date-hint">請選擇這筆花費實際發生的旅行日期</p>' +
         '<input class="tl-expense-date-input" name="expenseDate" type="date" min="' +
         escapeHtml(ledger.startDate || '') +
         '" max="' +
         escapeHtml(ledger.endDate || '') +
         '" value="' +
         escapeHtml(defaultDate || '') +
-        '">'
+        '">' +
+        '</section>'
       : '';
 
     return (
@@ -2429,9 +2478,13 @@
     groupExpensesForDisplay: groupExpensesForDisplay,
     formatMonthDayLabel: formatMonthDayLabel,
     formatRemainingBudgetHero: formatRemainingBudgetHero,
+    formatCashHero: formatCashHero,
     needsExpenseDatePicker: needsExpenseDatePicker,
     closeAllExpenseSwipes: closeAllExpenseSwipes,
     renderDetailPrimarySummary: renderDetailPrimarySummary,
+    renderExpenseSheetBody: renderExpenseSheetBody,
+    expenseSheetTitle: expenseSheetTitle,
+    expenseSubmitLabel: expenseSubmitLabel,
     addExpenseButtonHtml: addExpenseButtonHtml,
     getLedgerDayProgress: getLedgerDayProgress,
     getLedgerDayShort: getLedgerDayShort,
