@@ -80,6 +80,59 @@
     return 'active';
   }
 
+  /** Phase 1C.1 — temporal state from local date keys (upcoming | active | ended | archived). */
+  function getLedgerTemporalState(ledger, referenceDate) {
+    return deriveLedgerStatus(ledger, referenceDate);
+  }
+
+  function validateExpenseDateInTrip(dateKey, ledger) {
+    if (!dateKey || typeof dateKey !== 'string') {
+      return { ok: false, error: 'empty' };
+    }
+    if (!ledger || !ledger.startDate || !ledger.endDate) {
+      return { ok: true };
+    }
+    if (compareDateOnly(dateKey, ledger.startDate) < 0) {
+      return { ok: false, error: 'before_start' };
+    }
+    if (compareDateOnly(dateKey, ledger.endDate) > 0) {
+      return { ok: false, error: 'after_end' };
+    }
+    return { ok: true };
+  }
+
+  function buildOccurredAtFromDateKey(dateKey, timeSource) {
+    var base = parseDateOnly(dateKey);
+    if (!base) return new Date().toISOString();
+    var ref = timeSource instanceof Date && !isNaN(timeSource.getTime()) ? timeSource : new Date();
+    base.setHours(ref.getHours(), ref.getMinutes(), ref.getSeconds(), ref.getMilliseconds());
+    return base.toISOString();
+  }
+
+  function getLastExpenseDateKey(ledger) {
+    ledger = ledger || {};
+    var latest = '';
+    (ledger.expenses || []).forEach(function (exp) {
+      var key = expenseDateKey(exp);
+      if (key && key > latest) latest = key;
+    });
+    return latest || null;
+  }
+
+  function getDefaultExpenseDateKey(ledger, expense, referenceDate) {
+    if (expense && expense.occurredAt) {
+      return getLocalDateKeyFromIso(expense.occurredAt);
+    }
+    var state = getLedgerTemporalState(ledger, referenceDate);
+    if (state === 'ended') {
+      return getLastExpenseDateKey(ledger) || ledger.endDate || resolveReferenceDate(referenceDate);
+    }
+    if (state === 'upcoming') {
+      return ledger.startDate || resolveReferenceDate(referenceDate);
+    }
+    return resolveReferenceDate(referenceDate);
+  }
+
   function sanitizeMinor(value, allowNull) {
     if (value == null) return allowNull ? null : 0;
     var n = Number(value);
@@ -776,6 +829,8 @@
       if (expenseDateKey(exp) === ref) todaySpendMinor += exp.amountMinor;
     });
     var budgetMinor = sanitizeMinor(ledger.budgetMinor, true);
+    var budgetOverMinor =
+      budgetMinor != null && budgetSpendMinor > budgetMinor ? budgetSpendMinor - budgetMinor : null;
     var remainingBudgetMinor =
       budgetMinor == null ? null : Math.max(0, budgetMinor - budgetSpendMinor);
     var totalTripDays = daysBetweenInclusive(ledger.startDate, ledger.endDate);
@@ -787,6 +842,8 @@
     return {
       totalSpendMinor: totalSpendMinor,
       budgetSpendMinor: budgetSpendMinor,
+      budgetMinor: budgetMinor,
+      budgetOverMinor: budgetOverMinor,
       remainingBudgetMinor: remainingBudgetMinor,
       cashSpendMinor: cashSpendMinor,
       nonCashSpendMinor: nonCashSpendMinor,
@@ -848,6 +905,11 @@
     expenseDateKey: expenseDateKey,
     convertMinorUnits: FOREX.convertMinorUnits,
     deriveLedgerStatus: deriveLedgerStatus,
+    getLedgerTemporalState: getLedgerTemporalState,
+    validateExpenseDateInTrip: validateExpenseDateInTrip,
+    buildOccurredAtFromDateKey: buildOccurredAtFromDateKey,
+    getDefaultExpenseDateKey: getDefaultExpenseDateKey,
+    getLastExpenseDateKey: getLastExpenseDateKey,
     normalizeLedger: normalizeLedger,
     normalizeExpense: normalizeExpense,
     resetTravelLedgerStoreForTests: resetTravelLedgerStoreForTests

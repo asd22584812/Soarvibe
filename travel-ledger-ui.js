@@ -135,9 +135,163 @@
   }
 
   function getLedgerDisplayStatus(ledger, today) {
-    if (!ledger) return 'upcoming';
-    if (ledger.status === 'archived') return 'archived';
-    return DATA.deriveLedgerStatus(ledger, today || todayDateOnly());
+    return DATA.getLedgerTemporalState(ledger, today || todayDateOnly());
+  }
+
+  function getLedgerTemporalState(ledger, today) {
+    return DATA.getLedgerTemporalState(ledger, today || todayDateOnly());
+  }
+
+  function formatMonthDayLabel(dateKey) {
+    var d = parseDateOnly(dateKey);
+    if (!d) return dateKey || '';
+    return d.getMonth() + 1 + ' 月 ' + d.getDate() + ' 日';
+  }
+
+  function formatRemainingBudgetHero(summary, primaryCode) {
+    if (summary.budgetMinor == null) {
+      return {
+        label: '剩餘預算',
+        amountHtml: escapeHtml('尚未設定預算'),
+        modifier: 'is-unset'
+      };
+    }
+    if (summary.budgetOverMinor != null && summary.budgetOverMinor > 0) {
+      return {
+        label: '已超出預算',
+        amountHtml: escapeHtml(DATA.formatMoneyMinor(summary.budgetOverMinor, primaryCode)),
+        modifier: 'is-over'
+      };
+    }
+    return {
+      label: '剩餘預算',
+      amountHtml: escapeHtml(DATA.formatMoneyMinor(summary.remainingBudgetMinor, primaryCode)),
+      modifier: ''
+    };
+  }
+
+  function renderDetailPrimarySummary(ledger, today, summary, primaryCode) {
+    var state = getLedgerTemporalState(ledger, today);
+    var budget = formatRemainingBudgetHero(summary, primaryCode);
+
+    if (state === 'active') {
+      return (
+        '<div class="tl-hero-summary tl-hero-summary-dual">' +
+        '<div class="tl-hero-summary-col">' +
+        '<p class="tl-hero-summary-label">今天已花</p>' +
+        '<p class="tl-hero-summary-amount">' +
+        escapeHtml(DATA.formatMoneyMinor(summary.todaySpendMinor, primaryCode)) +
+        '</p></div>' +
+        '<div class="tl-hero-summary-col">' +
+        '<p class="tl-hero-summary-label' +
+        (budget.modifier === 'is-over' ? ' is-warning' : '') +
+        '">' +
+        escapeHtml(budget.label) +
+        '</p>' +
+        '<p class="tl-hero-summary-amount ' +
+        budget.modifier +
+        '">' +
+        budget.amountHtml +
+        '</p></div></div>'
+      );
+    }
+
+    if (state === 'ended') {
+      return (
+        '<div class="tl-hero-summary tl-hero-summary-ended">' +
+        '<p class="tl-hero-summary-kicker">旅程已結束</p>' +
+        '<div class="tl-hero-summary-col">' +
+        '<p class="tl-hero-summary-label">旅行總花費</p>' +
+        '<p class="tl-hero-summary-amount">' +
+        escapeHtml(DATA.formatMoneyMinor(summary.totalSpendMinor, primaryCode)) +
+        '</p></div>' +
+        '<div class="tl-hero-summary-col">' +
+        '<p class="tl-hero-summary-label' +
+        (budget.modifier === 'is-over' ? ' is-warning' : '') +
+        '">' +
+        escapeHtml(budget.label) +
+        '</p>' +
+        '<p class="tl-hero-summary-amount ' +
+        budget.modifier +
+        '">' +
+        budget.amountHtml +
+        '</p></div></div>'
+      );
+    }
+
+    if (state === 'upcoming') {
+      return (
+        '<div class="tl-hero-summary tl-hero-summary-upcoming">' +
+        '<p class="tl-hero-summary-kicker">' +
+        escapeHtml(getLedgerDayProgress(ledger, today)) +
+        '</p>' +
+        '<p class="tl-hero-summary-label">尚未開始記帳</p>' +
+        '<p class="tl-hero-summary-hint">出發後即可快速記錄，現在也能預先記一筆。</p>' +
+        '</div>'
+      );
+    }
+
+    return (
+      '<div class="tl-hero-summary tl-hero-summary-archived">' +
+      '<p class="tl-hero-summary-kicker">已封存</p>' +
+      '<div class="tl-hero-summary-col">' +
+      '<p class="tl-hero-summary-label">旅行總花費</p>' +
+      '<p class="tl-hero-summary-amount">' +
+      escapeHtml(DATA.formatMoneyMinor(summary.totalSpendMinor, primaryCode)) +
+      '</p></div>' +
+      '<div class="tl-hero-summary-col">' +
+      '<p class="tl-hero-summary-label">' +
+      escapeHtml(budget.label) +
+      '</p>' +
+      '<p class="tl-hero-summary-amount ' +
+      budget.modifier +
+      '">' +
+      budget.amountHtml +
+      '</p></div></div>'
+    );
+  }
+
+  function expenseSheetTitle(ledger, isEdit) {
+    var state = getLedgerTemporalState(ledger);
+    if (isEdit) return '編輯花費';
+    if (state === 'ended') return '補記花費';
+    if (state === 'upcoming') return '預先記錄';
+    return '新增花費';
+  }
+
+  function expenseSubmitLabel(ledger, isEdit) {
+    if (isEdit) return '儲存變更';
+    var state = getLedgerTemporalState(ledger);
+    if (state === 'ended') return '補記花費';
+    if (state === 'upcoming') return '預先記錄';
+    return '新增花費';
+  }
+
+  function needsExpenseDatePicker(ledger, isEdit) {
+    var state = getLedgerTemporalState(ledger);
+    if (state === 'archived') return false;
+    if (state === 'active' && !isEdit) return false;
+    if (state === 'active' && isEdit) return false;
+    return true;
+  }
+
+  function addExpenseButtonHtml(ledgerId, ledger, today) {
+    ledger = ledger || (ledgerId ? DATA.getTravelLedgerById(ledgerId) : null);
+    today = today || todayDateOnly();
+    var state = ledger ? getLedgerTemporalState(ledger, today) : 'active';
+    if (state === 'archived') {
+      return '<p class="tl-detail-note tl-archived-expense-note">解除封存後才能補記花費</p>';
+    }
+    var label = '＋ 新增花費';
+    if (state === 'ended') label = '＋ 補記花費';
+    if (state === 'upcoming') label = '＋ 預先記錄';
+    return (
+      '<button type="button" class="tl-add-expense-btn" data-tl-action="add-expense" data-ledger-id="' +
+      escapeHtml(ledgerId || '') +
+      '">' +
+      escapeHtml(label) +
+      '</button>'
+    );
   }
 
   function getLedgerDisplayStatusLabel(statusKey) {
@@ -340,16 +494,8 @@
     showToast('新增花費即將開放，敬請期待');
   }
 
-  function addExpenseButtonHtml(ledgerId) {
-    return (
-      '<button type="button" class="tl-add-expense-btn" data-tl-action="add-expense" data-ledger-id="' +
-      escapeHtml(ledgerId || '') +
-      '">＋ 新增花費</button>'
-    );
-  }
-
   function comingSoonButtonHtml() {
-    return addExpenseButtonHtml(tlState.ledgerId || '');
+    return addExpenseButtonHtml(tlState.ledgerId || '', null);
   }
 
   function showConfirm(title, copy) {
@@ -807,7 +953,7 @@
       escapeHtml(remainingText) +
       '</p></div>' +
       '</div>' +
-      addExpenseButtonHtml(ledger.id) +
+      addExpenseButtonHtml(ledger.id, ledger, today) +
       '</section>'
     );
   }
@@ -939,17 +1085,55 @@
     });
   }
 
-  function groupExpensesForDisplay(expenses, today) {
+  function groupExpensesForDisplay(expenses, today, temporalState) {
     today = today || todayDateOnly();
-    var yesterday = yesterdayDateOnly(today);
-    var groups = { today: [], yesterday: [], earlier: [] };
+    if (temporalState === 'active') {
+      var yesterday = yesterdayDateOnly(today);
+      var groups = { today: [], yesterday: [], earlier: [] };
+      sortExpensesDesc(expenses).forEach(function (exp) {
+        var key = expenseOccurredDate(exp);
+        if (key === today) groups.today.push(exp);
+        else if (key === yesterday) groups.yesterday.push(exp);
+        else groups.earlier.push(exp);
+      });
+      return [
+        { title: '今天', expenses: groups.today, emptyCopy: '今天還沒有花費，點上方按鈕記一筆吧。' },
+        { title: '昨天', expenses: groups.yesterday, emptyCopy: '昨天沒有花費紀錄。' },
+        { title: '更早', expenses: groups.earlier, emptyCopy: '', hideIfEmpty: true }
+      ];
+    }
+
+    var byDate = Object.create(null);
     sortExpensesDesc(expenses).forEach(function (exp) {
-      var key = expenseOccurredDate(exp);
-      if (key === today) groups.today.push(exp);
-      else if (key === yesterday) groups.yesterday.push(exp);
-      else groups.earlier.push(exp);
+      var key = expenseOccurredDate(exp) || 'unknown';
+      if (!byDate[key]) byDate[key] = [];
+      byDate[key].push(exp);
     });
-    return groups;
+    return Object.keys(byDate)
+      .sort()
+      .reverse()
+      .map(function (key) {
+        return {
+          title: key === 'unknown' ? '其他' : formatMonthDayLabel(key),
+          expenses: byDate[key],
+          emptyCopy: '',
+          hideIfEmpty: false
+        };
+      });
+  }
+
+  function closeAllExpenseSwipes(container) {
+    var root = container || document.querySelector('#travelLedgerDetailView');
+    if (!root) return;
+    root.querySelectorAll('.tl-expense-swipe').forEach(function (el) {
+      el.classList.remove('is-open');
+      var track = el.querySelector('.tl-expense-track');
+      if (track) {
+        track.style.transition = 'transform 0.18s ease';
+        track.style.transform = 'translateX(0)';
+      }
+    });
+    tlState.swipeOpenId = null;
   }
 
   function isExpenseSheetOpen() {
@@ -981,19 +1165,15 @@
       ? '<p class="tl-expense-row-note">' + escapeHtml(expense.note) + '</p>'
       : '';
     var timeText = formatExpenseTime(expense.occurredAt);
-    var swiped = tlState.swipeOpenId === expense.id ? ' is-swiped' : '';
+    var isOpen = tlState.swipeOpenId === expense.id;
     return (
-      '<div class="tl-expense-swipe" data-expense-swipe="' +
+      '<div class="tl-expense-swipe' +
+      (isOpen ? ' is-open' : '') +
+      '" data-expense-swipe="' +
       escapeHtml(expense.id) +
       '">' +
-      '<button type="button" class="tl-expense-delete-reveal" data-tl-action="delete-expense" data-ledger-id="' +
-      escapeHtml(ledger.id) +
-      '" data-expense-id="' +
-      escapeHtml(expense.id) +
-      '">刪除</button>' +
-      '<button type="button" class="tl-expense-row' +
-      swiped +
-      '" data-tl-action="edit-expense" data-ledger-id="' +
+      '<div class="tl-expense-track">' +
+      '<button type="button" class="tl-expense-row" data-tl-action="edit-expense" data-ledger-id="' +
       escapeHtml(ledger.id) +
       '" data-expense-id="' +
       escapeHtml(expense.id) +
@@ -1001,7 +1181,7 @@
       '<div class="tl-expense-row-icon" aria-hidden="true">' +
       escapeHtml(expense.categoryIcon || '📦') +
       '</div>' +
-      '<div class="tl-expense-row-main">' +
+      '<div class="tl-expense-row-content">' +
       '<p class="tl-expense-row-title">' +
       escapeHtml(rowTitle) +
       '</p>' +
@@ -1012,7 +1192,15 @@
       '</p></div>' +
       '<p class="tl-expense-row-amount">' +
       escapeHtml(DATA.formatMoneyMinor(expense.amountMinor, primaryCode)) +
-      '</p></button></div>'
+      '</p></button>' +
+      '<button type="button" class="tl-expense-delete-reveal" data-tl-action="delete-expense" data-ledger-id="' +
+      escapeHtml(ledger.id) +
+      '" data-expense-id="' +
+      escapeHtml(expense.id) +
+      '" aria-label="刪除花費">' +
+      '<span class="tl-expense-delete-icon" aria-hidden="true">🗑️</span>' +
+      '<span class="tl-expense-delete-label">刪除</span>' +
+      '</button></div></div>'
     );
   }
 
@@ -1030,85 +1218,153 @@
   }
 
   function renderExpenseLists(ledger, today) {
-    var groups = groupExpensesForDisplay(ledger.expenses || [], today);
-    return (
-      '<div class="tl-expense-groups">' +
-      renderExpenseGroup('今天', groups.today, ledger, '今天還沒有花費，點上方按鈕記一筆吧。') +
-      renderExpenseGroup('昨天', groups.yesterday, ledger, '昨天沒有花費紀錄。') +
-      (groups.earlier.length
-        ? renderExpenseGroup('更早', groups.earlier, ledger, '')
-        : '') +
-      '</div>'
-    );
+    var temporalState = getLedgerTemporalState(ledger, today);
+    var groups = groupExpensesForDisplay(ledger.expenses || [], today, temporalState);
+    var html = '<div class="tl-expense-groups">';
+    groups.forEach(function (group) {
+      if (group.hideIfEmpty && !group.expenses.length) return;
+      html += renderExpenseGroup(group.title, group.expenses, ledger, group.emptyCopy || '');
+    });
+    if (!groups.length || !(ledger.expenses || []).length) {
+      html += '<p class="tl-expense-empty">這趟旅行還沒有花費紀錄。</p>';
+    }
+    html += '</div>';
+    return html;
   }
 
   function bindExpenseSwipeHandlers(container) {
     if (!container) return;
+    var deleteWidth = 0;
     var startX = 0;
     var startY = 0;
-    var activeRow = null;
+    var activeSwipe = null;
+    var activeTrack = null;
+    var tracking = false;
     var locked = false;
+    var currentDx = 0;
+    var openThreshold = 40;
 
-    container.querySelectorAll('.tl-expense-row').forEach(function (row) {
-      row.addEventListener(
+    function getDeleteWidth() {
+      if (deleteWidth > 0) return deleteWidth;
+      var sample = container.querySelector('.tl-expense-delete-reveal');
+      deleteWidth = sample ? sample.offsetWidth : 80;
+      return deleteWidth;
+    }
+
+    function setTrackOffset(track, dx, animate) {
+      var width = getDeleteWidth();
+      var clamped = Math.max(-width, Math.min(0, dx));
+      track.style.transition = animate ? 'transform 0.18s ease' : 'none';
+      track.style.transform = 'translateX(' + clamped + 'px)';
+      currentDx = clamped;
+    }
+
+    function openSwipe(swipeEl) {
+      closeAllExpenseSwipes(container);
+      swipeEl.classList.add('is-open');
+      var track = swipeEl.querySelector('.tl-expense-track');
+      setTrackOffset(track, -getDeleteWidth(), true);
+      tlState.swipeOpenId = swipeEl.getAttribute('data-expense-swipe');
+    }
+
+    function closeSwipe(swipeEl, animate) {
+      if (!swipeEl) return;
+      swipeEl.classList.remove('is-open');
+      var track = swipeEl.querySelector('.tl-expense-track');
+      setTrackOffset(track, 0, animate !== false);
+      if (tlState.swipeOpenId === swipeEl.getAttribute('data-expense-swipe')) {
+        tlState.swipeOpenId = null;
+      }
+    }
+
+    container.querySelectorAll('.tl-expense-swipe').forEach(function (swipeEl) {
+      var track = swipeEl.querySelector('.tl-expense-track');
+      if (!track) return;
+      setTrackOffset(track, 0, false);
+
+      track.addEventListener(
         'touchstart',
         function (e) {
           if (!e.touches || !e.touches[0]) return;
+          activeSwipe = swipeEl;
+          activeTrack = track;
           startX = e.touches[0].clientX;
           startY = e.touches[0].clientY;
-          activeRow = row;
+          tracking = true;
           locked = false;
+          var open = swipeEl.classList.contains('is-open');
+          currentDx = open ? -getDeleteWidth() : 0;
         },
         { passive: true }
       );
-      row.addEventListener(
+
+      track.addEventListener(
         'touchmove',
         function (e) {
-          if (!activeRow || !e.touches || !e.touches[0]) return;
+          if (!tracking || !activeTrack || activeSwipe !== swipeEl || !e.touches || !e.touches[0]) return;
           var dx = e.touches[0].clientX - startX;
           var dy = e.touches[0].clientY - startY;
           if (!locked) {
             if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
             if (Math.abs(dy) > Math.abs(dx)) {
-              activeRow = null;
+              tracking = false;
+              activeSwipe = null;
+              activeTrack = null;
               return;
             }
             locked = true;
+            closeAllExpenseSwipes(container);
+            activeSwipe = swipeEl;
+            activeTrack = track;
           }
-          if (dx < -40) {
-            container.querySelectorAll('.tl-expense-row.is-swiped').forEach(function (el) {
-              if (el !== activeRow) el.classList.remove('is-swiped');
-            });
-            activeRow.classList.add('is-swiped');
-            tlState.swipeOpenId = activeRow.getAttribute('data-expense-id');
-          } else if (dx > 24) {
-            activeRow.classList.remove('is-swiped');
-            if (tlState.swipeOpenId === activeRow.getAttribute('data-expense-id')) {
-              tlState.swipeOpenId = null;
-            }
-          }
+          var base = swipeEl.classList.contains('is-open') ? -getDeleteWidth() : 0;
+          setTrackOffset(track, base + dx, false);
         },
         { passive: true }
       );
-      row.addEventListener(
+
+      track.addEventListener(
         'touchend',
         function () {
-          activeRow = null;
+          if (!tracking || activeSwipe !== swipeEl || !activeTrack) return;
+          var width = getDeleteWidth();
+          if (-currentDx > openThreshold) {
+            openSwipe(swipeEl);
+          } else {
+            closeSwipe(swipeEl, true);
+          }
+          tracking = false;
           locked = false;
+          activeSwipe = null;
+          activeTrack = null;
         },
         { passive: true }
       );
     });
+
+    if (!container._tlSwipeScrollBound) {
+      container._tlSwipeScrollBound = true;
+      container.addEventListener(
+        'scroll',
+        function () {
+          closeAllExpenseSwipes(container);
+        },
+        { passive: true }
+      );
+    }
   }
 
   function renderExpenseSheetBody(ledger, expense) {
     var isEdit = !!expense;
+    var today = todayDateOnly();
     var primaryCode = ledger.primaryCurrency && ledger.primaryCurrency.code;
     var symbol = CONFIG.getCurrencySymbol(primaryCode) || primaryCode || '';
     var amountValue = isEdit ? minorToMajorInputValue(expense.amountMinor, primaryCode) : '';
     var category = isEdit ? expense.category : tlState.expenseCategory;
     var payment = isEdit ? expense.paymentMethod : tlState.expensePayment;
     var note = isEdit ? expense.note || '' : '';
+    var showDate = needsExpenseDatePicker(ledger, isEdit);
+    var defaultDate = DATA.getDefaultExpenseDateKey(ledger, expense, today);
     tlState.expenseCategory = category || 'food';
     tlState.expensePayment = payment || 'cash';
 
@@ -1148,10 +1404,21 @@
     });
     payHtml += '</div>';
 
+    var dateHtml = showDate
+      ? '<p class="tl-expense-section-label">消費日期</p>' +
+        '<input class="tl-expense-date-input" name="expenseDate" type="date" min="' +
+        escapeHtml(ledger.startDate || '') +
+        '" max="' +
+        escapeHtml(ledger.endDate || '') +
+        '" value="' +
+        escapeHtml(defaultDate || '') +
+        '">'
+      : '';
+
     return (
       '<form id="tlExpenseForm" novalidate>' +
       '<h3 id="travelLedgerExpenseSheetTitle" class="tl-expense-sheet-title">' +
-      (isEdit ? '編輯花費' : '新增花費') +
+      escapeHtml(expenseSheetTitle(ledger, isEdit)) +
       '</h3>' +
       '<div class="tl-expense-amount-wrap">' +
       '<p class="tl-expense-currency">' +
@@ -1164,6 +1431,7 @@
       '<input id="tlExpenseAmount" class="tl-expense-amount-input" name="amount" inputmode="decimal" type="text" autocomplete="off" placeholder="0" value="' +
       escapeHtml(amountValue) +
       '"></div></div>' +
+      dateHtml +
       '<p class="tl-expense-section-label">分類</p>' +
       catHtml +
       '<p class="tl-expense-section-label">付款方式</p>' +
@@ -1175,7 +1443,7 @@
       '<p id="tlExpenseFormError" class="tl-expense-error"></p>' +
       '<div class="tl-expense-sheet-actions">' +
       '<button type="submit" class="tl-primary-btn">' +
-      (isEdit ? '儲存變更' : '新增花費') +
+      escapeHtml(expenseSubmitLabel(ledger, isEdit)) +
       '</button>' +
       (isEdit
         ? '<button type="button" class="tl-danger-btn" data-tl-action="delete-expense" data-ledger-id="' +
@@ -1235,6 +1503,11 @@
   }
 
   function openAddExpenseSheet(ledgerId) {
+    var ledger = DATA.getTravelLedgerById(ledgerId || tlState.ledgerId);
+    if (ledger && getLedgerTemporalState(ledger) === 'archived') {
+      showToast('請先解除封存才能補記花費');
+      return;
+    }
     openExpenseSheet(ledgerId || tlState.ledgerId, null);
   }
 
@@ -1275,6 +1548,54 @@
       setExpenseSheetError('請選擇付款方式');
       return;
     }
+
+    var temporalState = getLedgerTemporalState(ledger);
+    if (temporalState === 'archived') {
+      setExpenseSheetError('已封存的帳本無法新增花費');
+      return;
+    }
+
+    var occurredAt = null;
+    if (needsExpenseDatePicker(ledger, tlState.expenseMode === 'edit')) {
+      var dateInput = form.querySelector('[name="expenseDate"]');
+      var dateKey = dateInput ? dateInput.value.trim() : '';
+      var dateCheck = DATA.validateExpenseDateInTrip(dateKey, ledger);
+      if (!dateCheck.ok) {
+        if (dateCheck.error === 'before_start') {
+          setExpenseSheetError('日期不可早於旅行開始日');
+        } else if (dateCheck.error === 'after_end') {
+          setExpenseSheetError('日期不可晚於旅行結束日');
+        } else {
+          setExpenseSheetError('請選擇旅行期間內的日期');
+        }
+        return;
+      }
+      if (tlState.expenseMode === 'edit' && tlState.expenseId) {
+        var existing = null;
+        for (var ei = 0; ei < (ledger.expenses || []).length; ei++) {
+          if (ledger.expenses[ei].id === tlState.expenseId) {
+            existing = ledger.expenses[ei];
+            break;
+          }
+        }
+        occurredAt = DATA.buildOccurredAtFromDateKey(
+          dateKey,
+          existing && existing.occurredAt ? new Date(existing.occurredAt) : new Date()
+        );
+      } else {
+        occurredAt = DATA.buildOccurredAtFromDateKey(dateKey, new Date());
+      }
+    } else if (tlState.expenseMode === 'edit' && tlState.expenseId) {
+      for (var ej = 0; ej < (ledger.expenses || []).length; ej++) {
+        if (ledger.expenses[ej].id === tlState.expenseId) {
+          occurredAt = ledger.expenses[ej].occurredAt;
+          break;
+        }
+      }
+    } else {
+      occurredAt = new Date().toISOString();
+    }
+
     if (!isStorageAvailable()) {
       showToast('目前無法儲存資料');
       return;
@@ -1287,6 +1608,7 @@
       paymentMethod: tlState.expensePayment,
       note: note
     };
+    if (occurredAt) payload.occurredAt = occurredAt;
 
     try {
       if (tlState.expenseMode === 'edit' && tlState.expenseId) {
@@ -1297,7 +1619,6 @@
         }
         showToast('花費已更新');
       } else {
-        payload.occurredAt = new Date().toISOString();
         var created = DATA.addTravelExpense(tlState.ledgerId, payload);
         if (!created) {
           showToast('新增失敗，請稍後再試');
@@ -1371,15 +1692,20 @@
     var today = todayDateOnly();
     var summary = DATA.calculateLedgerSummary(ledger, today);
     var primaryCode = ledger.primaryCurrency && ledger.primaryCurrency.code;
+    var temporalState = getLedgerTemporalState(ledger, today);
     var avgText =
       summary.averageDailySpendMinor != null
         ? DATA.formatMoneyMinor(summary.averageDailySpendMinor, primaryCode)
         : '—';
     var remainingRow =
-      summary.remainingBudgetMinor != null
-        ? '<div class="tl-summary-row"><span class="tl-summary-label">剩餘預算</span><span class="tl-summary-value">' +
-          escapeHtml(DATA.formatMoneyMinor(summary.remainingBudgetMinor, primaryCode)) +
-          '</span></div>'
+      summary.budgetMinor != null
+        ? summary.budgetOverMinor != null && summary.budgetOverMinor > 0
+          ? '<div class="tl-summary-row"><span class="tl-summary-label is-warning">已超出預算</span><span class="tl-summary-value is-over">' +
+            escapeHtml(DATA.formatMoneyMinor(summary.budgetOverMinor, primaryCode)) +
+            '</span></div>'
+          : '<div class="tl-summary-row"><span class="tl-summary-label">剩餘預算</span><span class="tl-summary-value">' +
+            escapeHtml(DATA.formatMoneyMinor(summary.remainingBudgetMinor, primaryCode)) +
+            '</span></div>'
         : '<div class="tl-detail-note">尚未設定旅行預算</div>';
 
     container.innerHTML =
@@ -1401,14 +1727,10 @@
       ' · ' +
       escapeHtml(primaryCode || '') +
       ' · ' +
-      escapeHtml(getLedgerDisplayStatusLabel(getLedgerDisplayStatus(ledger, today))) +
+      escapeHtml(getLedgerDisplayStatusLabel(temporalState)) +
       '</p></div>' +
-      '<div class="tl-today-block">' +
-      '<p class="tl-today-label">今天</p>' +
-      '<p class="tl-today-amount">' +
-      escapeHtml(DATA.formatMoneyMinor(summary.todaySpendMinor, primaryCode)) +
-      '</p></div>' +
-      addExpenseButtonHtml(ledger.id) +
+      renderDetailPrimarySummary(ledger, today, summary, primaryCode) +
+      addExpenseButtonHtml(ledger.id, ledger, today) +
       renderExpenseLists(ledger, today) +
       '<div class="tl-summary-card">' +
       '<h3 class="tl-summary-title">旅行摘要</h3>' +
@@ -1904,6 +2226,13 @@
 
     if (!target.closest('.tl-menu')) closeAllMenus();
 
+    if (
+      !target.closest('.tl-expense-swipe') &&
+      !target.closest('[data-tl-action="delete-expense"]')
+    ) {
+      closeAllExpenseSwipes($('travelLedgerDetailView'));
+    }
+
     var actionEl = target.closest('[data-tl-action]');
     if (actionEl) {
       var action = actionEl.getAttribute('data-tl-action');
@@ -2082,6 +2411,14 @@
     confirmDeleteExpense: confirmDeleteExpense,
     closeExpenseSheet: closeExpenseSheet,
     getLedgerDisplayStatus: getLedgerDisplayStatus,
+    getLedgerTemporalState: getLedgerTemporalState,
+    groupExpensesForDisplay: groupExpensesForDisplay,
+    formatMonthDayLabel: formatMonthDayLabel,
+    formatRemainingBudgetHero: formatRemainingBudgetHero,
+    needsExpenseDatePicker: needsExpenseDatePicker,
+    closeAllExpenseSwipes: closeAllExpenseSwipes,
+    renderDetailPrimarySummary: renderDetailPrimarySummary,
+    addExpenseButtonHtml: addExpenseButtonHtml,
     getLedgerDayProgress: getLedgerDayProgress,
     getLedgerDayShort: getLedgerDayShort,
     openWithFixture: openWithFixture

@@ -551,6 +551,74 @@
     border: 1px solid rgba(255, 255, 255, 0.7);
     box-shadow: 0 10px 28px rgba(80, 60, 50, 0.07);
 }
+
+/* Phase 1C.1 — detail hero summary */
+#travelLedger .tl-hero-summary {
+    margin-bottom: 0.85rem;
+    padding: 1.15rem 1rem 1.05rem;
+    border-radius: 1.45rem;
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    box-shadow: 0 10px 28px rgba(80, 60, 50, 0.07);
+}
+#travelLedger .tl-hero-summary-dual {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    align-items: start;
+}
+#travelLedger .tl-hero-summary-ended,
+#travelLedger .tl-hero-summary-archived {
+    display: grid;
+    gap: 0.65rem;
+}
+#travelLedger .tl-hero-summary-kicker {
+    margin: 0 0 0.15rem;
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    color: #78909c;
+    text-align: center;
+}
+#travelLedger .tl-hero-summary-label {
+    margin: 0 0 0.25rem;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    color: #90a4ae;
+}
+#travelLedger .tl-hero-summary-label.is-warning {
+    color: #c62828;
+}
+#travelLedger .tl-hero-summary-amount {
+    margin: 0;
+    font-size: clamp(1.45rem, 6vw, 2rem);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    color: #37474f;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+    word-break: keep-all;
+}
+#travelLedger .tl-hero-summary-amount.is-unset {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #90a4ae;
+}
+#travelLedger .tl-hero-summary-amount.is-over {
+    color: #c62828;
+}
+#travelLedger .tl-hero-summary-hint {
+    margin: 0.35rem 0 0;
+    font-size: 0.78rem;
+    line-height: 1.45;
+    color: #90a4ae;
+    text-align: center;
+}
+#travelLedger .tl-archived-expense-note {
+    margin-bottom: 0.85rem;
+    text-align: center;
+}
 #travelLedger .tl-today-label {
     margin: 0 0 0.35rem;
     font-size: 0.85rem;
@@ -623,6 +691,12 @@
     font-weight: 900;
     color: #37474f;
     text-align: right;
+}
+#travelLedger .tl-summary-value.is-over {
+    color: #c62828;
+}
+#travelLedger .tl-summary-label.is-warning {
+    color: #c62828;
 }
 #travelLedger .tl-detail-note {
     margin: 0.5rem 0 0;
@@ -1037,6 +1111,17 @@
     font-size: 16px;
     margin-bottom: 0.35rem;
 }
+#travelLedger .tl-expense-date-input {
+    width: 100%;
+    min-height: 48px;
+    padding: 0.75rem 0.9rem;
+    border-radius: 1rem;
+    border: 1px solid rgba(55, 71, 79, 0.12);
+    background: rgba(255, 255, 255, 0.96);
+    color: #37474f;
+    font-size: 16px;
+    margin-bottom: 0.85rem;
+}
 #travelLedger .tl-expense-sheet-actions {
     display: grid;
     gap: 0.55rem;
@@ -1081,19 +1166,33 @@
     border-radius: 1.05rem;
     margin-bottom: 0.55rem;
 }
-#travelLedger .tl-expense-delete-reveal {
-    position: absolute;
-    inset: 0 0 0 auto;
-    width: 4.75rem;
+#travelLedger .tl-expense-track {
     display: flex;
+    width: calc(100% + 5.25rem);
+    will-change: transform;
+}
+#travelLedger .tl-expense-delete-reveal {
+    flex: 0 0 5.25rem;
+    width: 5.25rem;
+    display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 0.15rem;
     background: linear-gradient(135deg, #ef5350, #c62828);
     color: #fff;
-    font-size: 0.82rem;
+    font-size: 0.72rem;
     font-weight: 800;
     border: none;
     cursor: pointer;
+    padding: 0;
+}
+#travelLedger .tl-expense-delete-icon {
+    font-size: 1.25rem;
+    line-height: 1;
+}
+#travelLedger .tl-expense-delete-label {
+    line-height: 1.1;
 }
 #travelLedger .tl-expense-row {
     position: relative;
@@ -1101,7 +1200,9 @@
     display: flex;
     align-items: center;
     gap: 0.7rem;
+    flex: 1 0 100%;
     width: 100%;
+    min-width: 0;
     padding: 0.85rem 0.9rem;
     border: none;
     border-radius: 1.05rem;
@@ -1109,16 +1210,16 @@
     box-shadow: 0 6px 18px rgba(80, 60, 50, 0.06);
     text-align: left;
     cursor: pointer;
-    transition: transform 0.18s ease;
     touch-action: pan-y;
-}
-#travelLedger .tl-expense-row.is-swiped {
-    transform: translateX(-4.75rem);
 }
 #travelLedger .tl-expense-row-icon {
     font-size: 1.55rem;
     line-height: 1;
     flex-shrink: 0;
+}
+#travelLedger .tl-expense-row-content {
+    flex: 1;
+    min-width: 0;
 }
 #travelLedger .tl-expense-row-main {
     flex: 1;
@@ -1129,6 +1230,9 @@
     font-size: 0.95rem;
     font-weight: 900;
     color: #37474f;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 #travelLedger .tl-expense-row-note {
     margin: 0.15rem 0 0;
@@ -1142,13 +1246,22 @@
     margin: 0.2rem 0 0;
     font-size: 0.72rem;
     color: #90a4ae;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 #travelLedger .tl-expense-row-amount {
     margin: 0;
-    font-size: 1.05rem;
+    flex-shrink: 0;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    font-size: clamp(18px, 4.2vw, 1.05rem);
     font-weight: 900;
     color: #37474f;
-    flex-shrink: 0;
+    min-width: 4.25rem;
+    max-width: 42%;
+    line-height: 1.15;
 }
 #travelLedger .tl-add-expense-btn {
     display: inline-flex;
