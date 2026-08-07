@@ -217,10 +217,13 @@ const activeSheet = UI.renderExpenseSheetBody(activeLedger, null);
 assert(!activeSheet.includes('tl-expense-date-block'), 'active sheet hides date');
 assert(!activeSheet.includes('name="expenseDate"'), 'active sheet no date input');
 
-assert(/\.tl-expense-date-title[\s\S]*?font-size:\s*18px/.test(css), 'date title >= 18px');
-assert(/\.tl-expense-date-title[\s\S]*?font-weight:\s*800/.test(css), 'date title weight 800');
+assert(/\.tl-expense-date-title[\s\S]*?font-size:\s*1[89]px/.test(css), 'date title >= 18px');
+assert(/\.tl-expense-date-title[\s\S]*?font-weight:\s*700/.test(css), 'date title weight 700');
+assert(/\.tl-expense-date-hint[\s\S]*?font-size:\s*15px/.test(css), 'date hint >= 15px');
 assert(/\.tl-expense-date-input[\s\S]*?font-size:\s*18px/.test(css), 'date input >= 18px');
-assert(/\.tl-expense-date-input[\s\S]*?min-height:\s*58px/.test(css), 'date input height >= 58px');
+assert(/\.tl-expense-date-input[\s\S]*?min-height:\s*6[0-4]px/.test(css), 'date input height 58–64px');
+assert(/\.tl-expense-date-block[\s\S]*?margin:\s*20px\s+0/.test(css), 'date block vertical margin 20px');
+assert(/\.tl-expense-sheet-intro[\s\S]*?margin:\s*0\s+0\s+1rem/.test(css), 'intro has no negative top margin');
 assert(/tabular-nums/.test(css), 'tabular-nums present');
 assert(/white-space:\s*nowrap/.test(css), 'hero amounts nowrap');
 

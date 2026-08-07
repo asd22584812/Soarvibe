@@ -1552,6 +1552,7 @@
     var sheet = $('travelLedgerExpenseSheet');
     if (!body || !sheet) return;
     body.innerHTML = renderExpenseSheetBody(ledger, expense);
+    body.scrollTop = 0;
     sheet.classList.remove('hidden');
     sheet.setAttribute('aria-hidden', 'false');
     lockActiveViewScroll();
@@ -1810,9 +1811,6 @@
       '<div class="tl-summary-row"><span class="tl-summary-label">平均每日</span><span class="tl-summary-value">' +
       escapeHtml(avgText) +
       '</span></div></div>' +
-      '<div class="tl-placeholder-block">' +
-      '<p class="tl-placeholder-title">統計</p>' +
-      '<p class="tl-placeholder-copy">分類統計與旅行回顧將在 Phase 1D 開放。</p></div>' +
       '<div class="tl-action-stack">' +
       '<button type="button" class="tl-secondary-btn" data-tl-action="edit" data-ledger-id="' +
       escapeHtml(ledger.id) +

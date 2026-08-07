@@ -40,7 +40,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="./city-shares-ui.css">
-    <link rel="stylesheet" href="./travel-ledger.css?v=v143">
+    <link rel="stylesheet" href="./travel-ledger.css?v=v144">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;900&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         html, body {
@@ -119,12 +119,14 @@
             flex-wrap: nowrap;
             gap: 0.5rem;
             overflow-x: auto;
-            overflow-y: hidden;
+            overflow-y: visible;
             scroll-behavior: smooth;
             -webkit-overflow-scrolling: touch;
             overscroll-behavior-x: contain;
             touch-action: pan-x;
-            padding-bottom: 0.25rem;
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+            margin-top: 0.1rem;
             max-width: 100%;
             min-width: 0;
             width: 100%;
@@ -133,6 +135,7 @@
             position: relative;
             flex-shrink: 0;
             display: inline-block;
+            margin: 2px 0;
         }
         .style-pill-input {
             position: absolute;
@@ -151,26 +154,39 @@
             display: inline-flex;
             align-items: center;
             gap: 0.35rem;
-            padding: 0.5rem 0.875rem;
+            padding: 0.55rem 0.95rem;
             border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 900;
-            color: #546E7A;
-            background: rgba(255, 255, 255, 0.82);
-            border: 1px solid rgba(255, 255, 255, 0.72);
-            box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.85);
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #78909C;
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid rgba(176, 190, 197, 0.55);
+            box-shadow: none;
             white-space: nowrap;
-            transition: background 0.15s, box-shadow 0.15s, color 0.15s, transform 0.1s;
+            transition: background 0.15s, box-shadow 0.15s, color 0.15s, border-color 0.15s, transform 0.1s;
         }
         .style-pill:active .style-pill-face { transform: scale(0.97); }
         .style-pill .peer:checked ~ .style-pill-face {
-            background: rgba(255, 255, 255, 0.96);
-            color: #37474F;
-            border-color: rgba(128, 203, 196, 0.55);
-            box-shadow: 0 0 0 2px rgba(128, 203, 196, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.9);
+            background: rgba(178, 235, 229, 0.55);
+            color: #1a3a3a;
+            font-weight: 700;
+            border: 2px solid #72cfc8;
+            box-shadow: 0 0 0 3px rgba(114, 207, 200, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.75);
+            padding: calc(0.55rem - 1px) calc(0.95rem - 1px);
+        }
+        .style-pill .peer:checked ~ .style-pill-face::after {
+            content: '✓';
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 0.15rem;
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: #00897a;
+            line-height: 1;
         }
         .style-pill .peer:focus-visible ~ .style-pill-face {
-            box-shadow: 0 0 0 2px rgba(128, 203, 196, 0.55);
+            box-shadow: 0 0 0 3px rgba(114, 207, 200, 0.35);
         }
         .brand-title {
             font-family: 'Outfit', sans-serif;
@@ -2857,9 +2873,9 @@
                     </div>
                 </section>
 
-                <section class="glass-card rounded-3xl p-3.5 shadow-sm min-w-0 overflow-hidden">
+                <section class="glass-card rounded-3xl p-3.5 shadow-sm min-w-0 overflow-x-hidden overflow-y-visible">
                     <h2 class="text-base font-bold text-[#37474F] mb-2">3. 期望的旅遊風格</h2>
-                    <p class="text-[10px] font-bold text-[#78909C] mb-2">👆 左右滑動，選一種專屬節奏</p>
+                    <p class="text-[10px] font-bold text-[#78909C] mb-1">👆 左右滑動，選一種專屬節奏</p>
                     <div id="travel-style-scroll" class="style-scroll hide-scrollbar" role="radiogroup" aria-label="期望的旅遊風格">
                         <label class="style-pill cursor-pointer">
                             <input type="radio" name="travel-style" class="style-pill-input peer" value="budget">
@@ -3334,10 +3350,10 @@
     <script src="./city-shares-config.js"></script>
     <script src="./city-shares-data.js"></script>
     <script src="./city-shares-ui.js"></script>
-    <script src="./travel-ledger-config.js?v=v143"></script>
-    <script src="./travel-ledger-forex.js?v=v143"></script>
-    <script src="./travel-ledger-data.js?v=v143"></script>
-    <script src="./travel-ledger-ui.js?v=v143"></script>
+    <script src="./travel-ledger-config.js?v=v144"></script>
+    <script src="./travel-ledger-forex.js?v=v144"></script>
+    <script src="./travel-ledger-data.js?v=v144"></script>
+    <script src="./travel-ledger-ui.js?v=v144"></script>
     <script>
         (function () {
             const TRAVEL_STYLE_LABELS = {
@@ -4128,7 +4144,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
-            const SOARVIBE_APP_BUILD = 'v143';
+            const SOARVIBE_APP_BUILD = 'v144';
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
