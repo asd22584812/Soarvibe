@@ -1,5 +1,5 @@
 /**
- * Travel Time Engine tests (P0 + inspiration/precise modes).
+ * Travel Time Engine tests (precise + preview modes).
  * Usage: node scripts/test-travel-time-engine.mjs
  */
 import vm from 'node:vm';
@@ -43,6 +43,7 @@ const payload = {
 const n = E.normalizeFlightPayload(payload);
 assert(E.hasCompleteFlightData(payload) === true, 'complete flight → hasCompleteFlightData');
 assert(n.planningMode === 'precise', 'complete flight → precise mode');
+assert(n.tripMode === 'PRECISION_TRIP_MODE', 'complete → PRECISION_TRIP_MODE');
 assert(n.hardConstraints.active === true, 'complete flight → hardConstraints.active');
 assert(n.arrival.hhmm === '10:30', 'arrival hhmm preserved');
 assert(n.departure.hhmm === '08:00', 'departure hhmm preserved');
@@ -119,65 +120,87 @@ assert(attached.arrivalTimezone === 'Asia/Tokyo', 'attach arrivalTimezone');
 assert(attached.departureTimezone === 'Asia/Taipei', 'attach departureTimezone');
 assert(attached.hasCompleteFlightData === true, 'attach hasCompleteFlightData');
 
-// --- Inspiration: no flight, no hotel ---
+// --- Preview: no flight, no hotel ---
 const bare = {
   destination: '東京',
-  dateStart: '2026-09-01',
-  dateEnd: '2026-09-05',
-  travelStyle: 'anime',
+  dateStart: '2026-08-20',
+  dateEnd: '2026-08-24',
+  travelStyle: 'sightseeing',
   accommodation: '',
   accommodations: [{ name: '', checkInNight: null }]
 };
 assert(E.hasCompleteFlightData(bare) === false, '無航班 → not complete');
 assert(E.hasPartialFlightData(bare) === false, '完全空白 → not partial');
 const bareN = E.normalizeFlightPayload(bare);
-assert(bareN.planningMode === 'inspiration', '無航班 → inspiration');
+assert(bareN.planningMode === 'preview', '無航班 → preview');
+assert(bareN.tripMode === 'PREVIEW_TRIP_MODE', '無航班 → PREVIEW_TRIP_MODE');
 assert(bareN.hardConstraints.active === false, '無航班 → hardConstraints off');
-assert(!bareN.buffers.earliestSightseeingHhmm, '無航班 → 無 earliest sightseeing');
+assert(bareN.previewPlan, 'previewPlan present');
+assert(bareN.previewPlan.outboundDepartureHhmm === '06:30', 'preview dep 06:30');
+assert(bareN.previewPlan.returnDepartureHhmm === '20:30', 'preview return 20:30');
+assert(bareN.previewPlan.isRealFlight === false, 'preview not real flight');
+assert(bareN.buffers.earliestSightseeingHhmm, 'preview sets earliest sightseeing');
+assert(
+  E.hhmmToMinutes(bareN.previewPlan.estimatedArrivalHhmm) < E.hhmmToMinutes('18:00'),
+  '亞洲近程 preview 抵達不得拖到晚上'
+);
+assert(
+  E.hhmmToMinutes(bareN.buffers.earliestSightseeingHhmm) < E.hhmmToMinutes('21:30'),
+  'Day1 不得以 21:30 才開始'
+);
+assert(bareN.accommodationPlan.mode === 'area_only', '無住宿 → area_only');
+assert(bareN.accommodationPlan.defaultHotelArea === '新宿', '東京預設住宿區域 新宿');
+assert(!bareN.accommodationPlan.hotelName, '無住宿不得捏造飯店名');
+
 const barePrompt = E.buildFlightHardConstraintPrompt(bareN);
-assert(barePrompt.includes('靈感規劃模式'), '無航班 prompt → 靈感模式');
+assert(barePrompt.includes('PREVIEW_TRIP_MODE'), '無航班 prompt → PREVIEW');
+assert(barePrompt.includes('不是真實航班'), 'preview 標示非真實航班');
 assert(!barePrompt.includes('HARD CONSTRAINT——航班時間不可改'), '無航班 → 無 HARD CONSTRAINT 標題');
 const bareAttached = E.attachToPayload(bare);
 assert(bareAttached.hasCompleteFlightData === false, 'bare attach not complete');
-assert(bareAttached.planningMode === 'inspiration', 'bare attach inspiration');
+assert(bareAttached.planningMode === 'preview', 'bare attach preview');
+assert(bareAttached.defaultHotelArea === '新宿', 'attach defaultHotelArea');
 
-// Only destination + dates + style (generation gate fields) — engine treats as inspiration
 const destOnly = {
   destination: '東京',
-  dateStart: '2026-09-01',
-  dateEnd: '2026-09-05',
-  travelStyle: 'foodie'
+  dateStart: '2026-08-20',
+  dateEnd: '2026-08-24',
+  travelStyle: 'sightseeing'
 };
 assert(E.hasCompleteFlightData(destOnly) === false, '只有目的地日期風格 → not complete');
-assert(E.normalizeFlightPayload(destOnly).planningMode === 'inspiration', '只有目的地日期風格 → inspiration PASS');
+assert(E.normalizeFlightPayload(destOnly).planningMode === 'preview', '只有目的地日期風格 → preview PASS');
+
+// duration table
+const dur = E.estimateFlightDuration('Taiwan', '東京');
+assert(dur.minutes >= 180 && dur.minutes <= 240, 'Taiwan→Tokyo duration 3–4h');
+const durLon = E.estimateFlightDuration('TPE', '倫敦');
+assert(durLon.minutes >= 800, 'Taiwan→London long haul');
 
 // --- Partial airports only ---
 const partial = {
+  destination: '東京',
   flightOutboundFrom: 'TPE',
   flightOutboundTo: 'NRT'
 };
 assert(E.hasPartialFlightData(partial) === true, '部分機場 → partial');
 assert(E.hasCompleteFlightData(partial) === false, '部分機場 → not complete');
 const partialN = E.normalizeFlightPayload(partial);
-assert(partialN.planningMode === 'inspiration', '部分航班 → inspiration（一般模式）');
+assert(partialN.planningMode === 'preview', '部分航班 → preview');
 assert(partialN.hardConstraints.active === false, '部分航班 → no HARD CONSTRAINT');
 assert(partialN.hasPartialFlightData === true, 'partial flag set');
 const partialPrompt = E.buildFlightHardConstraintPrompt(partialN);
-assert(partialPrompt.includes('靈感規劃模式'), '部分航班 prompt 仍為靈感模式');
+assert(partialPrompt.includes('PREVIEW_TRIP_MODE'), '部分航班 prompt 仍為 preview');
 
-// Partial must NOT invent arrival for hard QA
+// Partial must NOT treat user times as hard constraint arrival invent
 const partialQaHidden = JSON.parse(JSON.stringify(badHidden));
 const partialQa = E.applyTimeQaToHidden(partialQaHidden, partial);
-const stillEarly = partialQa.hidden.days[0].phases[0].items[0].startTime;
 assert(
-  stillEarly === '09:00' ||
-    !partialQa.fixes.some(function (f) {
-      return f.type === 'shift_after_buffer';
-    }),
-  '部分航班 → 不因虛構抵達而 shift Day1'
+  !partialQa.fixes.some(function (f) {
+    return f.type === 'shift_after_buffer' && f.reason === 'user_arrival';
+  }),
+  '部分航班 → 不以虛構使用者抵達做 HARD invent'
 );
 
-// No accommodation invent check (engine doesn't invent hotels; assert empty stays empty)
 assert(!bare.accommodation, '無住宿欄位保持空白（不得產生假住宿名稱）');
 
 console.log(`travel-time-engine: ${passed} passed, ${failed} failed`);

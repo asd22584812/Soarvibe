@@ -39,8 +39,8 @@
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="./city-shares-ui.css?v=v148">
-    <link rel="stylesheet" href="./travel-ledger.css?v=v148">
+    <link rel="stylesheet" href="./city-shares-ui.css?v=v149">
+    <link rel="stylesheet" href="./travel-ledger.css?v=v149">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;900&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         html, body {
@@ -413,6 +413,65 @@
         }
         #advanced-settings.is-open #advanced-chevron {
             transform: rotate(90deg);
+        }
+        .adv-sub {
+            margin-top: 0.55rem;
+            border-radius: 0.9rem;
+            background: rgba(255, 255, 255, 0.55);
+            border: 1px solid rgba(255, 255, 255, 0.65);
+            overflow: hidden;
+        }
+        .adv-sub-toggle {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            padding: 0.7rem 0.8rem;
+            text-align: left;
+            font-size: 0.84rem;
+            font-weight: 800;
+            color: #37474f;
+            background: transparent;
+            border: 0;
+            cursor: pointer;
+        }
+        .adv-sub-chevron {
+            transition: transform 0.2s ease;
+            color: #546e7a;
+        }
+        .adv-sub.is-open .adv-sub-chevron {
+            transform: rotate(90deg);
+        }
+        .adv-sub-panel {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.28s ease;
+        }
+        .adv-sub.is-open .adv-sub-panel {
+            grid-template-rows: 1fr;
+        }
+        .adv-sub-panel-inner {
+            overflow: hidden;
+            min-height: 0;
+            padding: 0 0.8rem;
+        }
+        .adv-sub.is-open .adv-sub-panel-inner {
+            padding-bottom: 0.8rem;
+        }
+        .preview-mode-banner {
+            margin: 0.65rem 0 0;
+            padding: 0.7rem 0.85rem;
+            border-radius: 0.85rem;
+            background: rgba(227, 242, 253, 0.95);
+            border: 1px solid rgba(66, 165, 245, 0.35);
+            color: #37474f;
+            font-size: 0.8rem;
+            font-weight: 700;
+            line-height: 1.45;
+        }
+        .preview-mode-banner.hidden {
+            display: none;
         }
         .city-card {
             cursor: pointer;
@@ -2340,7 +2399,7 @@
         #svAuthModal {
             position: fixed;
             inset: 0;
-            z-index: 80;
+            z-index: 10050;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -3076,87 +3135,115 @@
                         <div class="advanced-panel-inner">
                             <div class="pt-2 mt-2 border-t border-white/50 trip-details-stack">
                                 <p id="flight-dates-summary" class="flight-dates-summary" aria-readonly="true">出發日期：— | 回程日期：—</p>
-                                <div class="flight-leg-block">
-                                    <p class="flight-leg-title">去程航班</p>
-                                    <label for="flight-outbound-number">
-                                        <span class="field-label">航班編號 <span class="field-optional">選填・最準</span></span>
-                                        <input type="text" id="flight-outbound-number" class="field-input w-full rounded-lg" placeholder="例：CI100、BR198、JL809" autocomplete="off">
-                                    </label>
-                                    <div class="flight-airports-row">
-                                        <label for="flight-outbound-from">
-                                            <span class="field-label">出發機場</span>
-                                            <input type="text" id="flight-outbound-from" class="field-input w-full rounded-lg" placeholder="例：桃園 TPE" autocomplete="off">
-                                        </label>
-                                        <label for="flight-outbound-to">
-                                            <span class="field-label">抵達機場</span>
-                                            <input type="text" id="flight-outbound-to" class="field-input w-full rounded-lg" placeholder="例：成田 NRT" autocomplete="off">
-                                        </label>
-                                    </div>
-                                    <div class="flight-times-row">
-                                        <label class="min-w-0" for="flight-departure-time">
-                                            <span class="field-label">起飛時間 <span class="field-optional">出發地當地</span></span>
-                                            <div class="picker-field rounded-lg">
-                                                <span class="picker-display has-value" id="flight-departure-display">下午 2:30</span>
-                                                <span class="picker-icon" aria-hidden="true">🕐</span>
-                                                <input type="time" id="flight-departure-time" class="picker-input" value="14:30" aria-label="去程起飛時間（出發地當地）">
+                                <p class="text-[0.72rem] text-[#78909C] font-semibold mt-1 mb-1">以下為進階選填。未填也可生成靈感行程（早去晚回 Preview）。</p>
+
+                                <div class="adv-sub" id="adv-sub-outbound" data-adv-sub="outbound">
+                                    <button type="button" class="adv-sub-toggle" aria-expanded="false" aria-controls="adv-sub-outbound-panel">
+                                        <span>去程航班</span>
+                                        <span class="adv-sub-chevron" aria-hidden="true">▸</span>
+                                    </button>
+                                    <div id="adv-sub-outbound-panel" class="adv-sub-panel">
+                                        <div class="adv-sub-panel-inner flight-leg-block">
+                                            <label for="flight-outbound-number">
+                                                <span class="field-label">航班編號 <span class="field-optional">選填</span></span>
+                                                <input type="text" id="flight-outbound-number" class="field-input w-full rounded-lg" placeholder="例：CI100、BR198、JL809" autocomplete="off">
+                                            </label>
+                                            <div class="flight-airports-row">
+                                                <label for="flight-outbound-from">
+                                                    <span class="field-label">出發機場 <span class="field-optional">選填</span></span>
+                                                    <input type="text" id="flight-outbound-from" class="field-input w-full rounded-lg" placeholder="例：桃園 TPE" autocomplete="off">
+                                                </label>
+                                                <label for="flight-outbound-to">
+                                                    <span class="field-label">抵達機場 <span class="field-optional">選填</span></span>
+                                                    <input type="text" id="flight-outbound-to" class="field-input w-full rounded-lg" placeholder="例：成田 NRT" autocomplete="off">
+                                                </label>
                                             </div>
-                                        </label>
-                                        <label class="min-w-0" for="flight-arrival-time">
-                                            <span class="field-label">抵達時間 <span class="field-optional">目的地當地・必填</span></span>
-                                            <div class="picker-field rounded-lg">
-                                                <span class="picker-display" id="flight-arrival-display">選擇時間</span>
-                                                <span class="picker-icon" aria-hidden="true">🕐</span>
-                                                <input type="time" id="flight-arrival-time" class="picker-input" value="" aria-label="去程抵達時間（目的地當地）">
+                                            <div class="flight-times-row">
+                                                <label class="min-w-0" for="flight-departure-time">
+                                                    <span class="field-label">起飛時間 <span class="field-optional">選填・出發地當地</span></span>
+                                                    <div class="picker-field rounded-lg">
+                                                        <span class="picker-display" id="flight-departure-display">選擇時間</span>
+                                                        <span class="picker-icon" aria-hidden="true">🕐</span>
+                                                        <input type="time" id="flight-departure-time" class="picker-input" value="" aria-label="去程起飛時間（出發地當地）">
+                                                    </div>
+                                                </label>
+                                                <label class="min-w-0" for="flight-arrival-time">
+                                                    <span class="field-label">抵達時間 <span class="field-optional">選填・目的地當地</span></span>
+                                                    <div class="picker-field rounded-lg">
+                                                        <span class="picker-display" id="flight-arrival-display">選擇時間</span>
+                                                        <span class="picker-icon" aria-hidden="true">🕐</span>
+                                                        <input type="time" id="flight-arrival-time" class="picker-input" value="" aria-label="去程抵達時間（目的地當地）">
+                                                    </div>
+                                                </label>
                                             </div>
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="flight-leg-block">
-                                    <p class="flight-leg-title">回程航班</p>
-                                    <label for="flight-return-number">
-                                        <span class="field-label">航班編號 <span class="field-optional">選填・最準</span></span>
-                                        <input type="text" id="flight-return-number" class="field-input w-full rounded-lg" placeholder="例：CI101、BR199、JL810" autocomplete="off">
-                                    </label>
-                                    <div class="flight-airports-row">
-                                        <label for="flight-return-from">
-                                            <span class="field-label">出發機場</span>
-                                            <input type="text" id="flight-return-from" class="field-input w-full rounded-lg" placeholder="例：成田 NRT" autocomplete="off">
-                                        </label>
-                                        <label for="flight-return-to">
-                                            <span class="field-label">抵達機場</span>
-                                            <input type="text" id="flight-return-to" class="field-input w-full rounded-lg" placeholder="例：桃園 TPE" autocomplete="off">
-                                        </label>
-                                    </div>
-                                    <label class="min-w-0" for="flight-return-time">
-                                        <span class="field-label">起飛時間 <span class="field-optional">回程出發地當地</span></span>
-                                        <div class="picker-field rounded-lg">
-                                            <span class="picker-display has-value" id="flight-return-display">下午 6:00</span>
-                                            <span class="picker-icon" aria-hidden="true">🕐</span>
-                                            <input type="time" id="flight-return-time" class="picker-input" value="18:00" aria-label="回程起飛時間（出發地當地）">
                                         </div>
-                                    </label>
-                                </div>
-                                <div class="accommodations-block">
-                                    <div id="accommodations-list" class="accommodations-list" aria-live="polite"></div>
-                                    <button type="button" id="add-accommodation-btn" class="add-accommodation-btn">＋ 新增住宿</button>
-                                </div>
-                                <div>
-                                    <label for="advanced-transport" class="field-label">交通方式</label>
-                                    <div class="relative">
-                                        <select id="advanced-transport" name="advanced-transport" class="field-select w-full rounded-lg">
-                                            <option value="">請選擇交通方式</option>
-                                            <option value="public-transit">搭乘大眾運輸</option>
-                                            <option value="self-drive">全程輕鬆自駕</option>
-                                            <option value="mixed">混合搭配（大眾+計程車）</option>
-                                        </select>
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#B0BEC5] pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                        </svg>
                                     </div>
                                 </div>
-                                <div>
-                                    <label for="customWishes" class="field-label">✨ 專屬許願池 (選填)</label>
-                                    <textarea id="customWishes" name="customWishes" rows="2" class="field-textarea w-full rounded-lg" placeholder="例如：想去 SHIBUYA SKY 拍照…"></textarea>
+
+                                <div class="adv-sub" id="adv-sub-return" data-adv-sub="return">
+                                    <button type="button" class="adv-sub-toggle" aria-expanded="false" aria-controls="adv-sub-return-panel">
+                                        <span>回程航班</span>
+                                        <span class="adv-sub-chevron" aria-hidden="true">▸</span>
+                                    </button>
+                                    <div id="adv-sub-return-panel" class="adv-sub-panel">
+                                        <div class="adv-sub-panel-inner flight-leg-block">
+                                            <label for="flight-return-number">
+                                                <span class="field-label">航班編號 <span class="field-optional">選填</span></span>
+                                                <input type="text" id="flight-return-number" class="field-input w-full rounded-lg" placeholder="例：CI101、BR199、JL810" autocomplete="off">
+                                            </label>
+                                            <div class="flight-airports-row">
+                                                <label for="flight-return-from">
+                                                    <span class="field-label">出發機場 <span class="field-optional">選填</span></span>
+                                                    <input type="text" id="flight-return-from" class="field-input w-full rounded-lg" placeholder="例：成田 NRT" autocomplete="off">
+                                                </label>
+                                                <label for="flight-return-to">
+                                                    <span class="field-label">抵達機場 <span class="field-optional">選填</span></span>
+                                                    <input type="text" id="flight-return-to" class="field-input w-full rounded-lg" placeholder="例：桃園 TPE" autocomplete="off">
+                                                </label>
+                                            </div>
+                                            <label class="min-w-0" for="flight-return-time">
+                                                <span class="field-label">起飛時間 <span class="field-optional">選填・回程出發地當地</span></span>
+                                                <div class="picker-field rounded-lg">
+                                                    <span class="picker-display" id="flight-return-display">選擇時間</span>
+                                                    <span class="picker-icon" aria-hidden="true">🕐</span>
+                                                    <input type="time" id="flight-return-time" class="picker-input" value="" aria-label="回程起飛時間（出發地當地）">
+                                                </div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="adv-sub" id="adv-sub-stay" data-adv-sub="stay">
+                                    <button type="button" class="adv-sub-toggle" aria-expanded="false" aria-controls="adv-sub-stay-panel">
+                                        <span>住宿與交通</span>
+                                        <span class="adv-sub-chevron" aria-hidden="true">▸</span>
+                                    </button>
+                                    <div id="adv-sub-stay-panel" class="adv-sub-panel">
+                                        <div class="adv-sub-panel-inner">
+                                            <div class="accommodations-block">
+                                                <div id="accommodations-list" class="accommodations-list" aria-live="polite"></div>
+                                                <button type="button" id="add-accommodation-btn" class="add-accommodation-btn">＋ 新增住宿</button>
+                                            </div>
+                                            <div>
+                                                <label for="advanced-transport" class="field-label">交通方式 <span class="field-optional">選填</span></label>
+                                                <div class="relative">
+                                                    <select id="advanced-transport" name="advanced-transport" class="field-select w-full rounded-lg">
+                                                        <option value="">請選擇交通方式</option>
+                                                        <option value="public-transit">搭乘大眾運輸</option>
+                                                        <option value="self-drive">全程輕鬆自駕</option>
+                                                        <option value="mixed">混合搭配（大眾+計程車）</option>
+                                                    </select>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#B0BEC5] pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label for="customWishes" class="field-label">✨ 專屬許願池 <span class="field-optional">選填</span></label>
+                                                <textarea id="customWishes" name="customWishes" rows="2" class="field-textarea w-full rounded-lg" placeholder="例如：想去 SHIBUYA SKY 拍照…"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -3533,15 +3620,15 @@
         </div>
     </div>
 
-    <script src="./firebase-config.js?v=v148"></script>
+    <script src="./firebase-config.js?v=v149"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
-    <script src="./firebase-init.js?v=v148"></script>
-    <script src="./soarvibe-auth.js?v=v148"></script>
-    <script src="./city-shares-firestore.js?v=v148"></script>
-    <script src="./soarvibe-auth-ui.js?v=v148"></script>
+    <script src="./firebase-init.js?v=v149"></script>
+    <script src="./soarvibe-auth.js?v=v149"></script>
+    <script src="./city-shares-firestore.js?v=v149"></script>
+    <script src="./soarvibe-auth-ui.js?v=v149"></script>
     <script src="./feature-flags.js"></script>
     <script src="./city-journal-editorial-engine.js"></script>
     <script src="./city-journal-image-manifest.js"></script>
@@ -3549,14 +3636,14 @@
     <script src="./city-journal-image-library.js"></script>
     <script src="./city-journal-caption.js"></script>
     <script src="./city-journal-data.js"></script>
-    <script src="./city-shares-config.js?v=v148"></script>
-    <script src="./city-shares-data.js?v=v148"></script>
-    <script src="./city-shares-ui.js?v=v148"></script>
-    <script src="./travel-time-engine.js?v=v148"></script>
-    <script src="./travel-ledger-config.js?v=v148"></script>
-    <script src="./travel-ledger-forex.js?v=v148"></script>
-    <script src="./travel-ledger-data.js?v=v148"></script>
-    <script src="./travel-ledger-ui.js?v=v148"></script>
+    <script src="./city-shares-config.js?v=v149"></script>
+    <script src="./city-shares-data.js?v=v149"></script>
+    <script src="./city-shares-ui.js?v=v149"></script>
+    <script src="./travel-time-engine.js?v=v149"></script>
+    <script src="./travel-ledger-config.js?v=v149"></script>
+    <script src="./travel-ledger-forex.js?v=v149"></script>
+    <script src="./travel-ledger-data.js?v=v149"></script>
+    <script src="./travel-ledger-ui.js?v=v149"></script>
     <script>
         (function () {
             const TRAVEL_STYLE_LABELS = {
@@ -3609,7 +3696,9 @@
             const MSG_DATES_REVERSED = '時空秩序異常 ⏳！回程日期不能早於出發日期喔，SOARVIBE 還沒解鎖時空倒流功能，請機長重新確認航線日期！';
             const MSG_TRAVEL_STYLE_REQUIRED = '請左右滑動並點選一種「期望的旅遊風格」，我們好為您調配專屬節奏 ✨';
             const MSG_FLIGHT_PARTIAL_SOFT =
-                '航班資料尚未完整，本次將以一般行程模式規劃；之後補上航班資訊可重新最佳化。';
+                '航班資料尚未完整，本次將以早去晚回 Preview 模式規劃；之後補上航班資訊可重新精準最佳化。';
+            const MSG_PREVIEW_MODE =
+                '尚未填寫航班，本次先以早去晚回的預設時段規劃。實際訂票後補上航班資訊，可重新精準最佳化。';
             const MSG_ADVANCED_INCOMPLETE = MSG_FLIGHT_PARTIAL_SOFT;
             const MSG_COMING_SOON = '✨ SOARVIBE 專屬功能翱翔準備中！下一階段將全面解鎖此功能，敬請期待！';
             const MSG_AFFILIATE_NO_DESTINATION = '請先在「要去哪裡？」選好旅遊國家與地區，或一鍵生成行程後，再使用獨家精選功能 🌏';
@@ -4359,7 +4448,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
-            const SOARVIBE_APP_BUILD = 'v148';
+            const SOARVIBE_APP_BUILD = 'v149';
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
@@ -7423,16 +7512,10 @@
 
             function updateFlightDateDisplays() {
                 if (!flightDatesSummary) return;
-                var routeHint = '';
-                var outboundTo = flightOutboundToInput && flightOutboundToInput.value.trim();
-                var returnFrom = flightReturnFromInput && flightReturnFromInput.value.trim();
-                if (outboundTo || returnFrom) {
-                    routeHint = '｜' + (outboundTo || '—') + ' ↔ ' + (returnFrom || outboundTo || '—');
-                }
+                // Product: summary shows dates only — never airport pairs (NRT ↔ NRT etc).
                 flightDatesSummary.textContent =
                     '出發日期：' + formatSlashDate(tripDateState.dateStart) +
-                    ' | 回程日期：' + formatSlashDate(tripDateState.dateEnd) +
-                    routeHint;
+                    ' | 回程日期：' + formatSlashDate(tripDateState.dateEnd);
             }
 
             function resolveAirportHintsForDestination(destination) {
@@ -7723,9 +7806,20 @@
                 return parts.join('；');
             }
 
-            function buildAccommodationPromptBlock(accommodations, dateStart, dateEnd) {
+            function buildAccommodationPromptBlock(accommodations, dateStart, dateEnd, payload) {
                 var split = splitAccommodationEntries(accommodations);
-                if (!split.defaultEntry.name) return '（未填寫）';
+                if (!split.defaultEntry.name) {
+                    var area =
+                        (payload && payload.defaultHotelArea) ||
+                        (payload && payload.accommodationPlan && payload.accommodationPlan.defaultHotelArea) ||
+                        '市中心交通便利區';
+                    return [
+                        '🏨 預設住宿區域：' + area,
+                        '尚未指定飯店，本次以中價位、交通便利住宿作為動線基準。',
+                        '禁止虛構飯店名稱、禁止捏造 Booking／網路評分。',
+                        '行程可寫「返回' + area + '住宿區域」，不可寫「入住 XXX Hotel」。'
+                    ].join('\n');
+                }
                 var lines = ['主住宿：', split.defaultEntry.name];
                 var sortedAdditional = split.additional.filter(function (entry) {
                     return entry.name && entry.checkInNight;
@@ -7754,14 +7848,19 @@
                 return lines.join('\n');
             }
 
-            function buildAccommodationRoutingRulesBlock(accommodations, dateStart, dateEnd) {
+            function buildAccommodationRoutingRulesBlock(accommodations, dateStart, dateEnd, payload) {
                 var split = splitAccommodationEntries(accommodations);
                 if (!split.defaultEntry.name && !split.additional.some(function (e) { return e && e.name; })) {
+                    var area =
+                        (payload && payload.defaultHotelArea) ||
+                        (payload && payload.accommodationPlan && payload.accommodationPlan.defaultHotelArea) ||
+                        '市中心交通便利區';
                     return [
-                        '【🏨 住宿動線規則——靈感模式（未提供住宿）】',
-                        '・使用者未填寫住宿飯店，禁止虛構飯店名稱。',
-                        '・以當日主要活動區域／車站作為動線規劃基準。',
-                        '・晚上可寫「返回住宿區域休息」，但不得捏造具體飯店名。'
+                        '【🏨 住宿動線規則——Preview（未提供住宿）】',
+                        '・🏨 預設住宿區域：' + area,
+                        '・尚未指定飯店，本次以中價位、交通便利住宿作為動線基準。',
+                        '・禁止虛構飯店名稱與網路評分。',
+                        '・晚上寫「返回' + area + '住宿區域休息」。'
                     ].join('\n');
                 }
                 if (!split.additional.length) {
@@ -8288,11 +8387,11 @@
                 }
                 if (!hasHard) {
                     return (hardBlock || '') +
-                        '【✈️ 靈感規劃模式補充】\n' +
-                        '・航班編號／機場／起飛抵達時間／回程航班均允許空白。\n' +
-                        '・禁止虛構起飛／抵達時間或航班編號。\n' +
-                        '・Day 1／最終日按一般完整旅遊日規劃（合理營業時間＋預估移動）。\n' +
-                        '・交通分鐘數僅標示「預估」，不可假裝是航班硬性限制。\n';
+                        '【✈️ PREVIEW_TRIP_MODE 補充】\n' +
+                        '・禁止顯示假的航班編號；禁止 Gemini 任意猜飛行時間（以引擎預估為準）。\n' +
+                        '・亞洲近程：Day1 下午以前進入城市；最終日上午／下午仍可安排，傍晚送機。\n' +
+                        '・禁止 Day1 晚上才抵達、禁止最終日一早就結束。\n' +
+                        '・交通分鐘數僅標示「預估」，不可假裝是真實航班限制。\n';
                 }
                 var arrivalAnchor = ctx.arrivalTimeText || '（請使用使用者提供的抵達時間）';
                 var depAnchor = ctx.departureTimeText || '（未提供）';
@@ -8338,8 +8437,8 @@ ${ctx.typeInstruction}
 
 ${buildGeminiFlightLogicBlock(ctx, lastDayNum)}
 🏨 住宿飯店／區域：
-${buildAccommodationPromptBlock(resolvePayloadAccommodations(payload), payload.dateStart, payload.dateEnd)}
-${buildAccommodationRoutingRulesBlock(resolvePayloadAccommodations(payload), payload.dateStart, payload.dateEnd)}
+${buildAccommodationPromptBlock(resolvePayloadAccommodations(payload), payload.dateStart, payload.dateEnd, payload)}
+${buildAccommodationRoutingRulesBlock(resolvePayloadAccommodations(payload), payload.dateStart, payload.dateEnd, payload)}
 
 ${ctx.customerSelectedTransport
     ? `【🚇 客戶指定交通方式（customerSelectedTransport）——行程串聯必須 100% 遵守】
@@ -15456,8 +15555,8 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 setGenerateButtonLoading(true);
                 resetGeminiKeySession();
 
-                if (payload.hasPartialFlightData) {
-                    showSoftPlanningTip(MSG_FLIGHT_PARTIAL_SOFT);
+                if (payload.planningMode === 'preview' || payload.hasPartialFlightData || !payload.hasCompleteFlightData) {
+                    showSoftPlanningTip(payload.hasPartialFlightData ? MSG_FLIGHT_PARTIAL_SOFT : MSG_PREVIEW_MODE);
                 } else {
                     hideSoftPlanningTip();
                 }
@@ -16088,7 +16187,6 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 closeCityJournal();
                 if (destinationInput && dest) {
                     destinationInput.value = dest;
-                    suggestFlightAirportsForDestination(dest);
                 }
                 var radio = document.querySelector('input[name="travel-style"][value="' + formStyle + '"]');
                 if (radio) {
@@ -16212,17 +16310,14 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             document.querySelectorAll('.quick-tag').forEach(function (tag) {
                 tag.addEventListener('click', function () {
                     destinationInput.value = tag.dataset.city;
-                    suggestFlightAirportsForDestination(tag.dataset.city);
+                    // Do not auto-fill airports — Preview Mode must stay empty until user expands flight accordion.
                     destinationInput.focus();
                 });
             });
 
             if (destinationInput) {
                 destinationInput.addEventListener('change', function () {
-                    suggestFlightAirportsForDestination(destinationInput.value.trim());
-                });
-                destinationInput.addEventListener('blur', function () {
-                    suggestFlightAirportsForDestination(destinationInput.value.trim());
+                    /* airports remain optional; no auto-fill */
                 });
             }
 
@@ -16246,6 +16341,16 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             advancedToggle.addEventListener('click', function () {
                 var isOpen = advancedSettings.classList.toggle('is-open');
                 advancedToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            });
+            document.querySelectorAll('.adv-sub-toggle').forEach(function (btn) {
+                btn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var wrap = btn.closest('.adv-sub');
+                    if (!wrap) return;
+                    var open = wrap.classList.toggle('is-open');
+                    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+                });
             });
 
             generateBtn.addEventListener('click', function () {

@@ -59,10 +59,296 @@
     minGapBetweenStopsMinutes: 10,
     defaultInterStopMinutes: 35,
     sameAreaInterStopMinutes: 20,
-    crossCityInterStopMinutes: 50
+    crossCityInterStopMinutes: 50,
+    previewOutboundDepHhmm: '06:30',
+    previewReturnDepHhmm: '20:30',
+    previewOriginAirport: 'TPE',
+    previewOriginUtcOffsetHours: 8
   };
 
+  /**
+   * Maintainable destination profiles for preview flight estimates + hotel areas.
+   * flightMinutesFromTaiwan = typical airborne minutes (not wall-clock).
+   * haul: short | medium | long — shapes Day1 / LastDay expectations.
+   */
+  var DESTINATION_PROFILES = [
+    {
+      keys: ['東京', 'tokyo', '成田', '羽田'],
+      regionId: 'japan_tokyo',
+      label: '東京',
+      defaultAirport: 'NRT',
+      flightMinutesFromTaiwan: 210,
+      flightMinutesRange: [180, 240],
+      utcOffsetHours: 9,
+      iana: 'Asia/Tokyo',
+      hotelAreas: ['新宿', '上野', '東京站'],
+      haul: 'short'
+    },
+    {
+      keys: ['大阪', 'osaka', '關西'],
+      regionId: 'japan_osaka',
+      label: '大阪',
+      defaultAirport: 'KIX',
+      flightMinutesFromTaiwan: 165,
+      flightMinutesRange: [150, 195],
+      utcOffsetHours: 9,
+      iana: 'Asia/Tokyo',
+      hotelAreas: ['難波', '梅田', '心齋橋'],
+      haul: 'short'
+    },
+    {
+      keys: ['京都', 'kyoto'],
+      regionId: 'japan_kyoto',
+      label: '京都',
+      defaultAirport: 'KIX',
+      flightMinutesFromTaiwan: 165,
+      flightMinutesRange: [150, 195],
+      utcOffsetHours: 9,
+      iana: 'Asia/Tokyo',
+      hotelAreas: ['京都站', '祇園', '河原町'],
+      haul: 'short'
+    },
+    {
+      keys: ['北海道', '札幌', 'hokkaido', 'sapporo'],
+      regionId: 'japan_hokkaido',
+      label: '北海道',
+      defaultAirport: 'CTS',
+      flightMinutesFromTaiwan: 240,
+      flightMinutesRange: [210, 270],
+      utcOffsetHours: 9,
+      iana: 'Asia/Tokyo',
+      hotelAreas: ['札幌站', '大通'],
+      haul: 'short'
+    },
+    {
+      keys: ['沖繩', 'okinawa', '那霸'],
+      regionId: 'japan_okinawa',
+      label: '沖繩',
+      defaultAirport: 'OKA',
+      flightMinutesFromTaiwan: 135,
+      flightMinutesRange: [120, 165],
+      utcOffsetHours: 9,
+      iana: 'Asia/Tokyo',
+      hotelAreas: ['那霸', '國際通'],
+      haul: 'short'
+    },
+    {
+      keys: ['首爾', 'seoul', '韓國', 'korea'],
+      regionId: 'korea_seoul',
+      label: '首爾',
+      defaultAirport: 'ICN',
+      flightMinutesFromTaiwan: 165,
+      flightMinutesRange: [150, 180],
+      utcOffsetHours: 9,
+      iana: 'Asia/Seoul',
+      hotelAreas: ['明洞', '弘大', '江南'],
+      haul: 'short'
+    },
+    {
+      keys: ['曼谷', 'bangkok', '泰國'],
+      regionId: 'thailand_bangkok',
+      label: '曼谷',
+      defaultAirport: 'BKK',
+      flightMinutesFromTaiwan: 225,
+      flightMinutesRange: [210, 255],
+      utcOffsetHours: 7,
+      iana: 'Asia/Bangkok',
+      hotelAreas: ['暹羅', 'Sukhumvit', '考山路'],
+      haul: 'short'
+    },
+    {
+      keys: ['新加坡', 'singapore'],
+      regionId: 'singapore',
+      label: '新加坡',
+      defaultAirport: 'SIN',
+      flightMinutesFromTaiwan: 270,
+      flightMinutesRange: [240, 300],
+      utcOffsetHours: 8,
+      iana: 'Asia/Singapore',
+      hotelAreas: ['市中心', '烏節路', '濱海灣'],
+      haul: 'medium'
+    },
+    {
+      keys: ['香港', 'hong kong', 'hongkong'],
+      regionId: 'hongkong',
+      label: '香港',
+      defaultAirport: 'HKG',
+      flightMinutesFromTaiwan: 100,
+      flightMinutesRange: [90, 120],
+      utcOffsetHours: 8,
+      iana: 'Asia/Hong_Kong',
+      hotelAreas: ['尖沙咀', '銅鑼灣', '中環'],
+      haul: 'short'
+    },
+    {
+      keys: ['倫敦', 'london'],
+      regionId: 'uk_london',
+      label: '倫敦',
+      defaultAirport: 'LHR',
+      flightMinutesFromTaiwan: 900,
+      flightMinutesRange: [840, 960],
+      utcOffsetHours: 0,
+      iana: 'Europe/London',
+      hotelAreas: ['Kings Cross', 'South Bank', 'Paddington'],
+      haul: 'long'
+    },
+    {
+      keys: ['巴黎', 'paris'],
+      regionId: 'france_paris',
+      label: '巴黎',
+      defaultAirport: 'CDG',
+      flightMinutesFromTaiwan: 900,
+      flightMinutesRange: [840, 960],
+      utcOffsetHours: 1,
+      iana: 'Europe/Paris',
+      hotelAreas: ['拉丁區', '馬雷區', '歌劇院'],
+      haul: 'long'
+    },
+    {
+      keys: ['紐約', 'new york', 'nyc'],
+      regionId: 'usa_nyc',
+      label: '紐約',
+      defaultAirport: 'JFK',
+      flightMinutesFromTaiwan: 960,
+      flightMinutesRange: [900, 1020],
+      utcOffsetHours: -5,
+      iana: 'America/New_York',
+      hotelAreas: ['Midtown', 'Downtown'],
+      haul: 'long'
+    }
+  ];
+
+  // Extra airports used by long-haul preview estimates
+  AIRPORT_TZ.LHR = { iana: 'Europe/London', utcOffsetHours: 0, city: '倫敦' };
+  AIRPORT_TZ.CDG = { iana: 'Europe/Paris', utcOffsetHours: 1, city: '巴黎' };
+  AIRPORT_TZ.JFK = { iana: 'America/New_York', utcOffsetHours: -5, city: '紐約' };
+  AIRPORT_TZ.OKA = { iana: 'Asia/Tokyo', utcOffsetHours: 9, city: '那霸' };
+  AIRPORT_TO_CITY_MINUTES.LHR = 50;
+  AIRPORT_TO_CITY_MINUTES.CDG = 50;
+  AIRPORT_TO_CITY_MINUTES.JFK = 60;
+  AIRPORT_TO_CITY_MINUTES.OKA = 30;
+
   var routeCache = Object.create(null);
+
+  function resolveDestinationProfile(destination) {
+    var dest = String(destination || '').trim().toLowerCase();
+    if (!dest) return null;
+    for (var i = 0; i < DESTINATION_PROFILES.length; i++) {
+      var row = DESTINATION_PROFILES[i];
+      for (var j = 0; j < row.keys.length; j++) {
+        if (dest.indexOf(String(row.keys[j]).toLowerCase()) !== -1) return row;
+      }
+    }
+    return null;
+  }
+
+  function estimateFlightDuration(originRegionOrAirport, destinationRegionOrText) {
+    var profile = resolveDestinationProfile(destinationRegionOrText);
+    var fromCode = extractAirportCode(originRegionOrAirport) || CONFIG.previewOriginAirport;
+    var toCode =
+      extractAirportCode(destinationRegionOrText) ||
+      (profile && profile.defaultAirport) ||
+      '';
+    if (profile && (!fromCode || fromCode === 'TPE' || fromCode === 'TSA')) {
+      return {
+        minutes: profile.flightMinutesFromTaiwan,
+        range: profile.flightMinutesRange.slice(),
+        label:
+          'Taiwan → ' +
+          profile.label +
+          ' 約 ' +
+          (profile.flightMinutesRange[0] / 60).toFixed(1).replace(/\.0$/, '') +
+          '–' +
+          (profile.flightMinutesRange[1] / 60).toFixed(1).replace(/\.0$/, '') +
+          'h',
+        profile: profile,
+        fromCode: fromCode || CONFIG.previewOriginAirport,
+        toCode: toCode || profile.defaultAirport,
+        source: 'destination_profile'
+      };
+    }
+    var mins = 210;
+    if (fromCode && toCode) {
+      // reuse airport-pair heuristics via typical table in host if needed
+      var fromOff = resolveAirportMeta(fromCode).utcOffsetHours;
+      var toOff = resolveAirportMeta(toCode).utcOffsetHours;
+      if (fromOff != null && toOff != null && Math.abs(fromOff - toOff) >= 6) mins = 900;
+      else if (toCode === 'ICN' || toCode === 'GMP') mins = 165;
+      else if (toCode === 'BKK' || toCode === 'DMK') mins = 225;
+      else if (toCode === 'NRT' || toCode === 'HND') mins = 210;
+      else if (toCode === 'KIX' || toCode === 'ITM') mins = 165;
+    }
+    return {
+      minutes: mins,
+      range: [mins - 30, mins + 30],
+      label: (fromCode || 'TPE') + ' → ' + (toCode || 'DEST') + ' ~' + Math.round(mins / 60) + 'h',
+      profile: profile,
+      fromCode: fromCode || CONFIG.previewOriginAirport,
+      toCode: toCode,
+      source: 'heuristic'
+    };
+  }
+
+  function buildPreviewTripPlan(payload) {
+    payload = payload || {};
+    var profile = resolveDestinationProfile(payload.destination);
+    var duration = estimateFlightDuration(CONFIG.previewOriginAirport, payload.destination);
+    var fromCode = duration.fromCode || CONFIG.previewOriginAirport;
+    var toCode = duration.toCode || (profile && profile.defaultAirport) || '';
+    var fromMeta = resolveAirportMeta(fromCode);
+    var toMeta = toCode
+      ? resolveAirportMeta(toCode)
+      : {
+          code: '',
+          iana: (profile && profile.iana) || '',
+          utcOffsetHours: profile ? profile.utcOffsetHours : null,
+          city: (profile && profile.label) || ''
+        };
+    var depHhmm = CONFIG.previewOutboundDepHhmm;
+    var retHhmm = CONFIG.previewReturnDepHhmm;
+    var fromOff =
+      fromMeta.utcOffsetHours != null ? fromMeta.utcOffsetHours : CONFIG.previewOriginUtcOffsetHours;
+    var toOff = toMeta.utcOffsetHours != null ? toMeta.utcOffsetHours : fromOff;
+    var tzDeltaMins = (toOff - fromOff) * 60;
+    var arrHhmm = addMinutesToHhmm(depHhmm, duration.minutes + tzDeltaMins);
+    var arrBuffer = arrivalBufferMinutes(fromCode, toCode || fromCode);
+    var transferIn = toCode ? airportTransferMinutes(toCode) : 60;
+    var checkinBuf = checkinBufferMinutes(toCode || fromCode, fromCode);
+    var transferOut = toCode ? airportTransferMinutes(toCode) : 60;
+    var earliest = addMinutesToHhmm(arrHhmm, arrBuffer + transferIn);
+    var latestLeave = addMinutesToHhmm(retHhmm, -(checkinBuf + transferOut));
+    var haul = (profile && profile.haul) || (duration.minutes >= 600 ? 'long' : 'short');
+    var hotelAreas = (profile && profile.hotelAreas) || ['市中心交通便利區'];
+    var notice =
+      '尚未填寫航班，本次先以早去晚回的預設時段規劃。實際訂票後補上航班資訊，可重新精準最佳化。';
+
+    return {
+      mode: 'preview',
+      notice: notice,
+      haul: haul,
+      originAirport: fromCode,
+      destinationAirport: toCode,
+      originTimezone: fromMeta.iana || 'Asia/Taipei',
+      destinationTimezone: toMeta.iana || '',
+      originUtcOffsetHours: fromOff,
+      destinationUtcOffsetHours: toOff,
+      outboundDepartureHhmm: depHhmm,
+      estimatedArrivalHhmm: arrHhmm,
+      returnDepartureHhmm: retHhmm,
+      flightDurationMinutes: duration.minutes,
+      flightDurationLabel: duration.label,
+      flightDurationRange: duration.range,
+      arrivalBufferMinutes: arrBuffer,
+      airportTransferInMinutes: transferIn,
+      airportCheckinBufferMinutes: checkinBuf,
+      airportTransferOutMinutes: transferOut,
+      earliestSightseeingHhmm: earliest,
+      latestLeaveForAirportHhmm: latestLeave,
+      hotelAreas: hotelAreas,
+      defaultHotelArea: hotelAreas[0],
+      isRealFlight: false
+    };
+  }
 
   function extractAirportCode(text) {
     var s = String(text || '').toUpperCase();
@@ -291,8 +577,9 @@
 
     var completeOutbound = hasCompleteOutboundFlightData(payload);
     var completeReturn = hasCompleteReturnFlightData(payload);
-    var complete = completeOutbound; // precise mode gated on outbound completeness
+    var complete = completeOutbound;
     var partial = hasPartialFlightData(payload);
+    var previewPlan = !complete ? buildPreviewTripPlan(payload) : null;
 
     var depMeta = resolveAirportMeta(fromAirport);
     var arrMeta = resolveAirportMeta(toAirport);
@@ -311,11 +598,19 @@
     var earliestSightseeing = '';
     if (arr) {
       earliestSightseeing = addMinutesToHhmm(arr.hhmm, arrBuffer + transferIn);
+    } else if (previewPlan) {
+      earliestSightseeing = previewPlan.earliestSightseeingHhmm;
+      arrBuffer = previewPlan.arrivalBufferMinutes;
+      transferIn = previewPlan.airportTransferInMinutes;
     }
 
     var latestLeaveHotel = '';
     if (ret) {
       latestLeaveHotel = addMinutesToHhmm(ret.hhmm, -(checkinBuf + transferOut));
+    } else if (previewPlan) {
+      latestLeaveHotel = previewPlan.latestLeaveForAirportHhmm;
+      checkinBuf = previewPlan.airportCheckinBufferMinutes;
+      transferOut = previewPlan.airportTransferOutMinutes;
     }
 
     var verification = completeOutbound
@@ -325,21 +620,38 @@
           arrivalIso: arrIso
         })
       : {
-          status: 'inspiration_or_partial',
-          source: partial ? 'partial_flight_data' : 'no_flight_data',
-          label: partial ? '航班資料不完整・靈感規劃模式' : '未提供航班・靈感規劃模式',
-          message: partial
-            ? '航班資料尚未完整，不以 HARD CONSTRAINT 強制。'
-            : '未提供航班時間，Day1／最終日按一般完整旅遊日規劃。'
+          status: 'preview_trip_mode',
+          source: partial ? 'partial_flight_data' : 'preview_defaults',
+          label: partial ? '航班資料不完整・Preview 模式' : 'Preview・早去晚回預設時段',
+          message: previewPlan ? previewPlan.notice : '尚未填寫航班，使用預覽預設時段。'
         };
+
+    var userHotel =
+      (payload.accommodations &&
+        payload.accommodations[0] &&
+        String(payload.accommodations[0].name || '').trim()) ||
+      String(payload.accommodation || '').trim();
+    var hotelAreas = (previewPlan && previewPlan.hotelAreas) || ['市中心交通便利區'];
+    var accommodationPlan = {
+      mode: userHotel ? 'user_hotel' : 'area_only',
+      hotelName: userHotel || '',
+      defaultHotelArea: userHotel ? '' : hotelAreas[0],
+      hotelAreas: hotelAreas,
+      notice: userHotel
+        ? ''
+        : '尚未指定飯店，本次以中價位、交通便利住宿作為動線基準。'
+    };
 
     return {
       source: complete ? 'user_provided_flight_time' : verification.source,
-      planningMode: complete ? 'precise' : 'inspiration',
+      planningMode: complete ? 'precise' : 'preview',
+      tripMode: complete ? 'PRECISION_TRIP_MODE' : 'PREVIEW_TRIP_MODE',
       hasCompleteFlightData: complete,
       hasCompleteOutboundFlightData: completeOutbound,
       hasCompleteReturnFlightData: completeReturn,
       hasPartialFlightData: partial && !complete,
+      previewPlan: previewPlan,
+      accommodationPlan: accommodationPlan,
       verification: verification,
       departure: dep
         ? {
@@ -351,7 +663,18 @@
             timezone: depMeta.iana,
             utcOffsetHours: depMeta.utcOffsetHours
           }
-        : null,
+        : previewPlan
+          ? {
+              iso: '',
+              date: payload.dateStart || '',
+              hhmm: previewPlan.outboundDepartureHhmm,
+              airport: previewPlan.originAirport,
+              airportCode: previewPlan.originAirport,
+              timezone: previewPlan.originTimezone,
+              utcOffsetHours: previewPlan.originUtcOffsetHours,
+              isPreview: true
+            }
+          : null,
       arrival: arr
         ? {
             iso: arrIso,
@@ -362,7 +685,18 @@
             timezone: arrMeta.iana,
             utcOffsetHours: arrMeta.utcOffsetHours
           }
-        : null,
+        : previewPlan
+          ? {
+              iso: '',
+              date: payload.dateStart || '',
+              hhmm: previewPlan.estimatedArrivalHhmm,
+              airport: previewPlan.destinationAirport,
+              airportCode: previewPlan.destinationAirport,
+              timezone: previewPlan.destinationTimezone,
+              utcOffsetHours: previewPlan.destinationUtcOffsetHours,
+              isPreview: true
+            }
+          : null,
       returnDeparture: ret
         ? {
             iso: retIso,
@@ -373,7 +707,18 @@
             timezone: retDepMeta.iana,
             utcOffsetHours: retDepMeta.utcOffsetHours
           }
-        : null,
+        : previewPlan
+          ? {
+              iso: '',
+              date: payload.dateEnd || '',
+              hhmm: previewPlan.returnDepartureHhmm,
+              airport: previewPlan.destinationAirport,
+              airportCode: previewPlan.destinationAirport,
+              timezone: previewPlan.destinationTimezone,
+              utcOffsetHours: previewPlan.destinationUtcOffsetHours,
+              isPreview: true
+            }
+          : null,
       buffers: {
         arrivalBufferMinutes: arrBuffer,
         airportTransferInMinutes: transferIn,
@@ -384,7 +729,10 @@
       },
       transportConstraints: complete
         ? buildTransportConstraintsForAirports(payload)
-        : { mode: 'estimated', note: '無完整航班・交通時間僅供預估' },
+        : {
+            mode: 'estimated',
+            note: 'Preview／無完整航班・交通時間僅供預估'
+          },
       hardConstraints: {
         active: complete,
         mustUseUserTimes: complete,
@@ -449,19 +797,73 @@
   }
 
   function buildInspirationFlightPrompt() {
-    return [
-      '【✈️ 靈感規劃模式——無完整航班 HARD CONSTRAINT】',
-      '・使用者未提供完整去程機場＋起飛＋抵達時間，禁止啟用航班硬性約束。',
-      '・禁止虛構起飛／抵達時間、禁止捏造航班編號。',
-      '・Day 1／最終日按一般完整旅遊日規劃（可從合理晨間開始，夜間收尾）。',
-      '・可依營業時間與景點移動安排；交通分鐘數僅能標示為「預估」，不可假裝是航班限制。',
-      '・若之後補上完整航班，可再重新最佳化。'
-    ].join('\n');
+    return buildPreviewFlightPrompt(null);
+  }
+
+  function buildPreviewFlightPrompt(normalized) {
+    var plan = (normalized && normalized.previewPlan) || null;
+    var lines = [
+      '【✈️ PREVIEW_TRIP_MODE——早去晚回示範行程／靈感規劃】',
+      '・這不是真實航班。禁止顯示假的航班編號。',
+      '・' +
+        (plan && plan.notice
+          ? plan.notice
+          : '尚未填寫航班，本次先以早去晚回的預設時段規劃。實際訂票後補上航班資訊，可重新精準最佳化。')
+    ];
+    if (plan) {
+      lines.push(
+        '・預設去程出發（示範）：' +
+          plan.outboundDepartureHhmm +
+          '（' +
+          plan.originAirport +
+          '／' +
+          plan.originTimezone +
+          '）'
+      );
+      lines.push(
+        '・預估飛行時間（deterministic）：' +
+          plan.flightDurationLabel +
+          '（約 ' +
+          plan.flightDurationMinutes +
+          ' 分）'
+      );
+      lines.push(
+        '・預估目的地當地抵達：' +
+          plan.estimatedArrivalHhmm +
+          '（已含時差；非使用者真實航班）'
+      );
+      lines.push(
+        '・入境／提行李 buffer ' +
+          plan.arrivalBufferMinutes +
+          ' 分＋機場→市區約 ' +
+          plan.airportTransferInMinutes +
+          ' 分 → Day1 最早一般行程 ' +
+          plan.earliestSightseeingHhmm
+      );
+      lines.push(
+        '・預設回程出發（示範）：' +
+          plan.returnDepartureHhmm +
+          '；最終日最晚離開市區約 ' +
+          plan.latestLeaveForAirportHhmm
+      );
+      if (plan.haul === 'short') {
+        lines.push(
+          '・亞洲近程 Preview：Day1 應在下午以前進入城市，下午／晚上正常行程；最終日上午／下午仍可安排，傍晚前往機場。'
+        );
+        lines.push('・禁止 Day1 晚上才抵達、禁止最終日一早就結束。');
+      } else if (plan.haul === 'long') {
+        lines.push(
+          '・長程目的地：依預估飛行時間調整 Day1 開始，不要硬套亞洲近程模板；仍禁止捏造真實航班。'
+        );
+      }
+    }
+    lines.push('・交通分鐘數僅能標示「預估」。');
+    return lines.join('\n');
   }
 
   function buildFlightHardConstraintPrompt(normalized) {
     if (!normalized || !normalized.hasCompleteFlightData) {
-      return buildInspirationFlightPrompt() + '\n';
+      return buildPreviewFlightPrompt(normalized) + '\n';
     }
     var lines = [];
     lines.push('【🔒 HARD CONSTRAINT——航班時間不可改（程式強制，AI 禁止覆寫）】');
@@ -563,7 +965,10 @@
     var mode =
       (payload && (payload.customerSelectedTransport || payload.transport)) || 'public-transit';
     var dayCount = hidden.days.length;
-    var applyFlightHardQa = !!(normalized.hasCompleteFlightData && normalized.hardConstraints.active);
+    var applyFlightHardQa = !!(
+      (normalized.hasCompleteFlightData && normalized.hardConstraints.active) ||
+      (normalized.planningMode === 'preview' && normalized.buffers && normalized.buffers.earliestSightseeingHhmm)
+    );
 
     hidden.days.forEach(function (day, dayIdx) {
       var items = flattenDayItems(day);
@@ -702,13 +1107,18 @@
     next.transportConstraints = normalized.transportConstraints;
     next.flightVerification = normalized.verification;
     next.planningMode = normalized.planningMode;
+    next.tripMode = normalized.tripMode;
     next.hasCompleteFlightData = normalized.hasCompleteFlightData;
     next.hasPartialFlightData = normalized.hasPartialFlightData;
+    next.previewPlan = normalized.previewPlan || null;
+    next.accommodationPlan = normalized.accommodationPlan || null;
+    next.defaultHotelArea =
+      (normalized.accommodationPlan && normalized.accommodationPlan.defaultHotelArea) || '';
     return next;
   }
 
   global.SOARVIBE_TRAVEL_TIME_ENGINE = {
-    version: 2,
+    version: 3,
     CONFIG: CONFIG,
     extractAirportCode: extractAirportCode,
     resolveAirportMeta: resolveAirportMeta,
@@ -723,6 +1133,11 @@
     buildTransportConstraintsForDay: buildTransportConstraintsForDay,
     buildFlightHardConstraintPrompt: buildFlightHardConstraintPrompt,
     buildInspirationFlightPrompt: buildInspirationFlightPrompt,
+    buildPreviewFlightPrompt: buildPreviewFlightPrompt,
+    buildPreviewTripPlan: buildPreviewTripPlan,
+    estimateFlightDuration: estimateFlightDuration,
+    resolveDestinationProfile: resolveDestinationProfile,
+    DESTINATION_PROFILES: DESTINATION_PROFILES,
     applyTimeQaToHidden: applyTimeQaToHidden,
     attachToPayload: attachToPayload,
     hhmmToMinutes: hhmmToMinutes,

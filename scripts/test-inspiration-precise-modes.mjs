@@ -1,5 +1,5 @@
 /**
- * Generation-gate / planning-mode acceptance tests (no DOM).
+ * Generation-gate / preview-mode acceptance tests (no DOM).
  * Usage: node scripts/test-inspiration-precise-modes.mjs
  */
 import vm from 'node:vm';
@@ -27,21 +27,18 @@ function assert(cond, msg) {
   console.error('FAIL:', msg);
 }
 
-/** Mirrors homepage gate after fix: only destination + dates + style required. */
 function canGenerateItinerary(form) {
   if (!form.destination || !String(form.destination).trim()) return false;
   if (!form.dateStart || !form.dateEnd) return false;
   if (!form.travelStyle) return false;
-  // Advanced fields must NEVER block.
   return true;
 }
 
-// 1) 無任何航班＋無住宿 → PASS，可生成
 const bare = {
   destination: '東京',
-  dateStart: '2026-09-01',
-  dateEnd: '2026-09-05',
-  travelStyle: 'anime',
+  dateStart: '2026-08-20',
+  dateEnd: '2026-08-24',
+  travelStyle: 'sightseeing',
   accommodation: '',
   flightOutboundFrom: '',
   flightOutboundTo: '',
@@ -51,35 +48,44 @@ const bare = {
   transport: ''
 };
 assert(canGenerateItinerary(bare) === true, '無航班＋無住宿 → 可生成');
-assert(E.hasCompleteFlightData(bare) === false, '無航班 → 非精準');
-assert(E.normalizeFlightPayload(bare).hardConstraints.active === false, '無航班 → HARD off');
-assert(!E.normalizeFlightPayload(bare).buffers.earliestSightseeingHhmm, '無航班 → 無 earliest');
+const bareN = E.normalizeFlightPayload(bare);
+assert(bareN.planningMode === 'preview', 'Preview Mode');
+assert(bareN.tripMode === 'PREVIEW_TRIP_MODE', 'PREVIEW_TRIP_MODE');
+assert(bareN.hardConstraints.active === false, 'Preview HARD off');
+assert(bareN.previewPlan.outboundDepartureHhmm === '06:30', 'preview 06:30 dep');
+assert(bareN.previewPlan.returnDepartureHhmm === '20:30', 'preview 20:30 return');
+assert(
+  E.hhmmToMinutes(bareN.previewPlan.estimatedArrivalHhmm) < E.hhmmToMinutes('18:00'),
+  '亞洲近程 preview 抵達不得拖到晚上'
+);
+assert(
+  E.hhmmToMinutes(bareN.buffers.earliestSightseeingHhmm) < E.hhmmToMinutes('21:30'),
+  'Day1 不得 21:30 才開始'
+);
+assert(bareN.accommodationPlan.defaultHotelArea === '新宿', '東京住宿區域 新宿');
+assert(!bareN.accommodationPlan.hotelName, '不虛構飯店名');
 
-// 2) 只有目的地＋日期＋風格 → PASS
 const destOnly = {
   destination: '東京',
-  dateStart: '2026-09-01',
-  dateEnd: '2026-09-05',
-  travelStyle: 'foodie'
+  dateStart: '2026-08-20',
+  dateEnd: '2026-08-24',
+  travelStyle: 'sightseeing'
 };
 assert(canGenerateItinerary(destOnly) === true, '只有目的地＋日期＋風格 → 可生成');
-assert(E.normalizeFlightPayload(destOnly).planningMode === 'inspiration', '只有核心欄 → inspiration');
+assert(E.normalizeFlightPayload(destOnly).planningMode === 'preview', '核心欄 → preview');
 
-// 3) 部分航班資料 → PASS，一般模式
 const partial = {
   destination: '東京',
-  dateStart: '2026-09-01',
-  dateEnd: '2026-09-05',
-  travelStyle: 'anime',
+  dateStart: '2026-08-20',
+  dateEnd: '2026-08-24',
+  travelStyle: 'sightseeing',
   flightOutboundFrom: 'TPE',
   flightOutboundTo: 'NRT'
 };
 assert(canGenerateItinerary(partial) === true, '部分航班 → 可生成');
-assert(E.hasPartialFlightData(partial) === true, '部分航班 → partial flag');
-assert(E.hasCompleteFlightData(partial) === false, '部分航班 → 非 complete');
-assert(E.normalizeFlightPayload(partial).hardConstraints.active === false, '部分航班 → HARD off');
+assert(E.normalizeFlightPayload(partial).planningMode === 'preview', '部分航班 → preview');
+assert(E.normalizeFlightPayload(partial).hardConstraints.active === false, '部分航班 HARD off');
 
-// 4) 完整航班 → HARD 生效
 const complete = {
   destination: '東京',
   dateStart: '2026-08-10',
@@ -99,8 +105,8 @@ assert(E.hasCompleteFlightData(complete) === true, '完整航班 → complete');
 const n = E.normalizeFlightPayload(complete);
 assert(n.hardConstraints.active === true, '完整航班 → HARD on');
 assert(n.planningMode === 'precise', '完整航班 → precise');
+assert(n.tripMode === 'PRECISION_TRIP_MODE', 'PRECISION_TRIP_MODE');
 
-// 5) 完整航班 08:00/10:30 → Day1 不得安排 10:30 前活動
 const hidden = {
   days: [
     {
@@ -115,23 +121,31 @@ const hidden = {
   ]
 };
 const qa = E.applyTimeQaToHidden(hidden, complete);
-const firstStart = qa.hidden.days[0].phases[0].items[0].startTime;
 assert(
-  E.hhmmToMinutes(firstStart) >= E.hhmmToMinutes('10:30'),
+  E.hhmmToMinutes(qa.hidden.days[0].phases[0].items[0].startTime) >= E.hhmmToMinutes('10:30'),
   '完整航班 08:00/10:30 → Day1 不得安排 10:30 前的目的地活動'
 );
 
-// 6) 無住宿 → 不得產生假的住宿名稱（engine / attach 不得發明）
-const attachedBare = E.attachToPayload(bare);
-assert(!attachedBare.accommodation, '無住宿 → attach 不發明住宿名稱');
-assert(attachedBare.planningMode === 'inspiration', '無住宿仍為 inspiration');
-
-// index.html must not contain blocking tower modal copy
 const indexHtml = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 assert(!indexHtml.includes('塔台呼叫機長！請填妥'), 'UI 已移除 blocking 塔台驗證文案');
-assert(indexHtml.includes('航班資料尚未完整，本次將以一般行程模式規劃'), 'UI 有非阻塞軟提示文案');
-assert(/function isAdvancedIncomplete\(\)[\s\S]*?return false;/.test(indexHtml), 'isAdvancedIncomplete 永遠 false');
-assert(!/showModal\(MSG_ADVANCED_INCOMPLETE/.test(indexHtml), '不再 showModal 阻擋進階欄位');
+assert(!/flight-departure-time"[^>]*value="14:30"/.test(indexHtml), '去程時間不再預設 14:30');
+assert(/flight-departure-time"[^>]*value=""/.test(indexHtml), '去程時間預設空白');
+assert(indexHtml.includes('adv-sub-outbound'), '去程 secondary accordion');
+assert(indexHtml.includes('adv-sub-return'), '回程 secondary accordion');
+assert(indexHtml.includes('adv-sub-stay'), '住宿與交通 secondary accordion');
+assert(indexHtml.includes('z-index: 10050'), 'Auth modal 高於 City Shares');
+
+const cfg = fs.readFileSync(path.join(root, 'firebase-config.js'), 'utf8');
+assert(cfg.includes('AIzaSyCecAOqW264hYUxEdWOclotGU8Ci4VZKGE'), 'Firebase apiKey 大小寫已修正');
+assert(!cfg.includes('AIzaSyCecAOqW264HYUxEdWOclotGU8Ci4VZKGE'), '舊錯誤 apiKey 已移除');
+
+const authUi = fs.readFileSync(path.join(root, 'soarvibe-auth-ui.js'), 'utf8');
+assert(authUi.includes('登入服務暫時無法使用，請稍後再試。'), 'Auth 人話錯誤');
+assert(authUi.includes('humanizeAuthError'), 'Auth humanize helper');
+
+const cs = fs.readFileSync(path.join(root, 'city-shares-ui.js'), 'utf8');
+assert(cs.includes("pendingAction: 'city_share_compose'"), '分享 pending action');
+assert(cs.includes('Never render composer'), '未登入不 render composer');
 
 console.log(`inspiration-precise-modes: ${passed} passed, ${failed} failed`);
 process.exit(failed ? 1 : 0);

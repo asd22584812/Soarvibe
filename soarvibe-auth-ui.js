@@ -16,20 +16,86 @@
     el.classList.toggle('hidden', !text);
   }
 
+  function humanizeAuthError(err) {
+    var code = (err && err.code) || '';
+    var raw = (err && err.message) || '';
+    if (code) {
+      console.warn('[SOARVIBE] Auth error code:', code, raw);
+    } else if (raw) {
+      console.warn('[SOARVIBE] Auth error:', raw);
+    }
+    if (
+      code === 'auth/api-key-not-valid' ||
+      /api-key-not-valid|API key not valid/i.test(raw)
+    ) {
+      return '登入服務暫時無法使用，請稍後再試。';
+    }
+    if (code === 'auth/wrong-password' || code === 'auth/invalid-credential') {
+      return '帳號或密碼不正確，請再試一次。';
+    }
+    if (code === 'auth/user-not-found') {
+      return '找不到此帳號，請先註冊。';
+    }
+    if (code === 'auth/email-already-in-use') {
+      return '此 Email 已註冊，請直接登入。';
+    }
+    if (code === 'auth/weak-password') {
+      return '密碼太弱，請至少使用 6 個字元。';
+    }
+    if (code === 'auth/invalid-email') {
+      return 'Email 格式不正確。';
+    }
+    if (code === 'auth/too-many-requests') {
+      return '嘗試次數過多，請稍後再試。';
+    }
+    if (code === 'auth/network-request-failed') {
+      return '網路不穩，請檢查連線後再試。';
+    }
+    if (code === 'auth/popup-blocked') {
+      return '瀏覽器封鎖了登入視窗，請允許後再試。';
+    }
+    return '登入服務暫時無法使用，請稍後再試。';
+  }
+
+  function blurActive() {
+    try {
+      if (document.activeElement && typeof document.activeElement.blur === 'function') {
+        document.activeElement.blur();
+      }
+    } catch (e) {
+      /* silent */
+    }
+  }
+
   function openSoarvibeAuthModal(opts) {
     opts = opts || {};
+    blurActive();
     var modal = $('svAuthModal');
     if (!modal) return;
     setMsg(opts.reason || '', false);
     modal.classList.remove('hidden');
     modal.setAttribute('aria-hidden', 'false');
+    // Focus email only after modal is on top (never before auth gate / behind City Shares).
+    if (opts.focus === false) return;
     var email = $('svAuthEmail');
-    if (email) email.focus();
+    window.setTimeout(function () {
+      if (!email || modal.classList.contains('hidden')) return;
+      try {
+        email.focus({ preventScroll: true });
+      } catch (focusErr) {
+        try {
+          email.focus();
+        } catch (e2) {
+          /* silent */
+        }
+      }
+    }, 60);
   }
 
   function closeSoarvibeAuthModal() {
     var modal = $('svAuthModal');
     if (!modal) return;
+    blurActive();
     modal.classList.add('hidden');
     modal.setAttribute('aria-hidden', 'true');
     setMsg('', false);
@@ -132,9 +198,10 @@
             closeSoarvibeAuthModal();
             renderAuthStatus();
             syncProfileToUserCenter();
+            if (AUTH.resumePendingAction) AUTH.resumePendingAction();
           })
           .catch(function (err) {
-            setMsg((err && err.message) || '登入失敗', true);
+            setMsg(humanizeAuthError(err), true);
           });
       });
     }
@@ -146,16 +213,20 @@
             closeSoarvibeAuthModal();
             renderAuthStatus();
             syncProfileToUserCenter();
+            if (AUTH.resumePendingAction) AUTH.resumePendingAction();
           })
           .catch(function (err) {
-            setMsg((err && err.message) || 'Google 登入失敗', true);
+            setMsg(humanizeAuthError(err), true);
           });
       });
     }
 
-    AUTH.onAuthStateChanged(function () {
+    AUTH.onAuthStateChanged(function (snap) {
       renderAuthStatus();
       syncProfileToUserCenter();
+      if (snap && snap.signedIn && AUTH.resumePendingAction) {
+        AUTH.resumePendingAction();
+      }
     });
     setMode('login');
     renderAuthStatus();
@@ -165,4 +236,5 @@
   global.closeSoarvibeAuthModal = closeSoarvibeAuthModal;
   global.bindSoarvibeAuthUi = bindAuthUi;
   global.renderSoarvibeAuthStatus = renderAuthStatus;
+  global.humanizeSoarvibeAuthError = humanizeAuthError;
 })(typeof window !== 'undefined' ? window : globalThis);

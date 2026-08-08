@@ -592,18 +592,52 @@
     });
   }
 
-  function openCompose() {
+  function openCompose(opts) {
+    opts = opts || {};
     var a = auth();
+    try {
+      if (document.activeElement && typeof document.activeElement.blur === 'function') {
+        document.activeElement.blur();
+      }
+    } catch (blurErr) {
+      /* silent */
+    }
     if (!a || !a.isSignedIn()) {
-      if (a && a.requireAuth) a.requireAuth('分享投稿');
-      else if (global.openSoarvibeAuthModal) {
+      if (a && a.requireAuth) {
+        a.requireAuth('分享投稿', {
+          pendingAction: 'city_share_compose',
+          pendingPayload: { cityId: csState.cityId || null }
+        });
+      } else if (global.openSoarvibeAuthModal) {
+        if (global.SOARVIBE_AUTH && global.SOARVIBE_AUTH.setPendingAction) {
+          global.SOARVIBE_AUTH.setPendingAction('city_share_compose', {
+            cityId: csState.cityId || null
+          });
+        }
         global.openSoarvibeAuthModal({ reason: '請先登入後才能分享投稿' });
       }
+      // Never render composer / never focus inputs before auth.
       return;
+    }
+    if (opts.cityId && opts.cityId !== csState.cityId) {
+      csState.cityId = opts.cityId;
     }
     csState.view = 'compose';
     csState.postId = null;
     renderCurrentView();
+  }
+
+  function openCityShareComposer(payload) {
+    payload = payload || {};
+    if (payload.cityId && !csState.cityId) {
+      // Ensure City Shares shell is open for the pending city when possible.
+      if (typeof global.openCityShares === 'function') {
+        global.openCityShares(payload.cityId);
+      } else {
+        csState.cityId = payload.cityId;
+      }
+    }
+    openCompose({ cityId: payload.cityId || csState.cityId });
   }
 
   function focusPlannerWithDestination(value) {
@@ -899,6 +933,11 @@
       }
       if (e.target.id === 'csCommentFocusBtn') {
         e.preventDefault();
+        try {
+          if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+        } catch (blurC) {
+          /* silent */
+        }
         var auFocus = auth();
         if (!auFocus || !auFocus.isSignedIn()) {
           if (auFocus && auFocus.requireAuth) auFocus.requireAuth('留言');
@@ -980,9 +1019,18 @@
     });
 
     initCitySharesFromHash();
+
+    if (global.SOARVIBE_AUTH && global.SOARVIBE_AUTH.registerPendingActionHandler) {
+      global.SOARVIBE_AUTH.registerPendingActionHandler('city_share_compose', function (payload) {
+        openCityShareComposer(payload || {});
+      });
+      // Resume after redirect login if handler was not ready during auth start.
+      global.SOARVIBE_AUTH.resumePendingAction();
+    }
   }
 
   global.openCityShares = openCityShares;
+  global.openCityShareComposer = openCityShareComposer;
   global.closeCityShares = closeCityShares;
   global.openCityDestination = openCityDestination;
 

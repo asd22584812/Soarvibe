@@ -7,6 +7,69 @@
   var listeners = [];
   var currentProfile = null;
   var unsubAuth = null;
+  var pendingActionKey = 'soarvibe_pending_action';
+  var pendingActionPayloadKey = 'soarvibe_pending_action_payload';
+  var pendingResumeFns = Object.create(null);
+  var resumingPending = false;
+
+  function setPendingAction(actionId, payload) {
+    try {
+      if (!actionId) {
+        sessionStorage.removeItem(pendingActionKey);
+        sessionStorage.removeItem(pendingActionPayloadKey);
+        return;
+      }
+      sessionStorage.setItem(pendingActionKey, String(actionId));
+      sessionStorage.setItem(
+        pendingActionPayloadKey,
+        JSON.stringify(payload || {})
+      );
+    } catch (e) {
+      /* silent */
+    }
+  }
+
+  function getPendingAction() {
+    try {
+      var id = sessionStorage.getItem(pendingActionKey);
+      if (!id) return null;
+      var payload = {};
+      try {
+        payload = JSON.parse(sessionStorage.getItem(pendingActionPayloadKey) || '{}');
+      } catch (parseErr) {
+        payload = {};
+      }
+      return { id: id, payload: payload };
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function clearPendingAction() {
+    setPendingAction(null);
+  }
+
+  function registerPendingActionHandler(actionId, fn) {
+    if (!actionId || typeof fn !== 'function') return;
+    pendingResumeFns[actionId] = fn;
+  }
+
+  function resumePendingAction() {
+    if (!isSignedIn() || resumingPending) return false;
+    var pending = getPendingAction();
+    if (!pending || !pending.id) return false;
+    var fn = pendingResumeFns[pending.id];
+    if (typeof fn !== 'function') return false;
+    resumingPending = true;
+    clearPendingAction();
+    try {
+      fn(pending.payload || {});
+    } catch (e) {
+      console.warn('[SOARVIBE] resumePendingAction failed', e);
+    }
+    resumingPending = false;
+    return true;
+  }
 
   function auth() {
     return global.SOARVIBE_FIREBASE && global.SOARVIBE_FIREBASE.getAuth
@@ -257,11 +320,12 @@
         if (cred && cred.user) {
           return ensureUserDoc(cred.user).then(function () {
             notify();
+            resumePendingAction();
           });
         }
       })
       .catch(function (e) {
-        console.warn('[SOARVIBE] Google redirect result failed', e);
+        console.warn('[SOARVIBE] Google redirect result failed', e && e.code, e && e.message);
       });
 
     unsubAuth = a.onAuthStateChanged(function (user) {
@@ -273,6 +337,7 @@
       ensureUserDoc(user)
         .then(function () {
           notify();
+          resumePendingAction();
         })
         .catch(function (e) {
           console.warn('[SOARVIBE] ensureUserDoc failed', e);
@@ -281,9 +346,20 @@
     });
   }
 
-  function requireAuth(actionLabel) {
+  function requireAuth(actionLabel, opts) {
     if (isSignedIn()) return Promise.resolve(currentUser());
+    opts = opts || {};
+    if (opts.pendingAction) {
+      setPendingAction(opts.pendingAction, opts.pendingPayload || {});
+    }
     var label = actionLabel || '繼續';
+    try {
+      if (document.activeElement && typeof document.activeElement.blur === 'function') {
+        document.activeElement.blur();
+      }
+    } catch (blurErr) {
+      /* silent */
+    }
     if (typeof global.openSoarvibeAuthModal === 'function') {
       global.openSoarvibeAuthModal({ reason: '請先登入後才能' + label });
     }
@@ -346,6 +422,11 @@
     signInGoogle: signInGoogle,
     signOut: signOut,
     requireAuth: requireAuth,
+    setPendingAction: setPendingAction,
+    clearPendingAction: clearPendingAction,
+    getPendingAction: getPendingAction,
+    registerPendingActionHandler: registerPendingActionHandler,
+    resumePendingAction: resumePendingAction,
     sanitizeNickname: sanitizeNickname,
     savePrivateDoc: savePrivateDoc,
     loadPrivateDoc: loadPrivateDoc

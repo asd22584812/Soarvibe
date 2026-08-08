@@ -16,6 +16,23 @@
     return global.SOARVIBE_FIREBASE_CONFIG || null;
   }
 
+  function logFirebaseDiagnostics(cfg, appsCount) {
+    try {
+      var key = cfg && cfg.apiKey ? String(cfg.apiKey) : '';
+      var appId = cfg && cfg.appId ? String(cfg.appId) : '';
+      console.info('[SOARVIBE] Firebase diagnostics', {
+        projectId: (cfg && cfg.projectId) || '',
+        authDomain: (cfg && cfg.authDomain) || '',
+        appIdTail: appId ? appId.slice(-4) : '',
+        apiKeyPresent: !!key,
+        apiKeyLength: key.length,
+        firebaseAppsCount: appsCount
+      });
+    } catch (diagErr) {
+      /* silent */
+    }
+  }
+
   function initFirebase() {
     if (ready) return { app: app, auth: auth, db: db, storage: storage };
     if (typeof firebase === 'undefined') {
@@ -30,7 +47,8 @@
       return null;
     }
     try {
-      if (!firebase.apps || !firebase.apps.length) {
+      var beforeCount = firebase.apps ? firebase.apps.length : 0;
+      if (!beforeCount) {
         app = firebase.initializeApp(cfg);
       } else {
         app = firebase.app();
@@ -40,10 +58,11 @@
       storage = firebase.storage();
       ready = true;
       initError = null;
+      logFirebaseDiagnostics(cfg, firebase.apps ? firebase.apps.length : 0);
       return { app: app, auth: auth, db: db, storage: storage };
     } catch (e) {
       initError = e;
-      console.error('[SOARVIBE] Firebase init failed:', e);
+      console.error('[SOARVIBE] Firebase init failed:', e && e.code, e && e.message);
       return null;
     }
   }
@@ -77,6 +96,21 @@
     getAuth: getAuth,
     getDb: getDb,
     getStorage: getStorage,
-    getInitError: getInitError
+    getInitError: getInitError,
+    getDiagnostics: function () {
+      var cfg = getConfig() || {};
+      var key = cfg.apiKey ? String(cfg.apiKey) : '';
+      var appId = cfg.appId ? String(cfg.appId) : '';
+      return {
+        projectId: cfg.projectId || '',
+        authDomain: cfg.authDomain || '',
+        appIdTail: appId ? appId.slice(-4) : '',
+        apiKeyPresent: !!key,
+        apiKeyLength: key.length,
+        firebaseAppsCount:
+          typeof firebase !== 'undefined' && firebase.apps ? firebase.apps.length : 0,
+        ready: ready
+      };
+    }
   };
 })(typeof window !== 'undefined' ? window : globalThis);

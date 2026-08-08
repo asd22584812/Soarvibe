@@ -9,7 +9,8 @@
   'use strict';
 
   global.SOARVIBE_FIREBASE_CONFIG = Object.freeze({
-    apiKey: 'AIzaSyCecAOqW264HYUxEdWOclotGU8Ci4VZKGE',
+    // NOTE: apiKey is case-sensitive. Typo H vs h previously caused auth/api-key-not-valid.
+    apiKey: 'AIzaSyCecAOqW264hYUxEdWOclotGU8Ci4VZKGE',
     authDomain: 'soarvibe-885c8.firebaseapp.com',
     projectId: 'soarvibe-885c8',
     storageBucket: 'soarvibe-885c8.firebasestorage.app',
