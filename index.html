@@ -39,8 +39,8 @@
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="./city-shares-ui.css">
-    <link rel="stylesheet" href="./travel-ledger.css?v=v144">
+    <link rel="stylesheet" href="./city-shares-ui.css?v=v145">
+    <link rel="stylesheet" href="./travel-ledger.css?v=v145">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;900&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         html, body {
@@ -3347,13 +3347,14 @@
     <script src="./city-journal-image-library.js"></script>
     <script src="./city-journal-caption.js"></script>
     <script src="./city-journal-data.js"></script>
-    <script src="./city-shares-config.js"></script>
-    <script src="./city-shares-data.js"></script>
-    <script src="./city-shares-ui.js"></script>
-    <script src="./travel-ledger-config.js?v=v144"></script>
-    <script src="./travel-ledger-forex.js?v=v144"></script>
-    <script src="./travel-ledger-data.js?v=v144"></script>
-    <script src="./travel-ledger-ui.js?v=v144"></script>
+    <script src="./city-shares-config.js?v=v145"></script>
+    <script src="./city-shares-data.js?v=v145"></script>
+    <script src="./city-shares-ui.js?v=v145"></script>
+    <script src="./travel-time-engine.js?v=v145"></script>
+    <script src="./travel-ledger-config.js?v=v145"></script>
+    <script src="./travel-ledger-forex.js?v=v145"></script>
+    <script src="./travel-ledger-data.js?v=v145"></script>
+    <script src="./travel-ledger-ui.js?v=v145"></script>
     <script>
         (function () {
             const TRAVEL_STYLE_LABELS = {
@@ -4144,7 +4145,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
-            const SOARVIBE_APP_BUILD = 'v144';
+            const SOARVIBE_APP_BUILD = 'v145';
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
@@ -7779,6 +7780,15 @@
                 }, flightFields);
             }
 
+            function collectTripPayloadNormalized() {
+                var raw = collectTripPayload();
+                var engine = window.SOARVIBE_TRAVEL_TIME_ENGINE;
+                if (engine && typeof engine.attachToPayload === 'function') {
+                    return engine.attachToPayload(raw);
+                }
+                return raw;
+            }
+
             function syncTripInfoBarFields(meta, customerSelectedTransport) {
                 var dateEl = document.getElementById('info-date');
                 var hotelEl = document.getElementById('info-hotel');
@@ -7993,7 +8003,10 @@
                     flightHasNumbers: flightDetails.hasFlightNumbers,
                     destinationAirport: flightDetails.destinationAirport,
                     originAirport: flightDetails.originAirport,
-                    returnDepartureAirport: flightDetails.returnDepartureAirport
+                    returnDepartureAirport: flightDetails.returnDepartureAirport,
+                    rawPayload: payload,
+                    flightTimeNormalized: payload.flightTimeNormalized || null,
+                    transportConstraints: payload.transportConstraints || null
                 };
             }
 
@@ -8001,7 +8014,14 @@
                 var arrivalAnchor = ctx.arrivalTimeText || '（請依起飛時間＋航程＋時差推估目的地當地抵達時間）';
                 var depAnchor = ctx.departureTimeText || '（未提供）';
                 var retAnchor = ctx.returnTimeText || '（未提供）';
-                return '【✈️ 航班資訊——時區與起降不可搞混（最高優先）】\n' +
+                var engine = window.SOARVIBE_TRAVEL_TIME_ENGINE;
+                var hardBlock = '';
+                if (engine && ctx.flightTimeNormalized && typeof engine.buildFlightHardConstraintPrompt === 'function') {
+                    hardBlock = engine.buildFlightHardConstraintPrompt(ctx.flightTimeNormalized);
+                } else if (engine && ctx.rawPayload && typeof engine.normalizeFlightPayload === 'function') {
+                    hardBlock = engine.buildFlightHardConstraintPrompt(engine.normalizeFlightPayload(ctx.rawPayload));
+                }
+                return (hardBlock || '') + '【✈️ 航班資訊——時區與起降不可搞混（最高優先）】\n' +
                     '🛫 去程摘要：' + ctx.flightOutboundSummary + '\n' +
                     '🛬 回程摘要：' + ctx.flightReturnSummary + '\n' +
                     '・去程起飛時間（出發地當地 ' + (ctx.originAirport || '') + '）：' + depAnchor + '\n' +
@@ -8010,12 +8030,13 @@
                     '⚠️ 絕對禁止把「起飛時間」當成「抵達機場時間」。例：台北 06:45 起飛 ≠ 成田 06:45 抵達；若票面為 TPE 06:45→NRT 11:15，Day1 第一站必須從約 11:15 開始（入境／提行李約 1.5–2 小時）。\n' +
                     '⚠️ 必須考慮時差：台北 UTC+8、東京／首爾 UTC+9、曼谷 UTC+7 等；抵達時間一律使用【目的地當地時間】。\n' +
                     (ctx.flightHasNumbers
-                        ? '⚠️ 使用者已填航班編號：可核對該航班常見起降，但若上方已給明確起飛／抵達時間，【以使用者填寫的抵達時間為準】排 Day1。\n'
+                        ? '⚠️ 使用者已填航班編號：可核對該航班常見起降，但若上方已給明確起飛／抵達時間，【以使用者填寫的抵達時間為準】排 Day1。禁止發明起飛／抵達時間。\n'
                         : '⚠️ 請依機場代碼判斷市區距離與交通（例：成田 NRT→東京約 60–90 分；羽田 HND→東京約 30–45 分；仁川 ICN→首爾約 60–80 分）。\n') +
                     '【⏱️ 首日與最終日接送邏輯】\n' +
                     '1. Day 1：以【去程抵達時間 ' + arrivalAnchor + '】為基準，安排「抵達機場 → 入境／提取行李 → 前往住宿 → Check-in」；Check-in 完成前禁止一般觀光。\n' +
                     '2. Day ' + lastDayNum + '（最終日）：以【回程起飛時間 ' + retAnchor + '】倒推，預留至少 3 小時 Buffer（退房、前往機場、報到、安檢、候機）；上午、下午仍須各有 1–2 個具體行程，「晚上」才安排前往機場。\n' +
-                    '3. 若去程／回程機場不同，必須在 note 寫明並調整送機動線。\n';
+                    '3. 若去程／回程機場不同，必須在 note 寫明並調整送機動線。\n' +
+                    '4. 站與站之間的交通分鐘數若已在 transportConstraints 提供，必須遵守，禁止自行縮成更短。\n';
             }
 
             function buildGeminiRequestText(payload) {
@@ -9357,9 +9378,17 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 if (resolved.hidden) {
                     try {
                         resolved.hidden = ensureHiddenTripDayCount(resolved.hidden, meta);
+                        var engine = window.SOARVIBE_TRAVEL_TIME_ENGINE;
+                        if (engine && typeof engine.applyTimeQaToHidden === 'function') {
+                            var qa = engine.applyTimeQaToHidden(resolved.hidden, meta || window.soarvibeTripPayload || {});
+                            resolved.hidden = qa.hidden;
+                            if (qa.fixes && qa.fixes.length) {
+                                console.info('[SOARVIBE] time-qa fixes', qa.fixes.length, qa.issues.length);
+                            }
+                        }
                         resolved.markdown = hiddenToMarkdown(resolved.hidden);
                     } catch (ensureErr) {
-                        console.error('[SOARVIBE] ensureHiddenTripDayCount failed:', ensureErr);
+                        console.error('[SOARVIBE] ensureHiddenTripDayCount/time-qa failed:', ensureErr);
                     }
                 }
                 logItineraryRenderDiagnostics('after-resolve', resolved.hidden, false);
@@ -15139,7 +15168,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 var customerSelectedTransport = getCustomerSelectedTransport();
                 window.customerSelectedTransport = customerSelectedTransport;
 
-                var payload = collectTripPayload();
+                var payload = collectTripPayloadNormalized();
                 payload.customerSelectedTransport = customerSelectedTransport;
                 window.soarvibeTripPayload = payload;
 

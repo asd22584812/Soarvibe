@@ -187,15 +187,17 @@ function validatePost(post, expectedCityId) {
     addError(`${ctx}: too many tags (max ${LIMITS.tagsMaxCount})`);
   }
 
-  const placeholder = post.mediaPlaceholder === true;
+  const placeholder = post.mediaPlaceholder === true || post.mediaPending === true;
   const media = Array.isArray(post.media) ? post.media : [];
 
   if (!placeholder && media.length === 0) {
-    addError(`${ctx}: media must have at least 1 item (or set mediaPlaceholder: true)`);
+    addError(`${ctx}: media must have at least 1 item (or set mediaPending/mediaPlaceholder: true)`);
   }
 
   if (placeholder && media.length === 0) {
-    addWarning(`${ctx}: mediaPlaceholder=true — awaiting verified local images`);
+    addWarning(
+      `${ctx}: ${post.mediaPending ? 'mediaPending' : 'mediaPlaceholder'}=true — awaiting verified local images (hidden from feed)`
+    );
   }
 
   if (media.length > LIMITS.mediaMaxCount) {

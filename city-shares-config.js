@@ -51,14 +51,25 @@
     /images\.unsplash\.com/i
   ];
 
+  /** City feed hero banners — local static only (no runtime search / Places Photo). */
+  var CITY_HERO = Object.freeze({
+    tokyo: Object.freeze({
+      heroImage: './assets/city-shares/tokyo/tokyo-hero-kaminarimon.jpg',
+      heroPosition: 'center 40%',
+      heroAlt: '淺草寺雷門，東京城市辨識橫幅',
+      heroAttribution: 'Tak1701d / Wikimedia Commons (CC BY-SA 3.0)'
+    })
+  });
+
   global.SOARVIBE_CITY_SHARES_CONFIG = Object.freeze({
-    version: 1,
+    version: 2,
     SHARE_TYPES: SHARE_TYPES,
     SHARE_SOURCES: SHARE_SOURCES,
     SHARE_STATUSES: SHARE_STATUSES,
     MEDIA_SLOTS: MEDIA_SLOTS,
     SLOT_RULES_BY_TYPE: SLOT_RULES_BY_TYPE,
     FORBIDDEN_MEDIA_URL_PATTERNS: FORBIDDEN_MEDIA_URL_PATTERNS,
+    CITY_HERO: CITY_HERO,
     LIMITS: Object.freeze({
       titleMaxLength: 80,
       bodyMinLength: 80,

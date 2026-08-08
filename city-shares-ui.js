@@ -48,11 +48,26 @@
   function getCityMeta(cityId) {
     var data = global.SOARVIBE_CITY_SHARES;
     if (data && data.cities && data.cities[cityId]) return data.cities[cityId];
+    var cfg = global.SOARVIBE_CITY_SHARES_CONFIG;
+    var hero = cfg && cfg.CITY_HERO && cfg.CITY_HERO[cityId];
     var label = CITY_LABELS[cityId];
     return {
       cityId: cityId,
       title: (label && label.name ? label.name : cityId) + '旅人分享',
-      subtitle: '真正去過的人的照片與心得'
+      subtitle: '真正去過的人的照片與心得',
+      heroImage: hero && hero.heroImage,
+      heroPosition: hero && hero.heroPosition,
+      heroAlt: hero && hero.heroAlt
+    };
+  }
+
+  function resolveHero(meta, cityId) {
+    var cfg = global.SOARVIBE_CITY_SHARES_CONFIG;
+    var fromCfg = cfg && cfg.CITY_HERO && cfg.CITY_HERO[cityId];
+    return {
+      heroImage: (meta && meta.heroImage) || (fromCfg && fromCfg.heroImage) || '',
+      heroPosition: (meta && meta.heroPosition) || (fromCfg && fromCfg.heroPosition) || 'center center',
+      heroAlt: (meta && meta.heroAlt) || (fromCfg && fromCfg.heroAlt) || ((meta && meta.title) || '城市')
     };
   }
 
@@ -90,6 +105,7 @@
 
   function renderFeed(cityId) {
     var meta = getCityMeta(cityId);
+    var hero = resolveHero(meta, cityId);
     var types =
       typeof global.getCityShareTypes === 'function' ? global.getCityShareTypes(cityId) : [];
     var posts = getPosts(cityId, csState.typeFilter);
@@ -145,14 +161,29 @@
 
     return (
       '<div class="cs-page">' +
-      '<header class="cs-hero">' +
+      '<header class="cs-hero' +
+      (hero.heroImage ? ' has-photo' : '') +
+      '"' +
+      (hero.heroImage
+        ? ' style="--cs-hero-image:url(\'' +
+          escapeHtml(hero.heroImage) +
+          '\');--cs-hero-position:' +
+          escapeHtml(hero.heroPosition) +
+          ';"'
+        : '') +
+      '>' +
+      (hero.heroImage
+        ? '<span class="cs-hero-sr-only">' + escapeHtml(hero.heroAlt) + '</span>'
+        : '') +
+      '<div class="cs-hero-scrim" aria-hidden="true"></div>' +
+      '<div class="cs-hero-copy">' +
       '<p class="cs-kicker">SOARVIBE CITY SHARES</p>' +
       '<h1 class="cs-hero-title">' +
       escapeHtml(meta.title) +
       '</h1>' +
       '<p class="cs-hero-sub">' +
       escapeHtml(meta.subtitle || '') +
-      '</p></header>' +
+      '</p></div></header>' +
       '<div class="cs-filters">' +
       filterHtml +
       '</div>' +

@@ -195,20 +195,9 @@
         longitude: null,
         mapsUrl: ''
       },
-      media: [
-        {
-          mediaId: 'cover',
-          src: './assets/city-shares/tokyo/tokyo-shinjuku-gyoen-001-landmark-0.jpg',
-          thumbSrc: './assets/city-shares/tokyo/tokyo-shinjuku-gyoen-001-landmark-0.jpg',
-          slot: 'landmark',
-          caption: '新宿御苑園內綠地與樹冠，適合在快節奏行程中放慢半天。',
-          alt: '新宿御苑國家公園綠樹與藍天',
-          width: 4164,
-          height: 2776,
-          sortOrder: 0,
-          attribution: 'Ibex73 / Wikimedia Commons (CC BY-SA 4.0)'
-        }
-      ],
+      media: [],
+      mediaPending: true,
+      mediaPlaceholder: false,
       visitMeta: {
         stayDuration: '2–3 小時',
         budget: '門票依官網公告',
@@ -219,7 +208,7 @@
       stats: EMPTY_STATS,
       tags: ['新宿', '御苑', '公園', '散步'],
       publishedAt: '2026-07-27T10:45:00+08:00',
-      updatedAt: '2026-07-27T12:00:00+08:00'
+      updatedAt: '2026-08-08T12:00:00+08:00'
     },
     {
       postId: 'tokyo-ramen-afuri-ebisu-001',
@@ -246,7 +235,8 @@
         mapsUrl: ''
       },
       media: [],
-      mediaPlaceholder: true,
+      mediaPending: true,
+      mediaPlaceholder: false,
       visitMeta: {
         stayDuration: '30–50 分鐘',
         budget: '依菜單為準',
@@ -257,7 +247,7 @@
       stats: EMPTY_STATS,
       tags: ['拉麵', '惠比壽', 'AFURI', '柚子'],
       publishedAt: '2026-07-27T11:00:00+08:00',
-      updatedAt: '2026-07-27T11:00:00+08:00'
+      updatedAt: '2026-08-08T12:00:00+08:00'
     },
     {
       postId: 'tokyo-lodging-mimaru-ueno-001',
@@ -284,7 +274,8 @@
         mapsUrl: ''
       },
       media: [],
-      mediaPlaceholder: true,
+      mediaPending: true,
+      mediaPlaceholder: false,
       visitMeta: {
         stayDuration: '連住 2 晚以上較划算',
         budget: '依房型與季節',
@@ -306,16 +297,26 @@
         cityId: 'tokyo',
         title: '東京旅人分享',
         subtitle: '真正去過的人的照片與心得',
+        heroImage: './assets/city-shares/tokyo/tokyo-hero-kaminarimon.jpg',
+        heroPosition: 'center 40%',
+        heroAlt: '淺草寺雷門，東京城市辨識橫幅',
         posts: TOKYO_POSTS
       }
     }
   };
 
+  function postHasRenderableMedia(post) {
+    if (!post) return false;
+    if (post.mediaPending) return false;
+    if (post.mediaPlaceholder && !(post.media && post.media.length)) return false;
+    return !!(post.media && post.media.length);
+  }
+
   function getCityShares(cityId) {
     var city = DATA.cities[cityId];
     if (!city || !city.posts) return [];
     return city.posts.filter(function (p) {
-      return p.status === 'published';
+      return p.status === 'published' && postHasRenderableMedia(p);
     });
   }
 
