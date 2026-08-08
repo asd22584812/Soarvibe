@@ -1,9 +1,14 @@
-const CACHE_NAME = 'soarvibe-v145';
+const CACHE_NAME = 'soarvibe-v146';
 /* Phase 1C.1 cache bust — travel ledger network-first */
 const STATIC_ASSETS = [
   './index.html',
   './manifest.json',
   './feature-flags.js',
+  './firebase-config.js',
+  './firebase-init.js',
+  './soarvibe-auth.js',
+  './soarvibe-auth-ui.js',
+  './city-shares-firestore.js',
   './city-shares-config.js',
   './city-shares-data.js',
   './city-shares-ui.js',

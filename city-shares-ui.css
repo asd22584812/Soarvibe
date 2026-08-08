@@ -323,3 +323,129 @@
     background: #fff;
     border: 1px solid rgba(55, 71, 79, 0.14);
 }
+
+#cityShares .cs-feed-toolbar {
+    padding: 0.75rem 1rem 0;
+}
+#cityShares .cs-compose-open,
+#cityShares .cs-social-btn {
+    border-radius: 9999px;
+    border: 1px solid rgba(55, 71, 79, 0.12);
+    background: rgba(255, 255, 255, 0.95);
+    color: #37474f;
+    font-weight: 800;
+    font-size: 0.82rem;
+    padding: 0.55rem 0.9rem;
+    cursor: pointer;
+}
+#cityShares .cs-social-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin: 1rem 0 0.75rem;
+}
+#cityShares .cs-social-btn.is-on {
+    background: rgba(233, 30, 99, 0.1);
+    border-color: rgba(233, 30, 99, 0.35);
+    color: #ad1457;
+}
+#cityShares .cs-comments {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(55, 71, 79, 0.08);
+}
+#cityShares .cs-comments-title {
+    margin: 0 0 0.55rem;
+    font-size: 1rem;
+    font-weight: 900;
+    color: #37474f;
+}
+#cityShares .cs-comment-list {
+    display: grid;
+    gap: 0.65rem;
+    margin-bottom: 0.75rem;
+}
+#cityShares .cs-comment-item {
+    padding: 0.65rem 0.75rem;
+    border-radius: 0.85rem;
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(55, 71, 79, 0.08);
+}
+#cityShares .cs-comment-author {
+    margin: 0 0 0.2rem;
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #00838f;
+}
+#cityShares .cs-comment-text {
+    margin: 0;
+    font-size: 0.88rem;
+    color: #455a64;
+    line-height: 1.45;
+}
+#cityShares .cs-comment-del {
+    margin-top: 0.35rem;
+    border: none;
+    background: transparent;
+    color: #c62828;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 0;
+}
+#cityShares .cs-comment-empty {
+    margin: 0;
+    color: #90a4ae;
+    font-size: 0.82rem;
+}
+#cityShares .cs-comment-form,
+#cityShares .cs-compose-form {
+    display: grid;
+    gap: 0.55rem;
+}
+#cityShares .cs-comment-input,
+#cityShares .cs-compose-input {
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: 0.85rem;
+    border: 1px solid rgba(55, 71, 79, 0.14);
+    padding: 0.7rem 0.8rem;
+    font-size: 16px;
+    color: #37474f;
+    background: #fff;
+}
+#cityShares .cs-compose-page {
+    padding: 1rem 1rem 2rem;
+}
+#cityShares .cs-compose-title {
+    margin: 0 0 0.35rem;
+    font-size: 1.25rem;
+    font-weight: 900;
+    color: #37474f;
+}
+#cityShares .cs-compose-hint {
+    margin: 0 0 1rem;
+    color: #78909c;
+    font-size: 0.82rem;
+    line-height: 1.45;
+}
+#cityShares .cs-compose-label {
+    display: grid;
+    gap: 0.35rem;
+    font-size: 0.78rem;
+    font-weight: 800;
+    color: #546e7a;
+}
+#cityShares .cs-compose-msg {
+    margin: 0;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #00838f;
+}
+#cityShares .cs-compose-msg.hidden {
+    display: none;
+}
+#cityShares .cs-social-danger {
+    color: #c62828;
+    border-color: rgba(198, 40, 40, 0.28);
+}

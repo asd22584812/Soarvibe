@@ -39,8 +39,8 @@
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="./city-shares-ui.css?v=v145">
-    <link rel="stylesheet" href="./travel-ledger.css?v=v145">
+    <link rel="stylesheet" href="./city-shares-ui.css?v=v146">
+    <link rel="stylesheet" href="./travel-ledger.css?v=v146">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;900&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         html, body {
@@ -2298,6 +2298,165 @@
             font-weight: 700;
             outline: none;
         }
+        .user-auth-card {
+            display: grid;
+            gap: 0.65rem;
+            padding: 0.95rem 1rem;
+            border-radius: 20px;
+        }
+        .user-auth-status {
+            margin: 0;
+            font-size: 0.82rem;
+            line-height: 1.45;
+            color: #546e7a;
+            font-weight: 650;
+        }
+        .user-auth-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .user-auth-btn {
+            border: none;
+            border-radius: 9999px;
+            padding: 0.55rem 0.95rem;
+            font-size: 0.82rem;
+            font-weight: 800;
+            cursor: pointer;
+            color: #fff;
+            background: linear-gradient(90deg, #26a69a, #00838f);
+        }
+        .user-auth-btn.secondary {
+            color: #455a64;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(55, 71, 79, 0.14);
+        }
+        .user-auth-btn.hidden {
+            display: none;
+        }
+        #svAuthModal.hidden {
+            display: none;
+        }
+        #svAuthModal {
+            position: fixed;
+            inset: 0;
+            z-index: 80;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .sv-auth-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(38, 50, 56, 0.45);
+            border: none;
+            padding: 0;
+            cursor: pointer;
+        }
+        .sv-auth-panel {
+            position: relative;
+            z-index: 1;
+            width: min(100%, 22rem);
+            border-radius: 1.25rem;
+            padding: 1.15rem 1.1rem 1.25rem;
+            background: linear-gradient(165deg, #fffefb 0%, #f3f7f8 100%);
+            box-shadow: 0 18px 40px rgba(38, 50, 56, 0.22);
+        }
+        .sv-auth-title {
+            margin: 0 0 0.35rem;
+            font-size: 1.15rem;
+            font-weight: 900;
+            color: #37474f;
+        }
+        .sv-auth-tabs {
+            display: flex;
+            gap: 0.35rem;
+            margin: 0.75rem 0 0.85rem;
+        }
+        .sv-auth-tab {
+            flex: 1;
+            border: 1px solid rgba(55, 71, 79, 0.12);
+            border-radius: 9999px;
+            padding: 0.45rem 0.5rem;
+            font-size: 0.82rem;
+            font-weight: 800;
+            color: #607d8b;
+            background: rgba(255, 255, 255, 0.85);
+            cursor: pointer;
+        }
+        .sv-auth-tab.is-active {
+            color: #00695c;
+            border-color: rgba(0, 137, 123, 0.35);
+            background: rgba(0, 150, 136, 0.1);
+        }
+        .sv-auth-form {
+            display: grid;
+            gap: 0.55rem;
+        }
+        .sv-auth-label {
+            display: grid;
+            gap: 0.3rem;
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: #546e7a;
+        }
+        .sv-auth-input {
+            width: 100%;
+            box-sizing: border-box;
+            border-radius: 0.75rem;
+            border: 1px solid rgba(55, 71, 79, 0.14);
+            padding: 0.7rem 0.8rem;
+            font-size: 16px;
+            color: #37474f;
+            background: #fff;
+        }
+        .sv-auth-msg {
+            margin: 0.15rem 0 0;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #00838f;
+        }
+        .sv-auth-msg.is-error {
+            color: #c62828;
+        }
+        .sv-auth-msg.hidden,
+        #svAuthNicknameWrap.hidden {
+            display: none;
+        }
+        .sv-auth-submit,
+        .sv-auth-google {
+            width: 100%;
+            border: none;
+            border-radius: 9999px;
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+            font-weight: 800;
+            cursor: pointer;
+        }
+        .sv-auth-submit {
+            color: #fff;
+            background: linear-gradient(90deg, #26a69a, #00838f);
+        }
+        .sv-auth-google {
+            margin-top: 0.35rem;
+            color: #37474f;
+            background: #fff;
+            border: 1px solid rgba(55, 71, 79, 0.14);
+        }
+        .sv-auth-close {
+            position: absolute;
+            top: 0.55rem;
+            right: 0.55rem;
+            width: 2rem;
+            height: 2rem;
+            border: none;
+            border-radius: 9999px;
+            background: rgba(55, 71, 79, 0.08);
+            color: #546e7a;
+            font-size: 1rem;
+            cursor: pointer;
+        }
         .user-nickname-input:focus {
             border-color: rgba(184, 169, 154, 0.85);
             box-shadow: 0 0 0 2px rgba(184, 169, 154, 0.25);
@@ -3153,6 +3312,14 @@
                 <span class="user-wall-header-spacer" aria-hidden="true"></span>
             </header>
             <div id="user-wall-scroll" class="flex-1 min-h-0 overflow-y-auto hide-scrollbar px-4 pt-4 pb-5 space-y-4">
+                <section class="user-auth-card user-glass-card" aria-labelledby="user-auth-title">
+                    <h3 id="user-auth-title" class="user-tool-title">SoarVibe 帳號</h3>
+                    <p id="svAuthStatus" class="user-auth-status">檢查登入狀態…</p>
+                    <div class="user-auth-actions">
+                        <button type="button" id="svAuthOpenBtn" class="user-auth-btn">登入 / 註冊</button>
+                        <button type="button" id="svAuthLogoutBtn" class="user-auth-btn secondary hidden">登出</button>
+                    </div>
+                </section>
                 <section class="user-profile-card user-glass-card">
                     <button type="button" id="user-avatar-btn" class="user-avatar-btn" aria-label="點擊更換頭像">
                         <img id="user-avatar-img" class="hidden" alt="" />
@@ -3340,6 +3507,41 @@
         </div>
     </div>
 
+    <div id="svAuthModal" class="hidden" role="dialog" aria-modal="true" aria-labelledby="svAuthTitle" aria-hidden="true">
+        <button type="button" id="svAuthBackdrop" class="sv-auth-backdrop" aria-label="關閉登入視窗"></button>
+        <div class="sv-auth-panel">
+            <button type="button" id="svAuthCloseBtn" class="sv-auth-close" aria-label="關閉">×</button>
+            <h2 id="svAuthTitle" class="sv-auth-title">登入 SoarVibe</h2>
+            <div class="sv-auth-tabs" role="tablist">
+                <button type="button" id="svAuthTabLogin" class="sv-auth-tab is-active" role="tab" aria-selected="true">登入</button>
+                <button type="button" id="svAuthTabRegister" class="sv-auth-tab" role="tab" aria-selected="false">註冊</button>
+            </div>
+            <form id="svAuthForm" class="sv-auth-form">
+                <label class="sv-auth-label hidden" id="svAuthNicknameWrap">暱稱
+                    <input type="text" id="svAuthNickname" class="sv-auth-input" maxlength="32" autocomplete="nickname" placeholder="旅途上的名字">
+                </label>
+                <label class="sv-auth-label">Email
+                    <input type="email" id="svAuthEmail" class="sv-auth-input" required autocomplete="email" placeholder="you@example.com">
+                </label>
+                <label class="sv-auth-label">密碼
+                    <input type="password" id="svAuthPassword" class="sv-auth-input" required minlength="6" autocomplete="current-password" placeholder="至少 6 碼">
+                </label>
+                <p id="svAuthMsg" class="sv-auth-msg hidden" role="status"></p>
+                <button type="submit" id="svAuthSubmitBtn" class="sv-auth-submit">登入</button>
+            </form>
+            <button type="button" id="svAuthGoogleBtn" class="sv-auth-google">使用 Google 登入</button>
+        </div>
+    </div>
+
+    <script src="./firebase-config.js?v=v146"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
+    <script src="./firebase-init.js?v=v146"></script>
+    <script src="./soarvibe-auth.js?v=v146"></script>
+    <script src="./city-shares-firestore.js?v=v146"></script>
+    <script src="./soarvibe-auth-ui.js?v=v146"></script>
     <script src="./feature-flags.js"></script>
     <script src="./city-journal-editorial-engine.js"></script>
     <script src="./city-journal-image-manifest.js"></script>
@@ -3347,14 +3549,14 @@
     <script src="./city-journal-image-library.js"></script>
     <script src="./city-journal-caption.js"></script>
     <script src="./city-journal-data.js"></script>
-    <script src="./city-shares-config.js?v=v145"></script>
-    <script src="./city-shares-data.js?v=v145"></script>
-    <script src="./city-shares-ui.js?v=v145"></script>
-    <script src="./travel-time-engine.js?v=v145"></script>
-    <script src="./travel-ledger-config.js?v=v145"></script>
-    <script src="./travel-ledger-forex.js?v=v145"></script>
-    <script src="./travel-ledger-data.js?v=v145"></script>
-    <script src="./travel-ledger-ui.js?v=v145"></script>
+    <script src="./city-shares-config.js?v=v146"></script>
+    <script src="./city-shares-data.js?v=v146"></script>
+    <script src="./city-shares-ui.js?v=v146"></script>
+    <script src="./travel-time-engine.js?v=v146"></script>
+    <script src="./travel-ledger-config.js?v=v146"></script>
+    <script src="./travel-ledger-forex.js?v=v146"></script>
+    <script src="./travel-ledger-data.js?v=v146"></script>
+    <script src="./travel-ledger-ui.js?v=v146"></script>
     <script>
         (function () {
             const TRAVEL_STYLE_LABELS = {
@@ -3496,6 +3698,16 @@
 
             function resolveBookletUserName() {
                 try {
+                    if (window.SOARVIBE_AUTH && window.SOARVIBE_AUTH.isSignedIn()) {
+                        var profile = window.SOARVIBE_AUTH.getProfile && window.SOARVIBE_AUTH.getProfile();
+                        if (profile && profile.nickname && String(profile.nickname).trim()) {
+                            return String(profile.nickname).trim();
+                        }
+                        var u = window.SOARVIBE_AUTH.currentUser && window.SOARVIBE_AUTH.currentUser();
+                        if (u && u.displayName && String(u.displayName).trim()) {
+                            return String(u.displayName).trim();
+                        }
+                    }
                     var stored = localStorage.getItem(USER_NICKNAME_KEY);
                     if (stored && stored.trim()) return stored.trim();
                 } catch (e) { /* silent */ }
@@ -4145,7 +4357,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
-            const SOARVIBE_APP_BUILD = 'v145';
+            const SOARVIBE_APP_BUILD = 'v146';
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
@@ -6007,6 +6219,7 @@
                     userAvatarIcon.classList.remove('hidden');
                 }
             }
+            window.applyUserAvatar = applyUserAvatar;
 
             function saveUserChecklistState() {
                 if (!userChecklist) return;
@@ -6019,6 +6232,9 @@
                 try {
                     localStorage.setItem(USER_CHECKLIST_KEY, JSON.stringify(state));
                 } catch (e) { /* silent */ }
+                if (window.SOARVIBE_AUTH && window.SOARVIBE_AUTH.isSignedIn() && window.SOARVIBE_AUTH.savePrivateDoc) {
+                    window.SOARVIBE_AUTH.savePrivateDoc('checklist', { items: state });
+                }
             }
 
             function syncCheckItemVisual(li) {
@@ -6062,13 +6278,50 @@
             }
 
             function saveUserNotes() {
+                var payload = {
+                    shopping: userNoteShopping ? userNoteShopping.value : '',
+                    food: userNoteFood ? userNoteFood.value : '',
+                    spots: userNoteSpots ? userNoteSpots.value : ''
+                };
                 try {
-                    localStorage.setItem(USER_NOTES_KEY, JSON.stringify({
-                        shopping: userNoteShopping ? userNoteShopping.value : '',
-                        food: userNoteFood ? userNoteFood.value : '',
-                        spots: userNoteSpots ? userNoteSpots.value : ''
-                    }));
+                    localStorage.setItem(USER_NOTES_KEY, JSON.stringify(payload));
                 } catch (e) { /* silent */ }
+                if (window.SOARVIBE_AUTH && window.SOARVIBE_AUTH.isSignedIn() && window.SOARVIBE_AUTH.savePrivateDoc) {
+                    window.SOARVIBE_AUTH.savePrivateDoc('notes', payload);
+                }
+            }
+
+            function syncCloudUserCenterExtras() {
+                var AUTH = window.SOARVIBE_AUTH;
+                if (!AUTH || !AUTH.isSignedIn() || !AUTH.loadPrivateDoc) return;
+                AUTH.loadPrivateDoc('notes').then(function (notes) {
+                    if (!notes) return;
+                    if (userNoteShopping && notes.shopping != null) userNoteShopping.value = notes.shopping;
+                    if (userNoteFood && notes.food != null) userNoteFood.value = notes.food;
+                    if (userNoteSpots && notes.spots != null) userNoteSpots.value = notes.spots;
+                    try {
+                        localStorage.setItem(USER_NOTES_KEY, JSON.stringify({
+                            shopping: userNoteShopping ? userNoteShopping.value : '',
+                            food: userNoteFood ? userNoteFood.value : '',
+                            spots: userNoteSpots ? userNoteSpots.value : ''
+                        }));
+                    } catch (e) { /* silent */ }
+                });
+                AUTH.loadPrivateDoc('checklist').then(function (doc) {
+                    if (!doc || !doc.items || !userChecklist) return;
+                    var checklist = doc.items;
+                    userChecklist.querySelectorAll('.user-check-item').forEach(function (li) {
+                        var id = li.getAttribute('data-check-id');
+                        var cb = li.querySelector('input[type="checkbox"]');
+                        if (id && cb && checklist[id] != null) {
+                            cb.checked = !!checklist[id];
+                        }
+                        syncCheckItemVisual(li);
+                    });
+                    try {
+                        localStorage.setItem(USER_CHECKLIST_KEY, JSON.stringify(checklist));
+                    } catch (e) { /* silent */ }
+                });
             }
 
             function openUserWall() {
@@ -15994,6 +16247,21 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
             loadUserCenterData();
 
+            if (window.SOARVIBE_FIREBASE && typeof window.SOARVIBE_FIREBASE.init === 'function') {
+                window.SOARVIBE_FIREBASE.init();
+            }
+            if (window.SOARVIBE_AUTH && typeof window.SOARVIBE_AUTH.start === 'function') {
+                window.SOARVIBE_AUTH.start();
+                window.SOARVIBE_AUTH.onAuthStateChanged(function (snap) {
+                    if (snap && snap.signedIn) {
+                        syncCloudUserCenterExtras();
+                    }
+                });
+            }
+            if (typeof window.bindSoarvibeAuthUi === 'function') {
+                window.bindSoarvibeAuthUi();
+            }
+
             if (navProfile) {
                 navProfile.addEventListener('click', function () {
                     closeBookletInAppPreviewIfOpen();
@@ -16014,6 +16282,21 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 userAvatarInput.addEventListener('change', function () {
                     var file = userAvatarInput.files && userAvatarInput.files[0];
                     if (!file) return;
+                    var AUTH = window.SOARVIBE_AUTH;
+                    if (AUTH && AUTH.isSignedIn() && AUTH.uploadAvatar) {
+                        AUTH.uploadAvatar(file)
+                            .then(function (url) {
+                                applyUserAvatar(url);
+                                try {
+                                    localStorage.setItem(USER_AVATAR_KEY, url);
+                                } catch (e) { /* silent */ }
+                            })
+                            .catch(function (err) {
+                                alert((err && err.message) || '頭像上傳失敗');
+                            });
+                        userAvatarInput.value = '';
+                        return;
+                    }
                     var reader = new FileReader();
                     reader.onload = function () {
                         try {
@@ -16035,6 +16318,14 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     try {
                         localStorage.setItem(USER_NICKNAME_KEY, val);
                     } catch (e) { /* silent */ }
+                    if (window.SOARVIBE_AUTH && window.SOARVIBE_AUTH.isSignedIn() && window.SOARVIBE_AUTH.updateProfile) {
+                        window.SOARVIBE_AUTH.updateProfile({
+                            nickname: val,
+                            displayName: val
+                        }).catch(function (err) {
+                            console.warn('nickname sync failed', err);
+                        });
+                    }
                 });
                 userNicknameInput.addEventListener('blur', function () {
                     userNicknameInput.dispatchEvent(new Event('change'));

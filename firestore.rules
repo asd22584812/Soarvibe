@@ -1,0 +1,120 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isSelf(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function isValidNickname(name) {
+      return name is string && name.size() > 0 && name.size() <= 32;
+    }
+
+    function isValidPostCreate() {
+      return signedIn()
+        && request.resource.data.authorId == request.auth.uid
+        && request.resource.data.title is string
+        && request.resource.data.title.size() > 0
+        && request.resource.data.title.size() <= 80
+        && request.resource.data.body is string
+        && request.resource.data.body.size() >= 20
+        && request.resource.data.body.size() <= 600
+        && request.resource.data.cityId is string
+        && request.resource.data.cityId.size() > 0
+        && request.resource.data.cityId.size() <= 40
+        && request.resource.data.type is string
+        && request.resource.data.status == 'published'
+        && request.resource.data.source == 'user'
+        && request.resource.data.likeCount == 0
+        && request.resource.data.commentCount == 0
+        && (!('saveCount' in request.resource.data) || request.resource.data.saveCount == 0);
+    }
+
+    function onlyKeys(keys) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(keys);
+    }
+
+    match /users/{uid} {
+      allow read: if isSelf(uid);
+      allow create: if isSelf(uid)
+        && request.resource.data.uid == uid
+        && isValidNickname(request.resource.data.nickname);
+      allow update: if isSelf(uid)
+        && request.resource.data.uid == uid
+        && (!('nickname' in request.resource.data) || isValidNickname(request.resource.data.nickname))
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['uid', 'createdAt']);
+      allow delete: if false;
+
+      match /private/{docId} {
+        allow read, write: if isSelf(uid);
+      }
+    }
+
+    match /posts/{postId} {
+      allow read: if resource.data.status == 'published'
+        || (signedIn() && resource.data.authorId == request.auth.uid);
+
+      allow create: if isValidPostCreate();
+
+      allow update: if signedIn() && (
+        (
+          resource.data.authorId == request.auth.uid
+          && request.resource.data.authorId == resource.data.authorId
+          && onlyKeys(['title', 'body', 'place', 'media', 'tags', 'type', 'status', 'updatedAt', 'authorDisplayName', 'authorAvatarUrl'])
+          && request.resource.data.status in ['published', 'hidden', 'removed']
+        )
+        || (
+          onlyKeys(['likeCount', 'updatedAt'])
+          && request.resource.data.likeCount is number
+          && request.resource.data.likeCount >= 0
+          && (
+            request.resource.data.likeCount == resource.data.likeCount + 1
+            || request.resource.data.likeCount == resource.data.likeCount - 1
+          )
+        )
+        || (
+          onlyKeys(['commentCount', 'updatedAt'])
+          && request.resource.data.commentCount is number
+          && request.resource.data.commentCount >= 0
+          && (
+            request.resource.data.commentCount == resource.data.commentCount + 1
+            || request.resource.data.commentCount == resource.data.commentCount - 1
+          )
+        )
+      );
+
+      allow delete: if signedIn() && resource.data.authorId == request.auth.uid;
+
+      match /likes/{uid} {
+        allow read: if signedIn();
+        allow create: if isSelf(uid)
+          && request.resource.data.uid == uid;
+        allow delete: if isSelf(uid);
+        allow update: if false;
+      }
+
+      match /comments/{commentId} {
+        allow read: if resource.data.status == 'published'
+          || (signedIn() && resource.data.authorId == request.auth.uid);
+
+        allow create: if signedIn()
+          && request.resource.data.authorId == request.auth.uid
+          && request.resource.data.text is string
+          && request.resource.data.text.size() > 0
+          && request.resource.data.text.size() <= 500
+          && request.resource.data.status == 'published';
+
+        allow update: if signedIn()
+          && resource.data.authorId == request.auth.uid
+          && request.resource.data.authorId == resource.data.authorId
+          && onlyKeys(['text', 'status', 'updatedAt'])
+          && request.resource.data.status in ['published', 'removed', 'hidden'];
+
+        allow delete: if signedIn() && resource.data.authorId == request.auth.uid;
+      }
+    }
+  }
+}

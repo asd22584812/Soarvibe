@@ -1,0 +1,44 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isImage() {
+      return request.resource.contentType.matches('image/(jpeg|png|webp|gif)');
+    }
+
+    function under2mb() {
+      return request.resource.size < 2 * 1024 * 1024;
+    }
+
+    function under5mb() {
+      return request.resource.size < 5 * 1024 * 1024;
+    }
+
+    match /users/{uid}/avatar {
+      allow read: if true;
+      allow write: if signedIn()
+        && request.auth.uid == uid
+        && isImage()
+        && under2mb();
+    }
+
+    match /users/{uid}/avatar.{ext} {
+      allow read: if true;
+      allow write: if signedIn()
+        && request.auth.uid == uid
+        && isImage()
+        && under2mb();
+    }
+
+    match /city-shares/{uid}/{postId}/{fileName} {
+      allow read: if true;
+      allow write: if signedIn()
+        && request.auth.uid == uid
+        && isImage()
+        && under5mb();
+    }
+  }
+}
