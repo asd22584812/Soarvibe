@@ -39,8 +39,8 @@
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="./city-shares-ui.css?v=v147">
-    <link rel="stylesheet" href="./travel-ledger.css?v=v147">
+    <link rel="stylesheet" href="./city-shares-ui.css?v=v148">
+    <link rel="stylesheet" href="./travel-ledger.css?v=v148">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;900&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         html, body {
@@ -3533,15 +3533,15 @@
         </div>
     </div>
 
-    <script src="./firebase-config.js?v=v147"></script>
+    <script src="./firebase-config.js?v=v148"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
-    <script src="./firebase-init.js?v=v147"></script>
-    <script src="./soarvibe-auth.js?v=v147"></script>
-    <script src="./city-shares-firestore.js?v=v147"></script>
-    <script src="./soarvibe-auth-ui.js?v=v147"></script>
+    <script src="./firebase-init.js?v=v148"></script>
+    <script src="./soarvibe-auth.js?v=v148"></script>
+    <script src="./city-shares-firestore.js?v=v148"></script>
+    <script src="./soarvibe-auth-ui.js?v=v148"></script>
     <script src="./feature-flags.js"></script>
     <script src="./city-journal-editorial-engine.js"></script>
     <script src="./city-journal-image-manifest.js"></script>
@@ -3549,14 +3549,14 @@
     <script src="./city-journal-image-library.js"></script>
     <script src="./city-journal-caption.js"></script>
     <script src="./city-journal-data.js"></script>
-    <script src="./city-shares-config.js?v=v147"></script>
-    <script src="./city-shares-data.js?v=v147"></script>
-    <script src="./city-shares-ui.js?v=v147"></script>
-    <script src="./travel-time-engine.js?v=v147"></script>
-    <script src="./travel-ledger-config.js?v=v147"></script>
-    <script src="./travel-ledger-forex.js?v=v147"></script>
-    <script src="./travel-ledger-data.js?v=v147"></script>
-    <script src="./travel-ledger-ui.js?v=v147"></script>
+    <script src="./city-shares-config.js?v=v148"></script>
+    <script src="./city-shares-data.js?v=v148"></script>
+    <script src="./city-shares-ui.js?v=v148"></script>
+    <script src="./travel-time-engine.js?v=v148"></script>
+    <script src="./travel-ledger-config.js?v=v148"></script>
+    <script src="./travel-ledger-forex.js?v=v148"></script>
+    <script src="./travel-ledger-data.js?v=v148"></script>
+    <script src="./travel-ledger-ui.js?v=v148"></script>
     <script>
         (function () {
             const TRAVEL_STYLE_LABELS = {
@@ -3608,7 +3608,9 @@
             const MSG_DATES_INCOMPLETE = '「去幾天？」行程表還是空白！請選好出發與回程日期，天數才算得準喔 📅';
             const MSG_DATES_REVERSED = '時空秩序異常 ⏳！回程日期不能早於出發日期喔，SOARVIBE 還沒解鎖時空倒流功能，請機長重新確認航線日期！';
             const MSG_TRAVEL_STYLE_REQUIRED = '請左右滑動並點選一種「期望的旅遊風格」，我們好為您調配專屬節奏 ✨';
-            const MSG_ADVANCED_INCOMPLETE = '塔台呼叫機長！請填妥 『去程／回程機場（或航班編號）、起飛與抵達時間、住宿飯店、交通工具』，SOARVIBE 準備帶您起飛！';
+            const MSG_FLIGHT_PARTIAL_SOFT =
+                '航班資料尚未完整，本次將以一般行程模式規劃；之後補上航班資訊可重新最佳化。';
+            const MSG_ADVANCED_INCOMPLETE = MSG_FLIGHT_PARTIAL_SOFT;
             const MSG_COMING_SOON = '✨ SOARVIBE 專屬功能翱翔準備中！下一階段將全面解鎖此功能，敬請期待！';
             const MSG_AFFILIATE_NO_DESTINATION = '請先在「要去哪裡？」選好旅遊國家與地區，或一鍵生成行程後，再使用獨家精選功能 🌏';
             const MSG_API_ERROR = '塔台訊號中斷 📡！行程生成暫時失敗，請稍後再試，或確認網路連線後重新起飛。';
@@ -4357,7 +4359,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
-            const SOARVIBE_APP_BUILD = 'v147';
+            const SOARVIBE_APP_BUILD = 'v148';
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
@@ -7321,9 +7323,13 @@
             }
 
             function suggestOutboundArrivalTime(force) {
+                // Optional UI assist only — never invent arrival as part of generation validation.
+                // Requires explicit force=true so incomplete flight data stays incomplete.
+                if (!force) return;
                 if (!flightArrivalTimeInput || !flightDepartureTimeInput || !flightDepartureTimeInput.value) return;
-                if (!force && flightArrivalTimeInput.value) return;
+                if (flightArrivalTimeInput.value) return;
                 var fields = collectFlightAirportFields();
+                if (!fields.flightOutboundFrom || !fields.flightOutboundTo) return;
                 var estimated = estimateArrivalLocalHhmm(
                     flightDepartureTimeInput.value,
                     fields.flightOutboundFrom,
@@ -7672,7 +7678,13 @@
             function buildAccommodationSegments(accommodations, dateStart, dateEnd) {
                 var split = splitAccommodationEntries(accommodations);
                 var totalNights = countTripNights(dateStart, dateEnd);
-                var defaultName = split.defaultEntry.name || '住宿';
+                if (!split.defaultEntry.name && !split.additional.some(function (e) { return e && e.name; })) {
+                    return [];
+                }
+                var defaultName = split.defaultEntry.name || '';
+                if (!defaultName) {
+                    return [];
+                }
                 var points = [{ night: 1, name: defaultName }];
                 split.additional.filter(function (entry) {
                     return entry.name && entry.checkInNight;
@@ -7744,6 +7756,14 @@
 
             function buildAccommodationRoutingRulesBlock(accommodations, dateStart, dateEnd) {
                 var split = splitAccommodationEntries(accommodations);
+                if (!split.defaultEntry.name && !split.additional.some(function (e) { return e && e.name; })) {
+                    return [
+                        '【🏨 住宿動線規則——靈感模式（未提供住宿）】',
+                        '・使用者未填寫住宿飯店，禁止虛構飯店名稱。',
+                        '・以當日主要活動區域／車站作為動線規劃基準。',
+                        '・晚上可寫「返回住宿區域休息」，但不得捏造具體飯店名。'
+                    ].join('\n');
+                }
                 if (!split.additional.length) {
                     return '【🏨 住宿動線規則——必須遵守】\n僅一間主住宿時，整趟旅程每日起點、終點、交通動線、Check-in／回飯店皆以主住宿為根據；每天晚上行程終點不宜離住宿過遠。';
                 }
@@ -7769,14 +7789,15 @@
                 var segments = buildAccommodationSegments(accommodations, dateStart, dateEnd);
                 var seg;
                 for (seg = 0; seg < segments.length; seg++) {
-                    var s = segments[seg];
-                    if (nightNum >= s.startNight && nightNum <= s.endNight) {
-                        return s.name;
+                    var row = segments[seg];
+                    if (nightNum >= row.startNight && nightNum <= row.endNight) {
+                        return row.name || '';
                     }
                 }
                 var split = splitAccommodationEntries(accommodations);
                 if (split.defaultEntry.name) return split.defaultEntry.name;
-                return fallback || '住宿';
+                // Do not invent hotel names when user left accommodation blank.
+                return fallback || '';
             }
 
             function getHotelForDay(dayNum, meta) {
@@ -7988,7 +8009,7 @@
             function getCustomerSelectedTransport() {
                 var val = advancedTransportSelect ? advancedTransportSelect.value : '';
                 if (!val) {
-                    return '請選擇交通方式';
+                    return '';
                 }
                 return TRANSPORT_LABELS[val] || val;
             }
@@ -8004,16 +8025,7 @@
                 var accommodations = collectAccommodationsFromDom();
                 var accommodation = formatAccommodationSummary(accommodations);
                 var flightFields = collectFlightAirportFields();
-                if (!arrIso && depIso) {
-                    var estimatedHhmm = estimateArrivalLocalHhmm(
-                        formatTimeOnly(depIso),
-                        flightFields.flightOutboundFrom,
-                        flightFields.flightOutboundTo
-                    );
-                    if (estimatedHhmm && tripDateState.dateStart) {
-                        arrIso = combineDateAndTime(tripDateState.dateStart, estimatedHhmm);
-                    }
-                }
+                // Never invent arrival times for incomplete flight data.
                 return Object.assign({
                     destination: destinationInput.value.trim(),
                     dateStart: tripDateState.dateStart,
@@ -8232,7 +8244,7 @@
                 var customerSelectedTransport = payload.customerSelectedTransport
                     || TRANSPORT_LABELS[payload.transport]
                     || payload.transport
-                    || '搭乘大眾運輸';
+                    || '';
                 var flightDetails = buildFlightPromptDetails(payload);
                 var globalCityInstruction = '【🌍 全球目的地 currentCity】：使用者輸入的「' + currentCity + '」為真實旅遊目的地（可能是東京、巴黎、曼谷、冰島、紐約等任意城市/地區）。你必須完全依照該國該城的真實地理、交通、文化、語境規劃【' + selectedStyle + '】風格行程，禁止套用錯誤國家或虛構景點。';
                 return {
@@ -8264,32 +8276,40 @@
             }
 
             function buildGeminiFlightLogicBlock(ctx, lastDayNum) {
-                var arrivalAnchor = ctx.arrivalTimeText || '（請依起飛時間＋航程＋時差推估目的地當地抵達時間）';
+                var engine = window.SOARVIBE_TRAVEL_TIME_ENGINE;
+                var normalized = ctx.flightTimeNormalized || null;
+                if (!normalized && engine && ctx.rawPayload && typeof engine.normalizeFlightPayload === 'function') {
+                    normalized = engine.normalizeFlightPayload(ctx.rawPayload);
+                }
+                var hasHard = !!(normalized && normalized.hasCompleteFlightData);
+                var hardBlock = '';
+                if (engine && typeof engine.buildFlightHardConstraintPrompt === 'function') {
+                    hardBlock = engine.buildFlightHardConstraintPrompt(normalized || ctx.rawPayload || {});
+                }
+                if (!hasHard) {
+                    return (hardBlock || '') +
+                        '【✈️ 靈感規劃模式補充】\n' +
+                        '・航班編號／機場／起飛抵達時間／回程航班均允許空白。\n' +
+                        '・禁止虛構起飛／抵達時間或航班編號。\n' +
+                        '・Day 1／最終日按一般完整旅遊日規劃（合理營業時間＋預估移動）。\n' +
+                        '・交通分鐘數僅標示「預估」，不可假裝是航班硬性限制。\n';
+                }
+                var arrivalAnchor = ctx.arrivalTimeText || '（請使用使用者提供的抵達時間）';
                 var depAnchor = ctx.departureTimeText || '（未提供）';
                 var retAnchor = ctx.returnTimeText || '（未提供）';
-                var engine = window.SOARVIBE_TRAVEL_TIME_ENGINE;
-                var hardBlock = '';
-                if (engine && ctx.flightTimeNormalized && typeof engine.buildFlightHardConstraintPrompt === 'function') {
-                    hardBlock = engine.buildFlightHardConstraintPrompt(ctx.flightTimeNormalized);
-                } else if (engine && ctx.rawPayload && typeof engine.normalizeFlightPayload === 'function') {
-                    hardBlock = engine.buildFlightHardConstraintPrompt(engine.normalizeFlightPayload(ctx.rawPayload));
-                }
                 return (hardBlock || '') + '【✈️ 航班資訊——時區與起降不可搞混（最高優先）】\n' +
                     '🛫 去程摘要：' + ctx.flightOutboundSummary + '\n' +
                     '🛬 回程摘要：' + ctx.flightReturnSummary + '\n' +
                     '・去程起飛時間（出發地當地 ' + (ctx.originAirport || '') + '）：' + depAnchor + '\n' +
                     '・去程抵達時間（目的地當地 ' + (ctx.destinationAirport || '') + '）：' + arrivalAnchor + ' ←【Day 1 唯一時間基準】\n' +
                     '・回程起飛時間（回程出發機場當地 ' + (ctx.returnDepartureAirport || '') + '）：' + retAnchor + ' ←【最終日送機倒推基準】\n' +
-                    '⚠️ 絕對禁止把「起飛時間」當成「抵達機場時間」。例：台北 06:45 起飛 ≠ 成田 06:45 抵達；若票面為 TPE 06:45→NRT 11:15，Day1 第一站必須從約 11:15 開始（入境／提行李約 1.5–2 小時）。\n' +
-                    '⚠️ 必須考慮時差：台北 UTC+8、東京／首爾 UTC+9、曼谷 UTC+7 等；抵達時間一律使用【目的地當地時間】。\n' +
-                    (ctx.flightHasNumbers
-                        ? '⚠️ 使用者已填航班編號：可核對該航班常見起降，但若上方已給明確起飛／抵達時間，【以使用者填寫的抵達時間為準】排 Day1。禁止發明起飛／抵達時間。\n'
-                        : '⚠️ 請依機場代碼判斷市區距離與交通（例：成田 NRT→東京約 60–90 分；羽田 HND→東京約 30–45 分；仁川 ICN→首爾約 60–80 分）。\n') +
+                    '⚠️ 絕對禁止把「起飛時間」當成「抵達機場時間」。\n' +
+                    '⚠️ 必須考慮時差；抵達時間一律使用【目的地當地時間】。\n' +
+                    '⚠️ 禁止發明起飛／抵達時間；以使用者填寫時間為準。\n' +
                     '【⏱️ 首日與最終日接送邏輯】\n' +
-                    '1. Day 1：以【去程抵達時間 ' + arrivalAnchor + '】為基準，安排「抵達機場 → 入境／提取行李 → 前往住宿 → Check-in」；Check-in 完成前禁止一般觀光。\n' +
-                    '2. Day ' + lastDayNum + '（最終日）：以【回程起飛時間 ' + retAnchor + '】倒推，預留至少 3 小時 Buffer（退房、前往機場、報到、安檢、候機）；上午、下午仍須各有 1–2 個具體行程，「晚上」才安排前往機場。\n' +
-                    '3. 若去程／回程機場不同，必須在 note 寫明並調整送機動線。\n' +
-                    '4. 站與站之間的交通分鐘數若已在 transportConstraints 提供，必須遵守，禁止自行縮成更短。\n';
+                    '1. Day 1：以【去程抵達時間 ' + arrivalAnchor + '】為基準，安排「抵達機場 → 入境／提取行李 → 前往住宿／市區」；入境 buffer 完成前禁止一般觀光。\n' +
+                    '2. Day ' + lastDayNum + '（最終日）：以【回程起飛時間 ' + retAnchor + '】倒推報到／前往機場 buffer。\n' +
+                    '3. 站與站之間的交通分鐘數若已在 transportConstraints 提供，必須遵守。\n';
             }
 
             function buildGeminiRequestText(payload) {
@@ -8321,12 +8341,15 @@ ${buildGeminiFlightLogicBlock(ctx, lastDayNum)}
 ${buildAccommodationPromptBlock(resolvePayloadAccommodations(payload), payload.dateStart, payload.dateEnd)}
 ${buildAccommodationRoutingRulesBlock(resolvePayloadAccommodations(payload), payload.dateStart, payload.dateEnd)}
 
-【🚇 客戶指定交通方式（customerSelectedTransport）——行程串聯必須 100% 遵守】
+${ctx.customerSelectedTransport
+    ? `【🚇 客戶指定交通方式（customerSelectedTransport）——行程串聯必須 100% 遵守】
 客戶已在前端明確選定：【${ctx.customerSelectedTransport}】
 1. 你生成的「每一個」行程項目、移動方式、備註，都必須完全符合【${ctx.customerSelectedTransport}】，禁止擅自改為其他交通手段。
-2. 若為大眾運輸／地鐵：備註必寫明確路線名稱、站名、轉乘站、預估步行分鐘（例：東京 Metro 銀座線 淺草站→上野站，步行 5 分鐘），時間須接近 Google Maps 真實估時。
+2. 若為大眾運輸／地鐵：備註必寫明確路線名稱、站名、轉乘站、預估步行分鐘，時間為預估。
 3. 若為自駕：備註必寫導航動線、停車場或路邊停車建議、預估車程分鐘。
-4. 若為混合搭配：請在每一站標註該段使用大眾運輸或計程車／步行。
+4. 若為混合搭配：請在每一站標註該段使用大眾運輸或計程車／步行。`
+    : `【🚇 交通方式——未指定（靈感模式）】
+使用者未選定交通工具。請以當地合理大眾運輸／步行做預估安排，並在 note 標明「預估」分鐘數；不可假裝有航班或使用者指定交通硬性限制。`}
 
 【🏪 地標與商家具體化——硬性規則，違反即不合格】
 你生成的每一個行程項目、便利商店或餐廳，絕對不允許使用「附近的便利商店」「在地特色早餐」「飯店旁超商」等模糊字眼。
@@ -8344,7 +8367,7 @@ ${buildAccommodationRoutingRulesBlock(resolvePayloadAccommodations(payload), pay
 2. 每日以 Day 1 到 Day ${days} 規劃，每個時段為「上午」「下午」「晚上」。
 3. 每一站活動必須包含：time（【必須】HH:MM - HH:MM 起迄區間，禁止單一時間）、title（景點／店名）、highlight（為什麼值得去＋符合【${ctx.selectedStyle}】的停留理由）、note（從上一站出發的【${ctx.customerSelectedTransport}】路線／站名／步行或車程分鐘）。
 4. 禁止只寫景點名；禁止長篇日記式敘述；禁止所有風格都用相同店名與相同時間模板。
-5. 非最終日晚上最後一站必須寫「返回飯店休息」或「藥妝／唐吉訶德／便利商店 → 返回飯店休息」。
+5. 非最終日晚上最後一站：若有住宿名稱寫「返回【飯店名】休息」；若無住宿則寫「返回當日活動區域／車站附近休息」，禁止捏造飯店名。
 
 ${buildGeminiJsonOutputBlock(payload, days)}`;
             }
@@ -15425,18 +15448,19 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 payload.customerSelectedTransport = customerSelectedTransport;
                 window.soarvibeTripPayload = payload;
 
-                if (!payload.departureTime || !payload.returnTime) {
-                    showModal(MSG_ADVANCED_INCOMPLETE, '✈️');
-                    expandAdvancedPanel();
-                    focusAdvancedFirstMissing();
-                    return;
-                }
+                // Advanced flight/hotel fields are optional — never block generation here.
 
                 hideAlert();
                 itineraryResult.classList.remove('hidden');
                 showItineraryLoading(payload);
                 setGenerateButtonLoading(true);
                 resetGeminiKeySession();
+
+                if (payload.hasPartialFlightData) {
+                    showSoftPlanningTip(MSG_FLIGHT_PARTIAL_SOFT);
+                } else {
+                    hideSoftPlanningTip();
+                }
 
                 try {
                     var totalDays = countTripDays(payload.dateStart, payload.dateEnd);
@@ -15526,19 +15550,38 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             function isAdvancedIncomplete() {
-                syncTripDateState();
-                if (flightDepartureTimeInput && flightDepartureTimeInput.value &&
-                    (!flightArrivalTimeInput || !flightArrivalTimeInput.value)) {
-                    suggestOutboundArrivalTime(true);
+                // Advanced flight/hotel/transport are optional — never a generation gate.
+                return false;
+            }
+
+            function showSoftPlanningTip(message) {
+                var tip = document.getElementById('soarvibe-soft-planning-tip');
+                if (!tip) {
+                    tip = document.createElement('div');
+                    tip.id = 'soarvibe-soft-planning-tip';
+                    tip.setAttribute('role', 'status');
+                    tip.style.cssText =
+                        'margin:0.75rem 1rem 0;padding:0.75rem 0.9rem;border-radius:0.85rem;' +
+                        'background:rgba(255,243,224,0.95);border:1px solid rgba(255,167,38,0.35);' +
+                        'color:#5d4037;font-size:0.82rem;font-weight:700;line-height:1.45;';
+                    var anchor = document.getElementById('generate-btn') || generateBtn;
+                    if (anchor && anchor.parentNode) {
+                        anchor.parentNode.insertBefore(tip, anchor.nextSibling);
+                    } else if (itineraryResult) {
+                        itineraryResult.insertBefore(tip, itineraryResult.firstChild);
+                    }
                 }
-                return !tripDateState.dateStart
-                    || !tripDateState.dateEnd
-                    || !getFlightDepartureIso()
-                    || !getFlightArrivalIso()
-                    || !getFlightReturnIso()
-                    || !hasValidFlightRouteInput()
-                    || !hasValidAccommodationInput()
-                    || !advancedTransportSelect.value;
+                tip.textContent = message || '';
+                tip.classList.remove('hidden');
+                tip.hidden = false;
+            }
+
+            function hideSoftPlanningTip() {
+                var tip = document.getElementById('soarvibe-soft-planning-tip');
+                if (!tip) return;
+                tip.textContent = '';
+                tip.classList.add('hidden');
+                tip.hidden = true;
             }
 
             function focusAdvancedFirstMissing() {
@@ -16227,12 +16270,6 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 }
                 if (!getSelectedTravelStyle()) {
                     showModal(MSG_TRAVEL_STYLE_REQUIRED, '✨');
-                    return;
-                }
-                if (isAdvancedIncomplete()) {
-                    expandAdvancedPanel();
-                    showModal(MSG_ADVANCED_INCOMPLETE, '✈️');
-                    focusAdvancedFirstMissing();
                     return;
                 }
 

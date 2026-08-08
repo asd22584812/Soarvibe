@@ -1,4 +1,4 @@
-const CACHE_NAME = 'soarvibe-v147';
+const CACHE_NAME = 'soarvibe-v148';
 /* Phase 1C.1 cache bust ??travel ledger network-first */
 const STATIC_ASSETS = [
   './index.html',
@@ -151,3 +151,4 @@ self.addEventListener('fetch', function (event) {
 
   event.respondWith(staleWhileRevalidate(request));
 });
+

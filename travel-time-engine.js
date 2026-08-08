@@ -289,17 +289,24 @@
     var retFrom = payload.flightReturnFrom || payload.returnDepartureAirport || '';
     var retTo = payload.flightReturnTo || payload.returnArrivalAirport || '';
 
+    var completeOutbound = hasCompleteOutboundFlightData(payload);
+    var completeReturn = hasCompleteReturnFlightData(payload);
+    var complete = completeOutbound; // precise mode gated on outbound completeness
+    var partial = hasPartialFlightData(payload);
+
     var depMeta = resolveAirportMeta(fromAirport);
     var arrMeta = resolveAirportMeta(toAirport);
     var retDepMeta = resolveAirportMeta(retFrom);
-    var dep = parseIsoLocal(depIso);
-    var arr = parseIsoLocal(arrIso);
-    var ret = parseIsoLocal(retIso);
+    var dep = completeOutbound ? parseIsoLocal(depIso) : null;
+    var arr = completeOutbound ? parseIsoLocal(arrIso) : null;
+    var ret = completeReturn ? parseIsoLocal(retIso) : null;
 
-    var arrBuffer = arrivalBufferMinutes(fromAirport, toAirport);
-    var transferIn = airportTransferMinutes(toAirport);
-    var checkinBuf = checkinBufferMinutes(retFrom || toAirport, retTo || fromAirport);
-    var transferOut = airportTransferMinutes(retFrom || toAirport);
+    var arrBuffer = completeOutbound ? arrivalBufferMinutes(fromAirport, toAirport) : 0;
+    var transferIn = completeOutbound ? airportTransferMinutes(toAirport) : 0;
+    var checkinBuf = completeReturn
+      ? checkinBufferMinutes(retFrom || toAirport, retTo || fromAirport)
+      : 0;
+    var transferOut = completeReturn ? airportTransferMinutes(retFrom || toAirport) : 0;
 
     var earliestSightseeing = '';
     if (arr) {
@@ -311,14 +318,28 @@
       latestLeaveHotel = addMinutesToHhmm(ret.hhmm, -(checkinBuf + transferOut));
     }
 
-    var verification = verifyFlightTimes({
-      flightNumber: payload.flightOutboundNumber || '',
-      departureIso: depIso,
-      arrivalIso: arrIso
-    });
+    var verification = completeOutbound
+      ? verifyFlightTimes({
+          flightNumber: payload.flightOutboundNumber || '',
+          departureIso: depIso,
+          arrivalIso: arrIso
+        })
+      : {
+          status: 'inspiration_or_partial',
+          source: partial ? 'partial_flight_data' : 'no_flight_data',
+          label: partial ? '航班資料不完整・靈感規劃模式' : '未提供航班・靈感規劃模式',
+          message: partial
+            ? '航班資料尚未完整，不以 HARD CONSTRAINT 強制。'
+            : '未提供航班時間，Day1／最終日按一般完整旅遊日規劃。'
+        };
 
     return {
-      source: 'user_provided_flight_time',
+      source: complete ? 'user_provided_flight_time' : verification.source,
+      planningMode: complete ? 'precise' : 'inspiration',
+      hasCompleteFlightData: complete,
+      hasCompleteOutboundFlightData: completeOutbound,
+      hasCompleteReturnFlightData: completeReturn,
+      hasPartialFlightData: partial && !complete,
       verification: verification,
       departure: dep
         ? {
@@ -361,9 +382,12 @@
         earliestSightseeingHhmm: earliestSightseeing,
         latestLeaveForAirportHhmm: latestLeaveHotel
       },
-      transportConstraints: buildTransportConstraintsForAirports(payload),
+      transportConstraints: complete
+        ? buildTransportConstraintsForAirports(payload)
+        : { mode: 'estimated', note: '無完整航班・交通時間僅供預估' },
       hardConstraints: {
-        mustUseUserTimes: true,
+        active: complete,
+        mustUseUserTimes: complete,
         forbidAiInventFlightTimes: true,
         day1EarliestActivityHhmm: earliestSightseeing,
         lastDayLatestActivityEndHhmm: latestLeaveHotel
@@ -371,8 +395,74 @@
     };
   }
 
+  function filled(v) {
+    return String(v || '').trim().length > 0;
+  }
+
+  function hasCompleteOutboundFlightData(payload) {
+    payload = payload || {};
+    var depIso = payload.flightDeparture || payload.departureTime || '';
+    var arrIso = payload.flightArrival || payload.arrivalTime || '';
+    var fromAirport = payload.flightOutboundFrom || payload.departureAirport || '';
+    var toAirport = payload.flightOutboundTo || payload.arrivalAirport || '';
+    var dep = parseIsoLocal(depIso);
+    var arr = parseIsoLocal(arrIso);
+    return !!(
+      filled(fromAirport) &&
+      filled(toAirport) &&
+      dep &&
+      arr &&
+      dep.hhmm &&
+      arr.hhmm
+    );
+  }
+
+  function hasCompleteReturnFlightData(payload) {
+    payload = payload || {};
+    var retIso = payload.flightReturn || payload.returnTime || '';
+    var retFrom = payload.flightReturnFrom || payload.returnDepartureAirport || '';
+    var ret = parseIsoLocal(retIso);
+    return !!(filled(retFrom) && ret && ret.hhmm);
+  }
+
+  function hasCompleteFlightData(payload) {
+    return hasCompleteOutboundFlightData(payload);
+  }
+
+  function hasPartialFlightData(payload) {
+    payload = payload || {};
+    if (hasCompleteFlightData(payload)) return false;
+    var fields = [
+      payload.flightOutboundNumber,
+      payload.flightReturnNumber,
+      payload.flightOutboundFrom || payload.departureAirport,
+      payload.flightOutboundTo || payload.arrivalAirport,
+      payload.flightReturnFrom || payload.returnDepartureAirport,
+      payload.flightReturnTo || payload.returnArrivalAirport,
+      payload.flightDeparture || payload.departureTime,
+      payload.flightArrival || payload.arrivalTime,
+      payload.flightReturn || payload.returnTime
+    ];
+    return fields.some(function (f) {
+      return filled(f);
+    });
+  }
+
+  function buildInspirationFlightPrompt() {
+    return [
+      '【✈️ 靈感規劃模式——無完整航班 HARD CONSTRAINT】',
+      '・使用者未提供完整去程機場＋起飛＋抵達時間，禁止啟用航班硬性約束。',
+      '・禁止虛構起飛／抵達時間、禁止捏造航班編號。',
+      '・Day 1／最終日按一般完整旅遊日規劃（可從合理晨間開始，夜間收尾）。',
+      '・可依營業時間與景點移動安排；交通分鐘數僅能標示為「預估」，不可假裝是航班限制。',
+      '・若之後補上完整航班，可再重新最佳化。'
+    ].join('\n');
+  }
+
   function buildFlightHardConstraintPrompt(normalized) {
-    if (!normalized) return '';
+    if (!normalized || !normalized.hasCompleteFlightData) {
+      return buildInspirationFlightPrompt() + '\n';
+    }
     var lines = [];
     lines.push('【🔒 HARD CONSTRAINT——航班時間不可改（程式強制，AI 禁止覆寫）】');
     lines.push('來源：' + (normalized.verification && normalized.verification.label
@@ -432,6 +522,8 @@
           normalized.buffers.airportTransferOutMinutes +
           ' 分）'
       );
+    } else {
+      lines.push('・回程航班未完整：最終日不套用送機 HARD CONSTRAINT，按一般完整日規劃。');
     }
     lines.push('禁止：自行修改起飛／抵達時間；禁止把起飛時間當成抵達時間；禁止發明航程。');
     if (normalized.transportConstraints && normalized.transportConstraints.length) {
@@ -471,6 +563,7 @@
     var mode =
       (payload && (payload.customerSelectedTransport || payload.transport)) || 'public-transit';
     var dayCount = hidden.days.length;
+    var applyFlightHardQa = !!(normalized.hasCompleteFlightData && normalized.hardConstraints.active);
 
     hidden.days.forEach(function (day, dayIdx) {
       var items = flattenDayItems(day);
@@ -479,7 +572,7 @@
       var isFirst = dayIdx === 0;
       var isLast = dayIdx === dayCount - 1;
 
-      if (isFirst && normalized.buffers.earliestSightseeingHhmm) {
+      if (applyFlightHardQa && isFirst && normalized.buffers.earliestSightseeingHhmm) {
         var earliest = hhmmToMinutes(normalized.buffers.earliestSightseeingHhmm);
         items.forEach(function (it) {
           if (!it.startTime) return;
@@ -554,7 +647,7 @@
         }
       }
 
-      if (isLast && normalized.buffers.latestLeaveForAirportHhmm) {
+      if (applyFlightHardQa && isLast && normalized.buffers.latestLeaveForAirportHhmm) {
         var latest = hhmmToMinutes(normalized.buffers.latestLeaveForAirportHhmm);
         items = flattenDayItems(day);
         items.forEach(function (it) {
@@ -608,20 +701,28 @@
     next.flightTimeNormalized = normalized;
     next.transportConstraints = normalized.transportConstraints;
     next.flightVerification = normalized.verification;
+    next.planningMode = normalized.planningMode;
+    next.hasCompleteFlightData = normalized.hasCompleteFlightData;
+    next.hasPartialFlightData = normalized.hasPartialFlightData;
     return next;
   }
 
   global.SOARVIBE_TRAVEL_TIME_ENGINE = {
-    version: 1,
+    version: 2,
     CONFIG: CONFIG,
     extractAirportCode: extractAirportCode,
     resolveAirportMeta: resolveAirportMeta,
     normalizeFlightPayload: normalizeFlightPayload,
+    hasCompleteFlightData: hasCompleteFlightData,
+    hasCompleteOutboundFlightData: hasCompleteOutboundFlightData,
+    hasCompleteReturnFlightData: hasCompleteReturnFlightData,
+    hasPartialFlightData: hasPartialFlightData,
     verifyFlightTimes: verifyFlightTimes,
     estimateTransferMinutes: estimateTransferMinutes,
     buildTransportConstraintsForAirports: buildTransportConstraintsForAirports,
     buildTransportConstraintsForDay: buildTransportConstraintsForDay,
     buildFlightHardConstraintPrompt: buildFlightHardConstraintPrompt,
+    buildInspirationFlightPrompt: buildInspirationFlightPrompt,
     applyTimeQaToHidden: applyTimeQaToHidden,
     attachToPayload: attachToPayload,
     hhmmToMinutes: hhmmToMinutes,
