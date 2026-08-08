@@ -36,6 +36,7 @@
     typeFilter: 'all',
     remotePosts: [],
     liked: false,
+    saved: false,
     comments: []
   };
 
@@ -265,6 +266,7 @@
     var stats = post.stats || {};
     var likeCount = stats.likeCount != null ? stats.likeCount : post.likeCount || 0;
     var commentCount = stats.commentCount != null ? stats.commentCount : post.commentCount || 0;
+    var saveCount = stats.saveCount != null ? stats.saveCount : post.saveCount || 0;
     var socialEnabled = isFirestorePost(post);
     var metaChips = [];
     if (vm.stayDuration) metaChips.push('停留 ' + vm.stayDuration);
@@ -306,40 +308,46 @@
       })
       .join('');
 
-    var socialHtml = socialEnabled
-      ? '<div class="cs-social-bar">' +
-        '<button type="button" class="cs-social-btn' +
-        (csState.liked ? ' is-on' : '') +
-        '" id="csLikeBtn" aria-pressed="' +
-        (csState.liked ? 'true' : 'false') +
-        '">♡ 按讚 <span id="csLikeCount">' +
-        escapeHtml(String(likeCount)) +
-        '</span></button>' +
-        '<button type="button" class="cs-social-btn" id="csCommentFocusBtn">💬 留言 <span>' +
-        escapeHtml(String(commentCount)) +
-        '</span></button>' +
-        '<button type="button" class="cs-social-btn" id="csComposeBtn">＋ 分享投稿</button>' +
-        (auth() &&
-        auth().isSignedIn() &&
-        auth().currentUser() &&
-        post.author &&
-        post.author.authorId === auth().currentUser().uid
-          ? '<button type="button" class="cs-social-btn cs-social-danger" id="csDeletePostBtn">刪除我的貼文</button>'
-          : '') +
-        '</div>' +
-        '<section class="cs-comments" id="csComments">' +
-        '<h3 class="cs-comments-title">留言</h3>' +
-        '<div id="csCommentList" class="cs-comment-list">' +
-        (commentsHtml || '<p class="cs-comment-empty">還沒有留言，來當第一個吧。</p>') +
-        '</div>' +
-        '<form id="csCommentForm" class="cs-comment-form">' +
-        '<textarea id="csCommentInput" class="cs-comment-input" maxlength="500" rows="3" placeholder="寫下你的補充或提問…"></textarea>' +
-        '<button type="submit" class="cs-action-btn cs-action-primary">送出留言</button>' +
-        '</form></section>'
-      : '<div class="cs-social-bar">' +
-        '<button type="button" class="cs-social-btn" id="csComposeBtn">＋ 分享投稿</button>' +
-        '</div>' +
-        '<p class="cs-comment-empty">此為官方精選，歡迎分享你自己的旅行心得。</p>';
+    var socialHtml =
+      '<div class="cs-social-bar">' +
+      '<button type="button" class="cs-social-btn' +
+      (csState.liked ? ' is-on' : '') +
+      '" id="csLikeBtn" aria-pressed="' +
+      (csState.liked ? 'true' : 'false') +
+      '">♡ 按讚 <span id="csLikeCount">' +
+      escapeHtml(String(likeCount)) +
+      '</span></button>' +
+      '<button type="button" class="cs-social-btn' +
+      (csState.saved ? ' is-on' : '') +
+      '" id="csSaveBtn" aria-pressed="' +
+      (csState.saved ? 'true' : 'false') +
+      '">☆ 收藏 <span id="csSaveCount">' +
+      escapeHtml(String(saveCount)) +
+      '</span></button>' +
+      '<button type="button" class="cs-social-btn" id="csCommentFocusBtn">💬 留言 <span>' +
+      escapeHtml(String(commentCount)) +
+      '</span></button>' +
+      '<button type="button" class="cs-social-btn" id="csComposeBtn">＋ 分享投稿</button>' +
+      (socialEnabled &&
+      auth() &&
+      auth().isSignedIn() &&
+      auth().currentUser() &&
+      post.author &&
+      post.author.authorId === auth().currentUser().uid
+        ? '<button type="button" class="cs-social-btn cs-social-danger" id="csDeletePostBtn">刪除我的貼文</button>'
+        : '') +
+      '</div>' +
+      (socialEnabled
+        ? '<section class="cs-comments" id="csComments">' +
+          '<h3 class="cs-comments-title">留言</h3>' +
+          '<div id="csCommentList" class="cs-comment-list">' +
+          (commentsHtml || '<p class="cs-comment-empty">還沒有留言，來當第一個吧。</p>') +
+          '</div>' +
+          '<form id="csCommentForm" class="cs-comment-form">' +
+          '<textarea id="csCommentInput" class="cs-comment-input" maxlength="500" rows="3" placeholder="寫下你的補充或提問…"></textarea>' +
+          '<button type="submit" class="cs-action-btn cs-action-primary">送出留言</button>' +
+          '</form></section>'
+        : '<p class="cs-comment-empty">官方精選可瀏覽；登入後按讚／收藏／留言請先「分享投稿」建立旅人貼文。</p>');
 
     return (
       '<div class="cs-page">' +
@@ -449,6 +457,7 @@
     var post = findPost(postId);
     csState.comments = [];
     csState.liked = false;
+    csState.saved = false;
     if (!a || !postId || !isFirestorePost(post)) return Promise.resolve();
     var tasks = [];
     if (a.listComments) {
@@ -472,6 +481,18 @@
           })
           .catch(function () {
             csState.liked = false;
+          })
+      );
+    }
+    if (a.hasSaved) {
+      tasks.push(
+        a
+          .hasSaved(postId)
+          .then(function (saved) {
+            csState.saved = !!saved;
+          })
+          .catch(function () {
+            csState.saved = false;
           })
       );
     }
@@ -606,6 +627,13 @@
     var au = auth();
     if (!au || !au.isSignedIn()) {
       if (au && au.requireAuth) au.requireAuth('按讚');
+      else if (global.openSoarvibeAuthModal) {
+        global.openSoarvibeAuthModal({ reason: '請先登入後才能按讚' });
+      }
+      return;
+    }
+    if (!isFirestorePost(findPost(csState.postId))) {
+      alert('官方精選暫不開放按讚。請先「分享投稿」建立旅人貼文後再互動。');
       return;
     }
     if (!a || !csState.postId) return;
@@ -626,11 +654,50 @@
       });
   }
 
+  function handleSave() {
+    var a = api();
+    var au = auth();
+    if (!au || !au.isSignedIn()) {
+      if (au && au.requireAuth) au.requireAuth('收藏');
+      else if (global.openSoarvibeAuthModal) {
+        global.openSoarvibeAuthModal({ reason: '請先登入後才能收藏' });
+      }
+      return;
+    }
+    if (!isFirestorePost(findPost(csState.postId))) {
+      alert('官方精選暫不開放收藏。請先「分享投稿」建立旅人貼文後再互動。');
+      return;
+    }
+    if (!a || !csState.postId || !a.toggleSave) return;
+    a.toggleSave(csState.postId)
+      .then(function (res) {
+        csState.saved = !!(res && res.saved);
+        var post = findPost(csState.postId);
+        if (post) {
+          post.saveCount = Math.max(0, (post.saveCount || 0) + (csState.saved ? 1 : -1));
+          if (!post.stats) post.stats = {};
+          post.stats.saveCount = post.saveCount;
+        }
+        renderCurrentView();
+      })
+      .catch(function (err) {
+        if (err && err.message === 'AUTH_REQUIRED') return;
+        alert((err && err.message) || '收藏失敗');
+      });
+  }
+
   function handleCommentSubmit() {
     var a = api();
     var au = auth();
     if (!au || !au.isSignedIn()) {
       if (au && au.requireAuth) au.requireAuth('留言');
+      else if (global.openSoarvibeAuthModal) {
+        global.openSoarvibeAuthModal({ reason: '請先登入後才能留言' });
+      }
+      return;
+    }
+    if (!isFirestorePost(findPost(csState.postId))) {
+      alert('官方精選暫不開放留言。請先「分享投稿」建立旅人貼文後再互動。');
       return;
     }
     var input = document.getElementById('csCommentInput');
@@ -823,6 +890,11 @@
       if (e.target.id === 'csLikeBtn' || e.target.closest('#csLikeBtn')) {
         e.preventDefault();
         handleLike();
+        return;
+      }
+      if (e.target.id === 'csSaveBtn' || e.target.closest('#csSaveBtn')) {
+        e.preventDefault();
+        handleSave();
         return;
       }
       if (e.target.id === 'csCommentFocusBtn') {

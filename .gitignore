@@ -10,3 +10,10 @@ scripts/*-out.txt
 
 # City shares image probe / temp downloads
 assets/city-shares/**/_probe/
+
+# Local Firebase emulator / rules test tooling
+node_modules/
+.tools/
+firestore-debug.log
+firebase-debug.log
+ui-debug.log

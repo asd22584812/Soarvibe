@@ -1,6 +1,10 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // ------------------------------------------------------------------
+    // Helpers
+    // ------------------------------------------------------------------
     function signedIn() {
       return request.auth != null;
     }
@@ -11,6 +15,129 @@ service cloud.firestore {
 
     function isValidNickname(name) {
       return name is string && name.size() > 0 && name.size() <= 32;
+    }
+
+    function onlyKeys(keys) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(keys);
+    }
+
+    function unchanged(field) {
+      return !(field in request.resource.data.diff(resource.data).affectedKeys());
+    }
+
+    function postPath(postId) {
+      return /databases/$(database)/documents/posts/$(postId);
+    }
+
+    function likePath(postId, uid) {
+      return /databases/$(database)/documents/posts/$(postId)/likes/$(uid);
+    }
+
+    function commentPath(postId, commentId) {
+      return /databases/$(database)/documents/posts/$(postId)/comments/$(commentId);
+    }
+
+    function collectionPath(uid, postId) {
+      return /databases/$(database)/documents/users/$(uid)/collections/$(postId);
+    }
+
+    function postBefore(postId) {
+      return get(postPath(postId)).data;
+    }
+
+    function postAfter(postId) {
+      return getAfter(postPath(postId)).data;
+    }
+
+    function parentPostPublished(postId) {
+      return postBefore(postId).status == 'published';
+    }
+
+    function isPublicPost() {
+      return resource.data.status == 'published';
+    }
+
+    function isPostAuthor() {
+      return signedIn() && resource.data.authorId == request.auth.uid;
+    }
+
+    function isPublicCommentOnPublishedPost(postId) {
+      return resource.data.status == 'published'
+        && parentPostPublished(postId);
+    }
+
+    function isCommentAuthor() {
+      return signedIn() && resource.data.authorId == request.auth.uid;
+    }
+
+    // Exact ±1 on a numeric counter; result must be >= 0.
+    function counterMovedBy(postId, field, delta) {
+      return postBefore(postId)[field] is number
+        && postAfter(postId)[field] is number
+        && postAfter(postId)[field] == postBefore(postId)[field] + delta
+        && postAfter(postId)[field] >= 0;
+    }
+
+    // Post-side: likeCount ±1 iff likes/{auth.uid} existsAfter matches.
+    function validLikeCountChange(postId) {
+      return signedIn()
+        && onlyKeys(['likeCount', 'updatedAt'])
+        && resource.data.likeCount is number
+        && request.resource.data.likeCount is number
+        && request.resource.data.likeCount >= 0
+        && (
+          (
+            request.resource.data.likeCount == resource.data.likeCount + 1
+            && existsAfter(likePath(postId, request.auth.uid))
+          )
+          || (
+            request.resource.data.likeCount == resource.data.likeCount - 1
+            && !existsAfter(likePath(postId, request.auth.uid))
+          )
+        );
+    }
+
+    // Post-side: saveCount ±1 iff users/{auth}/collections/{postId} matches.
+    function validSaveCountChange(postId) {
+      return signedIn()
+        && onlyKeys(['saveCount', 'updatedAt'])
+        && resource.data.saveCount is number
+        && request.resource.data.saveCount is number
+        && request.resource.data.saveCount >= 0
+        && (
+          (
+            request.resource.data.saveCount == resource.data.saveCount + 1
+            && existsAfter(collectionPath(request.auth.uid, postId))
+          )
+          || (
+            request.resource.data.saveCount == resource.data.saveCount - 1
+            && !existsAfter(collectionPath(request.auth.uid, postId))
+          )
+        );
+    }
+
+    // Post-side: commentCount ±1 bound to opCommentId create/delete in same write.
+    function validCommentCountChange(postId) {
+      return signedIn()
+        && onlyKeys(['commentCount', 'updatedAt', 'opCommentId'])
+        && resource.data.commentCount is number
+        && request.resource.data.commentCount is number
+        && request.resource.data.commentCount >= 0
+        && request.resource.data.opCommentId is string
+        && request.resource.data.opCommentId.size() > 0
+        && request.resource.data.opCommentId.size() <= 128
+        && (
+          (
+            request.resource.data.commentCount == resource.data.commentCount + 1
+            && !exists(commentPath(postId, request.resource.data.opCommentId))
+            && existsAfter(commentPath(postId, request.resource.data.opCommentId))
+          )
+          || (
+            request.resource.data.commentCount == resource.data.commentCount - 1
+            && exists(commentPath(postId, request.resource.data.opCommentId))
+            && !existsAfter(commentPath(postId, request.resource.data.opCommentId))
+          )
+        );
     }
 
     function isValidPostCreate() {
@@ -26,95 +153,150 @@ service cloud.firestore {
         && request.resource.data.cityId.size() > 0
         && request.resource.data.cityId.size() <= 40
         && request.resource.data.type is string
-        && request.resource.data.status == 'published'
+        && request.resource.data.status in ['published', 'draft']
         && request.resource.data.source == 'user'
         && request.resource.data.likeCount == 0
         && request.resource.data.commentCount == 0
-        && (!('saveCount' in request.resource.data) || request.resource.data.saveCount == 0);
+        && request.resource.data.saveCount == 0;
     }
 
-    function onlyKeys(keys) {
-      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(keys);
-    }
-
+    // ------------------------------------------------------------------
+    // users/{uid}
+    // ------------------------------------------------------------------
     match /users/{uid} {
       allow read: if isSelf(uid);
+
       allow create: if isSelf(uid)
         && request.resource.data.uid == uid
+        && request.resource.data.uid == request.auth.uid
         && isValidNickname(request.resource.data.nickname);
+
       allow update: if isSelf(uid)
         && request.resource.data.uid == uid
-        && (!('nickname' in request.resource.data) || isValidNickname(request.resource.data.nickname))
-        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['uid', 'createdAt']);
+        && request.resource.data.uid == request.auth.uid
+        && unchanged('uid')
+        && unchanged('createdAt')
+        && (!('nickname' in request.resource.data)
+            || isValidNickname(request.resource.data.nickname))
+        && !request.resource.data.diff(resource.data)
+            .affectedKeys()
+            .hasAny(['uid', 'createdAt']);
+
       allow delete: if false;
 
       match /private/{docId} {
         allow read, write: if isSelf(uid);
       }
+
+      // collections/{postId} ↔ posts/{postId}.saveCount (±1) must be atomic
+      match /collections/{postId} {
+        allow read: if isSelf(uid);
+
+        allow create: if isSelf(uid)
+          && request.resource.data.uid == uid
+          && request.resource.data.uid == request.auth.uid
+          && request.resource.data.postId == postId
+          && exists(postPath(postId))
+          && counterMovedBy(postId, 'saveCount', 1);
+
+        allow update: if false;
+
+        allow delete: if isSelf(uid)
+          && exists(postPath(postId))
+          && counterMovedBy(postId, 'saveCount', -1);
+      }
     }
 
+    // ------------------------------------------------------------------
+    // posts/{postId}
+    // ------------------------------------------------------------------
     match /posts/{postId} {
-      allow read: if resource.data.status == 'published'
-        || (signedIn() && resource.data.authorId == request.auth.uid);
+      allow read: if isPublicPost() || isPostAuthor();
 
       allow create: if isValidPostCreate();
 
       allow update: if signedIn() && (
         (
-          resource.data.authorId == request.auth.uid
+          isPostAuthor()
           && request.resource.data.authorId == resource.data.authorId
-          && onlyKeys(['title', 'body', 'place', 'media', 'tags', 'type', 'status', 'updatedAt', 'authorDisplayName', 'authorAvatarUrl'])
-          && request.resource.data.status in ['published', 'hidden', 'removed']
+          && request.resource.data.authorId == request.auth.uid
+          && unchanged('authorId')
+          && unchanged('createdAt')
+          && unchanged('source')
+          && unchanged('likeCount')
+          && unchanged('commentCount')
+          && unchanged('saveCount')
+          && unchanged('opCommentId')
+          && onlyKeys([
+            'title',
+            'body',
+            'place',
+            'media',
+            'tags',
+            'type',
+            'status',
+            'updatedAt',
+            'authorDisplayName',
+            'authorAvatarUrl'
+          ])
+          && request.resource.data.status in ['published', 'draft', 'hidden', 'removed']
         )
-        || (
-          onlyKeys(['likeCount', 'updatedAt'])
-          && request.resource.data.likeCount is number
-          && request.resource.data.likeCount >= 0
-          && (
-            request.resource.data.likeCount == resource.data.likeCount + 1
-            || request.resource.data.likeCount == resource.data.likeCount - 1
-          )
-        )
-        || (
-          onlyKeys(['commentCount', 'updatedAt'])
-          && request.resource.data.commentCount is number
-          && request.resource.data.commentCount >= 0
-          && (
-            request.resource.data.commentCount == resource.data.commentCount + 1
-            || request.resource.data.commentCount == resource.data.commentCount - 1
-          )
-        )
+        // Counter-only paths — each requires matching child doc via existsAfter
+        || validLikeCountChange(postId)
+        || validSaveCountChange(postId)
+        || validCommentCountChange(postId)
       );
 
-      allow delete: if signedIn() && resource.data.authorId == request.auth.uid;
+      allow delete: if isPostAuthor()
+        && resource.data.authorId == request.auth.uid;
 
+      // likes/{uid} ↔ likeCount (±1) must be atomic
       match /likes/{uid} {
         allow read: if signedIn();
+
         allow create: if isSelf(uid)
-          && request.resource.data.uid == uid;
-        allow delete: if isSelf(uid);
+          && request.resource.data.uid == uid
+          && request.resource.data.uid == request.auth.uid
+          && counterMovedBy(postId, 'likeCount', 1);
+
+        allow delete: if isSelf(uid)
+          && counterMovedBy(postId, 'likeCount', -1);
+
         allow update: if false;
       }
 
+      // comments/{commentId} ↔ commentCount (±1) + opCommentId binding
       match /comments/{commentId} {
-        allow read: if resource.data.status == 'published'
-          || (signedIn() && resource.data.authorId == request.auth.uid);
+        allow read: if isPublicCommentOnPublishedPost(postId) || isCommentAuthor();
 
         allow create: if signedIn()
           && request.resource.data.authorId == request.auth.uid
           && request.resource.data.text is string
           && request.resource.data.text.size() > 0
           && request.resource.data.text.size() <= 500
-          && request.resource.data.status == 'published';
+          && request.resource.data.status == 'published'
+          && parentPostPublished(postId)
+          && counterMovedBy(postId, 'commentCount', 1)
+          && postAfter(postId).opCommentId == commentId;
 
-        allow update: if signedIn()
-          && resource.data.authorId == request.auth.uid
+        allow update: if isCommentAuthor()
           && request.resource.data.authorId == resource.data.authorId
+          && request.resource.data.authorId == request.auth.uid
+          && unchanged('authorId')
+          && unchanged('createdAt')
           && onlyKeys(['text', 'status', 'updatedAt'])
           && request.resource.data.status in ['published', 'removed', 'hidden'];
 
-        allow delete: if signedIn() && resource.data.authorId == request.auth.uid;
+        allow delete: if isCommentAuthor()
+          && resource.data.authorId == request.auth.uid
+          && counterMovedBy(postId, 'commentCount', -1)
+          && postAfter(postId).opCommentId == commentId;
       }
+    }
+
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }

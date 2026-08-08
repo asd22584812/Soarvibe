@@ -203,11 +203,16 @@
     var body = String(text || '').trim().slice(0, COMMENT_MAX);
     if (!body) return Promise.reject(new Error('請輸入留言'));
     var postRef = database.collection('posts').doc(postId);
+    // Pre-allocate id so rules can bind opCommentId ↔ comments/{commentId}
     var commentRef = postRef.collection('comments').doc();
+    var commentId = commentRef.id;
     var now = firebase.firestore.FieldValue.serverTimestamp();
     return database.runTransaction(function (tx) {
       return tx.get(postRef).then(function (postSnap) {
         if (!postSnap.exists) throw new Error('貼文不存在');
+        if (postSnap.data().status !== 'published') {
+          throw new Error('僅能在已公開貼文留言');
+        }
         tx.set(commentRef, {
           authorId: user.uid,
           authorDisplayName: profileName(),
@@ -218,11 +223,12 @@
         });
         tx.update(postRef, {
           commentCount: firebase.firestore.FieldValue.increment(1),
+          opCommentId: commentId,
           updatedAt: now
         });
       });
     }).then(function () {
-      return commentRef.id;
+      return commentId;
     });
   }
 
@@ -232,12 +238,16 @@
     var postRef = database.collection('posts').doc(postId);
     var commentRef = postRef.collection('comments').doc(commentId);
     return database.runTransaction(function (tx) {
-      return tx.get(commentRef).then(function (snap) {
+      return Promise.all([tx.get(postRef), tx.get(commentRef)]).then(function (pair) {
+        var postSnap = pair[0];
+        var snap = pair[1];
+        if (!postSnap.exists) throw new Error('貼文不存在');
         if (!snap.exists) throw new Error('留言不存在');
         if (snap.data().authorId !== user.uid) throw new Error('只能刪除自己的留言');
         tx.delete(commentRef);
         tx.update(postRef, {
           commentCount: firebase.firestore.FieldValue.increment(-1),
+          opCommentId: commentId,
           updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         });
       });
@@ -253,6 +263,21 @@
       .doc(postId)
       .collection('likes')
       .doc(user.uid)
+      .get()
+      .then(function (snap) {
+        return snap.exists;
+      });
+  }
+
+  function hasSaved(postId) {
+    var user = currentMaybeUser();
+    if (!user) return Promise.resolve(false);
+    var database = requireDb();
+    return database
+      .collection('users')
+      .doc(user.uid)
+      .collection('collections')
+      .doc(postId)
       .get()
       .then(function (snap) {
         return snap.exists;
@@ -276,6 +301,7 @@
         if (!postSnap.exists) throw new Error('貼文不存在');
         var now = firebase.firestore.FieldValue.serverTimestamp();
         if (likeSnap.exists) {
+          // Atomic: delete likes/{uid} + likeCount -1
           tx.delete(likeRef);
           tx.update(postRef, {
             likeCount: firebase.firestore.FieldValue.increment(-1),
@@ -283,12 +309,52 @@
           });
           return { liked: false };
         }
+        // Atomic: create likes/{uid} + likeCount +1
         tx.set(likeRef, { createdAt: now, uid: user.uid });
         tx.update(postRef, {
           likeCount: firebase.firestore.FieldValue.increment(1),
           updatedAt: now
         });
         return { liked: true };
+      });
+    });
+  }
+
+  /**
+   * Save / unsave post (collections ↔ saveCount). Must be one transaction.
+   */
+  function toggleSave(postId, meta) {
+    var user = requireUser();
+    var database = requireDb();
+    var postRef = database.collection('posts').doc(postId);
+    var colRef = database.collection('users').doc(user.uid).collection('collections').doc(postId);
+    meta = meta || {};
+    return database.runTransaction(function (tx) {
+      return Promise.all([tx.get(postRef), tx.get(colRef)]).then(function (pair) {
+        var postSnap = pair[0];
+        var colSnap = pair[1];
+        if (!postSnap.exists) throw new Error('貼文不存在');
+        var now = firebase.firestore.FieldValue.serverTimestamp();
+        if (colSnap.exists) {
+          tx.delete(colRef);
+          tx.update(postRef, {
+            saveCount: firebase.firestore.FieldValue.increment(-1),
+            updatedAt: now
+          });
+          return { saved: false };
+        }
+        tx.set(colRef, {
+          uid: user.uid,
+          postId: postId,
+          cityId: postSnap.data().cityId || meta.cityId || '',
+          title: postSnap.data().title || meta.title || '',
+          createdAt: now
+        });
+        tx.update(postRef, {
+          saveCount: firebase.firestore.FieldValue.increment(1),
+          updatedAt: now
+        });
+        return { saved: true };
       });
     });
   }
@@ -322,7 +388,9 @@
     addComment: addComment,
     deleteComment: deleteComment,
     hasLiked: hasLiked,
+    hasSaved: hasSaved,
     toggleLike: toggleLike,
+    toggleSave: toggleSave,
     mergeFeed: mergeFeed
   };
 })(typeof window !== 'undefined' ? window : globalThis);

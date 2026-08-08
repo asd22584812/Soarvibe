@@ -202,11 +202,36 @@
     if (!a) return Promise.reject(new Error('Firebase Auth 未就緒'));
     var provider = new firebase.auth.GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
-    return a.signInWithPopup(provider).then(function (cred) {
+
+    function afterCred(cred) {
       return ensureUserDoc(cred.user).then(function () {
         notify();
         return cred.user;
       });
+    }
+
+    var ua = typeof navigator !== 'undefined' ? navigator.userAgent || '' : '';
+    var standalone =
+      typeof window !== 'undefined' &&
+      (window.matchMedia('(display-mode: standalone)').matches ||
+        window.navigator.standalone === true);
+    var preferRedirect = standalone || /iPhone|iPad|iPod|Android/i.test(ua);
+
+    if (preferRedirect) {
+      return a.signInWithRedirect(provider);
+    }
+
+    return a.signInWithPopup(provider).then(afterCred).catch(function (err) {
+      var code = err && err.code;
+      if (
+        code === 'auth/popup-blocked' ||
+        code === 'auth/popup-closed-by-user' ||
+        code === 'auth/cancelled-popup-request' ||
+        code === 'auth/operation-not-supported-in-this-environment'
+      ) {
+        return a.signInWithRedirect(provider);
+      }
+      return Promise.reject(err);
     });
   }
 
@@ -226,6 +251,19 @@
     var a = auth();
     if (!a) return;
     if (unsubAuth) return;
+
+    a.getRedirectResult()
+      .then(function (cred) {
+        if (cred && cred.user) {
+          return ensureUserDoc(cred.user).then(function () {
+            notify();
+          });
+        }
+      })
+      .catch(function (e) {
+        console.warn('[SOARVIBE] Google redirect result failed', e);
+      });
+
     unsubAuth = a.onAuthStateChanged(function (user) {
       if (!user) {
         currentProfile = null;
