@@ -19,17 +19,24 @@ import {
   assertPlacesTextSearchEnabled,
   assertPlacesPhotoFetchEnabled
 } from './feature-flags.js';
+import {
+  isCitySharesMediaPath,
+  routeCitySharesMedia
+} from './city-shares-media.js';
 
 const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta/models/';
 const DEFAULT_MODEL = 'gemini-2.5-flash';
 const CORS_HEADERS = {
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, X-SOARVIBE-Token',
+  'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-SOARVIBE-Token, X-Post-Id, X-Image-Id',
   'Access-Control-Max-Age': '86400'
 };
 
 function parseAllowedOrigins(env) {
-  var raw = String(env.ALLOWED_ORIGINS || 'https://asd22584812.github.io');
+  var raw = String(
+    env.ALLOWED_ORIGINS ||
+      'https://soarvibe-885c8.web.app,https://soarvibe-885c8.firebaseapp.com,https://asd22584812.github.io'
+  );
   return raw.split(',').map(function (o) { return o.trim(); }).filter(Boolean);
 }
 
@@ -798,13 +805,34 @@ export default {
         service: 'soarvibe-api',
         geminiKeyCount: geminiKeys.length,
         geminiRotation: geminiKeys.length > 1,
-        maps: !!(env.GOOGLE_MAPS_SERVER_KEY || env.GOOGLE_MAPS_API_KEY)
+        maps: !!(env.GOOGLE_MAPS_SERVER_KEY || env.GOOGLE_MAPS_API_KEY),
+        citySharesR2: env.CITY_SHARES_BUCKET ? 'configured' : 'not_configured',
+        citySharesLimits: env.CITY_SHARES_LIMITS ? 'configured' : 'not_configured'
       }, 200, origin, env);
+    }
+
+    // Public image GET — allow without Origin gate (img tags often omit Origin).
+    if (
+      url.pathname.indexOf('/api/city-shares/media/object/') === 0 &&
+      request.method === 'GET'
+    ) {
+      var mediaGet = await routeCitySharesMedia(
+        request,
+        env,
+        { ok: true, origin: origin || '*' },
+        jsonResponse
+      );
+      if (mediaGet) return mediaGet;
     }
 
     var auth = authorizeRequest(request, env);
     if (!auth.ok) {
       return jsonResponse({ error: 'forbidden', message: 'Origin not allowed' }, 403, origin, env);
+    }
+
+    if (isCitySharesMediaPath(url.pathname)) {
+      var mediaRes = await routeCitySharesMedia(request, env, auth, jsonResponse);
+      if (mediaRes) return mediaRes;
     }
 
     if (url.pathname === '/api/gemini' && request.method === 'POST') {

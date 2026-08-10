@@ -159,7 +159,16 @@ service cloud.firestore {
         && request.resource.data.source == 'user'
         && request.resource.data.likeCount == 0
         && request.resource.data.commentCount == 0
-        && request.resource.data.saveCount == 0;
+        && request.resource.data.saveCount == 0
+        && (!('media' in request.resource.data)
+            || (request.resource.data.media is list
+                && request.resource.data.media.size() <= 3));
+    }
+
+    function mediaWithinCap() {
+      return !('media' in request.resource.data)
+        || (request.resource.data.media is list
+            && request.resource.data.media.size() <= 3);
     }
 
     // ------------------------------------------------------------------
@@ -242,6 +251,7 @@ service cloud.firestore {
             'authorAvatarUrl'
           ])
           && request.resource.data.status in ['published', 'draft', 'hidden', 'removed']
+          && mediaWithinCap()
         )
         // Counter-only paths — each requires matching child doc via existsAfter
         || validLikeCountChange(postId)

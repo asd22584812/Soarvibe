@@ -24,6 +24,12 @@
     } else if (raw) {
       console.warn('[SOARVIBE] Auth error:', raw);
     }
+    if (code === 'auth/redirect-session-lost') {
+      return (
+        raw ||
+        'Google 登入導回後無法恢復工作階段。請改用 Email 登入，或改在 Firebase Hosting 網域使用 Google 登入。'
+      );
+    }
     if (
       code === 'auth/api-key-not-valid' ||
       /api-key-not-valid|API key not valid/i.test(raw)
@@ -54,6 +60,12 @@
     if (code === 'auth/popup-blocked') {
       return '瀏覽器封鎖了登入視窗，請允許後再試。';
     }
+    if (
+      code === 'auth/web-storage-unsupported' ||
+      /persistence|indexedDB|localStorage|storage/i.test(code + ' ' + raw)
+    ) {
+      return '無法儲存登入狀態，請檢查瀏覽器是否封鎖網站資料後再試。';
+    }
     return '登入服務暫時無法使用，請稍後再試。';
   }
 
@@ -69,27 +81,41 @@
 
   function openSoarvibeAuthModal(opts) {
     opts = opts || {};
-    blurActive();
-    var modal = $('svAuthModal');
-    if (!modal) return;
-    setMsg(opts.reason || '', false);
-    modal.classList.remove('hidden');
-    modal.setAttribute('aria-hidden', 'false');
-    // Focus email only after modal is on top (never before auth gate / behind City Shares).
-    if (opts.focus === false) return;
-    var email = $('svAuthEmail');
-    window.setTimeout(function () {
-      if (!email || modal.classList.contains('hidden')) return;
-      try {
-        email.focus({ preventScroll: true });
-      } catch (focusErr) {
-        try {
-          email.focus();
-        } catch (e2) {
-          /* silent */
-        }
+    var AUTH = global.SOARVIBE_AUTH;
+    var openNow = function () {
+      if (AUTH && AUTH.isSignedIn && AUTH.isSignedIn()) {
+        closeSoarvibeAuthModal();
+        if (AUTH.resumePendingAction) AUTH.resumePendingAction();
+        return;
       }
-    }, 60);
+      blurActive();
+      var modal = $('svAuthModal');
+      if (!modal) return;
+      setMsg(opts.reason || '', false);
+      modal.classList.remove('hidden');
+      modal.setAttribute('aria-hidden', 'false');
+      if (opts.focus === false) return;
+      var email = $('svAuthEmail');
+      window.setTimeout(function () {
+        if (!email || modal.classList.contains('hidden')) return;
+        try {
+          email.focus({ preventScroll: true });
+        } catch (focusErr) {
+          try {
+            email.focus();
+          } catch (e2) {
+            /* silent */
+          }
+        }
+      }, 60);
+    };
+
+    // Never flash login modal while Firebase is still restoring session.
+    if (AUTH && AUTH.whenAuthReady && !(AUTH.isAuthReady && AUTH.isAuthReady())) {
+      AUTH.whenAuthReady().then(openNow).catch(openNow);
+      return;
+    }
+    openNow();
   }
 
   function closeSoarvibeAuthModal() {
@@ -107,7 +133,15 @@
     var loginBtn = $('svAuthOpenBtn');
     var logoutBtn = $('svAuthLogoutBtn');
     if (!box) return;
-    if (!AUTH || !AUTH.isSignedIn()) {
+
+    if (!AUTH || (AUTH.isAuthReady && !AUTH.isAuthReady())) {
+      box.textContent = '登入狀態確認中…';
+      if (loginBtn) loginBtn.classList.add('hidden');
+      if (logoutBtn) logoutBtn.classList.add('hidden');
+      return;
+    }
+
+    if (!AUTH.isSignedIn()) {
       box.textContent = '尚未登入 — 瀏覽 City Shares 不用登入；留言／按讚／發文時會請您登入。';
       if (loginBtn) loginBtn.classList.remove('hidden');
       if (logoutBtn) logoutBtn.classList.add('hidden');
@@ -117,7 +151,7 @@
     var u = AUTH.currentUser();
     box.textContent =
       '已登入：' +
-      (p.nickname || u.displayName || u.email || u.uid);
+      (p.nickname || (u && u.displayName) || (u && u.email) || (u && u.uid) || '');
     if (loginBtn) loginBtn.classList.add('hidden');
     if (logoutBtn) logoutBtn.classList.remove('hidden');
   }
@@ -165,17 +199,23 @@
       if (submit) submit.textContent = mode === 'login' ? '登入' : '註冊';
     }
 
-    if (openBtn) openBtn.addEventListener('click', function () {
-      openSoarvibeAuthModal();
-    });
+    if (openBtn) {
+      openBtn.addEventListener('click', function () {
+        openSoarvibeAuthModal();
+      });
+    }
     if (closeBtn) closeBtn.addEventListener('click', closeSoarvibeAuthModal);
     if (backdrop) backdrop.addEventListener('click', closeSoarvibeAuthModal);
-    if (tabLogin) tabLogin.addEventListener('click', function () {
-      setMode('login');
-    });
-    if (tabRegister) tabRegister.addEventListener('click', function () {
-      setMode('register');
-    });
+    if (tabLogin) {
+      tabLogin.addEventListener('click', function () {
+        setMode('login');
+      });
+    }
+    if (tabRegister) {
+      tabRegister.addEventListener('click', function () {
+        setMode('register');
+      });
+    }
     if (logoutBtn) {
       logoutBtn.addEventListener('click', function () {
         AUTH.signOut().then(renderAuthStatus);
@@ -184,7 +224,7 @@
     if (form) {
       form.addEventListener('submit', function (e) {
         e.preventDefault();
-        var email = ($('svAuthEmail') && $('svAuthEmail').value || '').trim();
+        var email = (($('svAuthEmail') && $('svAuthEmail').value) || '').trim();
         var password = ($('svAuthPassword') && $('svAuthPassword').value) || '';
         var nickname = ($('svAuthNickname') && $('svAuthNickname').value) || '';
         setMsg('處理中…', false);
@@ -210,6 +250,7 @@
         setMsg('開啟 Google 登入…', false);
         AUTH.signInGoogle()
           .then(function () {
+            // Redirect navigates away; popup/email-like completion lands here.
             closeSoarvibeAuthModal();
             renderAuthStatus();
             syncProfileToUserCenter();
@@ -224,10 +265,66 @@
     AUTH.onAuthStateChanged(function (snap) {
       renderAuthStatus();
       syncProfileToUserCenter();
-      if (snap && snap.signedIn && AUTH.resumePendingAction) {
-        AUTH.resumePendingAction();
+      if (snap && snap.signedIn) {
+        closeSoarvibeAuthModal();
+        if (AUTH.resumePendingAction) AUTH.resumePendingAction();
       }
     });
+
+    try {
+      global.addEventListener('soarvibe-auth-redirect-failed', function (evt) {
+        var detail = (evt && evt.detail) || {};
+        openSoarvibeAuthModal({
+          reason: humanizeAuthError({
+            code: detail.code || 'auth/redirect-session-lost',
+            message: detail.message || ''
+          })
+        });
+        setMsg(
+          humanizeAuthError({
+            code: detail.code || 'auth/redirect-session-lost',
+            message: detail.message || ''
+          }),
+          true
+        );
+      });
+      global.addEventListener('soarvibe-auth-persistence-failed', function (evt) {
+        var detail = (evt && evt.detail) || {};
+        openSoarvibeAuthModal({
+          reason: humanizeAuthError({
+            code: detail.code || 'auth/web-storage-unsupported',
+            message: detail.message || ''
+          })
+        });
+        setMsg(
+          humanizeAuthError({
+            code: detail.code || 'auth/web-storage-unsupported',
+            message: detail.message || ''
+          }),
+          true
+        );
+      });
+    } catch (evtBindErr) {
+      /* silent */
+    }
+
+    // Catch redirect errors that fired before this UI was bound.
+    if (AUTH.whenAuthReady) {
+      AUTH.whenAuthReady().then(function () {
+        var redirectErr = AUTH.consumeRedirectError && AUTH.consumeRedirectError();
+        if (redirectErr) {
+          openSoarvibeAuthModal({ reason: humanizeAuthError(redirectErr) });
+          setMsg(humanizeAuthError(redirectErr), true);
+        }
+        var persistErr = AUTH.getPersistenceError && AUTH.getPersistenceError();
+        if (persistErr) {
+          openSoarvibeAuthModal({ reason: humanizeAuthError(persistErr) });
+          setMsg(humanizeAuthError(persistErr), true);
+        }
+        renderAuthStatus();
+      });
+    }
+
     setMode('login');
     renderAuthStatus();
   }

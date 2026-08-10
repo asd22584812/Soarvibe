@@ -969,8 +969,71 @@
       (normalized.hasCompleteFlightData && normalized.hardConstraints.active) ||
       (normalized.planningMode === 'preview' && normalized.buffers && normalized.buffers.earliestSightseeingHhmm)
     );
+    var integrity = global.SOARVIBE_ITINERARY_TIME_INTEGRITY || null;
+
+    function itemAbsStart(it) {
+      if (integrity && typeof integrity.normalizeItemTimeline === 'function') {
+        var tl = integrity.normalizeItemTimeline(it);
+        return tl.startAbs;
+      }
+      return hhmmToMinutes(it && it.startTime);
+    }
+
+    function itemAbsEnd(it) {
+      if (integrity && typeof integrity.normalizeItemTimeline === 'function') {
+        var tl = integrity.normalizeItemTimeline(it);
+        return tl.endAbs;
+      }
+      return hhmmToMinutes(it && (it.endTime || it.startTime));
+    }
+
+    function sortDayPhasesChronologically(day) {
+      if (integrity && typeof integrity.sortItemsChronologically === 'function') {
+        var flat = [];
+        (day.phases || []).forEach(function (phase) {
+          (phase.items || []).forEach(function (it) {
+            flat.push(it);
+          });
+        });
+        flat = integrity.sortItemsChronologically(flat);
+        var buckets = { 上午: [], 下午: [], 晚上: [] };
+        flat.forEach(function (it) {
+          var tl = integrity.normalizeItemTimeline(it);
+          it.startTime = tl.startTime;
+          it.endTime = tl.endTime;
+          it.startAbs = tl.startAbs;
+          it.endAbs = tl.endAbs;
+          it.crossesMidnight = tl.crossesMidnight;
+          if (it.startTime && it.endTime) it.timeLabel = it.startTime + ' - ' + it.endTime;
+          var startMin = isNaN(tl.startMinutes) ? 15 * 60 : tl.startMinutes;
+          var period = startMin < 12 * 60 ? '上午' : startMin < 17 * 60 ? '下午' : '晚上';
+          if (tl.startDayOffset > 0) period = '晚上';
+          it.period = period;
+          buckets[period].push(it);
+        });
+        var order = ['上午', '下午', '晚上'];
+        var emoji = { 上午: '☀️', 下午: '🌤️', 晚上: '🌙' };
+        day.phases = order.map(function (label) {
+          return {
+            label: label,
+            period: label,
+            emoji: emoji[label],
+            items: buckets[label]
+          };
+        });
+        return;
+      }
+      // Fallback: sort within each phase by clock only
+      (day.phases || []).forEach(function (phase) {
+        if (!phase.items) return;
+        phase.items.sort(function (a, b) {
+          return (hhmmToMinutes(a.startTime) || 0) - (hhmmToMinutes(b.startTime) || 0);
+        });
+      });
+    }
 
     hidden.days.forEach(function (day, dayIdx) {
+      sortDayPhasesChronologically(day);
       var items = flattenDayItems(day);
       if (!items.length) return;
 
@@ -1006,7 +1069,8 @@
         });
       }
 
-      // Re-flatten after possible shifts
+      // Re-flatten after possible shifts + chronological order
+      sortDayPhasesChronologically(day);
       items = flattenDayItems(day);
       var i;
       for (i = 0; i < items.length - 1; i++) {
@@ -1018,14 +1082,19 @@
         if (!a.startTime || !b.startTime) continue;
         var leg = estimateTransferMinutes(a.title || '', b.title || '', mode);
         var needGap = Math.max(CONFIG.minGapBetweenStopsMinutes, leg.estimatedMinutes);
-        var aEnd = hhmmToMinutes(a.endTime || a.startTime);
-        var bStart = hhmmToMinutes(b.startTime);
+        var aEnd = itemAbsEnd(a);
+        var bStart = itemAbsStart(b);
         if (isNaN(aEnd) || isNaN(bStart)) continue;
         if (bStart < aEnd) {
           issues.push({ type: 'overlap', day: day.dayNum, from: a.title, to: b.title });
-          b.startTime = addMinutesToHhmm(a.endTime || a.startTime, needGap);
-          var bStay = Math.max(25, (hhmmToMinutes(b.endTime) || bStart + 45) - bStart);
-          b.endTime = addMinutesToHhmm(b.startTime, bStay);
+          // Shift using absolute end + gap, then write clock times
+          var newStartAbs = aEnd + needGap;
+          var bStay = Math.max(
+            25,
+            (itemAbsEnd(b) || bStart + 45) - bStart
+          );
+          b.startTime = minutesToHhmm(newStartAbs);
+          b.endTime = minutesToHhmm(newStartAbs + bStay);
           b.timeLabel = b.startTime + ' - ' + b.endTime;
           fixes.push({ type: 'fix_overlap', to: b.title, start: b.startTime });
           continue;
@@ -1039,9 +1108,10 @@
             needMinutes: needGap,
             actualGap: bStart - aEnd
           });
-          b.startTime = addMinutesToHhmm(a.endTime || a.startTime, needGap);
-          var stay2 = Math.max(25, (hhmmToMinutes(b.endTime) || bStart + 45) - bStart);
-          b.endTime = addMinutesToHhmm(b.startTime, stay2);
+          var shiftedAbs = aEnd + needGap;
+          var stay2 = Math.max(25, (itemAbsEnd(b) || bStart + 45) - bStart);
+          b.startTime = minutesToHhmm(shiftedAbs);
+          b.endTime = minutesToHhmm(shiftedAbs + stay2);
           b.timeLabel = b.startTime + ' - ' + b.endTime;
           fixes.push({
             type: 'insert_transfer_gap',
@@ -1060,7 +1130,11 @@
           if (!it.endTime) return;
           if (/機場|空港|airport|送機|報到/i.test(String(it.title || ''))) return;
           var end = hhmmToMinutes(it.endTime);
-          if (!isNaN(end) && !isNaN(latest) && end > latest) {
+          // Overnight end (00:xx after late activity) is always past return buffer on same calendar label —
+          // use absolute end when integrity available
+          var endAbs = itemAbsEnd(it);
+          var endCmp = !isNaN(endAbs) ? endAbs % (24 * 60) : end;
+          if (!isNaN(endCmp) && !isNaN(latest) && endCmp > latest && (isNaN(endAbs) || endAbs < 24 * 60)) {
             issues.push({
               type: 'return_buffer_breach',
               day: day.dayNum,
@@ -1078,6 +1152,9 @@
           }
         });
       }
+
+      // Final chronological pass after flight/transfer edits
+      sortDayPhasesChronologically(day);
     });
 
     hidden.meta = hidden.meta || {};

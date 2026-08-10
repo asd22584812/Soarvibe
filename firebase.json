@@ -6,6 +6,87 @@
   "storage": {
     "rules": "storage.rules"
   },
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      "firebase-debug.log",
+      "firestore-debug.log",
+      "ui-debug.log",
+      "**/.*",
+      "**/node_modules/**",
+      "worker/**",
+      "scripts/**",
+      "editorial/**",
+      "agent-transcripts/**",
+      ".tools/**",
+      "live*.html",
+      "live*.js",
+      "*.md",
+      "package.json",
+      "package-lock.json",
+      "firestore.rules",
+      "firestore.indexes.json",
+      "storage.rules",
+      "city-shares-schema.json",
+      "branch-policies.json",
+      "deployments.json",
+      "deps-check.json",
+      "env-pages.json",
+      "envs.json",
+      "ghstatus.json",
+      "jobs*.json",
+      "pages-info.json",
+      "repo.json",
+      "run*.json",
+      "runs*.json",
+      "workflows.json",
+      "**/*.test.js",
+      "**/*.test.mjs",
+      "**/*.spec.js",
+      "**/*.spec.mjs",
+      "**/__tests__/**",
+      "test/**",
+      "tests/**"
+    ],
+    "headers": [
+      {
+        "source": "/manifest.json",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/manifest+json"
+          }
+        ]
+      },
+      {
+        "source": "/service-worker.js",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
+          },
+          {
+            "key": "Service-Worker-Allowed",
+            "value": "/"
+          }
+        ]
+      },
+      {
+        "source": "**/*.@(js|css|html)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
+          }
+        ]
+      }
+    ]
+  },
   "emulators": {
     "firestore": {
       "port": 8080,

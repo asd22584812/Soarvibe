@@ -652,6 +652,48 @@ describe('POST / USER access', () => {
     );
     await assertFails(getDoc(doc(dbGuest(), 'metrics', 'x')));
   });
+
+  it('29. create post with media.length <= 3 → PASS', async () => {
+    const db = dbAs(USER_A);
+    await assertSucceeds(
+      setDoc(doc(db, 'posts', 'post_media_ok'), publishedPost({
+        media: [
+          { mediaId: 'a', src: 'https://example.com/a.webp', type: 'image/webp', sortOrder: 0 },
+          { mediaId: 'b', src: 'https://example.com/b.webp', type: 'image/webp', sortOrder: 1 },
+          { mediaId: 'c', src: 'https://example.com/c.webp', type: 'image/webp', sortOrder: 2 }
+        ]
+      }))
+    );
+  });
+
+  it('30. create post with media.length 4 → DENY', async () => {
+    const db = dbAs(USER_A);
+    await assertFails(
+      setDoc(doc(db, 'posts', 'post_media_over'), publishedPost({
+        media: [
+          { mediaId: 'a', src: 'https://example.com/a.webp' },
+          { mediaId: 'b', src: 'https://example.com/b.webp' },
+          { mediaId: 'c', src: 'https://example.com/c.webp' },
+          { mediaId: 'd', src: 'https://example.com/d.webp' }
+        ]
+      }))
+    );
+  });
+
+  it('31. update post media to length 4 → DENY', async () => {
+    const db = dbAs(USER_A);
+    await assertFails(
+      updateDoc(doc(db, 'posts', POST_PUB), {
+        media: [
+          { mediaId: 'a', src: 'https://example.com/a.webp' },
+          { mediaId: 'b', src: 'https://example.com/b.webp' },
+          { mediaId: 'c', src: 'https://example.com/c.webp' },
+          { mediaId: 'd', src: 'https://example.com/d.webp' }
+        ],
+        updatedAt: serverTimestamp()
+      })
+    );
+  });
 });
 
 describe('city-shares-firestore.js API against emulator', () => {

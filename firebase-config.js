@@ -11,7 +11,9 @@
   global.SOARVIBE_FIREBASE_CONFIG = Object.freeze({
     // NOTE: apiKey is case-sensitive. Typo H vs h previously caused auth/api-key-not-valid.
     apiKey: 'AIzaSyCecAOqW264hYUxEdWOclotGU8Ci4VZKGE',
-    authDomain: 'soarvibe-885c8.firebaseapp.com',
+    // Primary PWA host is Firebase Hosting (web.app). Same-site authDomain avoids
+    // Safari / iOS third-party storage breakage with signInWithRedirect.
+    authDomain: 'soarvibe-885c8.web.app',
     projectId: 'soarvibe-885c8',
     storageBucket: 'soarvibe-885c8.firebasestorage.app',
     messagingSenderId: '1010057383556',

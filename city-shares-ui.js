@@ -298,10 +298,46 @@
         escapeHtml(media.src) +
         '" alt="' +
         escapeHtml(media.alt || altFallback || '') +
-        '" loading="lazy" decoding="async">'
+        '" loading="lazy" decoding="async" onerror="this.style.display=\'none\'">'
       );
     }
-    return '<div class="cs-card-placeholder"><span aria-hidden="true">📷</span><span>照片準備中</span></div>';
+    return '';
+  }
+
+  function renderMediaGallery(post) {
+    var list =
+      post && Array.isArray(post.media)
+        ? post.media
+            .slice()
+            .sort(function (a, b) {
+              return (a.sortOrder || 0) - (b.sortOrder || 0);
+            })
+            .filter(function (m) {
+              return m && m.src;
+            })
+            .slice(0, MEDIA_MAX_PER_POST)
+        : [];
+    if (!list.length) return '';
+    if (list.length === 1) {
+      return (
+        '<div class="cs-detail-hero">' + renderMediaBlock(list[0], post.title) + '</div>'
+      );
+    }
+    return (
+      '<div class="cs-detail-gallery cs-detail-gallery--' +
+      list.length +
+      '">' +
+      list
+        .map(function (m) {
+          return (
+            '<div class="cs-detail-gallery-item">' +
+            renderMediaBlock(m, post.title) +
+            '</div>'
+          );
+        })
+        .join('') +
+      '</div>'
+    );
   }
 
   function renderFeed(cityId) {
@@ -339,15 +375,22 @@
         .map(function (post) {
           var cover = getCoverMedia(post);
           var typeLabel = TYPE_LABELS[post.type] || post.type;
+          var mediaHtml = cover
+            ? '<div class="cs-card-media">' +
+              renderMediaBlock(cover, post.title) +
+              '<span class="cs-card-type">' +
+              escapeHtml(typeLabel) +
+              '</span></div>'
+            : '<div class="cs-card-media cs-card-media--text"><span class="cs-card-type">' +
+              escapeHtml(typeLabel) +
+              '</span></div>';
           return (
-            '<button type="button" class="cs-card" data-cs-post="' +
+            '<button type="button" class="cs-card' +
+            (cover ? '' : ' cs-card--text') +
+            '" data-cs-post="' +
             escapeHtml(post.postId) +
             '">' +
-            '<div class="cs-card-media">' +
-            renderMediaBlock(cover, post.title) +
-            '<span class="cs-card-type">' +
-            escapeHtml(typeLabel) +
-            '</span></div>' +
+            mediaHtml +
             '<div class="cs-card-body">' +
             '<h3 class="cs-card-title">' +
             escapeHtml(post.title) +
@@ -489,9 +532,7 @@
 
     return (
       '<div class="cs-page">' +
-      '<div class="cs-detail-hero">' +
-      renderMediaBlock(cover, post.title) +
-      '</div>' +
+      renderMediaGallery(post) +
       '<div class="cs-detail-body">' +
       '<span class="cs-detail-type">' +
       escapeHtml(TYPE_LABELS[post.type] || post.type) +
@@ -742,7 +783,7 @@
           ? ''
           : '<label class="cs-compose-add-photo">' +
             '＋ 新增照片' +
-            '<input id="csComposeMediaInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple hidden>' +
+            '<input id="csComposeMediaInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/heic,image/heif,.heic,.heif" multiple hidden>' +
             '</label>') +
         thumbs +
         '</div>';
@@ -1277,25 +1318,82 @@
     if (!files.length) return;
     if (!Array.isArray(csState.composeMedia)) csState.composeMedia = [];
     var room = Math.max(0, MEDIA_MAX_PER_POST - csState.composeMedia.length);
-    files.slice(0, room).forEach(function (file) {
-      if (!file || !/^image\/(jpeg|png|webp|gif)$/i.test(file.type || '')) return;
-      if (file.size > 2 * 1024 * 1024) {
-        alert('單張照片請小於 2MB');
-        return;
-      }
-      var previewUrl = '';
-      try {
-        previewUrl = URL.createObjectURL(file);
-      } catch (e) {
-        previewUrl = '';
-      }
-      csState.composeMedia.push({
-        file: file,
-        previewUrl: previewUrl,
-        type: file.type
+    if (!room) {
+      alert('每篇最多 ' + MEDIA_MAX_PER_POST + ' 張照片');
+      return;
+    }
+    var imgApi = global.SOARVIBE_CITY_SHARES_IMAGE;
+    var picked = files.slice(0, room);
+    var msg = document.getElementById('csComposeMsg');
+    if (msg) {
+      msg.textContent = '處理照片中…';
+      msg.classList.remove('hidden');
+    }
+
+    var chain = Promise.resolve();
+    picked.forEach(function (file) {
+      chain = chain.then(function () {
+        if (csState.composeMedia.length >= MEDIA_MAX_PER_POST) return null;
+        if (!file) return null;
+        if (imgApi && typeof imgApi.isAcceptedInput === 'function' && !imgApi.isAcceptedInput(file)) {
+          alert('請選擇 JPG、PNG、WebP 或 iPhone 照片');
+          return null;
+        }
+        var compressPromise =
+          imgApi && typeof imgApi.compressForUpload === 'function'
+            ? imgApi.compressForUpload(file)
+            : Promise.resolve({
+                ok: false,
+                code: 'no_compressor',
+                message: '照片壓縮模組未載入'
+              });
+        return compressPromise.then(function (result) {
+          if (!result || !result.ok) {
+            var code = result && result.code;
+            var text =
+              (result && result.message) ||
+              (code === 'heic_unsupported'
+                ? '這張 HEIC 無法解碼。請轉成 JPG 後再試。'
+                : '照片處理失敗');
+            alert(text);
+            return null;
+          }
+          if (csState.composeMedia.length >= MEDIA_MAX_PER_POST) return null;
+          var previewUrl = '';
+          try {
+            previewUrl = URL.createObjectURL(result.blob || result.file);
+          } catch (e) {
+            previewUrl = '';
+          }
+          csState.composeMedia.push({
+            file: result.file || result.blob,
+            imageId: result.imageId,
+            previewUrl: previewUrl,
+            type: 'image/webp',
+            bytes: result.bytes,
+            width: result.width,
+            height: result.height
+          });
+          return null;
+        });
       });
     });
-    renderCurrentView();
+
+    chain
+      .then(function () {
+        if (msg) {
+          msg.textContent = '';
+          msg.classList.add('hidden');
+        }
+        renderCurrentView();
+      })
+      .catch(function (err) {
+        if (msg) {
+          msg.textContent = (err && err.message) || '照片處理失敗';
+          msg.classList.remove('hidden');
+        }
+        renderCurrentView();
+      });
   }
 
   function handleComposeSubmit() {
@@ -1362,7 +1460,7 @@
       media: [],
       mediaFiles: uploadOn
         ? mediaDraft.map(function (m) {
-            return m.file;
+            return m.imageId ? { file: m.file, imageId: m.imageId } : m.file;
           })
         : []
     };

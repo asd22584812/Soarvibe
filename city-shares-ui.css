@@ -191,7 +191,36 @@
     background: #eceff1;
     overflow: hidden;
 }
+#cityShares .cs-card-media--text {
+    aspect-ratio: 16 / 5;
+    background: linear-gradient(135deg, #e8eef2, #f5f7f8);
+}
 #cityShares .cs-card-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+#cityShares .cs-detail-gallery {
+    display: grid;
+    gap: 4px;
+    background: #111;
+}
+#cityShares .cs-detail-gallery--2 {
+    grid-template-columns: 1fr 1fr;
+}
+#cityShares .cs-detail-gallery--3 {
+    grid-template-columns: 1fr 1fr;
+}
+#cityShares .cs-detail-gallery--3 .cs-detail-gallery-item:first-child {
+    grid-column: 1 / -1;
+}
+#cityShares .cs-detail-gallery-item {
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: #1a1a1a;
+}
+#cityShares .cs-detail-gallery-item img {
     width: 100%;
     height: 100%;
     object-fit: cover;

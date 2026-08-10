@@ -16,7 +16,7 @@
 #   → 把 workers.dev 網址填到 index.html 的 SOARVIBE_API_BASE
 #
 #   驗證：curl https://你的worker.dev/api/health
-#   應看到 geminiKeyCount: 4, maps: true
+#   應看到 geminiKeyCount: 4, maps: true, citySharesR2: configured
 
 name = "soarvibe-api"
 main = "src/index.js"
@@ -24,4 +24,21 @@ compatibility_date = "2024-12-01"
 workers_dev = true
 
 [vars]
-ALLOWED_ORIGINS = "https://asd22584812.github.io,http://localhost:8787,http://127.0.0.1:8787,http://localhost:3000,http://127.0.0.1:3000"
+# Firebase Hosting is the primary PWA origin; GitHub Pages remains a mirror.
+# Write routes (upload/delete) only echo ACAO when Origin is in this list — never *.
+ALLOWED_ORIGINS = "https://soarvibe-885c8.web.app,https://soarvibe-885c8.firebaseapp.com,https://asd22584812.github.io,http://localhost:8787,http://127.0.0.1:8787,http://localhost:3000,http://127.0.0.1:3000"
+FIREBASE_PROJECT_ID = "soarvibe-885c8"
+# Keep empty — R2 Public Access stays Disabled; images served via Worker GET only.
+CITY_SHARES_PUBLIC_BASE = ""
+CITY_SHARES_WORKER_PUBLIC_BASE = "https://soarvibe-api.soarvibe.workers.dev"
+
+# City Shares images (Cloudflare R2 — NOT Firebase Storage).
+# Production bucket already exists; do NOT set preview_bucket_name (avoids blocking prod deploy).
+[[r2_buckets]]
+binding = "CITY_SHARES_BUCKET"
+bucket_name = "soarvibe-city-shares"
+
+# Upload quotas / draft post claims (billing safety)
+[[kv_namespaces]]
+binding = "CITY_SHARES_LIMITS"
+id = "4e1aebea2565456797b5f47fd6aa846b"

@@ -15,7 +15,7 @@
   var TITLE_MAX = 80;
   var BODY_MAX = 600;
   var BODY_MIN = 20;
-  /** Per-post media cap (enforced when citySharesMediaUpload is true; R2 later). */
+  /** Per-post media cap (Cloudflare R2; no Firebase Storage). */
   var MEDIA_MAX_PER_POST = 3;
 
   function mediaUploadEnabled() {
@@ -300,57 +300,179 @@
       });
   }
 
-  function storage() {
-    return global.SOARVIBE_FIREBASE && global.SOARVIBE_FIREBASE.getStorage
-      ? global.SOARVIBE_FIREBASE.getStorage()
-      : null;
+  function getCitySharesApiBase() {
+    try {
+      var stored = localStorage.getItem('SOARVIBE_API_BASE');
+      if (stored) return String(stored).trim().replace(/\/$/, '');
+    } catch (e) {
+      /* silent */
+    }
+    if (global.SOARVIBE_API_BASE) {
+      return String(global.SOARVIBE_API_BASE).trim().replace(/\/$/, '');
+    }
+    return 'https://soarvibe-api.soarvibe.workers.dev';
   }
 
+  function getIdToken() {
+    var a = authApi();
+    if (a && typeof a.getIdToken === 'function') {
+      return a.getIdToken();
+    }
+    var user = a && a.currentUser ? a.currentUser() : null;
+    if (!user || typeof user.getIdToken !== 'function') {
+      return Promise.reject(new Error('請先登入'));
+    }
+    return user.getIdToken();
+  }
+
+  /**
+   * Upload compressed WebP files to Cloudflare R2 via Worker.
+   * Sequential to reduce 3-image race windows; Worker still enforces after-put.
+   * mediaFiles items may be File/Blob or { file, imageId }.
+   */
   function uploadPostImages(uid, postId, files) {
     if (!mediaUploadEnabled()) {
       return Promise.resolve([]);
     }
-    var store = storage();
     if (!files || !files.length) return Promise.resolve([]);
-    if (!store) {
-      return Promise.reject(new Error('照片上傳尚未啟用'));
+    var base = getCitySharesApiBase();
+    if (!base) {
+      return Promise.reject(new Error('照片上傳服務尚未設定'));
     }
-    var tasks = files.slice(0, MEDIA_MAX_PER_POST).map(function (file, idx) {
-      if (!file) return Promise.resolve(null);
-      var type = String(file.type || '');
-      if (!/^image\/(jpeg|png|webp|gif)$/i.test(type)) {
-        return Promise.reject(new Error('僅支援 JPG / PNG / WEBP / GIF'));
-      }
-      if (file.size > 2 * 1024 * 1024) {
-        return Promise.reject(new Error('單張照片請小於 2MB'));
-      }
-      var ext =
-        type.indexOf('png') !== -1
-          ? 'png'
-          : type.indexOf('webp') !== -1
-            ? 'webp'
-            : type.indexOf('gif') !== -1
-              ? 'gif'
-              : 'jpg';
-      var fileName = 'img-' + idx + '-' + Date.now() + '.' + ext;
-      var path = 'city-shares/' + uid + '/' + postId + '/' + fileName;
-      var ref = store.ref().child(path);
-      return ref.put(file, { contentType: type }).then(function () {
-        return ref.getDownloadURL().then(function (url) {
-          return {
-            mediaId: fileName,
-            src: url,
-            downloadURL: url,
-            storagePath: path,
-            type: type,
-            sortOrder: idx,
-            slot: 'other'
-          };
+
+    var list = files.slice(0, MEDIA_MAX_PER_POST);
+    var uploaded = [];
+
+    function cleanupOrphans() {
+      if (!uploaded.length) return Promise.resolve();
+      return deletePostMediaAll(postId).catch(function (e) {
+        console.warn('[SOARVIBE] orphan media cleanup failed', e);
+      });
+    }
+
+    return getIdToken().then(function (token) {
+      var chain = Promise.resolve();
+      list.forEach(function (item, idx) {
+        chain = chain.then(function () {
+          var file = item && item.file ? item.file : item;
+          var imageId =
+            (item && item.imageId) ||
+            (global.SOARVIBE_CITY_SHARES_IMAGE &&
+              global.SOARVIBE_CITY_SHARES_IMAGE.newImageId &&
+              global.SOARVIBE_CITY_SHARES_IMAGE.newImageId()) ||
+            'img' + Date.now() + idx;
+          if (!file) return null;
+          var type = String(file.type || '');
+          if (type && type !== 'image/webp') {
+            return Promise.reject(new Error('僅接受 WebP（請先經客戶端壓縮）'));
+          }
+          if (file.size > 2 * 1024 * 1024) {
+            return Promise.reject(new Error('單張照片請小於 2MB'));
+          }
+          var form = new FormData();
+          form.append('postId', postId);
+          form.append('imageId', imageId);
+          form.append('file', file, imageId + '.webp');
+          return fetch(base + '/api/city-shares/media/upload', {
+            method: 'POST',
+            headers: { Authorization: 'Bearer ' + token },
+            body: form
+          }).then(function (res) {
+            return res.json().then(function (body) {
+              if (!res.ok || !body || !body.ok) {
+                var msg =
+                  (body && (body.message || body.error)) ||
+                  '上傳失敗 (' + res.status + ')';
+                if (body && body.error === 'media_limit') {
+                  msg = '每篇最多 ' + MEDIA_MAX_PER_POST + ' 張照片';
+                }
+                return Promise.reject(new Error(msg));
+              }
+              var src = body.src || '';
+              if (src.indexOf('http') !== 0) {
+                src = base + src;
+              }
+              var mediaItem = {
+                mediaId: body.mediaId || imageId,
+                imageId: body.imageId || imageId,
+                src: src,
+                downloadURL: src,
+                storagePath: body.path || body.storagePath,
+                path: body.path || body.storagePath,
+                type: 'image/webp',
+                sortOrder: idx,
+                slot: 'other',
+                bytes: body.bytes || file.size
+              };
+              uploaded.push(mediaItem);
+              return mediaItem;
+            });
+          });
         });
       });
+      return chain
+        .then(function () {
+          return uploaded.slice(0, MEDIA_MAX_PER_POST);
+        })
+        .catch(function (err) {
+          return cleanupOrphans().then(function () {
+            return Promise.reject(err);
+          });
+        });
     });
-    return Promise.all(tasks).then(function (items) {
-      return items.filter(Boolean);
+  }
+
+  function deletePostMediaAll(postId) {
+    if (!mediaUploadEnabled()) return Promise.resolve({ ok: true, skipped: true });
+    var base = getCitySharesApiBase();
+    if (!base || !postId) return Promise.resolve({ ok: true, skipped: true });
+    return getIdToken()
+      .then(function (token) {
+        return fetch(base + '/api/city-shares/media', {
+          method: 'DELETE',
+          headers: {
+            Authorization: 'Bearer ' + token,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ postId: postId, all: true })
+        });
+      })
+      .then(function (res) {
+        if (!res.ok) {
+          return res.json().catch(function () {
+            return {};
+          }).then(function (body) {
+            console.warn('[SOARVIBE] deletePostMediaAll', res.status, body);
+            return { ok: false, status: res.status };
+          });
+        }
+        return res.json().catch(function () {
+          return { ok: true };
+        });
+      })
+      .catch(function (e) {
+        console.warn('[SOARVIBE] deletePostMediaAll failed', e);
+        return { ok: false };
+      });
+  }
+
+  function deletePostMediaOne(postId, imageId) {
+    if (!mediaUploadEnabled()) return Promise.resolve({ ok: true, skipped: true });
+    var base = getCitySharesApiBase();
+    if (!base || !postId || !imageId) return Promise.resolve({ ok: true, skipped: true });
+    return getIdToken().then(function (token) {
+      return fetch(base + '/api/city-shares/media', {
+        method: 'DELETE',
+        headers: {
+          Authorization: 'Bearer ' + token,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ postId: postId, imageId: imageId })
+      }).then(function (res) {
+        return res.json().catch(function () {
+          return { ok: res.ok };
+        });
+      });
     });
   }
 
@@ -414,44 +536,76 @@
     var now = firebase.firestore.FieldValue.serverTimestamp();
     var allowMedia = mediaUploadEnabled();
     var files = allowMedia && Array.isArray(input.mediaFiles) ? input.mediaFiles : [];
+    if (files.length > MEDIA_MAX_PER_POST) {
+      files = files.slice(0, MEDIA_MAX_PER_POST);
+    }
     var presetMedia =
       allowMedia && Array.isArray(input.media) && input.media.length
         ? input.media.slice(0, MEDIA_MAX_PER_POST)
         : null;
 
-    return uploadPostImages(user.uid, postId, files).then(function (uploaded) {
-      var media = presetMedia || uploaded || [];
-      if (!allowMedia) media = [];
-      var doc = {
-        authorId: user.uid,
-        authorDisplayName: profileName(),
-        authorAvatarUrl: (profile && profile.avatarUrl) || user.photoURL || '',
-        countryId: countryId,
-        countryName: String(tax.countryName || '').trim().slice(0, 40),
-        regionId: String(tax.regionId || '').trim().slice(0, 40),
-        regionName: String(tax.regionName || '').trim().slice(0, 40),
-        cityId: cityId,
-        cityName: String(tax.cityName || '').trim().slice(0, 60),
-        locationRaw: String(tax.locationRaw || '').trim().slice(0, 80),
-        locationSource: String(tax.locationSource || 'manual').slice(0, 24),
-        type: type,
-        title: title,
-        body: body,
-        place: input.place || null,
-        media: media,
-        tags: Array.isArray(input.tags) ? input.tags.slice(0, 12) : [],
-        status: 'published',
-        source: 'user',
-        likeCount: 0,
-        commentCount: 0,
-        saveCount: 0,
-        createdAt: now,
-        updatedAt: now
-      };
-      return ref.set(doc).then(function () {
-        return getPost(postId);
+    var wroteDoc = false;
+    return uploadPostImages(user.uid, postId, files)
+      .then(function (uploaded) {
+        var media = presetMedia || uploaded || [];
+        if (!allowMedia) media = [];
+        media = (media || []).slice(0, MEDIA_MAX_PER_POST).map(function (m, idx) {
+          // Never persist Base64 / data URLs in Firestore
+          var src = String((m && (m.src || m.downloadURL)) || '');
+          if (/^data:/i.test(src)) {
+            throw new Error('照片網址無效');
+          }
+          var item = {
+            mediaId: String((m && (m.mediaId || m.imageId)) || 'm' + idx),
+            imageId: String((m && (m.imageId || m.mediaId)) || 'm' + idx),
+            src: src,
+            downloadURL: src,
+            storagePath: String((m && (m.storagePath || m.path)) || ''),
+            path: String((m && (m.path || m.storagePath)) || ''),
+            type: String((m && m.type) || 'image/webp'),
+            sortOrder: typeof (m && m.sortOrder) === 'number' ? m.sortOrder : idx,
+            slot: String((m && m.slot) || 'other')
+          };
+          if (typeof (m && m.bytes) === 'number') item.bytes = m.bytes;
+          return item;
+        });
+        var doc = {
+          authorId: user.uid,
+          authorDisplayName: profileName(),
+          authorAvatarUrl: (profile && profile.avatarUrl) || user.photoURL || '',
+          countryId: countryId,
+          countryName: String(tax.countryName || '').trim().slice(0, 40),
+          regionId: String(tax.regionId || '').trim().slice(0, 40),
+          regionName: String(tax.regionName || '').trim().slice(0, 40),
+          cityId: cityId,
+          cityName: String(tax.cityName || '').trim().slice(0, 60),
+          locationRaw: String(tax.locationRaw || '').trim().slice(0, 80),
+          locationSource: String(tax.locationSource || 'manual').slice(0, 24),
+          type: type,
+          title: title,
+          body: body,
+          place: input.place || null,
+          media: media,
+          tags: Array.isArray(input.tags) ? input.tags.slice(0, 12) : [],
+          status: 'published',
+          source: 'user',
+          likeCount: 0,
+          commentCount: 0,
+          saveCount: 0,
+          createdAt: now,
+          updatedAt: now
+        };
+        return ref.set(doc).then(function () {
+          wroteDoc = true;
+          return getPost(postId);
+        });
+      })
+      .catch(function (err) {
+        if (wroteDoc) return Promise.reject(err);
+        return deletePostMediaAll(postId).then(function () {
+          return Promise.reject(err);
+        });
       });
-    });
   }
 
   function deletePost(postId) {
@@ -461,9 +615,11 @@
     return ref.get().then(function (snap) {
       if (!snap.exists) throw new Error('貼文不存在');
       if (snap.data().authorId !== user.uid) throw new Error('只能刪除自己的貼文');
-      return ref.update({
-        status: 'removed',
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      return deletePostMediaAll(postId).then(function () {
+        return ref.update({
+          status: 'removed',
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
       });
     });
   }
@@ -678,6 +834,8 @@
     getPost: getPost,
     createPost: createPost,
     deletePost: deletePost,
+    deletePostMediaAll: deletePostMediaAll,
+    deletePostMediaOne: deletePostMediaOne,
     listComments: listComments,
     addComment: addComment,
     deleteComment: deleteComment,
@@ -685,6 +843,7 @@
     hasSaved: hasSaved,
     toggleLike: toggleLike,
     toggleSave: toggleSave,
-    mergeFeed: mergeFeed
+    mergeFeed: mergeFeed,
+    MEDIA_MAX_PER_POST: MEDIA_MAX_PER_POST
   };
 })(typeof window !== 'undefined' ? window : globalThis);

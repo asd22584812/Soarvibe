@@ -1,6 +1,8 @@
 /**
  * Firebase app bootstrap (compat SDK — works with GitHub Pages static scripts).
- * Requires: firebase-app-compat, auth, firestore, storage CDNs + firebase-config.js
+ * Requires: firebase-app-compat, auth, firestore (+ optional storage) CDNs + firebase-config.js
+ *
+ * Auth + Firestore must succeed even when Storage is not provisioned / Blaze-locked.
  */
 (function (global) {
   'use strict';
@@ -9,6 +11,7 @@
   var auth = null;
   var db = null;
   var storage = null;
+  var storageAvailable = false;
   var ready = false;
   var initError = null;
 
@@ -20,13 +23,20 @@
     try {
       var key = cfg && cfg.apiKey ? String(cfg.apiKey) : '';
       var appId = cfg && cfg.appId ? String(cfg.appId) : '';
+      var standalone =
+        typeof window !== 'undefined' &&
+        ((window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
+          (window.navigator && window.navigator.standalone === true));
       console.info('[SOARVIBE] Firebase diagnostics', {
         projectId: (cfg && cfg.projectId) || '',
         authDomain: (cfg && cfg.authDomain) || '',
         appIdTail: appId ? appId.slice(-4) : '',
         apiKeyPresent: !!key,
         apiKeyLength: key.length,
-        firebaseAppsCount: appsCount
+        firebaseAppsCount: appsCount,
+        displayMode: standalone ? 'standalone' : 'browser',
+        pathname: typeof location !== 'undefined' ? location.pathname : '',
+        origin: typeof location !== 'undefined' ? location.origin : ''
       });
     } catch (diagErr) {
       /* silent */
@@ -55,7 +65,21 @@
       }
       auth = firebase.auth();
       db = firebase.firestore();
-      storage = firebase.storage();
+      storage = null;
+      storageAvailable = false;
+      try {
+        if (typeof firebase.storage === 'function') {
+          storage = firebase.storage();
+          storageAvailable = !!storage;
+        }
+      } catch (storageInitErr) {
+        storage = null;
+        storageAvailable = false;
+        console.warn(
+          '[SOARVIBE] Firebase Storage init skipped (Auth/Firestore still ready)',
+          storageInitErr && storageInitErr.message
+        );
+      }
       ready = true;
       initError = null;
       logFirebaseDiagnostics(cfg, firebase.apps ? firebase.apps.length : 0);
@@ -83,7 +107,12 @@
 
   function getStorage() {
     if (!ready) initFirebase();
-    return storage;
+    return storageAvailable ? storage : null;
+  }
+
+  function isStorageAvailable() {
+    if (!ready) initFirebase();
+    return storageAvailable && !!storage;
   }
 
   function getInitError() {
@@ -96,6 +125,7 @@
     getAuth: getAuth,
     getDb: getDb,
     getStorage: getStorage,
+    isStorageAvailable: isStorageAvailable,
     getInitError: getInitError,
     getDiagnostics: function () {
       var cfg = getConfig() || {};

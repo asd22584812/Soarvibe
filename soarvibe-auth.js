@@ -1,48 +1,131 @@
 /**
  * SoarVibe Auth — Email/Password + Google, users/{uid} bootstrap.
+ *
+ * Single source of truth: SOARVIBE_AUTH.currentUser (cached from onAuthStateChanged).
+ * Boot order: init Firebase → setPersistence(LOCAL) → getRedirectResult → onAuthStateChanged.
  */
 (function (global) {
   'use strict';
 
   var listeners = [];
+  var authUser = null;
   var currentProfile = null;
   var unsubAuth = null;
+  var started = false;
+  var starting = null;
+  var persistenceReady = false;
+  var persistenceError = null;
+  var firstAuthEventDone = false;
+  var resumingPending = false;
+  var lastRedirectError = null;
+
   var pendingActionKey = 'soarvibe_pending_action';
   var pendingActionPayloadKey = 'soarvibe_pending_action_payload';
+  var redirectPendingKey = 'soarvibe_auth_redirect_pending';
   var pendingResumeFns = Object.create(null);
-  var resumingPending = false;
 
-  function setPendingAction(actionId, payload) {
+  var authReadyResolve = null;
+  var authReadyReject = null;
+  var authReadyPromise = new Promise(function (resolve, reject) {
+    authReadyResolve = resolve;
+    authReadyReject = reject;
+  });
+
+  function displayMode() {
     try {
-      if (!actionId) {
-        sessionStorage.removeItem(pendingActionKey);
-        sessionStorage.removeItem(pendingActionPayloadKey);
-        return;
+      if (
+        typeof window !== 'undefined' &&
+        window.matchMedia &&
+        window.matchMedia('(display-mode: standalone)').matches
+      ) {
+        return 'standalone';
       }
-      sessionStorage.setItem(pendingActionKey, String(actionId));
-      sessionStorage.setItem(
-        pendingActionPayloadKey,
-        JSON.stringify(payload || {})
+      if (typeof navigator !== 'undefined' && navigator.standalone === true) {
+        return 'standalone';
+      }
+    } catch (e) {
+      /* silent */
+    }
+    return 'browser';
+  }
+
+  function authDiag(event, extra) {
+    try {
+      var payload = Object.assign(
+        {
+          event: event,
+          displayMode: displayMode(),
+          pathname: typeof location !== 'undefined' ? location.pathname : '',
+          origin: typeof location !== 'undefined' ? location.origin : ''
+        },
+        extra || {}
       );
+      console.info('[SOARVIBE][auth]', payload);
     } catch (e) {
       /* silent */
     }
   }
 
-  function getPendingAction() {
+  function storageGet(key) {
     try {
-      var id = sessionStorage.getItem(pendingActionKey);
-      if (!id) return null;
-      var payload = {};
-      try {
-        payload = JSON.parse(sessionStorage.getItem(pendingActionPayloadKey) || '{}');
-      } catch (parseErr) {
-        payload = {};
-      }
-      return { id: id, payload: payload };
-    } catch (e) {
+      var v = localStorage.getItem(key);
+      if (v != null) return v;
+    } catch (e1) {
+      /* silent */
+    }
+    try {
+      return sessionStorage.getItem(key);
+    } catch (e2) {
       return null;
     }
+  }
+
+  function storageSet(key, value) {
+    try {
+      localStorage.setItem(key, value);
+    } catch (e1) {
+      /* silent */
+    }
+    try {
+      sessionStorage.setItem(key, value);
+    } catch (e2) {
+      /* silent */
+    }
+  }
+
+  function storageRemove(key) {
+    try {
+      localStorage.removeItem(key);
+    } catch (e1) {
+      /* silent */
+    }
+    try {
+      sessionStorage.removeItem(key);
+    } catch (e2) {
+      /* silent */
+    }
+  }
+
+  function setPendingAction(actionId, payload) {
+    if (!actionId) {
+      storageRemove(pendingActionKey);
+      storageRemove(pendingActionPayloadKey);
+      return;
+    }
+    storageSet(pendingActionKey, String(actionId));
+    storageSet(pendingActionPayloadKey, JSON.stringify(payload || {}));
+  }
+
+  function getPendingAction() {
+    var id = storageGet(pendingActionKey);
+    if (!id) return null;
+    var payload = {};
+    try {
+      payload = JSON.parse(storageGet(pendingActionPayloadKey) || '{}');
+    } catch (parseErr) {
+      payload = {};
+    }
+    return { id: id, payload: payload };
   }
 
   function clearPendingAction() {
@@ -57,11 +140,22 @@
   function resumePendingAction() {
     if (!isSignedIn() || resumingPending) return false;
     var pending = getPendingAction();
-    if (!pending || !pending.id) return false;
+    if (!pending || !pending.id) {
+      authDiag('pendingAction restored', { restored: false });
+      return false;
+    }
     var fn = pendingResumeFns[pending.id];
-    if (typeof fn !== 'function') return false;
+    if (typeof fn !== 'function') {
+      authDiag('pendingAction restored', {
+        restored: false,
+        reason: 'handler-missing',
+        actionId: pending.id
+      });
+      return false;
+    }
     resumingPending = true;
     clearPendingAction();
+    authDiag('pendingAction restored', { restored: true, actionId: pending.id });
     try {
       fn(pending.payload || {});
     } catch (e) {
@@ -90,19 +184,29 @@
   }
 
   function currentUser() {
-    var a = auth();
-    return a ? a.currentUser : null;
+    return authUser;
   }
 
   function isSignedIn() {
-    return !!currentUser();
+    return !!authUser;
+  }
+
+  function isAuthReady() {
+    return firstAuthEventDone;
+  }
+
+  function whenAuthReady() {
+    return authReadyPromise;
   }
 
   function notify() {
     var snap = {
-      user: currentUser(),
+      user: authUser,
       profile: currentProfile,
-      signedIn: isSignedIn()
+      signedIn: !!authUser,
+      authReady: firstAuthEventDone,
+      persistenceReady: persistenceReady,
+      persistenceError: persistenceError
     };
     listeners.forEach(function (fn) {
       try {
@@ -116,12 +220,28 @@
   function onAuthStateChanged(fn) {
     if (typeof fn !== 'function') return function () {};
     listeners.push(fn);
-    fn({ user: currentUser(), profile: currentProfile, signedIn: isSignedIn() });
+    if (firstAuthEventDone) {
+      fn({
+        user: authUser,
+        profile: currentProfile,
+        signedIn: !!authUser,
+        authReady: true,
+        persistenceReady: persistenceReady,
+        persistenceError: persistenceError
+      });
+    }
     return function () {
       listeners = listeners.filter(function (x) {
         return x !== fn;
       });
     };
+  }
+
+  function markAuthReady() {
+    if (firstAuthEventDone) return;
+    firstAuthEventDone = true;
+    authDiag('authReady resolved', { uidPresent: !!authUser });
+    if (authReadyResolve) authReadyResolve({ user: authUser, signedIn: !!authUser });
   }
 
   function sanitizeNickname(name, fallback) {
@@ -190,7 +310,6 @@
       updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
       uid: user.uid
     });
-    // Prevent clients from swapping uid
     delete patch.createdAt;
     return database
       .collection('users')
@@ -202,10 +321,14 @@
   }
 
   function uploadAvatar(file) {
+    var flags = global.SOARVIBE_FEATURE_FLAGS || {};
+    if (flags.avatarUploadEnabled !== true) {
+      return Promise.reject(new Error('頭像上傳即將開放'));
+    }
     var user = currentUser();
     var store = storage();
     if (!user) return Promise.reject(new Error('請先登入'));
-    if (!store) return Promise.reject(new Error('Storage 尚未啟用'));
+    if (!store) return Promise.reject(new Error('頭像上傳尚未啟用'));
     if (!file) return Promise.reject(new Error('未選擇檔案'));
     var type = String(file.type || '');
     if (!/^image\/(jpeg|png|webp|gif)$/i.test(type)) {
@@ -229,141 +352,313 @@
       });
   }
 
-  function signUpEmail(email, password, nickname) {
-    var a = auth();
-    if (!a) return Promise.reject(new Error('Firebase Auth 未就緒'));
-    return a.createUserWithEmailAndPassword(email, password).then(function (cred) {
-      var nick = sanitizeNickname(nickname, email.split('@')[0]);
-      return cred.user
-        .updateProfile({ displayName: nick })
-        .catch(function () {})
-        .then(function () {
-          return ensureUserDoc(cred.user).then(function () {
-            return updateProfile({ nickname: nick, displayName: nick });
-          });
-        })
-        .then(function () {
-          notify();
-          return cred.user;
+  function ensurePersistence(a) {
+    if (!a) {
+      return Promise.reject(new Error('Firebase Auth 未就緒'));
+    }
+    if (persistenceReady) return Promise.resolve(true);
+    return a
+      .setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+      .then(function () {
+        persistenceReady = true;
+        persistenceError = null;
+        authDiag('auth persistence set success');
+        return true;
+      })
+      .catch(function (err) {
+        persistenceReady = false;
+        persistenceError = err;
+        authDiag('auth persistence set fail', {
+          code: (err && err.code) || '',
+          message: (err && err.message) || ''
         });
+        return Promise.reject(err);
+      });
+  }
+
+  function afterCredentialUser(user) {
+    if (!user) return Promise.resolve(null);
+    authUser = user;
+    return ensureUserDoc(user).then(function () {
+      notify();
+      resumePendingAction();
+      return user;
+    });
+  }
+
+  function signUpEmail(email, password, nickname) {
+    return ensurePersistence(auth()).then(function () {
+      var a = auth();
+      if (!a) return Promise.reject(new Error('Firebase Auth 未就緒'));
+      return a.createUserWithEmailAndPassword(email, password).then(function (cred) {
+        var nick = sanitizeNickname(nickname, email.split('@')[0]);
+        return cred.user
+          .updateProfile({ displayName: nick })
+          .catch(function () {})
+          .then(function () {
+            return ensureUserDoc(cred.user).then(function () {
+              return updateProfile({ nickname: nick, displayName: nick });
+            });
+          })
+          .then(function () {
+            authUser = cred.user;
+            notify();
+            return cred.user;
+          });
+      });
     });
   }
 
   function signInEmail(email, password) {
-    var a = auth();
-    if (!a) return Promise.reject(new Error('Firebase Auth 未就緒'));
-    return a.signInWithEmailAndPassword(email, password).then(function (cred) {
-      return ensureUserDoc(cred.user).then(function () {
-        notify();
-        return cred.user;
+    return ensurePersistence(auth()).then(function () {
+      var a = auth();
+      if (!a) return Promise.reject(new Error('Firebase Auth 未就緒'));
+      return a.signInWithEmailAndPassword(email, password).then(function (cred) {
+        return afterCredentialUser(cred.user);
       });
     });
   }
 
-  function signInGoogle() {
-    var a = auth();
-    if (!a) return Promise.reject(new Error('Firebase Auth 未就緒'));
-    var provider = new firebase.auth.GoogleAuthProvider();
-    provider.setCustomParameters({ prompt: 'select_account' });
-
-    function afterCred(cred) {
-      return ensureUserDoc(cred.user).then(function () {
-        notify();
-        return cred.user;
-      });
-    }
-
+  function prefersRedirectSignIn() {
     var ua = typeof navigator !== 'undefined' ? navigator.userAgent || '' : '';
-    var standalone =
-      typeof window !== 'undefined' &&
-      (window.matchMedia('(display-mode: standalone)').matches ||
-        window.navigator.standalone === true);
-    var preferRedirect = standalone || /iPhone|iPad|iPod|Android/i.test(ua);
+    var standalone = displayMode() === 'standalone';
+    return standalone || /iPhone|iPad|iPod|Android/i.test(ua);
+  }
 
-    if (preferRedirect) {
-      return a.signInWithRedirect(provider);
+  function crossOriginAuthDomain() {
+    try {
+      var cfg = global.SOARVIBE_FIREBASE_CONFIG || {};
+      var authDomain = String(cfg.authDomain || '');
+      var host = typeof location !== 'undefined' ? location.hostname : '';
+      if (!authDomain || !host) return false;
+      return authDomain !== host;
+    } catch (e) {
+      return true;
     }
+  }
 
-    return a.signInWithPopup(provider).then(afterCred).catch(function (err) {
-      var code = err && err.code;
-      if (
-        code === 'auth/popup-blocked' ||
-        code === 'auth/popup-closed-by-user' ||
-        code === 'auth/cancelled-popup-request' ||
-        code === 'auth/operation-not-supported-in-this-environment'
-      ) {
+  function signInGoogle() {
+    return ensurePersistence(auth()).then(function () {
+      var a = auth();
+      if (!a) return Promise.reject(new Error('Firebase Auth 未就緒'));
+      var provider = new firebase.auth.GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: 'select_account' });
+
+      var useRedirect = prefersRedirectSignIn();
+      if (useRedirect) {
+        authDiag('before redirect', {
+          crossOriginAuthDomain: crossOriginAuthDomain(),
+          authDomain: (global.SOARVIBE_FIREBASE_CONFIG &&
+            global.SOARVIBE_FIREBASE_CONFIG.authDomain) ||
+            ''
+        });
+        storageSet(redirectPendingKey, '1');
         return a.signInWithRedirect(provider);
       }
-      return Promise.reject(err);
+
+      return a
+        .signInWithPopup(provider)
+        .then(function (cred) {
+          return afterCredentialUser(cred.user);
+        })
+        .catch(function (err) {
+          var code = err && err.code;
+          if (
+            code === 'auth/popup-blocked' ||
+            code === 'auth/popup-closed-by-user' ||
+            code === 'auth/cancelled-popup-request' ||
+            code === 'auth/operation-not-supported-in-this-environment'
+          ) {
+            authDiag('before redirect', {
+              reason: 'popup-fallback',
+              code: code || '',
+              crossOriginAuthDomain: crossOriginAuthDomain()
+            });
+            storageSet(redirectPendingKey, '1');
+            return a.signInWithRedirect(provider);
+          }
+          return Promise.reject(err);
+        });
     });
   }
 
   function signOut() {
     var a = auth();
-    if (!a) return Promise.resolve();
+    if (!a) {
+      authUser = null;
+      currentProfile = null;
+      notify();
+      return Promise.resolve();
+    }
     return a.signOut().then(function () {
+      authUser = null;
       currentProfile = null;
       notify();
     });
   }
 
-  function start() {
-    if (global.SOARVIBE_FIREBASE && global.SOARVIBE_FIREBASE.init) {
-      global.SOARVIBE_FIREBASE.init();
-    }
-    var a = auth();
-    if (!a) return;
-    if (unsubAuth) return;
-
-    a.getRedirectResult()
+  function handleRedirectResult(a) {
+    return a
+      .getRedirectResult()
       .then(function (cred) {
+        var hadPending = storageGet(redirectPendingKey) === '1';
         if (cred && cred.user) {
-          return ensureUserDoc(cred.user).then(function () {
-            notify();
-            resumePendingAction();
+          storageRemove(redirectPendingKey);
+          authDiag('getRedirectResult', { result: 'user' });
+          return afterCredentialUser(cred.user).then(function () {
+            if (typeof global.closeSoarvibeAuthModal === 'function') {
+              global.closeSoarvibeAuthModal();
+            }
+            return cred;
           });
         }
+        authDiag('getRedirectResult', { result: 'null', hadRedirectPending: hadPending });
+        if (hadPending) {
+          storageRemove(redirectPendingKey);
+          var err = new Error(
+            'Google 登入導回後無法恢復工作階段。此環境可能封鎖跨站 Auth storage（常見於 iOS Safari / PWA + GitHub Pages）。請改用 Email 登入，或改在 Firebase Hosting 網域測試 Google 登入。'
+          );
+          err.code = 'auth/redirect-session-lost';
+          err.crossOriginAuthDomain = crossOriginAuthDomain();
+          lastRedirectError = err;
+          return Promise.reject(err);
+        }
+        return null;
       })
       .catch(function (e) {
-        console.warn('[SOARVIBE] Google redirect result failed', e && e.code, e && e.message);
+        storageRemove(redirectPendingKey);
+        lastRedirectError = e;
+        authDiag('getRedirectResult', {
+          result: 'error',
+          code: (e && e.code) || '',
+          message: (e && e.message) || ''
+        });
+        return Promise.reject(e);
+      });
+  }
+
+  function start() {
+    if (started) return authReadyPromise;
+    if (starting) return starting;
+
+    authDiag('boot started');
+    starting = Promise.resolve()
+      .then(function () {
+        if (global.SOARVIBE_FIREBASE && global.SOARVIBE_FIREBASE.init) {
+          global.SOARVIBE_FIREBASE.init();
+        }
+        var a = auth();
+        if (!a) {
+          var missing = new Error('Firebase Auth 未就緒');
+          markAuthReady();
+          notify();
+          if (authReadyReject) authReadyReject(missing);
+          throw missing;
+        }
+        return ensurePersistence(a)
+          .catch(function (err) {
+            // Persistence failure must not pretend login works; still attach listener.
+            return err;
+          })
+          .then(function (persistOutcome) {
+            var persistFailed =
+              persistOutcome && persistOutcome instanceof Error ? persistOutcome : null;
+            return handleRedirectResult(a)
+              .catch(function (redirectErr) {
+                // Surface redirect loss to UI listeners; do not signOut.
+                try {
+                  global.dispatchEvent(
+                    new CustomEvent('soarvibe-auth-redirect-failed', {
+                      detail: {
+                        code: (redirectErr && redirectErr.code) || '',
+                        message: (redirectErr && redirectErr.message) || ''
+                      }
+                    })
+                  );
+                } catch (evtErr) {
+                  /* silent */
+                }
+                return null;
+              })
+              .then(function () {
+                if (unsubAuth) return;
+                unsubAuth = a.onAuthStateChanged(function (user) {
+                  if (!firstAuthEventDone) {
+                    authDiag('first onAuthStateChanged', {
+                      result: user ? 'uid-present' : 'null'
+                    });
+                  }
+                  if (!user) {
+                    authUser = null;
+                    currentProfile = null;
+                    markAuthReady();
+                    notify();
+                    return;
+                  }
+                  authUser = user;
+                  ensureUserDoc(user)
+                    .then(function () {
+                      markAuthReady();
+                      notify();
+                      if (typeof global.closeSoarvibeAuthModal === 'function') {
+                        global.closeSoarvibeAuthModal();
+                      }
+                      resumePendingAction();
+                    })
+                    .catch(function (e) {
+                      console.warn('[SOARVIBE] ensureUserDoc failed', e);
+                      markAuthReady();
+                      notify();
+                    });
+                });
+                if (persistFailed) {
+                  try {
+                    global.dispatchEvent(
+                      new CustomEvent('soarvibe-auth-persistence-failed', {
+                        detail: {
+                          code: (persistFailed && persistFailed.code) || '',
+                          message: (persistFailed && persistFailed.message) || ''
+                        }
+                      })
+                    );
+                  } catch (evtErr2) {
+                    /* silent */
+                  }
+                }
+                started = true;
+                return authReadyPromise;
+              });
+          });
+      })
+      .catch(function (err) {
+        markAuthReady();
+        notify();
+        return authReadyPromise;
       });
 
-    unsubAuth = a.onAuthStateChanged(function (user) {
-      if (!user) {
-        currentProfile = null;
-        notify();
-        return;
-      }
-      ensureUserDoc(user)
-        .then(function () {
-          notify();
-          resumePendingAction();
-        })
-        .catch(function (e) {
-          console.warn('[SOARVIBE] ensureUserDoc failed', e);
-          notify();
-        });
-    });
+    return starting;
   }
 
   function requireAuth(actionLabel, opts) {
-    if (isSignedIn()) return Promise.resolve(currentUser());
     opts = opts || {};
-    if (opts.pendingAction) {
-      setPendingAction(opts.pendingAction, opts.pendingPayload || {});
-    }
-    var label = actionLabel || '繼續';
-    try {
-      if (document.activeElement && typeof document.activeElement.blur === 'function') {
-        document.activeElement.blur();
+    return whenAuthReady().then(function () {
+      if (isSignedIn()) return currentUser();
+      if (opts.pendingAction) {
+        setPendingAction(opts.pendingAction, opts.pendingPayload || {});
       }
-    } catch (blurErr) {
-      /* silent */
-    }
-    if (typeof global.openSoarvibeAuthModal === 'function') {
-      global.openSoarvibeAuthModal({ reason: '請先登入後才能' + label });
-    }
-    return Promise.reject(new Error('AUTH_REQUIRED'));
+      var label = actionLabel || '繼續';
+      try {
+        if (document.activeElement && typeof document.activeElement.blur === 'function') {
+          document.activeElement.blur();
+        }
+      } catch (blurErr) {
+        /* silent */
+      }
+      if (typeof global.openSoarvibeAuthModal === 'function') {
+        global.openSoarvibeAuthModal({ reason: '請先登入後才能' + label });
+      }
+      return Promise.reject(new Error('AUTH_REQUIRED'));
+    });
   }
 
   function privateDocRef(docId) {
@@ -406,10 +701,21 @@
       });
   }
 
+  function getIdToken(forceRefresh) {
+    var user = currentUser();
+    if (!user || typeof user.getIdToken !== 'function') {
+      return Promise.reject(new Error('請先登入'));
+    }
+    return user.getIdToken(!!forceRefresh);
+  }
+
   global.SOARVIBE_AUTH = {
     start: start,
+    whenAuthReady: whenAuthReady,
+    isAuthReady: isAuthReady,
     onAuthStateChanged: onAuthStateChanged,
     currentUser: currentUser,
+    getIdToken: getIdToken,
     isSignedIn: isSignedIn,
     getProfile: function () {
       return currentProfile;
@@ -429,6 +735,17 @@
     resumePendingAction: resumePendingAction,
     sanitizeNickname: sanitizeNickname,
     savePrivateDoc: savePrivateDoc,
-    loadPrivateDoc: loadPrivateDoc
+    loadPrivateDoc: loadPrivateDoc,
+    getPersistenceError: function () {
+      return persistenceError;
+    },
+    isPersistenceReady: function () {
+      return persistenceReady;
+    },
+    consumeRedirectError: function () {
+      var err = lastRedirectError;
+      lastRedirectError = null;
+      return err;
+    }
   };
 })(typeof window !== 'undefined' ? window : globalThis);
