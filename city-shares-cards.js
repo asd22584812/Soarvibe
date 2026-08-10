@@ -1,7 +1,7 @@
 /**
  * Data-driven City Shares homepage cards.
- * Existing 9 cards keep exact image URLs / order relative to each other.
- * New country/city cards appended around them without mutating frozen assets.
+ * Display order is controlled only by sortOrder (see getEnabledCards).
+ * frozen:true cards must keep exact image URL / crop — never re-fetch.
  */
 (function (global) {
   'use strict';
@@ -25,7 +25,8 @@
       imageAlt: '富士山景觀',
       imagePosition: 'center 40%',
       enabled: true,
-      sortOrder: 10,
+      /* sortOrder: after hot cities — 日本 #9 */
+      sortOrder: 90,
       frozen: false
     },
     {
@@ -39,7 +40,8 @@
       imageAlt: '首爾北村韓屋',
       imagePosition: 'center 35%',
       enabled: true,
-      sortOrder: 20,
+      /* 韓國 #10 */
+      sortOrder: 100,
       frozen: false
     },
     {
@@ -53,7 +55,8 @@
       imageAlt: '舊金山金門大橋',
       imagePosition: 'center 45%',
       enabled: true,
-      sortOrder: 30,
+      /* 美國 #13 */
+      sortOrder: 130,
       frozen: false
     },
     {
@@ -67,11 +70,12 @@
       imageAlt: '雪梨歌劇院',
       imagePosition: 'center 40%',
       enabled: true,
-      sortOrder: 40,
+      /* 澳洲 #14 */
+      sortOrder: 140,
       frozen: false
     },
 
-    /* —— Original 9 cards: image URLs frozen exactly —— */
+    /* —— City / region cards: image URLs frozen exactly —— */
     {
       id: 'tokyo',
       type: 'city',
@@ -83,7 +87,8 @@
       imageAlt: '東京鐵塔夜景',
       imagePosition: 'center',
       enabled: true,
-      sortOrder: 100,
+      /* 東京 #1 */
+      sortOrder: 10,
       frozen: true
     },
     {
@@ -97,7 +102,8 @@
       imageAlt: '京都祇園傳統街道',
       imagePosition: 'center',
       enabled: true,
-      sortOrder: 110,
+      /* 京都 #2 */
+      sortOrder: 20,
       frozen: true
     },
     {
@@ -111,7 +117,8 @@
       imageAlt: '大阪城黃昏夜景',
       imagePosition: 'center',
       enabled: true,
-      sortOrder: 120,
+      /* 大阪 #3 */
+      sortOrder: 30,
       frozen: true
     },
     {
@@ -125,7 +132,8 @@
       imageAlt: '首爾潮流城市夜景',
       imagePosition: 'center',
       enabled: true,
-      sortOrder: 130,
+      /* 首爾 #4 */
+      sortOrder: 40,
       frozen: true
     },
     {
@@ -139,7 +147,8 @@
       imageAlt: '北海道札幌雪景',
       imagePosition: 'center',
       enabled: true,
-      sortOrder: 140,
+      /* 北海道 #6 */
+      sortOrder: 60,
       frozen: true
     },
     {
@@ -153,7 +162,8 @@
       imageAlt: '曼谷鄭王廟泰式建築',
       imagePosition: 'center',
       enabled: true,
-      sortOrder: 150,
+      /* 曼谷 #7 */
+      sortOrder: 70,
       frozen: true
     },
     {
@@ -167,7 +177,8 @@
       imagePosition: 'center',
       imageFallback: './cover-photos/default.jpg',
       enabled: true,
-      sortOrder: 160,
+      /* 越南 #8 */
+      sortOrder: 80,
       frozen: true
     },
     {
@@ -181,7 +192,8 @@
       imageAlt: '倫敦泰晤士河天際線',
       imagePosition: 'center',
       enabled: true,
-      sortOrder: 170,
+      /* 倫敦 #11 */
+      sortOrder: 110,
       frozen: true
     },
     {
@@ -195,11 +207,11 @@
       imageAlt: '巴黎艾菲爾鐵塔',
       imagePosition: 'center',
       enabled: true,
-      sortOrder: 180,
+      /* 巴黎 #12 */
+      sortOrder: 120,
       frozen: true
     },
 
-    /* —— New popular city shortcut —— */
     {
       id: 'busan',
       type: 'city',
@@ -212,7 +224,8 @@
       imageAlt: '釜山廣安大橋夜景',
       imagePosition: 'center 40%',
       enabled: true,
-      sortOrder: 200,
+      /* 釜山 #5 */
+      sortOrder: 50,
       frozen: false
     }
   ];

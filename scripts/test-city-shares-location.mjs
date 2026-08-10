@@ -81,7 +81,29 @@ frozen.forEach((id) => {
 const enabled = cards.getEnabledCards().map((c) => c.id);
 const tokyoIdx = enabled.indexOf('tokyo');
 const kyotoIdx = enabled.indexOf('kyoto');
-const parisIdx = enabled.indexOf('paris');
-assert.ok(tokyoIdx < kyotoIdx && kyotoIdx < parisIdx, 'original relative order preserved');
+const busanIdx = enabled.indexOf('busan');
+const japanIdx = enabled.indexOf('japan');
+const australiaIdx = enabled.indexOf('australia');
+assert.equal(
+  enabled.join(','),
+  [
+    'tokyo',
+    'kyoto',
+    'osaka',
+    'seoul',
+    'busan',
+    'hokkaido',
+    'bangkok',
+    'vietnam',
+    'japan',
+    'korea',
+    'london',
+    'paris',
+    'usa',
+    'australia'
+  ].join(','),
+  'homepage card order'
+);
+assert.ok(tokyoIdx < kyotoIdx && busanIdx < japanIdx && japanIdx < australiaIdx);
 
 console.log('city-shares-location + cards OK');
