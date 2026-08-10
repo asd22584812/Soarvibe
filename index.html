@@ -39,8 +39,8 @@
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="./city-shares-ui.css?v=v149">
-    <link rel="stylesheet" href="./travel-ledger.css?v=v149">
+    <link rel="stylesheet" href="./city-shares-ui.css?v=v154">
+    <link rel="stylesheet" href="./travel-ledger.css?v=v154">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;900&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         html, body {
@@ -454,10 +454,17 @@
         .adv-sub-panel-inner {
             overflow: hidden;
             min-height: 0;
-            padding: 0 0.8rem;
+            max-height: 0;
+            padding: 0;
+            margin: 0;
+            visibility: hidden;
+            pointer-events: none;
         }
         .adv-sub.is-open .adv-sub-panel-inner {
-            padding-bottom: 0.8rem;
+            max-height: none;
+            padding: 0 0.8rem 0.8rem;
+            visibility: visible;
+            pointer-events: auto;
         }
         .preview-mode-banner {
             margin: 0.65rem 0 0;
@@ -2663,6 +2670,45 @@
             color: #90A4AE;
             font-size: 0.625rem;
         }
+        .adv-stay-inner {
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+            width: 100%;
+        }
+        .adv-stay-field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            width: 100%;
+            min-width: 0;
+        }
+        .adv-stay-field .field-label {
+            display: block;
+            width: 100%;
+            line-height: 1.35;
+            white-space: normal;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+            margin: 0;
+            padding: 0;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #546E7A;
+        }
+        .adv-stay-control {
+            width: 100%;
+            min-width: 0;
+        }
+        .adv-stay-field .field-select,
+        .adv-stay-field .field-textarea {
+            width: 100%;
+            box-sizing: border-box;
+            margin: 0;
+        }
+        #adv-sub-stay-panel .adv-sub-panel-inner {
+            /* padding only applied when .is-open (see .adv-sub.is-open .adv-sub-panel-inner) */
+        }
         .flight-times-row label {
             min-width: 0;
         }
@@ -3135,7 +3181,7 @@
                         <div class="advanced-panel-inner">
                             <div class="pt-2 mt-2 border-t border-white/50 trip-details-stack">
                                 <p id="flight-dates-summary" class="flight-dates-summary" aria-readonly="true">出發日期：— | 回程日期：—</p>
-                                <p class="text-[0.72rem] text-[#78909C] font-semibold mt-1 mb-1">以下為進階選填。未填也可生成靈感行程（早去晚回 Preview）。</p>
+                                <p class="text-[0.72rem] text-[#78909C] font-semibold mt-1 mb-2 leading-relaxed">已有航班或住宿資訊？可以在這裡補充；還沒決定也沒關係，SoarVibe 會先以早去晚回幫你規劃。</p>
 
                                 <div class="adv-sub" id="adv-sub-outbound" data-adv-sub="outbound">
                                     <button type="button" class="adv-sub-toggle" aria-expanded="false" aria-controls="adv-sub-outbound-panel">
@@ -3145,22 +3191,22 @@
                                     <div id="adv-sub-outbound-panel" class="adv-sub-panel">
                                         <div class="adv-sub-panel-inner flight-leg-block">
                                             <label for="flight-outbound-number">
-                                                <span class="field-label">航班編號 <span class="field-optional">選填</span></span>
+                                                <span class="field-label">航班編號</span>
                                                 <input type="text" id="flight-outbound-number" class="field-input w-full rounded-lg" placeholder="例：CI100、BR198、JL809" autocomplete="off">
                                             </label>
                                             <div class="flight-airports-row">
                                                 <label for="flight-outbound-from">
-                                                    <span class="field-label">出發機場 <span class="field-optional">選填</span></span>
+                                                    <span class="field-label">出發機場</span>
                                                     <input type="text" id="flight-outbound-from" class="field-input w-full rounded-lg" placeholder="例：桃園 TPE" autocomplete="off">
                                                 </label>
                                                 <label for="flight-outbound-to">
-                                                    <span class="field-label">抵達機場 <span class="field-optional">選填</span></span>
+                                                    <span class="field-label">抵達機場</span>
                                                     <input type="text" id="flight-outbound-to" class="field-input w-full rounded-lg" placeholder="例：成田 NRT" autocomplete="off">
                                                 </label>
                                             </div>
                                             <div class="flight-times-row">
                                                 <label class="min-w-0" for="flight-departure-time">
-                                                    <span class="field-label">起飛時間 <span class="field-optional">選填・出發地當地</span></span>
+                                                    <span class="field-label">起飛時間 · 出發地當地</span>
                                                     <div class="picker-field rounded-lg">
                                                         <span class="picker-display" id="flight-departure-display">選擇時間</span>
                                                         <span class="picker-icon" aria-hidden="true">🕐</span>
@@ -3168,7 +3214,7 @@
                                                     </div>
                                                 </label>
                                                 <label class="min-w-0" for="flight-arrival-time">
-                                                    <span class="field-label">抵達時間 <span class="field-optional">選填・目的地當地</span></span>
+                                                    <span class="field-label">抵達時間 · 目的地當地</span>
                                                     <div class="picker-field rounded-lg">
                                                         <span class="picker-display" id="flight-arrival-display">選擇時間</span>
                                                         <span class="picker-icon" aria-hidden="true">🕐</span>
@@ -3188,21 +3234,21 @@
                                     <div id="adv-sub-return-panel" class="adv-sub-panel">
                                         <div class="adv-sub-panel-inner flight-leg-block">
                                             <label for="flight-return-number">
-                                                <span class="field-label">航班編號 <span class="field-optional">選填</span></span>
+                                                <span class="field-label">航班編號</span>
                                                 <input type="text" id="flight-return-number" class="field-input w-full rounded-lg" placeholder="例：CI101、BR199、JL810" autocomplete="off">
                                             </label>
                                             <div class="flight-airports-row">
                                                 <label for="flight-return-from">
-                                                    <span class="field-label">出發機場 <span class="field-optional">選填</span></span>
+                                                    <span class="field-label">出發機場</span>
                                                     <input type="text" id="flight-return-from" class="field-input w-full rounded-lg" placeholder="例：成田 NRT" autocomplete="off">
                                                 </label>
                                                 <label for="flight-return-to">
-                                                    <span class="field-label">抵達機場 <span class="field-optional">選填</span></span>
+                                                    <span class="field-label">抵達機場</span>
                                                     <input type="text" id="flight-return-to" class="field-input w-full rounded-lg" placeholder="例：桃園 TPE" autocomplete="off">
                                                 </label>
                                             </div>
                                             <label class="min-w-0" for="flight-return-time">
-                                                <span class="field-label">起飛時間 <span class="field-optional">選填・回程出發地當地</span></span>
+                                                <span class="field-label">起飛時間 · 回程出發地當地</span>
                                                 <div class="picker-field rounded-lg">
                                                     <span class="picker-display" id="flight-return-display">選擇時間</span>
                                                     <span class="picker-icon" aria-hidden="true">🕐</span>
@@ -3219,14 +3265,14 @@
                                         <span class="adv-sub-chevron" aria-hidden="true">▸</span>
                                     </button>
                                     <div id="adv-sub-stay-panel" class="adv-sub-panel">
-                                        <div class="adv-sub-panel-inner">
+                                        <div class="adv-sub-panel-inner adv-stay-inner">
                                             <div class="accommodations-block">
                                                 <div id="accommodations-list" class="accommodations-list" aria-live="polite"></div>
                                                 <button type="button" id="add-accommodation-btn" class="add-accommodation-btn">＋ 新增住宿</button>
                                             </div>
-                                            <div>
-                                                <label for="advanced-transport" class="field-label">交通方式 <span class="field-optional">選填</span></label>
-                                                <div class="relative">
+                                            <div class="adv-stay-field">
+                                                <label for="advanced-transport" class="field-label">交通方式</label>
+                                                <div class="relative adv-stay-control">
                                                     <select id="advanced-transport" name="advanced-transport" class="field-select w-full rounded-lg">
                                                         <option value="">請選擇交通方式</option>
                                                         <option value="public-transit">搭乘大眾運輸</option>
@@ -3238,8 +3284,8 @@
                                                     </svg>
                                                 </div>
                                             </div>
-                                            <div>
-                                                <label for="customWishes" class="field-label">✨ 專屬許願池 <span class="field-optional">選填</span></label>
+                                            <div class="adv-stay-field">
+                                                <label for="customWishes" class="field-label">✨ 專屬許願池</label>
                                                 <textarea id="customWishes" name="customWishes" rows="2" class="field-textarea w-full rounded-lg" placeholder="例如：想去 SHIBUYA SKY 拍照…"></textarea>
                                             </div>
                                         </div>
@@ -3261,60 +3307,7 @@
                     <span class="text-black text-xl leading-none" aria-hidden="true">❯</span>
                 </div>
                 <div id="mag-city-list" class="recommend-scroll hide-scrollbar snap-x snap-proximity h-[9rem] items-stretch gap-2.5 -mx-0.5 px-0.5" role="list" aria-label="城市旅人分享推薦">
-                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" onclick="openCityDestination('tokyo')" aria-label="開啟東京旅人分享">
-                        <img src="https://images.unsplash.com/photo-1648301184879-28c6ed4964d7?auto=format&fit=crop&w=600&q=85" alt="東京鐵塔夜景" loading="lazy" class="absolute inset-0 w-full h-full object-cover pointer-events-none">
-                        <div class="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/75 to-transparent pointer-events-none">
-                            <span class="text-white font-bold text-sm">東京</span>
-                        </div>
-                    </article>
-                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" onclick="openCityDestination('kyoto')" aria-label="開啟京都旅人分享">
-                        <img src="https://images.unsplash.com/photo-1573047330192-4e6bb1594325?auto=format&fit=crop&w=600&q=85" alt="京都祇園傳統街道" loading="lazy" class="absolute inset-0 w-full h-full object-cover pointer-events-none">
-                        <div class="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/75 to-transparent pointer-events-none">
-                            <span class="text-white font-bold text-sm">京都</span>
-                        </div>
-                    </article>
-                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" onclick="openCityDestination('osaka')" aria-label="開啟大阪旅人分享">
-                        <img src="https://images.unsplash.com/photo-1773467223754-b9f3eb4d2c0f?auto=format&fit=crop&w=600&q=85" alt="大阪城黃昏夜景" loading="lazy" class="absolute inset-0 w-full h-full object-cover pointer-events-none">
-                        <div class="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/75 to-transparent pointer-events-none">
-                            <span class="text-white font-bold text-sm">大阪</span>
-                        </div>
-                    </article>
-                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" onclick="openCityDestination('seoul')" aria-label="開啟首爾旅人分享">
-                        <img src="https://images.unsplash.com/photo-1517154421773-0529f29ea451?auto=format&fit=crop&w=600&q=85" alt="首爾潮流城市夜景" loading="lazy" class="absolute inset-0 w-full h-full object-cover pointer-events-none">
-                        <div class="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/75 to-transparent pointer-events-none">
-                            <span class="text-white font-bold text-sm">首爾</span>
-                        </div>
-                    </article>
-                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" onclick="openCityDestination('hokkaido')" aria-label="開啟北海道旅人分享">
-                        <img src="https://images.unsplash.com/photo-1741225241678-0c7f8fa07917?auto=format&fit=crop&w=600&q=85" alt="北海道札幌雪景" loading="lazy" class="absolute inset-0 w-full h-full object-cover pointer-events-none">
-                        <div class="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/75 to-transparent pointer-events-none">
-                            <span class="text-white font-bold text-sm">北海道</span>
-                        </div>
-                    </article>
-                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" onclick="openCityDestination('bangkok')" aria-label="開啟曼谷旅人分享">
-                        <img src="https://images.unsplash.com/photo-1768392810963-017c92313d79?auto=format&fit=crop&w=600&q=85" alt="曼谷鄭王廟泰式建築" loading="lazy" class="absolute inset-0 w-full h-full object-cover pointer-events-none">
-                        <div class="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/75 to-transparent pointer-events-none">
-                            <span class="text-white font-bold text-sm">曼谷</span>
-                        </div>
-                    </article>
-                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" data-city-id="vietnam" onclick="openCityDestination('vietnam')" aria-label="開啟越南旅人分享">
-                        <img src="./cover-photos/vietnam.jpg" alt="越南下龍灣景色" loading="lazy" class="mag-city-card-img absolute inset-0 w-full h-full object-cover pointer-events-none" onerror="if(!this.dataset.magCardFb){this.dataset.magCardFb='1';this.src='./cover-photos/default.jpg';}else{this.src='./assets/city-journal/placeholder-city-journal.jpg';}">
-                        <div class="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/75 to-transparent pointer-events-none">
-                            <span class="text-white font-bold text-sm">越南</span>
-                        </div>
-                    </article>
-                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" onclick="openCityDestination('london')" aria-label="開啟倫敦旅人分享">
-                        <img src="https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=600&q=85" alt="倫敦泰晤士河天際線" loading="lazy" class="absolute inset-0 w-full h-full object-cover pointer-events-none">
-                        <div class="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/75 to-transparent pointer-events-none">
-                            <span class="text-white font-bold text-sm">倫敦</span>
-                        </div>
-                    </article>
-                    <article class="city-card mag-city-card flex-shrink-0 w-[6.75rem] h-full rounded-3xl overflow-hidden relative shadow-lg snap-start bg-white/20" role="button" tabindex="0" onclick="openCityDestination('paris')" aria-label="開啟巴黎旅人分享">
-                        <img src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=600&q=85" alt="巴黎艾菲爾鐵塔" loading="lazy" class="absolute inset-0 w-full h-full object-cover pointer-events-none">
-                        <div class="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/75 to-transparent pointer-events-none">
-                            <span class="text-white font-bold text-sm">巴黎</span>
-                        </div>
-                    </article>
+                    <!-- Populated by city-shares-cards.js (data-driven). Frozen original card image URLs preserved in config. -->
                 </div>
             </section>
 
@@ -3408,12 +3401,12 @@
                     </div>
                 </section>
                 <section class="user-profile-card user-glass-card">
-                    <button type="button" id="user-avatar-btn" class="user-avatar-btn" aria-label="點擊更換頭像">
+                    <button type="button" id="user-avatar-btn" class="user-avatar-btn" aria-label="頭像">
                         <img id="user-avatar-img" class="hidden" alt="" />
                         <span id="user-avatar-icon" class="user-avatar-icon" aria-hidden="true">
                             <i class="fa-solid fa-user"></i>
                         </span>
-                        <span class="user-avatar-hint">更換</span>
+                        <span class="user-avatar-hint" id="user-avatar-hint">更換</span>
                     </button>
                     <input type="file" id="user-avatar-input" accept="image/*" class="sr-only" tabindex="-1" aria-hidden="true" />
                     <div class="user-nickname-field">
@@ -3552,6 +3545,7 @@
         <main id="csViewport" class="cs-viewport"></main>
         <header class="cs-chrome">
             <button type="button" id="csBackBtn" class="cs-chrome-btn is-hidden" aria-label="返回分享列表">← 返回</button>
+            <p id="csChromeTitle" class="cs-chrome-title is-hidden" aria-live="polite">分享這次旅行</p>
             <button type="button" id="csCloseBtn" class="cs-chrome-btn" aria-label="關閉城市旅人分享">✕</button>
         </header>
     </div>
@@ -3620,30 +3614,48 @@
         </div>
     </div>
 
-    <script src="./firebase-config.js?v=v149"></script>
+    <script src="./firebase-config.js?v=v153"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
-    <script src="./firebase-init.js?v=v149"></script>
-    <script src="./soarvibe-auth.js?v=v149"></script>
-    <script src="./city-shares-firestore.js?v=v149"></script>
-    <script src="./soarvibe-auth-ui.js?v=v149"></script>
-    <script src="./feature-flags.js"></script>
+    <script src="./firebase-init.js?v=v153"></script>
+    <script src="./soarvibe-auth.js?v=v153"></script>
+    <script src="./city-shares-firestore.js?v=v154"></script>
+    <script src="./soarvibe-auth-ui.js?v=v153"></script>
+    <script>
+      // Auth boot must run before City Shares / personal-center UI so redirect
+      // completion + persistence restore finish before any "未登入" gate.
+      (function () {
+        try {
+          if (window.SOARVIBE_FIREBASE && typeof window.SOARVIBE_FIREBASE.init === 'function') {
+            window.SOARVIBE_FIREBASE.init();
+          }
+          if (window.SOARVIBE_AUTH && typeof window.SOARVIBE_AUTH.start === 'function') {
+            window.SOARVIBE_AUTH.start();
+          }
+        } catch (bootErr) {
+          console.warn('[SOARVIBE] early auth boot failed', bootErr);
+        }
+      })();
+    </script>
+    <script src="./feature-flags.js?v=v153"></script>
     <script src="./city-journal-editorial-engine.js"></script>
     <script src="./city-journal-image-manifest.js"></script>
     <script src="./city-journal-photo-scoring.js"></script>
     <script src="./city-journal-image-library.js"></script>
     <script src="./city-journal-caption.js"></script>
     <script src="./city-journal-data.js"></script>
-    <script src="./city-shares-config.js?v=v149"></script>
-    <script src="./city-shares-data.js?v=v149"></script>
-    <script src="./city-shares-ui.js?v=v149"></script>
-    <script src="./travel-time-engine.js?v=v149"></script>
-    <script src="./travel-ledger-config.js?v=v149"></script>
-    <script src="./travel-ledger-forex.js?v=v149"></script>
-    <script src="./travel-ledger-data.js?v=v149"></script>
-    <script src="./travel-ledger-ui.js?v=v149"></script>
+    <script src="./city-shares-config.js?v=v154"></script>
+    <script src="./city-shares-location.js?v=v154"></script>
+    <script src="./city-shares-cards.js?v=v154"></script>
+    <script src="./city-shares-data.js?v=v154"></script>
+    <script src="./city-shares-ui.js?v=v154"></script>
+    <script src="./travel-time-engine.js?v=v153"></script>
+    <script src="./travel-ledger-config.js?v=v153"></script>
+    <script src="./travel-ledger-forex.js?v=v153"></script>
+    <script src="./travel-ledger-data.js?v=v153"></script>
+    <script src="./travel-ledger-ui.js?v=v153"></script>
     <script>
         (function () {
             const TRAVEL_STYLE_LABELS = {
@@ -3696,16 +3708,18 @@
             const MSG_DATES_REVERSED = '時空秩序異常 ⏳！回程日期不能早於出發日期喔，SOARVIBE 還沒解鎖時空倒流功能，請機長重新確認航線日期！';
             const MSG_TRAVEL_STYLE_REQUIRED = '請左右滑動並點選一種「期望的旅遊風格」，我們好為您調配專屬節奏 ✨';
             const MSG_FLIGHT_PARTIAL_SOFT =
-                '航班資料尚未完整，本次將以早去晚回 Preview 模式規劃；之後補上航班資訊可重新精準最佳化。';
+                '航班資料尚未完整，本次將以早去晚回的預設時段規劃；之後補上航班資訊可重新精準最佳化。';
             const MSG_PREVIEW_MODE =
                 '尚未填寫航班，本次先以早去晚回的預設時段規劃。實際訂票後補上航班資訊，可重新精準最佳化。';
             const MSG_ADVANCED_INCOMPLETE = MSG_FLIGHT_PARTIAL_SOFT;
             const MSG_COMING_SOON = '✨ SOARVIBE 專屬功能翱翔準備中！下一階段將全面解鎖此功能，敬請期待！';
             const MSG_AFFILIATE_NO_DESTINATION = '請先在「要去哪裡？」選好旅遊國家與地區，或一鍵生成行程後，再使用獨家精選功能 🌏';
-            const MSG_API_ERROR = '塔台訊號中斷 📡！行程生成暫時失敗，請稍後再試，或確認網路連線後重新起飛。';
-            const MSG_GEMINI_BACKUP = 'AI 連線暫時忙碌，已為您載入「{dest}」精選備援行程 ✨';
-            const MSG_GEMINI_BILLING = 'Gemini AI 預付額度已用完，暫時無法客製化行程。已為您載入「{dest}」精選備援行程。請至 https://ai.studio/projects 充值後再試 💳';
-            const MSG_GEMINI_ALL_KEYS_429 = '所有 Gemini API 金鑰免費額度已用盡（429）。已為您載入「{dest}」備援行程，請稍後再試或至 AI Studio 充值 💳';
+            const MSG_API_ERROR = '目前規劃服務較忙碌，請稍後再試一次。';
+            const MSG_GEMINI_BACKUP = MSG_API_ERROR;
+            const MSG_GEMINI_BILLING = MSG_API_ERROR;
+            const MSG_GEMINI_ALL_KEYS_429 = MSG_API_ERROR;
+            const MSG_PLANNING_BUSY = '目前規劃服務較忙碌，請稍後再試一次。';
+            const MSG_MAPS_UNAVAILABLE = '附近推薦暫時無法載入，請稍後再試。';
             const MSG_BOOKLET_POPUP_BLOCKED = '請允許 App 開啟新視窗，才能預覽旅行小本本 📖';
 
             const DESTINATION_EPITHETS = {
@@ -4448,7 +4462,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
-            const SOARVIBE_APP_BUILD = 'v149';
+            const SOARVIBE_APP_BUILD = 'v154';
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
@@ -4456,6 +4470,9 @@
             const MSG_NAVER_MAP_HINT = 'SOARVIBE 提示：前往南韓自由行，強烈建議先下載「NAVER Map」App，即可享受一鍵精準真數據導航功能喔！🌸';
             const WAYSIM_BASE_URL = 'https://waysim.net';
             var googleMapsPlacesLoadPromise = null;
+            var googleMapsAuthFailed = false;
+            var googleMapsAuthFailureCode = '';
+            var MAPS_LOAD_TIMEOUT_MS = 15000;
             var soarvibePlaceClass = null;
             var googleMapsBootstrapInstalled = false;
             var forexRateCache = { base: 'TWD', rates: null, fetchedAt: 0 };
@@ -4501,10 +4518,17 @@
                             method: 'GET',
                             headers: getBackendAuthHeaders()
                         });
-                        if (!response.ok) return '';
+                        if (!response.ok) {
+                            var errBody = {};
+                            try { errBody = await response.json(); } catch (parseErr) { /* silent */ }
+                            console.warn('[SOARVIBE] maps-key HTTP', response.status, errBody);
+                            return '';
+                        }
                         var data = await response.json();
                         if (data && data.key && String(data.key).indexOf('AIzaSy') === 0) {
                             cachedBackendMapsKey = String(data.key).trim();
+                        } else {
+                            console.warn('[SOARVIBE] maps-key payload missing AIzaSy key');
                         }
                     } catch (e) {
                         console.warn('[SOARVIBE] 後端 Maps 金鑰取得失敗:', e);
@@ -4725,9 +4749,10 @@
             const KKDAY_TICKET_CATEGORY_SEARCH = [
                 { label: '景點門票', emoji: '🏛️', suffix: '門票 景點' },
                 { label: '交通票券', emoji: '🚇', suffix: '交通卡 車票' },
+                { label: '機場交通', emoji: '✈️', suffix: '機場交通 機場巴士' },
                 { label: '一日遊', emoji: '🚌', suffix: '一日遊 包車' },
                 { label: '體驗行程', emoji: '🎯', suffix: '體驗 門票' },
-                { label: 'eSIM', emoji: '🛜', suffix: 'eSIM', placeholder: true }
+                { label: 'eSIM', emoji: '📶', suffix: 'eSIM', isEsim: true }
             ];
 
             const KKDAY_ESIM_CATALOG = {
@@ -4824,7 +4849,9 @@
 
             const KKDAY_CITY_CATALOG_ALIAS = {
                 '巴黎': '東京',
-                '倫敦': '東京'
+                '倫敦': '東京',
+                '札幌': '北海道',
+                'Sapporo': '北海道'
             };
 
             function kkdayCategoryEmoji(category) {
@@ -4879,18 +4906,21 @@
 
             function buildKkdayCategoryBrowseLinks(city) {
                 return KKDAY_TICKET_CATEGORY_SEARCH.map(function (cat, idx) {
-                    if (cat.placeholder) {
+                    if (cat.isEsim) {
+                        var profile = getRegionProfile();
+                        var esim =
+                            (KKDAY_ESIM_CATALOG[profile.country] && KKDAY_ESIM_CATALOG[profile.country][0]) ||
+                            null;
+                        if (!esim || !esim.productUrl) return null;
                         return {
-                            id: 'kkday-browse-' + idx,
-                            name: cat.emoji + ' ' + cat.label,
-                            rating: '即將開放',
-                            address: '未來將接入 KKday／Trip.com eSIM 分潤方案',
-                            tag: '分類',
-                            emoji: cat.emoji,
+                            id: 'kkday-browse-esim',
+                            name: 'eSIM',
+                            rating: esim.price || '',
+                            address: esim.desc || '抵達即開通',
+                            tag: '上網方案',
+                            emoji: '📶',
                             photoUrl: '',
-                            url: '',
-                            isPlaceholder: true,
-                            placeholderMessage: 'eSIM 方案即將開放，敬請期待'
+                            url: appendKkdayCid(esim.productUrl)
                         };
                     }
                     return {
@@ -4903,7 +4933,7 @@
                         photoUrl: '',
                         url: buildKkdaySearchUrl(city + ' ' + cat.suffix)
                     };
-                }).concat([{
+                }).filter(Boolean).concat([{
                     id: 'kkday-city-list',
                     name: city + ' 全部 KKday 商品',
                     rating: '官方列表',
@@ -4975,6 +5005,7 @@
             function resolveCurrentCity() {
                 var raw = getCurrentTripRegion();
                 if (!raw) return '';
+                if (/sapporo|札幌/i.test(raw)) return '北海道';
                 var known = ['東京', '大阪', '京都', '沖繩', '北海道', '首爾', '曼谷', '新加坡', '巴黎', '倫敦',
                     '上海', '北京', '深圳', '廣州', '成都', '杭州', '西安', '南京', '廈門', '重慶', '蘇州', '武漢',
                     '香港', '澳門', '紐約', '冰島', '洛杉磯', '雪梨', '墨爾本', '羅馬', '米蘭', '柏林', '阿姆斯特丹'];
@@ -4998,6 +5029,8 @@
                 if (/iceland|冰島/i.test(raw)) return '冰島';
                 return raw.trim();
             }
+            window.resolveCurrentCity = resolveCurrentCity;
+            window.getCurrentTripRegion = getCurrentTripRegion;
 
             function syncCurrentStyleFromUi() {
                 var el = getSelectedTravelStyle();
@@ -5644,6 +5677,56 @@
                 return geo.regionCode || 'JP';
             }
 
+            function withTimeout(promise, ms, code) {
+                return new Promise(function (resolve, reject) {
+                    var settled = false;
+                    var timer = setTimeout(function () {
+                        if (settled) return;
+                        settled = true;
+                        var err = new Error(code || 'TIMEOUT');
+                        err.code = code || 'TIMEOUT';
+                        reject(err);
+                    }, ms);
+                    Promise.resolve(promise).then(
+                        function (value) {
+                            if (settled) return;
+                            settled = true;
+                            clearTimeout(timer);
+                            resolve(value);
+                        },
+                        function (err) {
+                            if (settled) return;
+                            settled = true;
+                            clearTimeout(timer);
+                            reject(err);
+                        }
+                    );
+                });
+            }
+
+            function installGoogleMapsAuthFailureHook() {
+                if (typeof window === 'undefined') return;
+                var prev = window.gm_authFailure;
+                window.gm_authFailure = function () {
+                    googleMapsAuthFailed = true;
+                    googleMapsAuthFailureCode = 'gm_authFailure';
+                    console.error('[SOARVIBE] Google Maps gm_authFailure', {
+                        hint: 'Likely RefererNotAllowedMapError / REQUEST_DENIED / InvalidKeyMapError. Add Hosting referrers on the Browser key; do not disable restrictions.',
+                        referrersNeeded: [
+                            'https://soarvibe-885c8.web.app/*',
+                            'https://soarvibe-885c8.firebaseapp.com/*'
+                        ]
+                    });
+                    if (typeof prev === 'function') {
+                        try {
+                            prev();
+                        } catch (e) {
+                            /* silent */
+                        }
+                    }
+                };
+            }
+
             function installGoogleMapsBootstrapLoader() {
                 if (googleMapsBootstrapInstalled) {
                     return;
@@ -5652,6 +5735,7 @@
                 if (!apiKey) {
                     return;
                 }
+                installGoogleMapsAuthFailureHook();
                 var legacyScript = document.getElementById('soarvibe-google-maps-sdk');
                 if (legacyScript) {
                     legacyScript.remove();
@@ -5727,11 +5811,16 @@
                 if (!apiKey) {
                     throw new Error('INVALID_GOOGLE_KEY');
                 }
+                if (googleMapsAuthFailed) {
+                    var denied = new Error('MAPS_AUTH_DENIED');
+                    denied.code = googleMapsAuthFailureCode || 'MAPS_AUTH_DENIED';
+                    throw denied;
+                }
                 if (soarvibePlaceClass) {
                     return;
                 }
                 if (googleMapsPlacesLoadPromise) {
-                    await googleMapsPlacesLoadPromise;
+                    await withTimeout(googleMapsPlacesLoadPromise, MAPS_LOAD_TIMEOUT_MS, 'MAPS_LOAD_TIMEOUT');
                     return;
                 }
                 googleMapsPlacesLoadPromise = (async function () {
@@ -5740,10 +5829,15 @@
                         throw new Error('MAPS_BOOTSTRAP_FAIL');
                     }
                     var placesLib = await google.maps.importLibrary('places');
+                    if (googleMapsAuthFailed) {
+                        var authErr = new Error('MAPS_AUTH_DENIED');
+                        authErr.code = 'MAPS_AUTH_DENIED';
+                        throw authErr;
+                    }
                     soarvibePlaceClass = placesLib.Place;
                 })();
                 try {
-                    await googleMapsPlacesLoadPromise;
+                    await withTimeout(googleMapsPlacesLoadPromise, MAPS_LOAD_TIMEOUT_MS, 'MAPS_LOAD_TIMEOUT');
                 } catch (err) {
                     googleMapsPlacesLoadPromise = null;
                     soarvibePlaceClass = null;
@@ -6097,14 +6191,14 @@
                 } catch (err) {
                     setExclusiveLoading(false);
                     googleMapsPlacesLoadPromise = null;
-                    if (err && err.message === 'INVALID_GOOGLE_KEY') {
-                        exclusiveResultsList.innerHTML =
-                            '<p class="exclusive-results-loading">地圖 API 金鑰格式異常，請確認已使用 AIzaSy 開頭的 Google 付費金鑰。</p>';
-                    } else {
-                        console.warn('[SOARVIBE] loadFoodAndSpotResultsPanel:', err);
-                        exclusiveResultsList.innerHTML =
-                            '<p class="exclusive-results-loading">景點＆美食服務連線中斷，請檢查網路或 Google Cloud API 啟用狀態後再試。</p>';
-                    }
+                    console.warn('[SOARVIBE] loadFoodAndSpotResultsPanel:', {
+                        message: err && err.message,
+                        code: err && err.code,
+                        authFailed: googleMapsAuthFailed,
+                        authCode: googleMapsAuthFailureCode
+                    });
+                    exclusiveResultsList.innerHTML =
+                        '<p class="exclusive-results-loading">' + escapeHtml(MSG_MAPS_UNAVAILABLE) + '</p>';
                 }
             }
 
@@ -6113,33 +6207,37 @@
                 showExclusiveResultsPanel(city + ' KKday 票券專區');
                 setExclusiveLoading(false);
 
-                var esimCategory = {
-                    id: 'ticket-cat-esim',
-                    name: '🛜 eSIM',
-                    rating: '即將開放',
-                    address: '未來將接入 KKday／Trip.com eSIM 分潤方案',
-                    tag: '分類',
-                    emoji: '🛜',
-                    photoUrl: '',
-                    url: '',
-                    isPlaceholder: true,
-                    placeholderMessage: 'eSIM 方案即將開放，敬請期待'
-                };
+                var profile = getRegionProfile();
+                var esimPlan =
+                    (KKDAY_ESIM_CATALOG[profile.country] && KKDAY_ESIM_CATALOG[profile.country][0]) || null;
+                var esimCard = esimPlan
+                    ? {
+                          id: 'ticket-esim',
+                          name: 'eSIM',
+                          rating: esimPlan.price || '',
+                          address: esimPlan.desc || '抵達即開通',
+                          tag: '上網方案',
+                          emoji: '📶',
+                          photoUrl: '',
+                          url: appendKkdayCid(esimPlan.productUrl)
+                      }
+                    : null;
 
                 var tickets = buildKkdayTicketsForTrip(city);
                 var ticketItems = tickets
                     .filter(function (ticket) {
-                        return ticket.productUrl && isKkdaySingleProductUrl(ticket.productUrl);
+                        if (!ticket.productUrl || !isKkdaySingleProductUrl(ticket.productUrl)) return false;
+                        // Keep a single eSIM card — drop catalog duplicates.
+                        if (/esim/i.test(String(ticket.title || '') + String(ticket.category || ''))) {
+                            return false;
+                        }
+                        return true;
                     })
                     .map(ticketToResultCard);
 
-                var items = [esimCategory].concat(ticketItems);
+                var items = (esimCard ? [esimCard] : []).concat(ticketItems);
 
                 renderExclusiveResultCards(items, function (item) {
-                    if (item.isPlaceholder) {
-                        showModal(item.placeholderMessage || '即將開放，敬請期待', item.emoji || '🛜');
-                        return;
-                    }
                     openAffiliateUrl(item.url);
                 }, { mode: 'affiliate', actionLabel: '前往 KKday' });
             }
@@ -6519,7 +6617,7 @@
 
             window.backupItinerary = {
                 '東京': {
-                    summary: '✨ 【SOARVIBE 精選備援 · 東京】這份「{style}」路線從淺草、上野到秋葉原、表參道，串連江戶文化、動漫聖地與質感街拍。每日動線已避開跨區折返，含交通備註與用餐時段建議，可直接照表走。',
+                    summary: '✨ 【SOARVIBE · 東京】這份「{style}」路線從淺草、上野到秋葉原、表參道，串連江戶文化、動漫聖地與質感街拍。每日動線已避開跨區折返，含交通備註與用餐時段建議，可直接照表走。',
                     days: [
                         {
                             day: 1,
@@ -6548,7 +6646,7 @@
                     ]
                 },
                 '大阪': {
-                    summary: '✨ 【SOARVIBE 精選備援 · 大阪】「{style}」關西美食動線：大阪城、道頓堀、心齋橋、黑門市場到梅田夜景，經典與在地小吃一次收齊。每站附步行／地鐵動線，適合首次造訪大阪的旅人。',
+                    summary: '✨ 【SOARVIBE · 大阪】「{style}」關西美食動線：大阪城、道頓堀、心齋橋、黑門市場到梅田夜景，經典與在地小吃一次收齊。每站附步行／地鐵動線，適合首次造訪大阪的旅人。',
                     days: [
                         {
                             day: 1,
@@ -6577,7 +6675,7 @@
                     ]
                 },
                 '首爾': {
-                    summary: '✨ 【SOARVIBE 精選備援 · 首爾】「{style}」韓流深度路線：景福宮、北村、弘大、明洞到 N 首爾塔，傳統與潮流並陳。含地鐵出口與排隊時段提醒，適合第一次來首爾的旅人。',
+                    summary: '✨ 【SOARVIBE · 首爾】「{style}」韓流深度路線：景福宮、北村、弘大、明洞到 N 首爾塔，傳統與潮流並陳。含地鐵出口與排隊時段提醒，適合第一次來首爾的旅人。',
                     days: [
                         {
                             day: 1,
@@ -6606,7 +6704,7 @@
                     ]
                 },
                 '釜山': {
-                    summary: '✨ 【SOARVIBE 精選備援 · 釜山】「{style}」海港城市動線：甘川洞、海雲台、札嘎其、國際市場到廣安里夜景，美食與文青一次收齊。含地鐵／公車動線與排隊時段提醒。',
+                    summary: '✨ 【SOARVIBE · 釜山】「{style}」海港城市動線：甘川洞、海雲台、札嘎其、國際市場到廣安里夜景，美食與文青一次收齊。含地鐵／公車動線與排隊時段提醒。',
                     days: [
                         {
                             day: 1,
@@ -6659,7 +6757,7 @@
                     ]
                 },
                 '京都': {
-                    summary: '✨ 【SOARVIBE 精選備援 · 京都】「{style}」千年古都慢旅：伏見稻荷、清水寺、祇園、嵐山到錦市場，和風經典一次收齊。動線依區域串連，附寺社禮儀與巴士動線提示。',
+                    summary: '✨ 【SOARVIBE · 京都】「{style}」千年古都慢旅：伏見稻荷、清水寺、祇園、嵐山到錦市場，和風經典一次收齊。動線依區域串連，附寺社禮儀與巴士動線提示。',
                     days: [
                         {
                             day: 1,
@@ -6688,7 +6786,7 @@
                     ]
                 },
                 '曼谷': {
-                    summary: '✨ 【SOARVIBE 精選備援 · 曼谷】「{style}」泰式經典動線：大皇宮、臥佛寺、鄭王廟、洽圖洽到河濱夜市，金碧寺廟與街頭美食並重。附著裝提醒、BTS 動線與尖峰避開建議。',
+                    summary: '✨ 【SOARVIBE · 曼谷】「{style}」泰式經典動線：大皇宮、臥佛寺、鄭王廟、洽圖洽到河濱夜市，金碧寺廟與街頭美食並重。附著裝提醒、BTS 動線與尖峰避開建議。',
                     days: [
                         {
                             day: 1,
@@ -6717,7 +6815,7 @@
                     ]
                 },
                 '北海道': {
-                    summary: '✨ 【SOARVIBE 精選備援 · 北海道】「{style}」北國經典：札幌大通、小樽運河、海鮮市場到白色戀人公園，四季風景與美食兼顧。含 JR 動線與早晚溫差提醒，適合首次北海道旅。',
+                    summary: '✨ 【SOARVIBE · 北海道】「{style}」北國經典：札幌大通、小樽運河、海鮮市場到白色戀人公園，四季風景與美食兼顧。含 JR 動線與早晚溫差提醒，適合首次北海道旅。',
                     days: [
                         {
                             day: 1,
@@ -6746,7 +6844,7 @@
                     ]
                 },
                 '濟州': {
-                    summary: '✨ 【SOARVIBE 精選備援 · 濟州】「{style}」海島慢旅：城山日出峰、牛島、涯月海岸到東門市場，火山地形與海鮮一次收齊。',
+                    summary: '✨ 【SOARVIBE · 濟州】「{style}」海島慢旅：城山日出峰、牛島、涯月海岸到東門市場，火山地形與海鮮一次收齊。',
                     days: [
                         { day: 1, phases: [
                             { period: '上午', items: ['09:30 - 11:30｜城山日出峰 Seongsan Ilchulbong｜亮點： UNESCO 火山口，海島經典首拍｜備註：包車或市外巴士，建議早到避開人潮'] },
@@ -6766,7 +6864,7 @@
                     ]
                 },
                 '沖繩': {
-                    summary: '✨ 【SOARVIBE 精選備援 · 沖繩】「{style}」海島度假動線：首里城、國際通、美麗海水族館到古宇利島，南國風情與海景一次收齊。',
+                    summary: '✨ 【SOARVIBE · 沖繩】「{style}」海島度假動線：首里城、國際通、美麗海水族館到古宇利島，南國風情與海景一次收齊。',
                     days: [
                         { day: 1, phases: [
                             { period: '上午', items: ['10:00 - 12:00｜首里城公園｜亮點：琉球王國紅瓦王城，世界遺產｜備註：單軌電車首里站，坡道多穿好走鞋'] },
@@ -6786,7 +6884,7 @@
                     ]
                 },
                 '新加坡': {
-                    summary: '✨ 【SOARVIBE 精選備援 · 新加坡】「{style}」獅城精華：濱海灣、魚尾獅、牛車水、小印度到克拉碼頭，多元文化與美食一次收齊。',
+                    summary: '✨ 【SOARVIBE · 新加坡】「{style}」獅城精華：濱海灣、魚尾獅、牛車水、小印度到克拉碼頭，多元文化與美食一次收齊。',
                     days: [
                         { day: 1, phases: [
                             { period: '上午', items: ['10:00 - 12:00｜魚尾獅公園 Merlion Park｜亮點：新加坡地標，濱海灣全景｜備註：MRT Raffles Place，步行 10 分鐘'] },
@@ -6806,7 +6904,7 @@
                     ]
                 },
                 '香港': {
-                    summary: '✨ 【SOARVIBE 精選備援 · 香港】「{style}」港式經典：太平山、尖沙咀、中環、旺角到維港夜景，美食與購物並重。',
+                    summary: '✨ 【SOARVIBE · 香港】「{style}」港式經典：太平山、尖沙咀、中環、旺角到維港夜景，美食與購物並重。',
                     days: [
                         { day: 1, phases: [
                             { period: '上午', items: ['10:00 - 12:00｜太平山頂 Peak Tram｜亮點：360 度港島全景，經典首訪｜備註：中環花園道纜車站，建議預約或早到'] },
@@ -6826,7 +6924,7 @@
                     ]
                 },
                 '澳門': {
-                    summary: '✨ 【SOARVIBE 精選備援 · 澳門】「{style}」中西合璧：大三巴、議事亭、路氹金光大道，葡式蛋撻與夜景一次收齊。',
+                    summary: '✨ 【SOARVIBE · 澳門】「{style}」中西合璧：大三巴、議事亭、路氹金光大道，葡式蛋撻與夜景一次收齊。',
                     days: [
                         { day: 1, phases: [
                             { period: '上午', items: ['10:00 - 12:00｜大三巴牌坊・戀愛巷｜亮點：世界遺產核心，經典打卡｜備註：巴士至新馬路，步行 uphill'] },
@@ -6846,7 +6944,7 @@
                     ]
                 },
                 '台北': {
-                    summary: '✨ 【SOARVIBE 精選備援 · 台北】「{style}」寶島首都：101、故宮、西門町、象山到饒河夜市，經典與夜食並重。',
+                    summary: '✨ 【SOARVIBE · 台北】「{style}」寶島首都：101、故宮、西門町、象山到饒河夜市，經典與夜食並重。',
                     days: [
                         { day: 1, phases: [
                             { period: '上午', items: ['10:00 - 12:00｜台北 101 觀景台｜亮點：地標全景，購物美食一站｜備註：捷運市政府站，建議預約時段'] },
@@ -6866,7 +6964,7 @@
                     ]
                 },
                 '清邁': {
-                    summary: '✨ 【SOARVIBE 精選備援 · 清邁】「{style}」泰北慢活：古城寺廟、素帖山、寧曼路與週六夜市，蘭納文化與咖啡廳並重。',
+                    summary: '✨ 【SOARVIBE · 清邁】「{style}」泰北慢活：古城寺廟、素帖山、寧曼路與週六夜市，蘭納文化與咖啡廳並重。',
                     days: [
                         { day: 1, phases: [
                             { period: '上午', items: ['09:30 - 11:30｜素帖山雙龍寺 Doi Suthep｜亮點：金色佛塔俯瞰清邁，必訪聖地｜備註：包車或雙條車，盤山彎多暈車者注意'] },
@@ -6886,7 +6984,7 @@
                     ]
                 },
                 '普吉島': {
-                    summary: '✨ 【SOARVIBE 精選備援 · 普吉島】「{style}」安達曼海度假：芭東、大佛、普吉鎮到攀牙灣，海灘與泰式美食並重。',
+                    summary: '✨ 【SOARVIBE · 普吉島】「{style}」安達曼海度假：芭東、大佛、普吉鎮到攀牙灣，海灘與泰式美食並重。',
                     days: [
                         { day: 1, phases: [
                             { period: '上午', items: ['10:00 - 12:00｜山頂大佛 Big Buddha｜亮點：全島制高點，海景壯觀｜備註：包車或租機車，著裝需遮蔽'] },
@@ -6906,7 +7004,7 @@
                     ]
                 },
                 '馬來西亞': {
-                    summary: '✨ 【SOARVIBE 精選備援 · 馬來西亞】「{style}」雙城精華：吉隆坡雙子星、黑風洞、獨立廣場到茨廠街，多元文化與椰漿飯並重。',
+                    summary: '✨ 【SOARVIBE · 馬來西亞】「{style}」雙城精華：吉隆坡雙子星、黑風洞、獨立廣場到茨廠街，多元文化與椰漿飯並重。',
                     days: [
                         { day: 1, phases: [
                             { period: '上午', items: ['10:00 - 12:00｜雙子星塔 KLCC｜亮點：國家地標，觀景台與購物｜備註：LRT KLCC，建議預約 Skybridge'] },
@@ -6926,7 +7024,7 @@
                     ]
                 },
                 '越南': {
-                    summary: '✨ 【SOARVIBE 精選備援 · 越南】「{style}」越式經典：河內還劍湖、三十六行街，或胡志明紅教堂、濱城市場，法殖風情與河粉並重。',
+                    summary: '✨ 【SOARVIBE · 越南】「{style}」越式經典：河內還劍湖、三十六行街，或胡志明紅教堂、濱城市場，法殖風情與河粉並重。',
                     days: [
                         { day: 1, phases: [
                             { period: '上午', items: ['09:30 - 11:30｜還劍湖 Hoan Kiem Lake｜亮點：河內心臟，玉山祠與龜塔｜備註：步行圈，週末本地人多'] },
@@ -6946,7 +7044,7 @@
                     ]
                 },
                 '峇里島': {
-                    summary: '✨ 【SOARVIBE 精選備援 · 峇里島】「{style}」海島療癒：烏布梯田、海神庙、庫塔到水明漾，瑜伽與衝浪並重。',
+                    summary: '✨ 【SOARVIBE · 峇里島】「{style}」海島療癒：烏布梯田、海神庙、庫塔到水明漾，瑜伽與衝浪並重。',
                     days: [
                         { day: 1, phases: [
                             { period: '上午', items: ['09:30 - 11:30｜德格拉朗梯田 Tegallalang｜亮點：層層綠意，網美鞦韆｜備註：包車或租機車，入園費另計'] },
@@ -6966,7 +7064,7 @@
                     ]
                 },
                 '菲律賓': {
-                    summary: '✨ 【SOARVIBE 精選備援 · 菲律賓】「{style}」熱帶島國：馬尼拉王城、宿霧麥哲倫十字架到薄荷島，西班牙殖民遺跡與海島並重。',
+                    summary: '✨ 【SOARVIBE · 菲律賓】「{style}」熱帶島國：馬尼拉王城、宿霧麥哲倫十字架到薄荷島，西班牙殖民遺跡與海島並重。',
                     days: [
                         { day: 1, phases: [
                             { period: '上午', items: ['10:00 - 12:00｜馬尼拉王城 Intramuros｜亮點：西班牙古城牆，聖地牙哥堡｜備註：Grab 至，午後較熱'] },
@@ -6986,7 +7084,7 @@
                     ]
                 },
                 '倫敦': {
-                    summary: '✨ 【SOARVIBE 精選備援 · 倫敦】「{style}」英倫經典：大英博物館、白金漢宮、倫敦眼到博羅市場，皇室傳統與博物館並重。',
+                    summary: '✨ 【SOARVIBE · 倫敦】「{style}」英倫經典：大英博物館、白金漢宮、倫敦眼到博羅市場，皇室傳統與博物館並重。',
                     days: [
                         { day: 1, phases: [
                             { period: '上午', items: ['10:00 - 12:30｜大英博物館 British Museum｜亮點：羅塞塔石碑、埃及館，免費入場｜備註：Tottenham Court Road，週末人潮多'] },
@@ -7006,7 +7104,7 @@
                     ]
                 },
                 '巴黎': {
-                    summary: '✨ 【SOARVIBE 精選備援 · 巴黎】「{style}」法式浪漫：艾菲爾、羅浮宮、瑪黑區到蒙馬特，藝術與可頌並重。',
+                    summary: '✨ 【SOARVIBE · 巴黎】「{style}」法式浪漫：艾菲爾、羅浮宮、瑪黑區到蒙馬特，藝術與可頌並重。',
                     days: [
                         { day: 1, phases: [
                             { period: '上午', items: ['10:00 - 12:00｜艾菲爾鐵塔 Eiffel Tower｜亮點：巴黎地標，登頂需預約｜備註：Metro Bir-Hakeim，週末排隊長'] },
@@ -7026,7 +7124,7 @@
                     ]
                 },
                 '歐洲': {
-                    summary: '✨ 【SOARVIBE 精選備援 · 歐洲】「{style}」歐陸精華：老城廣場、世界遺產教堂、博物館與露天咖啡，步行＋大眾運輸動線。',
+                    summary: '✨ 【SOARVIBE · 歐洲】「{style}」歐陸精華：老城廣場、世界遺產教堂、博物館與露天咖啡，步行＋大眾運輸動線。',
                     days: [
                         { day: 1, phases: [
                             { period: '上午', items: ['10:00 - 12:00｜舊城中心廣場 Old Town Square｜亮點：哥德式鐘樓與市政廳，城市縮影｜備註：步行圈，週末市集熱鬧'] },
@@ -7046,7 +7144,7 @@
                     ]
                 },
                 '美國': {
-                    summary: '✨ 【SOARVIBE 精選備援 · 美國】「{style}」美式都會：地標天際線、博物館區、特色街區到夜景，Uber／地鐵動線。',
+                    summary: '✨ 【SOARVIBE · 美國】「{style}」美式都會：地標天際線、博物館區、特色街區到夜景，Uber／地鐵動線。',
                     days: [
                         { day: 1, phases: [
                             { period: '上午', items: ['10:00 - 12:00｜城市地標觀景台 Observation Deck｜亮點：天際線首拍，快速掌握方位｜備註：建議線上購票省排队'] },
@@ -7066,7 +7164,7 @@
                     ]
                 },
                 '加拿大': {
-                    summary: '✨ 【SOARVIBE 精選備援 · 加拿大】「{style}」楓情都會：濱水區、老城、市集到夜景，多元移民美食並重。',
+                    summary: '✨ 【SOARVIBE · 加拿大】「{style}」楓情都會：濱水區、老城、市集到夜景，多元移民美食並重。',
                     days: [
                         { day: 1, phases: [
                             { period: '上午', items: ['10:00 - 12:00｜CN Tower／濱水區 Harbourfront｜亮點：城市地標，湖景散步｜備註：地鐵 Union，建議預約登塔'] },
@@ -7086,7 +7184,7 @@
                     ]
                 },
                 '澳洲': {
-                    summary: '✨ 【SOARVIBE 精選備援 · 澳洲】「{style}」南半球風情：歌劇院、港灣大橋、海灘到動物園，戶外與咖啡文化並重。',
+                    summary: '✨ 【SOARVIBE · 澳洲】「{style}」南半球風情：歌劇院、港灣大橋、海灘到動物園，戶外與咖啡文化並重。',
                     days: [
                         { day: 1, phases: [
                             { period: '上午', items: ['10:00 - 12:00｜雪梨歌劇院 Sydney Opera House｜亮點：世界遺產，內部導覽需預約｜備註：Circular Quay 渡輪站'] },
@@ -7106,7 +7204,7 @@
                     ]
                 },
                 '紐西蘭': {
-                    summary: '✨ 【SOARVIBE 精選備援 · 紐西蘭】「{style}」紐式自然：港灣、火山、牧場到極限運動，自駕或一日遊動線。',
+                    summary: '✨ 【SOARVIBE · 紐西蘭】「{style}」紐式自然：港灣、火山、牧場到極限運動，自駕或一日遊動線。',
                     days: [
                         { day: 1, phases: [
                             { period: '上午', items: ['10:00 - 12:00｜奧克蘭天空塔 Sky Tower｜亮點：360 度港灣，極限跳台｜備註：Queen Street 步行圈'] },
@@ -7126,7 +7224,7 @@
                     ]
                 },
                 '中國': {
-                    summary: '✨ 【SOARVIBE 精選備援 · 中國】「{style}」大陸經典：老城區、世界遺產、步行街到夜市，地鐵＋步行動線。',
+                    summary: '✨ 【SOARVIBE · 中國】「{style}」大陸經典：老城區、世界遺產、步行街到夜市，地鐵＋步行動線。',
                     days: [
                         { day: 1, phases: [
                             { period: '上午', items: ['10:00 - 12:00｜外灘／故宮／天安門（依城市）｜亮點：城市名片，歷史首站｜備註：故宮需提前 7 天預約'] },
@@ -7146,7 +7244,7 @@
                     ]
                 },
                 '杜拜': {
-                    summary: '✨ 【SOARVIBE 精選備援 · 杜拜】「{style}」沙漠奢華：哈里發塔、黃金市集、棕榈島到沙漠衝沙，現代與傳統並重。',
+                    summary: '✨ 【SOARVIBE · 杜拜】「{style}」沙漠奢華：哈里發塔、黃金市集、棕榈島到沙漠衝沙，現代與傳統並重。',
                     days: [
                         { day: 1, phases: [
                             { period: '上午', items: ['10:00 - 12:00｜哈里發塔 Burj Khalifa At The Top｜亮點：世界最高，360 度沙漠與海｜備註：Dubai Mall Metro，需預約時段'] },
@@ -7166,7 +7264,7 @@
                     ]
                 },
                 '馬爾地夫': {
-                    summary: '✨ 【SOARVIBE 精選備援 · 馬爾地夫】「{style}」一島一飯店：浮潛、沙灘、水上屋到夕陽巡航，海島度假動線。',
+                    summary: '✨ 【SOARVIBE · 馬爾地夫】「{style}」一島一飯店：浮潛、沙灘、水上屋到夕陽巡航，海島度假動線。',
                     days: [
                         { day: 1, phases: [
                             { period: '上午', items: ['10:00 - 12:00｜水飛機／快艇上島 Check-in｜亮點：俯瞰環礁，度假開始｜備註：依度假村接駁時間'] },
@@ -7186,7 +7284,7 @@
                     ]
                 },
                 default: {
-                    summary: '✨ 【SOARVIBE 精選備援 · {dest}】AI 暫時忙碌，已為您載入「{style}」通用深度路線：每日含上午／下午／晚上三段，附景點亮點、交通備註與用餐建議。連線恢復後可重新生成個人化行程。',
+                    summary: '✨ 【SOARVIBE · {dest}】已為您精選「{style}」通用深度路線：每日含上午／下午／晚上三段，附景點亮點、交通備註與用餐建議。連線恢復後可重新生成個人化行程。',
                     days: [
                         {
                             day: 1,
@@ -9622,7 +9720,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 }
 
                 if (looksLikeJsonItinerary(text)) {
-                    console.warn('[SOARVIBE] JSON 無法解析，改用目的地精選備援行程');
+                    console.warn('[SOARVIBE] JSON 無法解析，改用目的地專屬行程');
                     var backupJson = extractJsonFromAiText(getBackupItineraryRaw(meta));
                     if (backupJson) {
                         return buildHiddenFromJson(backupJson, meta);
@@ -9962,8 +10060,8 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 var highlights = intro && intro.highlights && intro.highlights.length
                     ? ' 必訪亮點包括：' + intro.highlights.slice(0, 4).join('、') + '。'
                     : '';
-                return '✨ 【SOARVIBE 精選備援行程】這是一份『' + style + '』風格的「' + dest + '」深度路線，已按區域串連、減少折返。' +
-                    lead + highlights + ' AI 連線恢復後，可重新一鍵生成個人化版本。';
+                return '✨ 【SOARVIBE行程】這是一份『' + style + '』風格的「' + dest + '」深度路線，已按區域串連、減少折返。' +
+                    lead + highlights;
             }
 
             function renderWelcomeMessage(meta) {
@@ -14757,34 +14855,63 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             function pickBackupItineraryKey(destination) {
                 var dest = String(destination || '').trim();
                 if (!dest) return 'default';
-                var keys = Object.keys(window.backupItinerary || {}).filter(function (k) {
-                    return k !== 'default';
+                var packs = window.backupItinerary || {};
+
+                // Exact pack key match first (never accidental substring).
+                if (packs[dest] && dest !== 'default') return dest;
+
+                // Explicit city aliases → pack key (札幌 content belongs to 北海道 pack only).
+                if (/^(札幌|Sapporo)$/i.test(dest) || /札幌|Sapporo/i.test(dest)) {
+                    return packs['北海道'] ? '北海道' : 'default';
+                }
+
+                // Rules next (ordered specific → broad).
+                var i;
+                for (i = 0; i < BACKUP_ITINERARY_KEY_RULES.length; i++) {
+                    if (BACKUP_ITINERARY_KEY_RULES[i].re.test(dest)) {
+                        var ruled = BACKUP_ITINERARY_KEY_RULES[i].key;
+                        if (packs[ruled]) return ruled;
+                    }
+                }
+
+                // Longest contained pack key only (min 2 chars), never prefer 札幌 over destination.
+                var keys = Object.keys(packs).filter(function (k) {
+                    return k !== 'default' && k.length >= 2;
                 });
                 keys.sort(function (a, b) { return b.length - a.length; });
-                var i;
                 for (i = 0; i < keys.length; i++) {
                     if (dest.indexOf(keys[i]) !== -1) {
                         return keys[i];
-                    }
-                }
-                for (i = 0; i < BACKUP_ITINERARY_KEY_RULES.length; i++) {
-                    if (BACKUP_ITINERARY_KEY_RULES[i].re.test(dest)) {
-                        return BACKUP_ITINERARY_KEY_RULES[i].key;
                     }
                 }
                 return 'default';
             }
 
             function getBackupItineraryPack(payload) {
-                var key = pickBackupItineraryKey(payload && payload.destination);
+                var destLabel = String((payload && payload.destination) || '').trim() || '目的地';
+                var key = pickBackupItineraryKey(destLabel);
+                // Guard: never silently serve 北海道/札幌 content for unrelated destinations.
+                if (
+                    key === '北海道' &&
+                    destLabel &&
+                    !/北海道|Hokkaido|札幌|Sapporo|函館|小樽|富良野|Niseko|二世谷|旭川|帶廣|登別/i.test(destLabel)
+                ) {
+                    console.warn('[SOARVIBE] blocked wrong-city backup', {
+                        destination: destLabel,
+                        rejectedKey: key
+                    });
+                    key = 'default';
+                }
                 var pack = (window.backupItinerary && window.backupItinerary[key])
                     || window.backupItinerary.default
                     || { days: [], summary: '' };
-                var dest = (payload && payload.destination) || key || '目的地';
                 var clone = fitBackupDaysToTrip(JSON.parse(JSON.stringify(pack)), payload);
                 if (clone.summary) {
-                    clone.summary = clone.summary.replace(/\{dest\}/g, dest);
+                    clone.summary = clone.summary
+                        .replace(/\{dest\}/g, destLabel)
+                        .replace(/\{style\}/g, (payload && payload.styleLabel) || (payload && payload.style) || '旅遊');
                 }
+                clone._backupKey = key;
                 return clone;
             }
 
@@ -15015,6 +15142,17 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
                 if (!response.ok) {
                     console.error('SOARVIBE backend Gemini HTTP ' + response.status, result);
+                    if (response.status === 403 || result.error === 'forbidden') {
+                        var originErr = new Error(
+                            'origin_forbidden: Worker 未允許此網域（' +
+                            (typeof location !== 'undefined' ? location.origin : '') +
+                            '）。請更新 ALLOWED_ORIGINS 並重新部署 Worker。'
+                        );
+                        originErr.status = 403;
+                        originErr.code = 'origin_forbidden';
+                        originErr.responseBody = result;
+                        throw originErr;
+                    }
                     if (result.error === 'all_keys_exhausted' || response.status === 429) {
                         var details429 = result.details || result;
                         var rateErr = new Error('rate_limit: ' + (result.message || ((details429.error && details429.error.message) || response.status)));
@@ -15312,6 +15450,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 var days = [];
                 var priorSummary = '';
                 var anyBackup = false;
+                var originForbidden = false;
 
                 for (var d = 1; d <= totalDays; d++) {
                     setGeneratingDayProgress(d, totalDays, payload.destination);
@@ -15320,8 +15459,11 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                         days.push(dayObj);
                         priorSummary = summarizePriorDays(days);
                     } catch (err) {
+                        if (err && (err.code === 'origin_forbidden' || /origin_forbidden/i.test(String(err.message || '')))) {
+                            originForbidden = true;
+                        }
                         if (isAllKeysExhaustedError(err)) {
-                            console.warn('[SOARVIBE] 全部金鑰額度用盡 → Day', d, '起改用精選備援');
+                            console.warn('[SOARVIBE] 全部金鑰額度用盡 → Day', d, '起改用精選路線');
                             var backupDay = getBackupDayForIndex(payload, d - 1);
                             if (backupDay) {
                                 days.push(backupDay);
@@ -15352,14 +15494,18 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     return {
                         text: getBackupItineraryRaw(payload),
                         fromBackup: true,
-                        reason: 'day_by_day_failed'
+                        reason: originForbidden ? 'origin_forbidden' : 'day_by_day_failed'
                     };
                 }
 
                 return {
                     text: JSON.stringify({ days: days }),
                     fromBackup: anyBackup,
-                    reason: anyBackup ? 'partial_backup_days' : undefined
+                    reason: originForbidden
+                        ? 'origin_forbidden'
+                        : anyBackup
+                          ? 'partial_backup_days'
+                          : undefined
                 };
             }
 
@@ -15400,7 +15546,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                         console.log('[SOARVIBE] 批次補齊 Day', startDay, '–', endDay, '✓');
                     } catch (batchErr) {
                         if (isAllKeysExhaustedError(batchErr)) {
-                            console.warn('[SOARVIBE] 批次補齊時全部金鑰用盡 → Day', startDay, '起改用精選備援');
+                            console.warn('[SOARVIBE] 批次補齊時全部金鑰用盡 → Day', startDay, '起改用精選路線');
                             var backupDay = getBackupDayForIndex(payload, startDay - 1);
                             if (backupDay) {
                                 json.days.push(backupDay);
@@ -15429,7 +15575,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                         priorSummary = summarizePriorDays(json.days);
                     } catch (err) {
                         if (isAllKeysExhaustedError(err)) {
-                            console.warn('[SOARVIBE] 逐日補齊時全部金鑰用盡 → Day', singleDay, '起改用精選備援');
+                            console.warn('[SOARVIBE] 逐日補齊時全部金鑰用盡 → Day', singleDay, '起改用精選路線');
                             backupDay = getBackupDayForIndex(payload, singleDay - 1);
                             if (backupDay) {
                                 json.days.push(backupDay);
@@ -15468,7 +15614,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             async function fetchGeminiItinerary(promptText, payload) {
                 var validKeys = getActiveGeminiApiKeys();
                 if (!validKeys.length) {
-                    console.warn('[SOARVIBE] 無有效 Gemini 金鑰 → 使用精選備援行程');
+                    console.warn('[SOARVIBE] 無有效 Gemini 金鑰 → 使用專屬行程');
                     return {
                         text: getBackupItineraryRaw(payload),
                         fromBackup: true,
@@ -15482,11 +15628,23 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 } catch (lastError) {
                     var all429 = lastError && lastError.status === 429;
                     var billingDepleted = isGeminiBillingDepleted(lastError);
+                    var originForbidden =
+                        lastError &&
+                        (lastError.code === 'origin_forbidden' ||
+                            /origin_forbidden/i.test(String(lastError.message || '')));
                     console.warn('[SOARVIBE] All Gemini keys exhausted' + (billingDepleted ? ' (prepaid depleted)' : all429 ? ' (429)' : '') + ' → backupItinerary fallback', lastError);
                     return {
                         text: getBackupItineraryRaw(payload),
                         fromBackup: true,
-                        reason: billingDepleted ? 'billing_depleted' : (all429 ? 'all_keys_429' : (lastError && lastError.message ? lastError.message : 'exhausted'))
+                        reason: originForbidden
+                            ? 'origin_forbidden'
+                            : billingDepleted
+                              ? 'billing_depleted'
+                              : all429
+                                ? 'all_keys_429'
+                                : lastError && lastError.message
+                                  ? lastError.message
+                                  : 'exhausted'
                     };
                 }
             }
@@ -15593,31 +15751,25 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     }
                     displayItineraryFromAi(aiResult.text, payload);
                     if (aiResult.fromBackup) {
-                        var backupMsg = MSG_GEMINI_BACKUP;
-                        var backupIcon = '✨';
-                        if (aiResult.reason === 'all_keys_429') {
-                            backupMsg = MSG_GEMINI_ALL_KEYS_429;
-                            backupIcon = '💳';
-                        } else if (aiResult.reason === 'billing_depleted' || /prepayment credits are depleted/i.test(String(aiResult.reason || ''))) {
-                            backupMsg = MSG_GEMINI_BILLING;
-                            backupIcon = '💳';
-                        } else if (aiResult.reason === 'partial_backup_days') {
-                            backupMsg = '部分天數 AI 額度不足，已混合 AI 與「{dest}」精選備援。建議稍後重新生成以取得完整 AI 行程 ✨';
-                            backupIcon = '✨';
-                        }
-                        showModal(
-                            backupMsg.replace('{dest}', payload.destination || '目的地'),
-                            backupIcon
-                        );
+                        console.warn('[SOARVIBE] itinerary served via internal planner', {
+                            reason: aiResult.reason || 'backup',
+                            destination: payload.destination || ''
+                        });
+                        // Successful trip board: never expose vendor/quota/fallback wording to users.
                     }
                 } catch (error) {
                     console.warn('[SOARVIBE] Safeguard → backupItinerary:', error);
-                    window.soarvibeItineraryFromBackup = true;
-                    displayItineraryFromAi(getBackupItineraryRaw(payload), payload);
-                    showModal(
-                        MSG_GEMINI_BACKUP.replace('{dest}', payload.destination || '目的地'),
-                        '✨'
-                    );
+                    try {
+                        window.soarvibeItineraryFromBackup = true;
+                        displayItineraryFromAi(getBackupItineraryRaw(payload), payload);
+                        console.warn('[SOARVIBE] itinerary served via internal planner', {
+                            reason: (error && error.message) || 'safeguard',
+                            destination: payload.destination || ''
+                        });
+                    } catch (backupErr) {
+                        console.error('[SOARVIBE] internal planner also failed', backupErr);
+                        showModal(MSG_PLANNING_BUSY, '✈️');
+                    }
                 } finally {
                     hideGeneratingOverlay();
                     soarvibeIsLoading = false;
@@ -16393,6 +16545,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 window.SOARVIBE_FIREBASE.init();
             }
             if (window.SOARVIBE_AUTH && typeof window.SOARVIBE_AUTH.start === 'function') {
+                // Idempotent: early boot already started Auth; safe to call again.
                 window.SOARVIBE_AUTH.start();
                 window.SOARVIBE_AUTH.onAuthStateChanged(function (snap) {
                     if (snap && snap.signedIn) {
@@ -16418,10 +16571,33 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 userWallBack.addEventListener('click', closeUserWall);
             }
             if (userAvatarBtn && userAvatarInput) {
+                (function syncAvatarUploadUi() {
+                    var flags = window.SOARVIBE_FEATURE_FLAGS || {};
+                    var enabled = flags.avatarUploadEnabled === true;
+                    var hint = document.getElementById('user-avatar-hint');
+                    if (!enabled) {
+                        userAvatarBtn.setAttribute('aria-label', '頭像');
+                        if (hint) hint.textContent = '';
+                        userAvatarBtn.classList.add('is-avatar-upload-disabled');
+                    } else {
+                        userAvatarBtn.setAttribute('aria-label', '點擊更換頭像');
+                        if (hint) hint.textContent = '更換';
+                        userAvatarBtn.classList.remove('is-avatar-upload-disabled');
+                    }
+                })();
                 userAvatarBtn.addEventListener('click', function () {
+                    var flags = window.SOARVIBE_FEATURE_FLAGS || {};
+                    if (flags.avatarUploadEnabled !== true) {
+                        return;
+                    }
                     userAvatarInput.click();
                 });
                 userAvatarInput.addEventListener('change', function () {
+                    var flags = window.SOARVIBE_FEATURE_FLAGS || {};
+                    if (flags.avatarUploadEnabled !== true) {
+                        userAvatarInput.value = '';
+                        return;
+                    }
                     var file = userAvatarInput.files && userAvatarInput.files[0];
                     if (!file) return;
                     var AUTH = window.SOARVIBE_AUTH;

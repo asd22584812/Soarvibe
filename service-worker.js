@@ -1,5 +1,5 @@
-const CACHE_NAME = 'soarvibe-v149';
-/* Phase 1C.1 cache bust ??travel ledger network-first */
+const CACHE_NAME = 'soarvibe-v154';
+/* Phase 1C.1 cache bust — travel ledger network-first + auth/config network-first */
 const STATIC_ASSETS = [
   './index.html',
   './manifest.json',
@@ -87,6 +87,20 @@ function isHtmlRequest(request, url) {
   return path.endsWith('/') || path.endsWith('/index.html') || path.endsWith('/Soarvibe') || path.endsWith('/Soarvibe/');
 }
 
+function isRuntimeConfigAsset(url) {
+  var path = url.pathname;
+  return (
+    /\/feature-flags\.js$/i.test(path) ||
+    /\/firebase-config\.js$/i.test(path) ||
+    /\/firebase-init\.js$/i.test(path) ||
+    /\/soarvibe-auth(-ui)?\.js$/i.test(path) ||
+    /\/city-shares-(firestore|ui|config|data)\.js$/i.test(path) ||
+    /\/city-shares-ui\.css$/i.test(path) ||
+    /\/service-worker\.js$/i.test(path) ||
+    /\/manifest\.json$/i.test(path)
+  );
+}
+
 function isTravelLedgerAsset(url) {
   var path = url.pathname;
   return (
@@ -144,11 +158,10 @@ self.addEventListener('fetch', function (event) {
     return;
   }
 
-  if (isHtmlRequest(request, url) || isTravelLedgerAsset(url)) {
+  if (isHtmlRequest(request, url) || isTravelLedgerAsset(url) || isRuntimeConfigAsset(url)) {
     event.respondWith(networkFirst(request, './index.html'));
     return;
   }
 
   event.respondWith(staleWhileRevalidate(request));
 });
-

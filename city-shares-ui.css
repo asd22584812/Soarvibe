@@ -14,12 +14,31 @@
     left: 0;
     right: 0;
     z-index: 10002;
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(48px, auto) minmax(0, 1fr) minmax(48px, auto);
     align-items: center;
-    justify-content: space-between;
     gap: 0.5rem;
     padding: calc(env(safe-area-inset-top, 0px) + 12px) 16px 12px;
     pointer-events: none;
+    background: linear-gradient(180deg, rgba(255, 253, 247, 0.96) 0%, rgba(255, 253, 247, 0.72) 70%, rgba(255, 253, 247, 0) 100%);
+}
+#cityShares:not(.is-compose) .cs-chrome {
+    background: transparent;
+}
+#cityShares .cs-chrome-title {
+    margin: 0;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 800;
+    color: #37474f;
+    line-height: 1.3;
+    pointer-events: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+#cityShares .cs-chrome-title.is-hidden {
+    visibility: hidden;
 }
 #cityShares .cs-chrome-btn {
     pointer-events: auto;
@@ -415,13 +434,10 @@
     background: #fff;
 }
 #cityShares .cs-compose-page {
-    padding: 1rem 1rem 2rem;
+    padding: calc(env(safe-area-inset-top, 0px) + 4.75rem) 1.15rem calc(env(safe-area-inset-bottom, 0px) + 2rem);
 }
 #cityShares .cs-compose-title {
-    margin: 0 0 0.35rem;
-    font-size: 1.25rem;
-    font-weight: 900;
-    color: #37474f;
+    display: none;
 }
 #cityShares .cs-compose-hint {
     margin: 0 0 1rem;
@@ -431,10 +447,11 @@
 }
 #cityShares .cs-compose-label {
     display: grid;
-    gap: 0.35rem;
+    gap: 0.4rem;
     font-size: 0.78rem;
     font-weight: 800;
     color: #546e7a;
+    line-height: 1.35;
 }
 #cityShares .cs-compose-msg {
     margin: 0;
@@ -445,7 +462,84 @@
 #cityShares .cs-compose-msg.hidden {
     display: none;
 }
+#cityShares .cs-compose-photos {
+    margin: 0.15rem 0 0.35rem;
+}
+#cityShares .cs-compose-media-soon {
+    margin: 0.35rem 0 0.55rem;
+    padding: 0.75rem 0.9rem;
+    border-radius: 0.85rem;
+    background: rgba(236, 239, 241, 0.85);
+    color: #546e7a;
+    font-size: 0.88rem;
+    font-weight: 650;
+    line-height: 1.45;
+}
+#cityShares .cs-compose-add-photo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0.55rem 0.9rem;
+    margin-bottom: 0.65rem;
+    border-radius: 9999px;
+    border: 1px dashed rgba(55, 71, 79, 0.28);
+    background: rgba(255, 255, 255, 0.85);
+    color: #455a64;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+#cityShares .cs-compose-media-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+}
+#cityShares .cs-compose-thumb {
+    position: relative;
+    width: 4.75rem;
+    height: 4.75rem;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    background: #eceff1;
+}
+#cityShares .cs-compose-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+#cityShares .cs-compose-thumb-remove {
+    position: absolute;
+    top: 0.2rem;
+    right: 0.2rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 0;
+    border-radius: 9999px;
+    background: rgba(0, 0, 0, 0.65);
+    color: #fff;
+    font-size: 0.95rem;
+    line-height: 1;
+    cursor: pointer;
+}
 #cityShares .cs-social-danger {
     color: #c62828;
     border-color: rgba(198, 40, 40, 0.28);
+}
+
+#cityShares .cs-compose-location {
+    margin: 0 0 0.85rem;
+}
+#cityShares .cs-compose-location-chip {
+    margin: 0.35rem 0 0.75rem;
+    padding: 0.65rem 0.85rem;
+    border-radius: 0.85rem;
+    background: rgba(55, 71, 79, 0.06);
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #37474f;
+}
+#cityShares .cs-compose-location.is-locked .cs-compose-location-chip {
+    background: linear-gradient(135deg, rgba(0, 150, 136, 0.12), rgba(55, 71, 79, 0.06));
 }

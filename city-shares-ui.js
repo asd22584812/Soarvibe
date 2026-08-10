@@ -31,14 +31,110 @@
 
   var csState = {
     view: 'closed',
+    /** @deprecated use feedScope.entryId — kept for hash / auth pending compat */
     cityId: null,
     postId: null,
     typeFilter: 'all',
     remotePosts: [],
     liked: false,
     saved: false,
-    comments: []
+    comments: [],
+    composeMedia: [],
+    feedScope: null,
+    composeTaxonomy: null,
+    composeLocked: false,
+    composeNeedsCity: false,
+    composeNeedsCountry: false
   };
+
+  function locApi() {
+    return global.SOARVIBE_CITY_SHARES_LOCATION || null;
+  }
+
+  function cardsApi() {
+    return global.SOARVIBE_CITY_SHARES_CARDS || null;
+  }
+
+  function resolveItineraryDestinationText() {
+    var destInput = document.getElementById('destination-input');
+    if (destInput && destInput.value && String(destInput.value).trim()) {
+      return String(destInput.value).trim();
+    }
+    try {
+      if (typeof global.getCurrentTripRegion === 'function') {
+        var region = String(global.getCurrentTripRegion() || '').trim();
+        if (region) return region;
+      }
+    } catch (e2) { /* silent */ }
+    try {
+      if (typeof global.resolveCurrentCity === 'function') {
+        var city = String(global.resolveCurrentCity() || '').trim();
+        if (city) return city;
+      }
+    } catch (e1) { /* silent */ }
+    return '';
+  }
+
+  function buildScopeFromEntryId(entryId) {
+    var cards = cardsApi();
+    var card = cards && cards.getCardById ? cards.getCardById(entryId) : null;
+    var loc = locApi();
+    var tax;
+    if (card && loc && loc.resolveEntryCard) {
+      tax = loc.resolveEntryCard(card);
+    } else if (loc && loc.resolveLocation) {
+      tax = loc.resolveLocation(entryId, { source: 'card' });
+    } else {
+      tax = {
+        countryId: '',
+        countryName: '',
+        regionId: '',
+        regionName: '',
+        cityId: entryId,
+        cityName: (CITY_LABELS[entryId] && CITY_LABELS[entryId].name) || entryId,
+        feedKind: 'city',
+        displayLabel: (CITY_LABELS[entryId] && CITY_LABELS[entryId].name) || entryId,
+        chipLabel: ''
+      };
+    }
+    return {
+      entryId: entryId,
+      feedKind: (card && card.type) || tax.feedKind || 'city',
+      countryId: tax.countryId || (card && card.countryId) || '',
+      regionId: tax.regionId || (card && card.regionId) || '',
+      cityId: tax.cityId || (card && card.cityId) || '',
+      displayName: (card && card.displayName) || tax.displayLabel || entryId,
+      taxonomy: tax,
+      card: card
+    };
+  }
+
+  function postMatchesScope(post, scope) {
+    if (!post || !scope) return false;
+    var loc = locApi();
+    if (loc && loc.normalizePostTaxonomy) loc.normalizePostTaxonomy(post);
+    if (scope.feedKind === 'country' && scope.countryId) {
+      return post.countryId === scope.countryId;
+    }
+    if (scope.feedKind === 'region' && scope.regionId) {
+      return post.regionId === scope.regionId || post.cityId === scope.regionId;
+    }
+    if (scope.cityId) {
+      return post.cityId === scope.cityId;
+    }
+    if (scope.entryId) {
+      return post.cityId === scope.entryId;
+    }
+    return true;
+  }
+
+  /** Future R2 / storage upload; keep at 3 when re-enabled. */
+  var MEDIA_MAX_PER_POST = 3;
+
+  function mediaUploadEnabled() {
+    var flags = global.SOARVIBE_FEATURE_FLAGS || {};
+    return flags.citySharesMediaUpload === true;
+  }
 
   function api() {
     return global.SOARVIBE_CITY_SHARES_API || null;
@@ -70,15 +166,38 @@
     return false;
   }
 
+  function postSortTimeMs(post) {
+    if (!post) return 0;
+    var raw = post.createdAt || post.publishedAt || post.updatedAt || null;
+    if (!raw) {
+      // Official static seeds without timestamps stay below fresh user posts.
+      return post.source === 'user' ? Date.now() : 0;
+    }
+    if (typeof raw.toMillis === 'function') {
+      try {
+        return raw.toMillis();
+      } catch (e1) {
+        /* fall through */
+      }
+    }
+    if (typeof raw.seconds === 'number') {
+      return raw.seconds * 1000 + Math.floor((raw.nanoseconds || 0) / 1e6);
+    }
+    var parsed = Date.parse(raw);
+    return isNaN(parsed) ? 0 : parsed;
+  }
+
   function getPosts(cityId, typeFilter) {
+    var scope = csState.feedScope || buildScopeFromEntryId(cityId);
+    var seedKey = scope.cityId || scope.entryId || cityId;
     var local =
-      typeof global.getCityShares === 'function' ? global.getCityShares(cityId) : [];
+      typeof global.getCityShares === 'function' ? global.getCityShares(seedKey) : [];
     var merged = {};
     (local || []).forEach(function (p) {
-      if (p && p.postId) merged[p.postId] = p;
+      if (p && p.postId && postMatchesScope(p, scope)) merged[p.postId] = p;
     });
     (csState.remotePosts || []).forEach(function (p) {
-      if (p && p.postId && p.cityId === cityId) merged[p.postId] = p;
+      if (p && p.postId && postMatchesScope(p, scope)) merged[p.postId] = p;
     });
     var list = Object.keys(merged).map(function (k) {
       return merged[k];
@@ -88,17 +207,32 @@
         return p.type === typeFilter;
       });
     }
+    list.sort(function (a, b) {
+      var tb = postSortTimeMs(b);
+      var ta = postSortTimeMs(a);
+      if (tb !== ta) return tb - ta;
+      if ((a.source === 'user') !== (b.source === 'user')) {
+        return a.source === 'user' ? -1 : 1;
+      }
+      return String(b.postId || '').localeCompare(String(a.postId || ''));
+    });
     return list;
   }
 
   function refreshRemoteFeed(cityId) {
     var a = api();
-    if (!a || !a.listPublishedPosts) {
+    var scope = csState.feedScope || buildScopeFromEntryId(cityId || csState.cityId);
+    if (!a) {
       csState.remotePosts = [];
       return Promise.resolve([]);
     }
-    return a
-      .listPublishedPosts(cityId)
+    var loader =
+      a.listFeedForScope
+        ? a.listFeedForScope(scope)
+        : a.listPublishedPosts
+          ? a.listPublishedPosts(scope.cityId || scope.entryId || cityId)
+          : Promise.resolve([]);
+    return loader
       .then(function (posts) {
         csState.remotePosts = posts || [];
         return csState.remotePosts;
@@ -120,18 +254,22 @@
   }
 
   function getCityMeta(cityId) {
+    var scope = csState.feedScope || buildScopeFromEntryId(cityId);
     var data = global.SOARVIBE_CITY_SHARES;
     if (data && data.cities && data.cities[cityId]) return data.cities[cityId];
     var cfg = global.SOARVIBE_CITY_SHARES_CONFIG;
-    var hero = cfg && cfg.CITY_HERO && cfg.CITY_HERO[cityId];
-    var label = CITY_LABELS[cityId];
+    var heroKey = scope.cityId || cityId;
+    var hero = cfg && cfg.CITY_HERO && cfg.CITY_HERO[heroKey];
+    var label = CITY_LABELS[cityId] || CITY_LABELS[scope.cityId];
+    var name = scope.displayName || (label && label.name) || cityId;
     return {
       cityId: cityId,
-      title: (label && label.name ? label.name : cityId) + '旅人分享',
+      title: name + '旅人分享',
       subtitle: '真正去過的人的照片與心得',
-      heroImage: hero && hero.heroImage,
-      heroPosition: hero && hero.heroPosition,
-      heroAlt: hero && hero.heroAlt
+      heroImage: (scope.card && scope.card.image) || (hero && hero.heroImage),
+      heroPosition:
+        (scope.card && scope.card.imagePosition) || (hero && hero.heroPosition),
+      heroAlt: (scope.card && scope.card.imageAlt) || (hero && hero.heroAlt) || name
     };
   }
 
@@ -387,20 +525,233 @@
     );
   }
 
+  function prepareComposeTaxonomy(opts) {
+    opts = opts || {};
+    var loc = locApi();
+    var scope = csState.feedScope;
+    var itineraryText = resolveItineraryDestinationText();
+    var tax = null;
+    var locked = false;
+    var needsCity = false;
+    var needsCountry = false;
+
+    if (opts.fromItinerary && itineraryText && loc) {
+      tax = loc.resolveLocation(itineraryText, { source: 'itinerary' });
+      if (tax.countryId && tax.cityId) {
+        locked = true;
+      } else if (tax.countryId) {
+        needsCity = true;
+      } else {
+        needsCountry = true;
+        needsCity = true;
+      }
+    } else if (scope && scope.feedKind === 'city' && scope.taxonomy && scope.taxonomy.cityId) {
+      tax = Object.assign({}, scope.taxonomy);
+      tax.locationSource = 'card';
+      locked = true;
+    } else if (scope && scope.feedKind === 'region' && scope.taxonomy) {
+      tax = Object.assign({}, scope.taxonomy);
+      tax.locationSource = 'card';
+      if (itineraryText && loc) {
+        var it = loc.resolveLocation(itineraryText, {
+          countryId: tax.countryId,
+          regionId: tax.regionId,
+          source: 'itinerary'
+        });
+        if (it.cityId) {
+          tax = it;
+          locked = true;
+        } else {
+          needsCity = true;
+        }
+      } else {
+        needsCity = true;
+      }
+    } else if (scope && scope.feedKind === 'country' && scope.taxonomy) {
+      tax = Object.assign({}, scope.taxonomy);
+      tax.locationSource = 'card';
+      if (itineraryText && loc) {
+        var it2 = loc.resolveLocation(itineraryText, {
+          countryId: tax.countryId,
+          source: 'itinerary'
+        });
+        if (it2.countryId === tax.countryId && it2.cityId) {
+          tax = it2;
+          locked = true;
+        } else {
+          needsCity = true;
+        }
+      } else {
+        needsCity = true;
+      }
+    } else if (itineraryText && loc) {
+      tax = loc.resolveLocation(itineraryText, { source: 'itinerary' });
+      if (tax.countryId && tax.cityId) locked = true;
+      else if (tax.countryId) needsCity = true;
+      else {
+        needsCountry = true;
+        needsCity = true;
+      }
+    } else {
+      needsCountry = true;
+      needsCity = true;
+      tax = loc
+        ? loc.resolveLocation('', { source: 'manual' })
+        : { countryId: '', cityId: '', chipLabel: '' };
+    }
+
+    csState.composeTaxonomy = tax;
+    csState.composeLocked = locked;
+    csState.composeNeedsCity = needsCity && !locked;
+    csState.composeNeedsCountry = needsCountry && !locked;
+    return tax;
+  }
+
+  function renderComposeLocationBlock() {
+    var tax = csState.composeTaxonomy || {};
+    var locked = csState.composeLocked;
+    var needsCity = csState.composeNeedsCity;
+    var needsCountry = csState.composeNeedsCountry;
+    var chip = tax.chipLabel || '';
+    if (!chip && tax.cityName) {
+      chip =
+        '📍 ' +
+        [tax.cityName, tax.regionName, tax.countryName].filter(Boolean).join('・');
+    } else if (!chip && tax.countryName) {
+      chip = '📍 ' + tax.countryName;
+    }
+
+    if (locked) {
+      return (
+        '<div class="cs-compose-location is-locked">' +
+        '<p class="cs-compose-label">這趟去了哪裡？</p>' +
+        '<p class="cs-compose-location-chip" id="csComposeLocationChip">' +
+        escapeHtml(chip || '📍 已帶入目的地') +
+        '</p>' +
+        '<input type="hidden" id="csComposeCountryId" value="' +
+        escapeHtml(tax.countryId || '') +
+        '">' +
+        '<input type="hidden" id="csComposeRegionId" value="' +
+        escapeHtml(tax.regionId || '') +
+        '">' +
+        '<input type="hidden" id="csComposeCityId" value="' +
+        escapeHtml(tax.cityId || '') +
+        '">' +
+        '<input type="hidden" id="csComposeCityName" value="' +
+        escapeHtml(tax.cityName || '') +
+        '">' +
+        '</div>'
+      );
+    }
+
+    var html =
+      '<div class="cs-compose-location">' +
+      '<p class="cs-compose-label">📍 這趟去了哪裡？</p>';
+    if (chip && tax.countryId && !needsCountry) {
+      html +=
+        '<p class="cs-compose-location-chip">' + escapeHtml(chip) + '</p>';
+    }
+    if (needsCountry) {
+      var countries = (locApi() && locApi().listCountries && locApi().listCountries()) || [];
+      html +=
+        '<label class="cs-compose-label">國家／地區' +
+        '<select id="csComposeCountryId" class="cs-compose-input" required>' +
+        '<option value="">請選擇</option>' +
+        countries
+          .map(function (c) {
+            return (
+              '<option value="' +
+              escapeHtml(c.id) +
+              '"' +
+              (tax.countryId === c.id ? ' selected' : '') +
+              '>' +
+              escapeHtml(c.name) +
+              '</option>'
+            );
+          })
+          .join('') +
+        '</select></label>';
+    } else {
+      html +=
+        '<input type="hidden" id="csComposeCountryId" value="' +
+        escapeHtml(tax.countryId || '') +
+        '">';
+    }
+    html +=
+      '<input type="hidden" id="csComposeRegionId" value="' +
+      escapeHtml(tax.regionId || '') +
+      '">';
+    if (needsCity) {
+      html +=
+        '<label class="cs-compose-label">搜尋城市或地區' +
+        '<input id="csComposeCityQuery" class="cs-compose-input" list="csComposeCityList" placeholder="例如：名古屋、札幌、濟州、釜山" autocomplete="off">' +
+        '<datalist id="csComposeCityList"></datalist></label>' +
+        '<input type="hidden" id="csComposeCityId" value="">' +
+        '<input type="hidden" id="csComposeCityName" value="">';
+    } else {
+      html +=
+        '<input type="hidden" id="csComposeCityId" value="' +
+        escapeHtml(tax.cityId || '') +
+        '">' +
+        '<input type="hidden" id="csComposeCityName" value="' +
+        escapeHtml(tax.cityName || '') +
+        '">';
+    }
+    html += '</div>';
+    return html;
+  }
+
   function renderCompose() {
+    var draftMedia = csState.composeMedia || [];
+    var uploadOn = mediaUploadEnabled();
+    prepareComposeTaxonomy({ fromItinerary: true });
+    var photosBlock;
+    if (!uploadOn) {
+      photosBlock =
+        '<div class="cs-compose-photos cs-compose-photos--soon" aria-live="polite">' +
+        '<p class="cs-compose-label">照片</p>' +
+        '<p class="cs-compose-media-soon">📷 照片分享即將開放</p>' +
+        '</div>';
+    } else {
+      var atCap = draftMedia.length >= MEDIA_MAX_PER_POST;
+      var thumbs =
+        '<div id="csComposeMediaPreview" class="cs-compose-media-preview">' +
+        draftMedia
+          .map(function (item, idx) {
+            return (
+              '<div class="cs-compose-thumb" data-cs-media-idx="' +
+              idx +
+              '">' +
+              '<img src="' +
+              escapeHtml(item.previewUrl || item.src || '') +
+              '" alt="預覽">' +
+              '<button type="button" class="cs-compose-thumb-remove" data-cs-remove-media="' +
+              idx +
+              '" aria-label="移除照片">×</button>' +
+              '</div>'
+            );
+          })
+          .join('') +
+        '</div>';
+      photosBlock =
+        '<div class="cs-compose-photos">' +
+        '<p class="cs-compose-label">新增照片（最多 ' +
+        MEDIA_MAX_PER_POST +
+        ' 張）</p>' +
+        (atCap
+          ? ''
+          : '<label class="cs-compose-add-photo">' +
+            '＋ 新增照片' +
+            '<input id="csComposeMediaInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple hidden>' +
+            '</label>') +
+        thumbs +
+        '</div>';
+    }
     return (
       '<div class="cs-page cs-compose-page">' +
-      '<h2 class="cs-compose-title">分享這次旅行</h2>' +
-      '<p class="cs-compose-hint">發文後所有 SoarVibe 使用者都能看到。圖片之後可再擴充上傳；此版先支援純文字心得。</p>' +
+      '<p class="cs-compose-hint">發文後所有 SoarVibe 使用者都能看到。</p>' +
       '<form id="csComposeForm" class="cs-compose-form">' +
-      '<label class="cs-compose-label">城市' +
-      '<select id="csComposeCity" class="cs-compose-input">' +
-      '<option value="tokyo">東京</option>' +
-      '<option value="osaka">大阪</option>' +
-      '<option value="kyoto">京都</option>' +
-      '<option value="seoul">首爾</option>' +
-      '<option value="bangkok">曼谷</option>' +
-      '</select></label>' +
+      renderComposeLocationBlock() +
       '<label class="cs-compose-label">分類' +
       '<select id="csComposeType" class="cs-compose-input">' +
       Object.keys(TYPE_LABELS)
@@ -419,6 +770,7 @@
       '<input id="csComposeTitle" class="cs-compose-input" maxlength="80" required placeholder="例如：惠比壽這碗柚子鹽值得排隊"></label>' +
       '<label class="cs-compose-label">心得' +
       '<textarea id="csComposeBody" class="cs-compose-input" maxlength="600" rows="6" required placeholder="至少 20 字，分享真實體驗…"></textarea></label>' +
+      photosBlock +
       '<p id="csComposeMsg" class="cs-compose-msg hidden"></p>' +
       '<button type="submit" class="cs-action-btn cs-action-primary">發布</button>' +
       '<button type="button" class="cs-action-btn cs-action-secondary" id="csComposeCancel">取消</button>' +
@@ -428,12 +780,25 @@
 
   function updateChrome() {
     var backBtn = document.getElementById('csBackBtn');
+    var titleEl = document.getElementById('csChromeTitle');
+    var shell = document.getElementById('cityShares');
     if (!backBtn) return;
     if (csState.view === 'detail' || csState.view === 'compose') {
       backBtn.classList.remove('is-hidden');
       backBtn.textContent = '← 返回';
     } else {
       backBtn.classList.add('is-hidden');
+    }
+    if (titleEl) {
+      if (csState.view === 'compose') {
+        titleEl.textContent = '分享這次旅行';
+        titleEl.classList.remove('is-hidden');
+      } else {
+        titleEl.classList.add('is-hidden');
+      }
+    }
+    if (shell) {
+      shell.classList.toggle('is-compose', csState.view === 'compose');
     }
   }
 
@@ -504,8 +869,7 @@
     if (!viewport || !csState.cityId) return;
     if (csState.view === 'compose') {
       viewport.innerHTML = renderCompose();
-      var citySel = document.getElementById('csComposeCity');
-      if (citySel && csState.cityId) citySel.value = csState.cityId;
+      bindComposeLocationInputs();
     } else if (csState.view === 'detail' && csState.postId) {
       viewport.innerHTML = renderDetail(findPost(csState.postId));
     } else {
@@ -514,11 +878,69 @@
     updateChrome();
   }
 
+  function bindComposeLocationInputs() {
+    var queryEl = document.getElementById('csComposeCityQuery');
+    var listEl = document.getElementById('csComposeCityList');
+    var countryEl = document.getElementById('csComposeCountryId');
+    var cityIdEl = document.getElementById('csComposeCityId');
+    var cityNameEl = document.getElementById('csComposeCityName');
+    var regionEl = document.getElementById('csComposeRegionId');
+    function refreshSuggestions() {
+      if (!listEl || !locApi() || !locApi().listCitySuggestions) return;
+      var countryId = countryEl ? countryEl.value : (csState.composeTaxonomy && csState.composeTaxonomy.countryId) || '';
+      var q = queryEl ? queryEl.value : '';
+      var suggestions = locApi().listCitySuggestions(countryId, q);
+      listEl.innerHTML = suggestions
+        .map(function (c) {
+          return '<option value="' + escapeHtml(c.cityName) + '"></option>';
+        })
+        .join('');
+    }
+    function applyQuery() {
+      if (!queryEl || !locApi()) return;
+      var countryId = countryEl ? countryEl.value : '';
+      var tax = locApi().resolveLocation(queryEl.value, {
+        countryId: countryId,
+        source: 'search'
+      });
+      if (cityIdEl) cityIdEl.value = tax.cityId || '';
+      if (cityNameEl) cityNameEl.value = tax.cityName || queryEl.value || '';
+      if (regionEl && tax.regionId) regionEl.value = tax.regionId;
+      if (countryEl && tax.countryId && countryEl.tagName === 'SELECT') {
+        countryEl.value = tax.countryId;
+      }
+      csState.composeTaxonomy = Object.assign({}, csState.composeTaxonomy || {}, tax);
+    }
+    if (queryEl) {
+      queryEl.addEventListener('input', function () {
+        refreshSuggestions();
+        applyQuery();
+      });
+      queryEl.addEventListener('change', applyQuery);
+      refreshSuggestions();
+    }
+    if (countryEl && countryEl.tagName === 'SELECT') {
+      countryEl.addEventListener('change', function () {
+        refreshSuggestions();
+        if (csState.composeTaxonomy) {
+          csState.composeTaxonomy.countryId = countryEl.value;
+          var c =
+            locApi() &&
+            locApi().COUNTRIES &&
+            locApi().COUNTRIES[countryEl.value];
+          if (c) csState.composeTaxonomy.countryName = c.name;
+        }
+      });
+    }
+  }
+
   function openCityShares(cityId, postId) {
     var shell = document.getElementById('cityShares');
     var viewport = document.getElementById('csViewport');
     if (!shell || !viewport) return;
 
+    var scope = buildScopeFromEntryId(cityId);
+    csState.feedScope = scope;
     csState.cityId = cityId;
     csState.typeFilter = csState.typeFilter || 'all';
     if (postId) {
@@ -557,6 +979,8 @@
     csState.cityId = null;
     csState.postId = null;
     csState.typeFilter = 'all';
+    csState.feedScope = null;
+    csState.composeTaxonomy = null;
     clearHashIfShares();
   }
 
@@ -602,29 +1026,40 @@
     } catch (blurErr) {
       /* silent */
     }
-    if (!a || !a.isSignedIn()) {
-      if (a && a.requireAuth) {
-        a.requireAuth('分享投稿', {
-          pendingAction: 'city_share_compose',
-          pendingPayload: { cityId: csState.cityId || null }
-        });
-      } else if (global.openSoarvibeAuthModal) {
-        if (global.SOARVIBE_AUTH && global.SOARVIBE_AUTH.setPendingAction) {
-          global.SOARVIBE_AUTH.setPendingAction('city_share_compose', {
-            cityId: csState.cityId || null
-          });
-        }
-        global.openSoarvibeAuthModal({ reason: '請先登入後才能分享投稿' });
+    function proceedSignedIn() {
+      if (opts.cityId && opts.cityId !== csState.cityId) {
+        csState.cityId = opts.cityId;
       }
-      // Never render composer / never focus inputs before auth.
+      csState.view = 'compose';
+      csState.postId = null;
+      if (!Array.isArray(csState.composeMedia)) csState.composeMedia = [];
+      renderCurrentView();
+    }
+    function gate() {
+      if (!a || !a.isSignedIn()) {
+        if (a && a.requireAuth) {
+          a.requireAuth('分享投稿', {
+            pendingAction: 'city_share_compose',
+            pendingPayload: { cityId: csState.cityId || null }
+          });
+        } else if (global.openSoarvibeAuthModal) {
+          if (global.SOARVIBE_AUTH && global.SOARVIBE_AUTH.setPendingAction) {
+            global.SOARVIBE_AUTH.setPendingAction('city_share_compose', {
+              cityId: csState.cityId || null
+            });
+          }
+          global.openSoarvibeAuthModal({ reason: '請先登入後才能分享投稿' });
+        }
+        // Never render composer / never focus inputs before auth.
+        return;
+      }
+      proceedSignedIn();
+    }
+    if (a && a.whenAuthReady && !(a.isAuthReady && a.isAuthReady())) {
+      a.whenAuthReady().then(gate).catch(gate);
       return;
     }
-    if (opts.cityId && opts.cityId !== csState.cityId) {
-      csState.cityId = opts.cityId;
-    }
-    csState.view = 'compose';
-    csState.postId = null;
-    renderCurrentView();
+    gate();
   }
 
   function openCityShareComposer(payload) {
@@ -659,101 +1094,140 @@
   function handleLike() {
     var a = api();
     var au = auth();
-    if (!au || !au.isSignedIn()) {
-      if (au && au.requireAuth) au.requireAuth('按讚');
-      else if (global.openSoarvibeAuthModal) {
-        global.openSoarvibeAuthModal({ reason: '請先登入後才能按讚' });
-      }
-      return;
-    }
-    if (!isFirestorePost(findPost(csState.postId))) {
-      alert('官方精選暫不開放按讚。請先「分享投稿」建立旅人貼文後再互動。');
-      return;
-    }
-    if (!a || !csState.postId) return;
-    a.toggleLike(csState.postId)
-      .then(function (res) {
-        csState.liked = !!(res && res.liked);
-        var post = findPost(csState.postId);
-        if (post) {
-          post.likeCount = Math.max(0, (post.likeCount || 0) + (csState.liked ? 1 : -1));
-          if (!post.stats) post.stats = {};
-          post.stats.likeCount = post.likeCount;
+    function run() {
+      if (!au || !au.isSignedIn()) {
+        if (au && au.requireAuth) {
+          au.requireAuth('按讚', {
+            pendingAction: 'city_share_like',
+            pendingPayload: { postId: csState.postId, cityId: csState.cityId }
+          });
+        } else if (global.openSoarvibeAuthModal) {
+          global.openSoarvibeAuthModal({ reason: '請先登入後才能按讚' });
         }
-        renderCurrentView();
-      })
-      .catch(function (err) {
-        if (err && err.message === 'AUTH_REQUIRED') return;
-        alert((err && err.message) || '按讚失敗');
-      });
+        return;
+      }
+      if (!isFirestorePost(findPost(csState.postId))) {
+        alert('官方精選暫不開放按讚。請先「分享投稿」建立旅人貼文後再互動。');
+        return;
+      }
+      if (!a || !csState.postId) return;
+      a.toggleLike(csState.postId)
+        .then(function (res) {
+          csState.liked = !!(res && res.liked);
+          var post = findPost(csState.postId);
+          if (post) {
+            post.likeCount = Math.max(0, (post.likeCount || 0) + (csState.liked ? 1 : -1));
+            if (!post.stats) post.stats = {};
+            post.stats.likeCount = post.likeCount;
+          }
+          renderCurrentView();
+        })
+        .catch(function (err) {
+          if (err && err.message === 'AUTH_REQUIRED') return;
+          alert((err && err.message) || '按讚失敗');
+        });
+    }
+    if (au && au.whenAuthReady && !(au.isAuthReady && au.isAuthReady())) {
+      au.whenAuthReady().then(run).catch(run);
+      return;
+    }
+    run();
   }
 
   function handleSave() {
     var a = api();
     var au = auth();
-    if (!au || !au.isSignedIn()) {
-      if (au && au.requireAuth) au.requireAuth('收藏');
-      else if (global.openSoarvibeAuthModal) {
-        global.openSoarvibeAuthModal({ reason: '請先登入後才能收藏' });
-      }
-      return;
-    }
-    if (!isFirestorePost(findPost(csState.postId))) {
-      alert('官方精選暫不開放收藏。請先「分享投稿」建立旅人貼文後再互動。');
-      return;
-    }
-    if (!a || !csState.postId || !a.toggleSave) return;
-    a.toggleSave(csState.postId)
-      .then(function (res) {
-        csState.saved = !!(res && res.saved);
-        var post = findPost(csState.postId);
-        if (post) {
-          post.saveCount = Math.max(0, (post.saveCount || 0) + (csState.saved ? 1 : -1));
-          if (!post.stats) post.stats = {};
-          post.stats.saveCount = post.saveCount;
+    function run() {
+      if (!au || !au.isSignedIn()) {
+        if (au && au.requireAuth) {
+          au.requireAuth('收藏', {
+            pendingAction: 'city_share_save',
+            pendingPayload: { postId: csState.postId, cityId: csState.cityId }
+          });
+        } else if (global.openSoarvibeAuthModal) {
+          global.openSoarvibeAuthModal({ reason: '請先登入後才能收藏' });
         }
-        renderCurrentView();
-      })
-      .catch(function (err) {
-        if (err && err.message === 'AUTH_REQUIRED') return;
-        alert((err && err.message) || '收藏失敗');
-      });
+        return;
+      }
+      if (!isFirestorePost(findPost(csState.postId))) {
+        alert('官方精選暫不開放收藏。請先「分享投稿」建立旅人貼文後再互動。');
+        return;
+      }
+      if (!a || !csState.postId || !a.toggleSave) return;
+      a.toggleSave(csState.postId)
+        .then(function (res) {
+          csState.saved = !!(res && res.saved);
+          var post = findPost(csState.postId);
+          if (post) {
+            post.saveCount = Math.max(0, (post.saveCount || 0) + (csState.saved ? 1 : -1));
+            if (!post.stats) post.stats = {};
+            post.stats.saveCount = post.saveCount;
+          }
+          renderCurrentView();
+        })
+        .catch(function (err) {
+          if (err && err.message === 'AUTH_REQUIRED') return;
+          alert((err && err.message) || '收藏失敗');
+        });
+    }
+    if (au && au.whenAuthReady && !(au.isAuthReady && au.isAuthReady())) {
+      au.whenAuthReady().then(run).catch(run);
+      return;
+    }
+    run();
   }
 
   function handleCommentSubmit() {
     var a = api();
     var au = auth();
-    if (!au || !au.isSignedIn()) {
-      if (au && au.requireAuth) au.requireAuth('留言');
-      else if (global.openSoarvibeAuthModal) {
-        global.openSoarvibeAuthModal({ reason: '請先登入後才能留言' });
-      }
-      return;
-    }
-    if (!isFirestorePost(findPost(csState.postId))) {
-      alert('官方精選暫不開放留言。請先「分享投稿」建立旅人貼文後再互動。');
-      return;
-    }
-    var input = document.getElementById('csCommentInput');
-    var text = input ? input.value : '';
-    if (!a || !csState.postId) return;
-    a.addComment(csState.postId, text)
-      .then(function () {
-        return loadDetailExtras(csState.postId);
-      })
-      .then(function () {
-        var post = findPost(csState.postId);
-        if (post) {
-          post.commentCount = (post.commentCount || 0) + 1;
-          if (!post.stats) post.stats = {};
-          post.stats.commentCount = post.commentCount;
+    function run() {
+      if (!au || !au.isSignedIn()) {
+        if (au && au.requireAuth) {
+          au.requireAuth('留言', {
+            pendingAction: 'city_share_comment',
+            pendingPayload: {
+              postId: csState.postId,
+              cityId: csState.cityId,
+              draft: (document.getElementById('csCommentInput') &&
+                document.getElementById('csCommentInput').value) ||
+                ''
+            }
+          });
+        } else if (global.openSoarvibeAuthModal) {
+          global.openSoarvibeAuthModal({ reason: '請先登入後才能留言' });
         }
-        renderCurrentView();
-      })
-      .catch(function (err) {
-        if (err && err.message === 'AUTH_REQUIRED') return;
-        alert((err && err.message) || '留言失敗');
-      });
+        return;
+      }
+      if (!isFirestorePost(findPost(csState.postId))) {
+        alert('官方精選暫不開放留言。請先「分享投稿」建立旅人貼文後再互動。');
+        return;
+      }
+      var input = document.getElementById('csCommentInput');
+      var text = input ? input.value : '';
+      if (!a || !csState.postId) return;
+      a.addComment(csState.postId, text)
+        .then(function () {
+          return loadDetailExtras(csState.postId);
+        })
+        .then(function () {
+          var post = findPost(csState.postId);
+          if (post) {
+            post.commentCount = (post.commentCount || 0) + 1;
+            if (!post.stats) post.stats = {};
+            post.stats.commentCount = post.commentCount;
+          }
+          renderCurrentView();
+        })
+        .catch(function (err) {
+          if (err && err.message === 'AUTH_REQUIRED') return;
+          alert((err && err.message) || '留言失敗');
+        });
+    }
+    if (au && au.whenAuthReady && !(au.isAuthReady && au.isAuthReady())) {
+      au.whenAuthReady().then(run).catch(run);
+      return;
+    }
+    run();
   }
 
   function handleDeleteComment(commentId) {
@@ -797,27 +1271,135 @@
       });
   }
 
+  function handleComposeMediaPick(fileList) {
+    if (!mediaUploadEnabled()) return;
+    var files = Array.prototype.slice.call(fileList || []);
+    if (!files.length) return;
+    if (!Array.isArray(csState.composeMedia)) csState.composeMedia = [];
+    var room = Math.max(0, MEDIA_MAX_PER_POST - csState.composeMedia.length);
+    files.slice(0, room).forEach(function (file) {
+      if (!file || !/^image\/(jpeg|png|webp|gif)$/i.test(file.type || '')) return;
+      if (file.size > 2 * 1024 * 1024) {
+        alert('單張照片請小於 2MB');
+        return;
+      }
+      var previewUrl = '';
+      try {
+        previewUrl = URL.createObjectURL(file);
+      } catch (e) {
+        previewUrl = '';
+      }
+      csState.composeMedia.push({
+        file: file,
+        previewUrl: previewUrl,
+        type: file.type
+      });
+    });
+    renderCurrentView();
+  }
+
   function handleComposeSubmit() {
     var a = api();
     var titleEl = document.getElementById('csComposeTitle');
     var bodyEl = document.getElementById('csComposeBody');
-    var cityEl = document.getElementById('csComposeCity');
     var typeEl = document.getElementById('csComposeType');
+    var countryEl = document.getElementById('csComposeCountryId');
+    var regionEl = document.getElementById('csComposeRegionId');
+    var cityIdEl = document.getElementById('csComposeCityId');
+    var cityNameEl = document.getElementById('csComposeCityName');
+    var cityQueryEl = document.getElementById('csComposeCityQuery');
     var msg = document.getElementById('csComposeMsg');
     if (!a) return;
     if (msg) {
       msg.textContent = '發布中…';
       msg.classList.remove('hidden');
     }
-    a.createPost({
+    var uploadOn = mediaUploadEnabled();
+    var mediaDraft = uploadOn ? (csState.composeMedia || []).slice(0, MEDIA_MAX_PER_POST) : [];
+    var countryId = countryEl ? String(countryEl.value || '').trim() : '';
+    var regionId = regionEl ? String(regionEl.value || '').trim() : '';
+    var cityId = cityIdEl ? String(cityIdEl.value || '').trim() : '';
+    var cityName = cityNameEl ? String(cityNameEl.value || '').trim() : '';
+    var cityQuery = cityQueryEl ? String(cityQueryEl.value || '').trim() : '';
+    if (!cityId && cityQuery && locApi()) {
+      var resolved = locApi().resolveLocation(cityQuery, {
+        countryId: countryId,
+        source: 'search'
+      });
+      cityId = resolved.cityId || '';
+      cityName = resolved.cityName || cityQuery;
+      if (resolved.countryId) countryId = resolved.countryId;
+      if (resolved.regionId) regionId = resolved.regionId;
+    }
+    if (!countryId) {
+      if (msg) {
+        msg.textContent = '請選擇國家／地區';
+        msg.classList.remove('hidden');
+      }
+      return;
+    }
+    if (csState.composeNeedsCity && !cityId && !cityQuery) {
+      if (msg) {
+        msg.textContent = '請輸入這趟去了哪裡';
+        msg.classList.remove('hidden');
+      }
+      return;
+    }
+    var payload = {
       title: titleEl ? titleEl.value : '',
       body: bodyEl ? bodyEl.value : '',
-      cityId: cityEl ? cityEl.value : csState.cityId,
-      type: typeEl ? typeEl.value : 'sightseeing'
-    })
+      countryId: countryId,
+      regionId: regionId,
+      cityId: cityId,
+      cityName: cityName || cityQuery,
+      locationRaw: cityQuery || cityName || cityId,
+      locationSource: csState.composeLocked
+        ? (csState.composeTaxonomy && csState.composeTaxonomy.locationSource) || 'card'
+        : cityQuery
+          ? 'search'
+          : 'manual',
+      type: typeEl ? typeEl.value : 'sightseeing',
+      media: [],
+      mediaFiles: uploadOn
+        ? mediaDraft.map(function (m) {
+            return m.file;
+          })
+        : []
+    };
+    if (csState.composeTaxonomy) {
+      if (!payload.countryName && csState.composeTaxonomy.countryName) {
+        payload.countryName = csState.composeTaxonomy.countryName;
+      }
+      if (!payload.regionName && csState.composeTaxonomy.regionName) {
+        payload.regionName = csState.composeTaxonomy.regionName;
+      }
+    }
+    a.createPost(payload)
       .then(function (post) {
-        return refreshRemoteFeed(post.cityId || csState.cityId).then(function () {
-          csState.cityId = post.cityId || csState.cityId;
+        (csState.composeMedia || []).forEach(function (m) {
+          if (m && m.previewUrl) {
+            try {
+              URL.revokeObjectURL(m.previewUrl);
+            } catch (e) {
+              /* silent */
+            }
+          }
+        });
+        csState.composeMedia = [];
+        var feedKey = csState.cityId;
+        if (post.countryId && csState.feedScope && csState.feedScope.feedKind === 'country') {
+          feedKey = csState.feedScope.entryId;
+        } else if (post.cityId) {
+          // Stay on current feed if post belongs; else jump to city feed
+          if (csState.feedScope && postMatchesScope(post, csState.feedScope)) {
+            feedKey = csState.cityId;
+          } else {
+            feedKey = post.cityId;
+            csState.feedScope = buildScopeFromEntryId(post.cityId);
+            csState.cityId = post.cityId;
+          }
+        }
+        return refreshRemoteFeed(feedKey).then(function () {
           openCityShareDetail(post.postId);
         });
       })
@@ -831,14 +1413,24 @@
 
   function applyShareToTrip(post) {
     if (!post) return;
-    var cityLabel = (CITY_LABELS[post.cityId] && CITY_LABELS[post.cityId].dest) || post.cityId;
+    var cityLabel =
+      post.cityName ||
+      (CITY_LABELS[post.cityId] && CITY_LABELS[post.cityId].dest) ||
+      post.cityId ||
+      post.countryName ||
+      '';
     closeCityShares();
     focusPlannerWithDestination(cityLabel);
   }
 
   function planShareWithAI(post) {
     if (!post) return;
-    var cityLabel = (CITY_LABELS[post.cityId] && CITY_LABELS[post.cityId].dest) || post.cityId;
+    var cityLabel =
+      post.cityName ||
+      (CITY_LABELS[post.cityId] && CITY_LABELS[post.cityId].dest) ||
+      post.cityId ||
+      post.countryName ||
+      '';
     var placeName = (post.place && post.place.displayName) || post.title;
     closeCityShares();
     focusPlannerWithDestination(cityLabel + '（含 ' + placeName + '）');
@@ -880,6 +1472,9 @@
   function initCityShares() {
     var shell = document.getElementById('cityShares');
     if (!shell) return;
+    if (cardsApi() && typeof cardsApi().mountHomepageCards === 'function') {
+      cardsApi().mountHomepageCards();
+    }
 
     var closeBtn = document.getElementById('csCloseBtn');
     var backBtn = document.getElementById('csBackBtn');
@@ -919,6 +1514,23 @@
       if (e.target.id === 'csComposeCancel') {
         e.preventDefault();
         goBackCityShares();
+        return;
+      }
+      var removeMedia = e.target.closest('[data-cs-remove-media]');
+      if (removeMedia) {
+        e.preventDefault();
+        var rmIdx = parseInt(removeMedia.getAttribute('data-cs-remove-media'), 10);
+        if (!isNaN(rmIdx) && Array.isArray(csState.composeMedia)) {
+          var removed = csState.composeMedia.splice(rmIdx, 1)[0];
+          if (removed && removed.previewUrl) {
+            try {
+              URL.revokeObjectURL(removed.previewUrl);
+            } catch (revErr) {
+              /* silent */
+            }
+          }
+          renderCurrentView();
+        }
         return;
       }
       if (e.target.id === 'csLikeBtn' || e.target.closest('#csLikeBtn')) {
@@ -966,6 +1578,13 @@
       if (e.target.id === 'csPlanAiBtn' || e.target.closest('#csPlanAiBtn')) {
         var postAi = findPost(csState.postId);
         planShareWithAI(postAi);
+      }
+    });
+
+    shell.addEventListener('change', function (e) {
+      if (e.target && e.target.id === 'csComposeMediaInput') {
+        handleComposeMediaPick(e.target.files);
+        e.target.value = '';
       }
     });
 
@@ -1024,8 +1643,52 @@
       global.SOARVIBE_AUTH.registerPendingActionHandler('city_share_compose', function (payload) {
         openCityShareComposer(payload || {});
       });
+      global.SOARVIBE_AUTH.registerPendingActionHandler('city_share_like', function (payload) {
+        payload = payload || {};
+        if (payload.cityId) {
+          openCityShares(payload.cityId, payload.postId || null);
+        } else if (payload.postId) {
+          openCityShareDetail(payload.postId);
+        }
+        window.setTimeout(function () {
+          if (payload.postId) csState.postId = payload.postId;
+          handleLike();
+        }, 80);
+      });
+      global.SOARVIBE_AUTH.registerPendingActionHandler('city_share_save', function (payload) {
+        payload = payload || {};
+        if (payload.cityId) {
+          openCityShares(payload.cityId, payload.postId || null);
+        } else if (payload.postId) {
+          openCityShareDetail(payload.postId);
+        }
+        window.setTimeout(function () {
+          if (payload.postId) csState.postId = payload.postId;
+          handleSave();
+        }, 80);
+      });
+      global.SOARVIBE_AUTH.registerPendingActionHandler('city_share_comment', function (payload) {
+        payload = payload || {};
+        if (payload.cityId) {
+          openCityShares(payload.cityId, payload.postId || null);
+        } else if (payload.postId) {
+          openCityShareDetail(payload.postId);
+        }
+        window.setTimeout(function () {
+          if (payload.postId) csState.postId = payload.postId;
+          var input = document.getElementById('csCommentInput');
+          if (input && payload.draft) input.value = payload.draft;
+          handleCommentSubmit();
+        }, 80);
+      });
       // Resume after redirect login if handler was not ready during auth start.
-      global.SOARVIBE_AUTH.resumePendingAction();
+      if (global.SOARVIBE_AUTH.whenAuthReady) {
+        global.SOARVIBE_AUTH.whenAuthReady().then(function () {
+          global.SOARVIBE_AUTH.resumePendingAction();
+        });
+      } else {
+        global.SOARVIBE_AUTH.resumePendingAction();
+      }
     }
   }
 

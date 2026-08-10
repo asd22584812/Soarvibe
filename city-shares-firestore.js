@@ -15,6 +15,13 @@
   var TITLE_MAX = 80;
   var BODY_MAX = 600;
   var BODY_MIN = 20;
+  /** Per-post media cap (enforced when citySharesMediaUpload is true; R2 later). */
+  var MEDIA_MAX_PER_POST = 3;
+
+  function mediaUploadEnabled() {
+    var flags = global.SOARVIBE_FEATURE_FLAGS || {};
+    return flags.citySharesMediaUpload === true;
+  }
 
   function db() {
     return global.SOARVIBE_FIREBASE && global.SOARVIBE_FIREBASE.getDb
@@ -48,11 +55,22 @@
     return '旅人';
   }
 
+  function locApi() {
+    return global.SOARVIBE_CITY_SHARES_LOCATION || null;
+  }
+
   function mapPostDoc(doc) {
     var data = doc.data() || {};
     var likeCount = data.likeCount || 0;
     var commentCount = data.commentCount || 0;
-    return Object.assign(
+    var media = (data.media || []).map(function (m, idx) {
+      var item = Object.assign({}, m || {});
+      item.src = item.src || item.downloadURL || '';
+      item.thumbSrc = item.thumbSrc || item.src || '';
+      item.sortOrder = item.sortOrder != null ? item.sortOrder : idx;
+      return item;
+    });
+    var mapped = Object.assign(
       {
         postId: doc.id,
         source: data.source || 'user',
@@ -67,7 +85,7 @@
           wantCount: 0,
           avoidCount: 0
         },
-        media: data.media || [],
+        media: media,
         tags: data.tags || [],
         place: data.place || null,
         author: {
@@ -81,6 +99,7 @@
         postId: doc.id,
         likeCount: likeCount,
         commentCount: commentCount,
+        media: media,
         author: {
           authorId: data.authorId || '',
           displayName: data.authorDisplayName || '旅人',
@@ -96,21 +115,177 @@
         }
       }
     );
+    var loc = locApi();
+    if (loc && typeof loc.normalizePostTaxonomy === 'function') {
+      loc.normalizePostTaxonomy(mapped);
+    }
+    return mapped;
   }
 
   function listPublishedPosts(cityId, opt) {
+    return listByCity(cityId, opt);
+  }
+
+  function listByCity(cityId, opt) {
     var database = requireDb();
     opt = opt || {};
     var limit = opt.limit || 40;
+    var id = String(cityId || '').trim();
+    if (!id) return Promise.resolve([]);
     var q = database
       .collection('posts')
       .where('status', '==', 'published')
-      .where('cityId', '==', cityId)
+      .where('cityId', '==', id)
       .orderBy('createdAt', 'desc')
       .limit(limit);
     return q.get().then(function (snap) {
       return snap.docs.map(mapPostDoc);
     });
+  }
+
+  function listByCountry(countryId, opt) {
+    var database = requireDb();
+    opt = opt || {};
+    var limit = opt.limit || 40;
+    var id = String(countryId || '').trim();
+    if (!id) return Promise.resolve([]);
+    var q = database
+      .collection('posts')
+      .where('status', '==', 'published')
+      .where('countryId', '==', id)
+      .orderBy('createdAt', 'desc')
+      .limit(limit);
+    return q
+      .get()
+      .then(function (snap) {
+        return snap.docs.map(mapPostDoc);
+      })
+      .catch(function (err) {
+        // Index may still be building — soft-fail empty for country feed.
+        console.warn('[SOARVIBE] listByCountry failed', id, err && err.message);
+        return [];
+      });
+  }
+
+  function listByRegion(regionId, opt) {
+    var database = requireDb();
+    opt = opt || {};
+    var limit = opt.limit || 40;
+    var id = String(regionId || '').trim();
+    if (!id) return Promise.resolve([]);
+    var q = database
+      .collection('posts')
+      .where('status', '==', 'published')
+      .where('regionId', '==', id)
+      .orderBy('createdAt', 'desc')
+      .limit(limit);
+    return q
+      .get()
+      .then(function (snap) {
+        return snap.docs.map(mapPostDoc);
+      })
+      .catch(function (err) {
+        console.warn('[SOARVIBE] listByRegion failed', id, err && err.message);
+        // Legacy fallback: region cards previously used cityId == regionId (e.g. hokkaido)
+        return listByCity(id, opt);
+      });
+  }
+
+  function listFeedForScope(scope, opt) {
+    scope = scope || {};
+    var loc = locApi();
+    if (scope.feedKind === 'country' && scope.countryId) {
+      var cityIds = [];
+      if (loc && loc.CITIES) {
+        Object.keys(loc.CITIES).forEach(function (id) {
+          if (loc.CITIES[id].countryId === scope.countryId) cityIds.push(id);
+        });
+      }
+      // Legacy country-as-cityId entries (e.g. vietnam)
+      if (scope.entryId && scope.entryId !== scope.countryId) {
+        cityIds.push(scope.entryId);
+      }
+      cityIds.push(scope.countryId);
+      var tasks = [listByCountry(scope.countryId, opt)].concat(
+        cityIds.map(function (id) {
+          return listByCity(id, opt).catch(function () {
+            return [];
+          });
+        })
+      );
+      return Promise.all(tasks).then(function (lists) {
+        var map = {};
+        lists.forEach(function (arr) {
+          (arr || []).forEach(function (p) {
+            if (!p || !p.postId) return;
+            if (loc && loc.normalizePostTaxonomy) loc.normalizePostTaxonomy(p);
+            if (p.countryId === scope.countryId || (!p.countryId && cityIds.indexOf(p.cityId) !== -1)) {
+              map[p.postId] = p;
+              if (!p.countryId) p.countryId = scope.countryId;
+            }
+          });
+        });
+        return Object.keys(map)
+          .map(function (k) {
+            return map[k];
+          })
+          .sort(function (a, b) {
+            var am =
+              (a.createdAt && a.createdAt.toMillis && a.createdAt.toMillis()) || 0;
+            var bm =
+              (b.createdAt && b.createdAt.toMillis && b.createdAt.toMillis()) || 0;
+            return bm - am;
+          });
+      });
+    }
+    if (scope.feedKind === 'region' && scope.regionId) {
+      return listByRegion(scope.regionId, opt).then(function (byRegion) {
+        return listByCity(scope.regionId, opt).then(function (legacy) {
+          var map = {};
+          (byRegion || []).concat(legacy || []).forEach(function (p) {
+            if (p && p.postId) map[p.postId] = p;
+          });
+          // Also include sapporo etc. under region
+          var regionCities = [];
+          if (loc && loc.CITIES) {
+            Object.keys(loc.CITIES).forEach(function (id) {
+              if (loc.CITIES[id].regionId === scope.regionId) regionCities.push(id);
+            });
+          }
+          return Promise.all(
+            regionCities.map(function (id) {
+              return listByCity(id, opt).catch(function () {
+                return [];
+              });
+            })
+          ).then(function (extra) {
+            extra.forEach(function (arr) {
+              (arr || []).forEach(function (p) {
+                if (p && p.postId) map[p.postId] = p;
+              });
+            });
+            return Object.keys(map)
+              .map(function (k) {
+                return map[k];
+              })
+              .sort(function (a, b) {
+                var am =
+                  (a.createdAt && a.createdAt.toMillis && a.createdAt.toMillis()) || 0;
+                var bm =
+                  (b.createdAt && b.createdAt.toMillis && b.createdAt.toMillis()) || 0;
+                return bm - am;
+              });
+          });
+        });
+      });
+    }
+    if (scope.cityId) {
+      return listByCity(scope.cityId, opt);
+    }
+    if (scope.entryId) {
+      return listByCity(scope.entryId, opt);
+    }
+    return Promise.resolve([]);
   }
 
   function getPost(postId) {
@@ -125,42 +300,157 @@
       });
   }
 
+  function storage() {
+    return global.SOARVIBE_FIREBASE && global.SOARVIBE_FIREBASE.getStorage
+      ? global.SOARVIBE_FIREBASE.getStorage()
+      : null;
+  }
+
+  function uploadPostImages(uid, postId, files) {
+    if (!mediaUploadEnabled()) {
+      return Promise.resolve([]);
+    }
+    var store = storage();
+    if (!files || !files.length) return Promise.resolve([]);
+    if (!store) {
+      return Promise.reject(new Error('照片上傳尚未啟用'));
+    }
+    var tasks = files.slice(0, MEDIA_MAX_PER_POST).map(function (file, idx) {
+      if (!file) return Promise.resolve(null);
+      var type = String(file.type || '');
+      if (!/^image\/(jpeg|png|webp|gif)$/i.test(type)) {
+        return Promise.reject(new Error('僅支援 JPG / PNG / WEBP / GIF'));
+      }
+      if (file.size > 2 * 1024 * 1024) {
+        return Promise.reject(new Error('單張照片請小於 2MB'));
+      }
+      var ext =
+        type.indexOf('png') !== -1
+          ? 'png'
+          : type.indexOf('webp') !== -1
+            ? 'webp'
+            : type.indexOf('gif') !== -1
+              ? 'gif'
+              : 'jpg';
+      var fileName = 'img-' + idx + '-' + Date.now() + '.' + ext;
+      var path = 'city-shares/' + uid + '/' + postId + '/' + fileName;
+      var ref = store.ref().child(path);
+      return ref.put(file, { contentType: type }).then(function () {
+        return ref.getDownloadURL().then(function (url) {
+          return {
+            mediaId: fileName,
+            src: url,
+            downloadURL: url,
+            storagePath: path,
+            type: type,
+            sortOrder: idx,
+            slot: 'other'
+          };
+        });
+      });
+    });
+    return Promise.all(tasks).then(function (items) {
+      return items.filter(Boolean);
+    });
+  }
+
+  function resolveCreateTaxonomy(input) {
+    var loc = locApi();
+    var hints = {
+      countryId: input.countryId,
+      cityId: input.cityId,
+      regionId: input.regionId,
+      source: input.locationSource || 'manual'
+    };
+    var raw =
+      input.locationRaw ||
+      input.cityName ||
+      input.cityQuery ||
+      input.cityId ||
+      '';
+    var tax;
+    if (loc && typeof loc.resolveLocation === 'function') {
+      tax = loc.resolveLocation(raw, hints);
+    } else {
+      tax = {
+        countryId: String(input.countryId || '').trim(),
+        countryName: String(input.countryName || '').trim(),
+        regionId: String(input.regionId || '').trim(),
+        regionName: String(input.regionName || '').trim(),
+        cityId: String(input.cityId || '').trim(),
+        cityName: String(input.cityName || '').trim(),
+        locationRaw: String(raw || ''),
+        locationSource: hints.source
+      };
+    }
+    if (input.countryId) tax.countryId = String(input.countryId).trim();
+    if (input.countryName) tax.countryName = String(input.countryName).trim();
+    if (input.regionId) tax.regionId = String(input.regionId).trim();
+    if (input.regionName) tax.regionName = String(input.regionName).trim();
+    if (input.cityId) tax.cityId = String(input.cityId).trim();
+    if (input.cityName) tax.cityName = String(input.cityName).trim();
+    if (input.locationRaw) tax.locationRaw = String(input.locationRaw).trim();
+    return tax;
+  }
+
   function createPost(input) {
     var user = requireUser();
     var database = requireDb();
     var title = String(input.title || '').trim().slice(0, TITLE_MAX);
     var body = String(input.body || '').trim().slice(0, BODY_MAX);
-    var cityId = String(input.cityId || '').trim();
     var type = String(input.type || 'sightseeing').trim();
+    var tax = resolveCreateTaxonomy(input || {});
+    var cityId = String(tax.cityId || '').trim();
+    var countryId = String(tax.countryId || '').trim();
     if (!title) return Promise.reject(new Error('請填寫標題'));
     if (body.length < BODY_MIN) return Promise.reject(new Error('心得至少 ' + BODY_MIN + ' 字'));
-    if (!cityId) return Promise.reject(new Error('請選擇城市'));
+    if (!countryId) return Promise.reject(new Error('請選擇國家／地區'));
+    // cityId may be empty for country-level posts (nullable by design)
 
     var a = authApi();
     var profile = a && a.getProfile ? a.getProfile() : null;
     var ref = database.collection('posts').doc();
+    var postId = ref.id;
     var now = firebase.firestore.FieldValue.serverTimestamp();
-    var doc = {
-      authorId: user.uid,
-      authorDisplayName: profileName(),
-      authorAvatarUrl: (profile && profile.avatarUrl) || user.photoURL || '',
-      cityId: cityId,
-      type: type,
-      title: title,
-      body: body,
-      place: input.place || null,
-      media: Array.isArray(input.media) ? input.media.slice(0, 6) : [],
-      tags: Array.isArray(input.tags) ? input.tags.slice(0, 12) : [],
-      status: 'published',
-      source: 'user',
-      likeCount: 0,
-      commentCount: 0,
-      saveCount: 0,
-      createdAt: now,
-      updatedAt: now
-    };
-    return ref.set(doc).then(function () {
-      return getPost(ref.id);
+    var allowMedia = mediaUploadEnabled();
+    var files = allowMedia && Array.isArray(input.mediaFiles) ? input.mediaFiles : [];
+    var presetMedia =
+      allowMedia && Array.isArray(input.media) && input.media.length
+        ? input.media.slice(0, MEDIA_MAX_PER_POST)
+        : null;
+
+    return uploadPostImages(user.uid, postId, files).then(function (uploaded) {
+      var media = presetMedia || uploaded || [];
+      if (!allowMedia) media = [];
+      var doc = {
+        authorId: user.uid,
+        authorDisplayName: profileName(),
+        authorAvatarUrl: (profile && profile.avatarUrl) || user.photoURL || '',
+        countryId: countryId,
+        countryName: String(tax.countryName || '').trim().slice(0, 40),
+        regionId: String(tax.regionId || '').trim().slice(0, 40),
+        regionName: String(tax.regionName || '').trim().slice(0, 40),
+        cityId: cityId,
+        cityName: String(tax.cityName || '').trim().slice(0, 60),
+        locationRaw: String(tax.locationRaw || '').trim().slice(0, 80),
+        locationSource: String(tax.locationSource || 'manual').slice(0, 24),
+        type: type,
+        title: title,
+        body: body,
+        place: input.place || null,
+        media: media,
+        tags: Array.isArray(input.tags) ? input.tags.slice(0, 12) : [],
+        status: 'published',
+        source: 'user',
+        likeCount: 0,
+        commentCount: 0,
+        saveCount: 0,
+        createdAt: now,
+        updatedAt: now
+      };
+      return ref.set(doc).then(function () {
+        return getPost(postId);
+      });
     });
   }
 
@@ -381,6 +671,10 @@
 
   global.SOARVIBE_CITY_SHARES_API = {
     listPublishedPosts: listPublishedPosts,
+    listByCity: listByCity,
+    listByCountry: listByCountry,
+    listByRegion: listByRegion,
+    listFeedForScope: listFeedForScope,
     getPost: getPost,
     createPost: createPost,
     deletePost: deletePost,

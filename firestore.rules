@@ -149,8 +149,10 @@ service cloud.firestore {
         && request.resource.data.body is string
         && request.resource.data.body.size() >= 20
         && request.resource.data.body.size() <= 600
+        && request.resource.data.countryId is string
+        && request.resource.data.countryId.size() > 0
+        && request.resource.data.countryId.size() <= 40
         && request.resource.data.cityId is string
-        && request.resource.data.cityId.size() > 0
         && request.resource.data.cityId.size() <= 40
         && request.resource.data.type is string
         && request.resource.data.status in ['published', 'draft']
