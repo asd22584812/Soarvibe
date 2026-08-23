@@ -2734,6 +2734,21 @@
             font-weight: 700;
             color: #546E7A;
         }
+        .transport-error-hint {
+            display: none;
+            margin: 0.35rem 0 0;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #e53935;
+            line-height: 1.35;
+        }
+        .transport-error-hint.is-visible {
+            display: block;
+        }
+        .adv-stay-field.is-invalid .field-select {
+            border-color: #e53935;
+            box-shadow: 0 0 0 1px rgba(229, 57, 53, 0.25);
+        }
         .adv-stay-control {
             width: 100%;
             min-width: 0;
@@ -3320,6 +3335,7 @@
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                                     </svg>
                                                 </div>
+                                                <p id="transport-error-hint" class="transport-error-hint" role="alert">請先選擇交通方式</p>
                                             </div>
                                             <div class="adv-stay-field">
                                                 <label for="customWishes" class="field-label">✨ 專屬許願池</label>
@@ -4571,8 +4587,34 @@
             }
             function clearTransportRequiredHint() {
                 var field = document.getElementById('transport-field');
+                var hint = document.getElementById('transport-error-hint');
                 if (field) field.classList.remove('is-invalid');
+                if (hint) hint.classList.remove('is-visible');
                 if (advancedTransportSelect) advancedTransportSelect.removeAttribute('aria-invalid');
+            }
+            function showTransportRequiredHint() {
+                expandAdvancedPanel();
+                var stay = document.getElementById('adv-sub-stay');
+                if (stay && !stay.classList.contains('is-open')) {
+                    stay.classList.add('is-open');
+                    var stayToggle = stay.querySelector('.adv-sub-toggle');
+                    if (stayToggle) stayToggle.setAttribute('aria-expanded', 'true');
+                }
+                var field = document.getElementById('transport-field');
+                var hint = document.getElementById('transport-error-hint');
+                if (field) field.classList.add('is-invalid');
+                if (hint) hint.classList.add('is-visible');
+                if (advancedTransportSelect) {
+                    advancedTransportSelect.setAttribute('aria-invalid', 'true');
+                    try {
+                        advancedTransportSelect.focus({ preventScroll: false });
+                    } catch (eFocus) {
+                        advancedTransportSelect.focus();
+                    }
+                    if (typeof advancedTransportSelect.scrollIntoView === 'function') {
+                        advancedTransportSelect.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
             }
 
             const itineraryResult = document.getElementById('itinerary-result');
@@ -4656,6 +4698,11 @@
             var forexRateCache = { base: 'TWD', rates: null, fetchedAt: 0 };
             var cachedBackendMapsKey = '';
             var backendMapsKeyPromise = null;
+            /** In-memory foodspot recommendation cache (same app session). Not persisted. */
+            var soarvibeFoodSpotRecCache = { key: '', items: null };
+            /** Per-load Places request memo (cleared after each panel load). */
+            var foodSpotRequestMemo = null;
+            var foodSpotDebugStats = null;
 
             function getSoarvibeApiBase() {
                 try {
@@ -6054,10 +6101,103 @@
                 }
                 if (fields.length) {
                     try {
+                        if (foodSpotDebugStats) foodSpotDebugStats.fetchFieldsCount += 1;
                         await place.fetchFields({ fields: fields });
                     } catch (e) { /* optional enrich */ }
                 }
                 return place;
+            }
+
+            function hashFoodSpotString(input) {
+                var s = String(input || '');
+                var h = 5381;
+                for (var i = 0; i < s.length; i++) {
+                    h = ((h << 5) + h) ^ s.charCodeAt(i);
+                }
+                return (h >>> 0).toString(36);
+            }
+
+            function buildItineraryFoodSpotFingerprint() {
+                var hidden = currentTripHiddenData || window.soarvibeTripHiddenData;
+                if (!hidden || !Array.isArray(hidden.days) || !hidden.days.length) {
+                    return 'empty';
+                }
+                var parts = [];
+                hidden.days.forEach(function (day) {
+                    parts.push('D' + String(day && day.dayNum != null ? day.dayNum : ''));
+                    (day && day.phases ? day.phases : []).forEach(function (phase) {
+                        (phase && phase.items ? phase.items : []).forEach(function (item) {
+                            var title = getActivityTitleFromItem(item);
+                            if (title) parts.push(title);
+                        });
+                    });
+                    (day && day.foodPicks ? day.foodPicks : []).forEach(function (fp) {
+                        if (fp && fp.name) parts.push('F:' + cleanPlaceName(fp.name));
+                    });
+                });
+                return hashFoodSpotString(parts.join('|'));
+            }
+
+            function buildFoodSpotCacheKey(attractions) {
+                var dest = String(resolveCurrentCity() || getCurrentTripRegion() || '').trim();
+                var meta = currentItineraryMeta || window.soarvibeTripPayload || {};
+                var dateStart = String(meta.dateStart || (dateStartInput && dateStartInput.value) || '').trim();
+                var dateEnd = String(meta.dateEnd || (dateEndInput && dateEndInput.value) || '').trim();
+                var tripId = String(meta.tripId || meta.id || meta.savedTripId || '').trim();
+                var seeds = (attractions || []).map(function (t) {
+                    return String(t || '').trim();
+                }).filter(Boolean).join('\u0001');
+                var fingerprint = buildItineraryFoodSpotFingerprint();
+                return [
+                    'v1',
+                    dest,
+                    dateStart + '~' + dateEnd,
+                    tripId || '-',
+                    fingerprint,
+                    hashFoodSpotString(seeds),
+                    seeds
+                ].join('::');
+            }
+
+            function invalidateFoodSpotRecommendationCache(reason) {
+                soarvibeFoodSpotRecCache = { key: '', items: null };
+                window.soarvibeFoodSpotCache = [];
+                foodSpotRequestMemo = null;
+                try {
+                    console.debug('[SOARVIBE][FoodSpot Cache] invalidate', reason || '');
+                } catch (eInv) { /* silent */ }
+            }
+
+            function resetFoodSpotLoadDebug() {
+                foodSpotDebugStats = {
+                    searchRequestCount: 0,
+                    nearbyRequestCount: 0,
+                    legacyRequestCount: 0,
+                    fetchFieldsCount: 0
+                };
+                foodSpotRequestMemo = { text: Object.create(null), nearby: Object.create(null) };
+            }
+
+            function logFoodSpotCacheDebug(info) {
+                info = info || {};
+                var stats = foodSpotDebugStats || {};
+                try {
+                    console.debug('[SOARVIBE][FoodSpot Cache]', {
+                        cacheKey: info.cacheKey || '',
+                        cacheHit: !!info.cacheHit,
+                        searchRequestCount: stats.searchRequestCount || 0,
+                        nearbyRequestCount: stats.nearbyRequestCount || 0,
+                        legacyRequestCount: stats.legacyRequestCount || 0,
+                        fetchFieldsCount: stats.fetchFieldsCount || 0,
+                        resultCount: info.resultCount != null ? info.resultCount : 0
+                    });
+                } catch (eLog) { /* silent */ }
+            }
+
+            function cloneFoodSpotItems(items) {
+                return (items || []).map(function (item) {
+                    return Object.assign({}, item);
+                });
             }
 
             function mapLegacyPlaceResult(place, nearAttraction) {
@@ -6200,14 +6340,20 @@
                 return c;
             }
 
-            async function placesSearchByText(textQuery) {
+            async function placesSearchByText(textQuery, opts) {
+                opts = opts || {};
                 var city = resolveCurrentCity();
                 var geo = getCityGeoProfile(city);
                 var query = composePlacesQuery(textQuery, city, geo);
+                var memoKey = 'text:' + query + (opts.forAnchorResolve ? ':anchor' : '');
+                if (foodSpotRequestMemo && foodSpotRequestMemo.text[memoKey]) {
+                    return cloneFoodSpotItems(foodSpotRequestMemo.text[memoKey]);
+                }
                 var mapped = [];
 
                 try {
                     var Place = await getSoarvibePlaceClass();
+                    if (foodSpotDebugStats) foodSpotDebugStats.searchRequestCount += 1;
                     var response = await Place.searchByText({
                         textQuery: query,
                         fields: ['displayName', 'formattedAddress', 'location', 'rating', 'photos', 'id'],
@@ -6221,7 +6367,15 @@
                     var places = response.places || [];
                     var i;
                     for (i = 0; i < places.length; i++) {
-                        mapped.push(await mapPlaceToFoodSpotItem(places[i], city + ' · ' + geo.country));
+                        var mappedItem = await mapPlaceToFoodSpotItem(places[i], city + ' · ' + geo.country);
+                        if (opts.forAnchorResolve) {
+                            if (mappedItem.lat != null && mappedItem.lng != null) {
+                                mapped.push(mappedItem);
+                                break;
+                            }
+                            continue;
+                        }
+                        mapped.push(mappedItem);
                     }
                 } catch (e) {
                     console.debug('[SOARVIBE] Place.searchByText → 改用 legacy PlacesService', e && e.message ? e.message : e);
@@ -6229,10 +6383,25 @@
 
                 if (!mapped.length) {
                     await loadGoogleMapsPlacesLibrary();
+                    if (foodSpotDebugStats) foodSpotDebugStats.legacyRequestCount += 1;
                     var legacy = await placesLegacyTextSearch(query);
-                    mapped = legacy.slice(0, 6).map(function (p) {
-                        return mapLegacyPlaceResult(p, city + ' · ' + geo.country);
-                    });
+                    if (opts.forAnchorResolve) {
+                        var li;
+                        for (li = 0; li < legacy.length; li++) {
+                            var legacyItem = mapLegacyPlaceResult(legacy[li], city + ' · ' + geo.country);
+                            if (legacyItem.lat != null && legacyItem.lng != null) {
+                                mapped = [legacyItem];
+                                break;
+                            }
+                        }
+                    } else {
+                        mapped = legacy.slice(0, 6).map(function (p) {
+                            return mapLegacyPlaceResult(p, city + ' · ' + geo.country);
+                        });
+                    }
+                }
+                if (foodSpotRequestMemo) {
+                    foodSpotRequestMemo.text[memoKey] = cloneFoodSpotItems(mapped);
                 }
                 return mapped;
             }
@@ -6243,9 +6412,17 @@
                 var biasCenter = center || { lat: geo.lat, lng: geo.lng };
                 var mapped = [];
                 var nearbyQuery = composePlacesQuery('餐廳 美食 ' + (nearLabel || city), city, geo);
+                var memoKey = 'nearby:' +
+                    Number(biasCenter.lat).toFixed(5) + ',' +
+                    Number(biasCenter.lng).toFixed(5) + ':' +
+                    String(nearLabel || city || '');
+                if (foodSpotRequestMemo && foodSpotRequestMemo.nearby[memoKey]) {
+                    return cloneFoodSpotItems(foodSpotRequestMemo.nearby[memoKey]);
+                }
 
                 try {
                     var Place = await getSoarvibePlaceClass();
+                    if (foodSpotDebugStats) foodSpotDebugStats.nearbyRequestCount += 1;
                     var response = await Place.searchNearby({
                         fields: ['displayName', 'formattedAddress', 'location', 'rating', 'photos', 'id'],
                         locationRestriction: buildPlacesNearbyRestriction(biasCenter, 2200),
@@ -6263,10 +6440,14 @@
 
                 if (!mapped.length) {
                     await loadGoogleMapsPlacesLibrary();
+                    if (foodSpotDebugStats) foodSpotDebugStats.legacyRequestCount += 1;
                     var legacy = await placesLegacyTextSearch(nearbyQuery);
                     mapped = legacy.slice(0, 6).map(function (p) {
                         return mapLegacyPlaceResult(p, nearLabel || city);
                     });
+                }
+                if (foodSpotRequestMemo) {
+                    foodSpotRequestMemo.nearby[memoKey] = cloneFoodSpotItems(mapped);
                 }
                 return mapped;
             }
@@ -6274,7 +6455,7 @@
             async function resolveAttractionAnchor(attractionName) {
                 var city = resolveCurrentCity();
                 var geo = getCityGeoProfile(city);
-                var anchors = await placesSearchByText(attractionName + ' 景點');
+                var anchors = await placesSearchByText(attractionName + ' 景點', { forAnchorResolve: true });
                 if (anchors.length && anchors[0].lat != null && anchors[0].lng != null) {
                     return { lat: anchors[0].lat, lng: anchors[0].lng };
                 }
@@ -6313,10 +6494,30 @@
                 var city = resolveCurrentCity();
                 var geo = getCityGeoProfile(city);
                 var attractions = extractAllAttractionsFromItinerary();
+                var cacheKey = buildFoodSpotCacheKey(attractions);
                 showExclusiveResultsPanel(city + ' 景點＆美食推薦', { foodspotSheet: true });
                 setExclusiveLoading(true);
+                resetFoodSpotLoadDebug();
 
                 try {
+                    if (
+                        soarvibeFoodSpotRecCache.key === cacheKey &&
+                        Array.isArray(soarvibeFoodSpotRecCache.items) &&
+                        soarvibeFoodSpotRecCache.items.length
+                    ) {
+                        var cached = cloneFoodSpotItems(soarvibeFoodSpotRecCache.items);
+                        window.soarvibeFoodSpotCache = cloneFoodSpotItems(cached);
+                        setExclusiveLoading(false);
+                        renderExclusiveResultCards(cached, null, { mode: 'nav' });
+                        logFoodSpotCacheDebug({
+                            cacheKey: cacheKey,
+                            cacheHit: true,
+                            resultCount: cached.length
+                        });
+                        foodSpotRequestMemo = null;
+                        return;
+                    }
+
                     await loadGoogleMapsPlacesLibrary();
                     var merged = [];
                     var seenIds = {};
@@ -6359,12 +6560,27 @@
 
                     setExclusiveLoading(false);
                     if (merged.length) {
-                        window.soarvibeFoodSpotCache = merged.slice();
+                        var stored = cloneFoodSpotItems(merged);
+                        window.soarvibeFoodSpotCache = cloneFoodSpotItems(stored);
+                        soarvibeFoodSpotRecCache = {
+                            key: cacheKey,
+                            items: cloneFoodSpotItems(stored)
+                        };
                         renderExclusiveResultCards(merged, null, { mode: 'nav' });
+                        logFoodSpotCacheDebug({
+                            cacheKey: cacheKey,
+                            cacheHit: false,
+                            resultCount: merged.length
+                        });
                     } else {
                         exclusiveResultsList.innerHTML =
                             '<p class="exclusive-results-loading">目前查無「' + escapeHtml(city) +
                             '」的景點＆美食結果，請確認已一鍵生成行程且目的地正確。</p>';
+                        logFoodSpotCacheDebug({
+                            cacheKey: cacheKey,
+                            cacheHit: false,
+                            resultCount: 0
+                        });
                     }
                 } catch (err) {
                     setExclusiveLoading(false);
@@ -6377,6 +6593,8 @@
                     });
                     exclusiveResultsList.innerHTML =
                         '<p class="exclusive-results-loading">' + escapeHtml(MSG_MAPS_UNAVAILABLE) + '</p>';
+                } finally {
+                    foodSpotRequestMemo = null;
                 }
             }
 
@@ -10549,6 +10767,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             function showItineraryContent(markdownText, metaOptional, hiddenOptional) {
+                invalidateFoodSpotRecommendationCache('itinerary-content-update');
                 hideGeneratingOverlay();
                 itineraryLoading.classList.add('hidden');
                 itineraryLoading.setAttribute('aria-hidden', 'true');
@@ -16009,6 +16228,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             }
 
             async function runItineraryGeneration() {
+                invalidateFoodSpotRecommendationCache('itinerary-regenerate');
                 var customerSelectedTransport = getCustomerSelectedTransport();
                 window.customerSelectedTransport = customerSelectedTransport;
 
@@ -16904,6 +17124,11 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     showModal(MSG_TRAVEL_STYLE_REQUIRED, '✨');
                     return;
                 }
+                if (!isTransportSelected()) {
+                    showTransportRequiredHint();
+                    return;
+                }
+                clearTransportRequiredHint();
 
                 runItineraryGeneration();
             });
@@ -17262,6 +17487,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
             });
             if (advancedTransportSelect) {
                 advancedTransportSelect.addEventListener('change', function () {
+                    if (isTransportSelected()) clearTransportRequiredHint();
                     var transportLabel = getCustomerSelectedTransport();
                     window.customerSelectedTransport = transportLabel;
                     var transportEl = document.getElementById('info-transport');
