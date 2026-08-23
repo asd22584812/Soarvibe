@@ -6,5 +6,7 @@ GEMINI_API_KEYS=AIzaSy第一把,AIzaSy第二把,AIzaSy第三把,AIzaSy第四把
 # Google Maps（Places / 地圖功能 — 前端 referrer 限制金鑰）
 GOOGLE_MAPS_API_KEY=AIzaSy你的Maps金鑰
 
-# 選填：後端 Places 建稿用（IP 或無應用程式限制，勿 commit）
+# 選填但強烈建議：後端 Places + Routes / Distance Matrix
+# 需為「無 HTTP referrer 限制」的 server key（可用 IP 限制 Worker 出口，勿 commit）
+# Browser-restricted GOOGLE_MAPS_API_KEY 通常無法穩定從 Worker 呼叫 Routes API。
 # GOOGLE_MAPS_SERVER_KEY=AIzaSy你的Server金鑰

@@ -79,8 +79,10 @@
     item = item || {};
     var startClock = hhmmToMinutes(item.startTime);
     var endClock = hhmmToMinutes(item.endTime);
-    var startDayOffset = 0;
-    var endDayOffset = 0;
+    // Preserve offsets already assigned by upstream (Planner / Time QA).
+    // Resetting to 0 was the root cause of 00:xx appearing mid-day.
+    var startDayOffset = Number(item.startDayOffset) || 0;
+    var endDayOffset = Number(item.endDayOffset) || 0;
     var issues = [];
 
     if (isNaN(startClock) && !isNaN(endClock)) {
@@ -88,18 +90,20 @@
       issues.push('missing_start');
     }
     if (!isNaN(startClock) && isNaN(endClock)) {
-      endClock = startClock + 45;
-      endDayOffset = endClock >= DAY_MINUTES ? 1 : 0;
-      endClock = endClock % DAY_MINUTES;
+      var endAbsProbe = startDayOffset * DAY_MINUTES + startClock + 45;
+      endDayOffset = Math.floor(endAbsProbe / DAY_MINUTES);
+      endClock = endAbsProbe % DAY_MINUTES;
       issues.push('missing_end_inferred');
     }
     if (!isNaN(startClock) && !isNaN(endClock)) {
-      if (endClock < startClock) {
+      if (endDayOffset < startDayOffset) endDayOffset = startDayOffset;
+      if (endDayOffset === startDayOffset && endClock < startClock) {
         // Classic overnight span e.g. 23:30–00:30
-        endDayOffset = 1;
-      } else if (endClock === startClock) {
-        endClock = (startClock + 30) % DAY_MINUTES;
-        endDayOffset = startClock + 30 >= DAY_MINUTES ? 1 : 0;
+        endDayOffset = startDayOffset + 1;
+      } else if (endClock === startClock && endDayOffset === startDayOffset) {
+        var expanded = startDayOffset * DAY_MINUTES + startClock + 30;
+        endDayOffset = Math.floor(expanded / DAY_MINUTES);
+        endClock = expanded % DAY_MINUTES;
         issues.push('zero_duration_expanded');
       }
     }
@@ -338,28 +342,12 @@
           close: minutesToHhmm(hours.closeMin),
           note: hours.note
         });
-        // Local repair: move into open window (mid afternoon)
-        var repairedStart = Math.max(hours.openMin + 60, Math.min(14 * 60, lastEntry - 60));
-        if (repairedStart < hours.closeMin - 45) {
-          var stay = Math.min(
-            90,
-            Math.max(40, (tl.endAbs || tl.startAbs + 60) - tl.startAbs)
-          );
-          var repairedEnd = Math.min(repairedStart + stay, hours.closeMin - 15);
-          it.startTime = minutesToHhmm(repairedStart);
-          it.endTime = minutesToHhmm(repairedEnd);
-          applyTimelineToItem(it, normalizeItemTimeline(it));
-          it.period = periodForStartMinutes(repairedStart);
-          fixes.push({
-            type: 'shift_into_open_hours',
-            title: it.title,
-            to: it.startTime + '-' + it.endTime,
-            catalog: hours.id
-          });
-        } else {
-          it.timeIntegrityFlags = (it.timeIntegrityFlags || []).concat(['closed_unrepairable']);
-          fixes.push({ type: 'flag_closed', title: it.title, catalog: hours.id });
-        }
+        // GUARDRAIL: flag only — Gemini owns schedule
+        fixes.push({
+          type: 'after_hours_flag',
+          title: it.title,
+          close: minutesToHhmm(hours.closeMin)
+        });
       } else if (tl.startMinutes < hours.openMin) {
         issues.push({
           type: 'before_open',
@@ -367,13 +355,12 @@
           startTime: it.startTime,
           open: minutesToHhmm(hours.openMin)
         });
-        it.startTime = minutesToHhmm(hours.openMin + 15);
-        var stay2 = Math.max(40, (tl.endAbs || tl.startAbs + 60) - tl.startAbs);
-        it.endTime = minutesToHhmm(
-          Math.min(hours.openMin + 15 + stay2, hours.closeMin - 15)
-        );
-        applyTimelineToItem(it, normalizeItemTimeline(it));
-        fixes.push({ type: 'shift_after_open', title: it.title, to: it.startTime });
+        // GUARDRAIL: flag only — do not invent a new Gemini timetable
+        fixes.push({
+          type: 'before_open_flag',
+          title: it.title,
+          open: minutesToHhmm(hours.openMin)
+        });
       }
     });
     return { items: items, issues: issues, fixes: fixes };
@@ -442,26 +429,11 @@
       var curTl = normalizeItemTimeline(cur);
       if (isNaN(prevTl.endAbs) || isNaN(curTl.startAbs)) continue;
       if (curTl.startAbs < prevTl.endAbs) {
-        var gap = 10;
-        var newStartAbs = prevTl.endAbs + gap;
-        var stay = Math.max(25, (curTl.endAbs || curTl.startAbs + 40) - curTl.startAbs);
-        cur.startTime = minutesToHhmm(newStartAbs % DAY_MINUTES);
-        cur.endTime = minutesToHhmm((newStartAbs + stay) % DAY_MINUTES);
-        // If wrapped, endDayOffset handled by normalize
-        if (newStartAbs >= DAY_MINUTES && (newStartAbs + stay) % DAY_MINUTES < newStartAbs % DAY_MINUTES) {
-          /* overnight ok */
-        }
-        applyTimelineToItem(cur, normalizeItemTimeline(cur));
-        // If end still before start due to wrap confusion, force end after start same offset
-        var fixed = normalizeItemTimeline(cur);
-        if (!isNaN(fixed.startAbs) && !isNaN(fixed.endAbs) && fixed.endAbs <= fixed.startAbs) {
-          cur.endTime = minutesToHhmm((fixed.startAbs + stay) % DAY_MINUTES);
-          applyTimelineToItem(cur, normalizeItemTimeline(cur));
-        }
+        // GUARDRAIL: flag only — do not shift Gemini times
         fixes.push({
-          type: 'fix_overlap',
+          type: 'overlap_flag',
           title: cur.title,
-          to: cur.startTime
+          prev: prev.title
         });
       }
     }

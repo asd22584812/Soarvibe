@@ -279,8 +279,7 @@
   function needsExpenseDatePicker(ledger, isEdit) {
     var state = getLedgerTemporalState(ledger);
     if (state === 'archived') return false;
-    if (state === 'active' && !isEdit) return false;
-    if (state === 'active' && isEdit) return false;
+    // active / upcoming / ended: always show date so users can backfill other trip days
     return true;
   }
 
@@ -544,7 +543,8 @@
     return addExpenseButtonHtml(tlState.ledgerId || '', null);
   }
 
-  function showConfirm(title, copy) {
+  function showConfirm(title, copy, options) {
+    options = options || {};
     return new Promise(function (resolve) {
       var shell = $('travelLedgerConfirm');
       var titleEl = $('travelLedgerConfirmTitle');
@@ -557,10 +557,16 @@
       }
       if (titleEl) titleEl.textContent = title;
       if (copyEl) copyEl.textContent = copy;
+      var prevOk = okBtn.textContent;
+      var prevCancel = cancelBtn.textContent;
+      okBtn.textContent = options.okLabel || '確認';
+      cancelBtn.textContent = options.cancelLabel || '取消';
       shell.classList.remove('hidden');
 
       function cleanup(result) {
         shell.classList.add('hidden');
+        okBtn.textContent = prevOk;
+        cancelBtn.textContent = prevCancel;
         okBtn.removeEventListener('click', onOk);
         cancelBtn.removeEventListener('click', onCancel);
         resolve(result);
@@ -928,19 +934,20 @@
       '<div class="tl-menu">' +
       '<button type="button" class="tl-menu-btn" data-tl-menu="' +
       escapeHtml(ledger.id) +
-      '" aria-label="更多操作">⋯</button>' +
-      '<div class="tl-menu-panel hidden" data-tl-menu-panel="' +
+      '" aria-label="更多操作" aria-haspopup="menu">⋯</button>' +
+      '<div class="tl-menu-panel hidden" role="menu" data-tl-menu-panel="' +
       escapeHtml(ledger.id) +
       '">' +
-      '<button type="button" class="tl-menu-item" data-tl-action="edit" data-ledger-id="' +
+      '<button type="button" class="tl-menu-item" role="menuitem" data-tl-action="edit" data-ledger-id="' +
       escapeHtml(ledger.id) +
       '">編輯</button>' +
-      '<button type="button" class="tl-menu-item" data-tl-action="archive" data-ledger-id="' +
+      '<button type="button" class="tl-menu-item" role="menuitem" data-tl-action="archive" data-ledger-id="' +
       escapeHtml(ledger.id) +
       '">' +
       (ledger.status === 'archived' ? '取消封存' : '封存') +
       '</button>' +
-      '<button type="button" class="tl-menu-item is-danger" data-tl-action="delete" data-ledger-id="' +
+      '<div class="tl-menu-divider" role="separator" aria-hidden="true"></div>' +
+      '<button type="button" class="tl-menu-item is-danger" role="menuitem" data-tl-action="delete" data-ledger-id="' +
       escapeHtml(ledger.id) +
       '">刪除</button>' +
       '</div></div>'
@@ -1483,7 +1490,7 @@
       escapeHtml(expenseSheetTitle(ledger, isEdit)) +
       '</h3>' +
       introHtml +
-      '<div class="tl-expense-amount-wrap">' +
+      '<div class="tl-expense-amount-wrap" data-tl-action="focus-expense-amount" role="group" aria-label="金額">' +
       '<p class="tl-expense-currency">' +
       escapeHtml(primaryCode || '') +
       '</p>' +
@@ -1491,9 +1498,11 @@
       '<span class="tl-expense-symbol">' +
       escapeHtml(symbol) +
       '</span>' +
-      '<input id="tlExpenseAmount" class="tl-expense-amount-input" name="amount" inputmode="decimal" type="text" autocomplete="off" placeholder="0" value="' +
+      '<input id="tlExpenseAmount" class="tl-expense-amount-input" name="amount" inputmode="decimal" type="text" autocomplete="off" enterkeyhint="done" placeholder="輸入金額" value="' +
       escapeHtml(amountValue) +
-      '"></div></div>' +
+      '" aria-label="金額"></div>' +
+      '<p class="tl-expense-amount-hint">點這裡輸入金額</p>' +
+      '</div>' +
       dateHtml +
       '<p class="tl-expense-section-label">分類</p>' +
       catHtml +
@@ -1557,12 +1566,71 @@
     sheet.setAttribute('aria-hidden', 'false');
     lockActiveViewScroll();
     bindExpenseSheetDismissGestures(sheet);
+    bindExpenseAmountFocus(sheet);
     var amountInput = $('tlExpenseAmount');
     if (amountInput) {
       setTimeout(function () {
         amountInput.focus();
-        amountInput.select && amountInput.select();
+        if (amountInput.value) {
+          amountInput.select && amountInput.select();
+        }
       }, 80);
+    }
+  }
+
+  function bindExpenseAmountFocus(sheet) {
+    var wrap = sheet && sheet.querySelector('.tl-expense-amount-wrap');
+    var input = $('tlExpenseAmount');
+    if (!wrap || !input) return;
+
+    function setActive(on) {
+      wrap.classList.toggle('is-active', !!on);
+    }
+
+    if (!wrap._tlAmountBound) {
+      wrap._tlAmountBound = true;
+      wrap.addEventListener('click', function (e) {
+        if (e.target === input) return;
+        e.preventDefault();
+        input.focus();
+      });
+    }
+
+    if (!input._tlAmountBound) {
+      input._tlAmountBound = true;
+      input.addEventListener('focus', function () {
+        setActive(true);
+      });
+      input.addEventListener('blur', function () {
+        setActive(false);
+      });
+      input.addEventListener('input', function () {
+        setExpenseSheetError('');
+      });
+    }
+
+    // Keep save button reachable above iOS keyboard when possible
+    if (typeof window !== 'undefined' && window.visualViewport && !sheet._tlViewportBound) {
+      sheet._tlViewportBound = true;
+      var panel = sheet.querySelector('.tl-expense-sheet-panel');
+      var onVp = function () {
+        if (!panel || sheet.classList.contains('hidden')) return;
+        var vv = window.visualViewport;
+        var overlap = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+        panel.style.maxHeight = overlap > 40
+          ? 'min(92dvh, calc(100dvh - ' + Math.round(overlap) + 'px))'
+          : '';
+        var bodyEl = sheet.querySelector('.tl-expense-sheet-body');
+        if (bodyEl && document.activeElement === input) {
+          try {
+            input.scrollIntoView({ block: 'center', behavior: 'smooth' });
+          } catch (scrollErr) {
+            /* silent */
+          }
+        }
+      };
+      window.visualViewport.addEventListener('resize', onVp);
+      window.visualViewport.addEventListener('scroll', onVp);
     }
   }
 
@@ -2140,8 +2208,9 @@
       return Promise.resolve(false);
     }
     return showConfirm(
-      '刪除這本旅行帳本？',
-      '「' + ledger.name + '」的所有資料將一併刪除，此操作無法復原。'
+      '確定要刪除這本旅行帳本嗎？',
+      '帳本中的花費紀錄也會一併刪除，此操作無法復原。',
+      { okLabel: '刪除帳本', cancelLabel: '取消' }
     ).then(function (ok) {
       if (!ok) return false;
       if (!isStorageAvailable()) {
@@ -2192,6 +2261,9 @@
   function closeAllMenus() {
     document.querySelectorAll('#travelLedger .tl-menu-panel').forEach(function (panel) {
       panel.classList.add('hidden');
+    });
+    document.querySelectorAll('#travelLedger .is-menu-open').forEach(function (el) {
+      el.classList.remove('is-menu-open');
     });
     tlState.openMenuId = null;
   }
@@ -2337,6 +2409,12 @@
         closeExpenseSheet();
         return;
       }
+      if (action === 'focus-expense-amount') {
+        e.preventDefault();
+        var amountFocus = $('tlExpenseAmount');
+        if (amountFocus) amountFocus.focus();
+        return;
+      }
       if (action === 'pick-expense-category') {
         e.preventDefault();
         tlState.expenseCategory = actionEl.getAttribute('data-category') || 'food';
@@ -2402,6 +2480,12 @@
       if (willOpen) {
         panel.classList.remove('hidden');
         tlState.openMenuId = menuId;
+        // Parent cards use overflow:hidden for polish; lift it while menu is open
+        // so the 3rd item (刪除) is not clipped.
+        var host = menuBtn.closest('.tl-current-card, .tl-pass, .tl-detail-hero');
+        if (host) host.classList.add('is-menu-open');
+        var menuRoot = menuBtn.closest('.tl-menu');
+        if (menuRoot) menuRoot.classList.add('is-menu-open');
       }
       return;
     }

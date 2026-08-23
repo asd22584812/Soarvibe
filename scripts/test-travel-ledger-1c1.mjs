@@ -234,7 +234,8 @@ assert(DATA.formatMoneyMinor(25400, 'JPY') === '¥25,400', '¥25,400 format');
 assert(DATA.formatMoneyMinor(1250000, 'JPY') === '¥1,250,000', '¥1,250,000 format');
 
 assert(UI.needsExpenseDatePicker(ledgerWithExp, false), 'ended create needs date');
-assert(!UI.needsExpenseDatePicker(DATA.getTravelLedgerById(activeLedger.id), false), 'active create no date picker');
+assert(UI.needsExpenseDatePicker(DATA.getTravelLedgerById(activeLedger.id), false), 'active create needs date');
+assert(UI.needsExpenseDatePicker(DATA.getTravelLedgerById(activeLedger.id), true), 'active edit needs date');
 
 const beforeDelete = endedSummary.totalSpendMinor;
 const expId = ledgerWithExp.expenses[0].id;

@@ -394,16 +394,15 @@
               }
               var mediaItem = {
                 mediaId: body.mediaId || imageId,
-                imageId: body.imageId || imageId,
                 src: src,
-                downloadURL: src,
-                storagePath: body.path || body.storagePath,
-                path: body.path || body.storagePath,
                 type: 'image/webp',
-                sortOrder: idx,
-                slot: 'other',
+                sortOrder: typeof (item && item.sortOrder) === 'number' ? item.sortOrder : idx,
                 bytes: body.bytes || file.size
               };
+              var storagePath = body.path || body.storagePath || '';
+              if (storagePath) mediaItem.storagePath = storagePath;
+              if (typeof (item && item.width) === 'number') mediaItem.width = item.width;
+              if (typeof (item && item.height) === 'number') mediaItem.height = item.height;
               uploaded.push(mediaItem);
               return mediaItem;
             });
@@ -515,6 +514,29 @@
     return tax;
   }
 
+  function allocatePostId() {
+    var database = requireDb();
+    return database.collection('posts').doc().id;
+  }
+
+  function isSafePostId(id) {
+    return /^[A-Za-z0-9_-]{8,128}$/.test(String(id || ''));
+  }
+
+  /**
+   * Deduplicate posts by postId (remote wins over seed when both present).
+   * Pure helper — used by UI feed merge / tests.
+   */
+  function dedupePostsById(list) {
+    var map = {};
+    (list || []).forEach(function (p) {
+      if (p && p.postId) map[p.postId] = p;
+    });
+    return Object.keys(map).map(function (k) {
+      return map[k];
+    });
+  }
+
   function createPost(input) {
     var user = requireUser();
     var database = requireDb();
@@ -526,13 +548,17 @@
     var countryId = String(tax.countryId || '').trim();
     if (!title) return Promise.reject(new Error('請填寫標題'));
     if (body.length < BODY_MIN) return Promise.reject(new Error('心得至少 ' + BODY_MIN + ' 字'));
-    if (!countryId) return Promise.reject(new Error('請選擇國家／地區'));
-    // cityId may be empty for country-level posts (nullable by design)
+    if (!countryId) return Promise.reject(new Error('請選擇國家'));
+    if (!cityId) return Promise.reject(new Error('請選擇或輸入地區'));
 
     var a = authApi();
     var profile = a && a.getProfile ? a.getProfile() : null;
-    var ref = database.collection('posts').doc();
-    var postId = ref.id;
+    var clientPublishId = String(input.clientPublishId || '').trim().slice(0, 64);
+    var postId = String(input.postId || '').trim();
+    if (!isSafePostId(postId)) {
+      postId = allocatePostId();
+    }
+    var ref = database.collection('posts').doc(postId);
     var now = firebase.firestore.FieldValue.serverTimestamp();
     var allowMedia = mediaUploadEnabled();
     var files = allowMedia && Array.isArray(input.mediaFiles) ? input.mediaFiles : [];
@@ -545,8 +571,45 @@
         : null;
 
     var wroteDoc = false;
-    return uploadPostImages(user.uid, postId, files)
-      .then(function (uploaded) {
+
+    // Idempotent retry: same postId already published by this author → return it.
+    // Missing docs often fail read rules (resource == null); treat that as "not exists".
+    return ref
+      .get()
+      .then(function (existing) {
+        return { existing: existing, readOk: true };
+      })
+      .catch(function (readErr) {
+        var code = (readErr && readErr.code) || '';
+        if (code === 'permission-denied' || code === 'not-found') {
+          return { existing: null, readOk: false };
+        }
+        return Promise.reject(readErr);
+      })
+      .then(function (probe) {
+        var existing = probe && probe.existing;
+        if (existing && existing.exists) {
+          var ed = existing.data() || {};
+          if (ed.authorId === user.uid && ed.status === 'published') {
+            if (
+              !clientPublishId ||
+              !ed.clientPublishId ||
+              ed.clientPublishId === clientPublishId
+            ) {
+              return getPost(postId).then(function (post) {
+                return { __done: true, post: post };
+              });
+            }
+            return Promise.reject(new Error('貼文 ID 衝突'));
+          }
+        }
+        return uploadPostImages(user.uid, postId, files).then(function (uploaded) {
+          return { __done: false, uploaded: uploaded };
+        });
+      })
+      .then(function (step) {
+        if (step && step.__done) return step.post;
+        var uploaded = (step && step.uploaded) || [];
         var media = presetMedia || uploaded || [];
         if (!allowMedia) media = [];
         media = (media || []).slice(0, MEDIA_MAX_PER_POST).map(function (m, idx) {
@@ -555,18 +618,20 @@
           if (/^data:/i.test(src)) {
             throw new Error('照片網址無效');
           }
+          // Slim media schema — only allowlisted keys (must match firestore.rules)
           var item = {
             mediaId: String((m && (m.mediaId || m.imageId)) || 'm' + idx),
-            imageId: String((m && (m.imageId || m.mediaId)) || 'm' + idx),
             src: src,
-            downloadURL: src,
-            storagePath: String((m && (m.storagePath || m.path)) || ''),
-            path: String((m && (m.path || m.storagePath)) || ''),
             type: String((m && m.type) || 'image/webp'),
-            sortOrder: typeof (m && m.sortOrder) === 'number' ? m.sortOrder : idx,
-            slot: String((m && m.slot) || 'other')
+            sortOrder: typeof (m && m.sortOrder) === 'number' ? m.sortOrder : idx
           };
-          if (typeof (m && m.bytes) === 'number') item.bytes = m.bytes;
+          var storagePath = String((m && (m.storagePath || m.path)) || '');
+          if (storagePath) item.storagePath = storagePath;
+          var slot = String((m && m.slot) || '');
+          if (slot) item.slot = slot;
+          if (typeof (m && m.bytes) === 'number') item.bytes = Math.round(m.bytes);
+          if (typeof (m && m.width) === 'number') item.width = Math.round(m.width);
+          if (typeof (m && m.height) === 'number') item.height = Math.round(m.height);
           return item;
         });
         var doc = {
@@ -574,9 +639,17 @@
           authorDisplayName: profileName(),
           authorAvatarUrl: (profile && profile.avatarUrl) || user.photoURL || '',
           countryId: countryId,
+          countryCode: String(
+            input.countryCode ||
+              (locApi() && locApi().countryCodeOf && locApi().countryCodeOf(countryId)) ||
+              ''
+          )
+            .trim()
+            .slice(0, 8),
           countryName: String(tax.countryName || '').trim().slice(0, 40),
           regionId: String(tax.regionId || '').trim().slice(0, 40),
-          regionName: String(tax.regionName || '').trim().slice(0, 40),
+          regionKey: String(input.regionKey || cityId || '').trim().slice(0, 48),
+          regionName: String(tax.regionName || tax.cityName || '').trim().slice(0, 40),
           cityId: cityId,
           cityName: String(tax.cityName || '').trim().slice(0, 60),
           locationRaw: String(tax.locationRaw || '').trim().slice(0, 80),
@@ -595,6 +668,7 @@
           createdAt: now,
           updatedAt: now
         };
+        if (clientPublishId) doc.clientPublishId = clientPublishId;
         return ref.set(doc).then(function () {
           wroteDoc = true;
           return getPost(postId);
@@ -608,6 +682,10 @@
       });
   }
 
+  /**
+   * Soft-remove first so feed hides immediately; R2 cleanup is async and must not
+   * block UX. R2 failure must never re-publish the post.
+   */
   function deletePost(postId) {
     var user = requireUser();
     var database = requireDb();
@@ -615,12 +693,22 @@
     return ref.get().then(function (snap) {
       if (!snap.exists) throw new Error('貼文不存在');
       if (snap.data().authorId !== user.uid) throw new Error('只能刪除自己的貼文');
-      return deletePostMediaAll(postId).then(function () {
-        return ref.update({
+      return ref
+        .update({
           status: 'removed',
           updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        })
+        .then(function () {
+          deletePostMediaAll(postId).catch(function (err) {
+            console.warn('[SOARVIBE] R2 cleanup after delete failed', {
+              uid: user.uid,
+              postId: postId,
+              category: (err && err.code) || 'r2_cleanup_failed',
+              message: String((err && err.message) || err)
+            });
+          });
+          return { ok: true, postId: postId };
         });
-      });
     });
   }
 
@@ -808,20 +896,11 @@
   function mergeFeed(cityId, localPosts) {
     return listPublishedPosts(cityId)
       .then(function (remote) {
-        var map = {};
-        (localPosts || []).forEach(function (p) {
-          if (p && p.postId) map[p.postId] = p;
-        });
-        remote.forEach(function (p) {
-          map[p.postId] = p;
-        });
-        return Object.keys(map).map(function (k) {
-          return map[k];
-        });
+        return dedupePostsById([].concat(localPosts || [], remote || []));
       })
       .catch(function (e) {
         console.warn('[SOARVIBE] Firestore feed fallback to local seeds', e);
-        return localPosts || [];
+        return dedupePostsById(localPosts || []);
       });
   }
 
@@ -832,6 +911,7 @@
     listByRegion: listByRegion,
     listFeedForScope: listFeedForScope,
     getPost: getPost,
+    allocatePostId: allocatePostId,
     createPost: createPost,
     deletePost: deletePost,
     deletePostMediaAll: deletePostMediaAll,
@@ -844,6 +924,7 @@
     toggleLike: toggleLike,
     toggleSave: toggleSave,
     mergeFeed: mergeFeed,
+    dedupePostsById: dedupePostsById,
     MEDIA_MAX_PER_POST: MEDIA_MAX_PER_POST
   };
 })(typeof window !== 'undefined' ? window : globalThis);

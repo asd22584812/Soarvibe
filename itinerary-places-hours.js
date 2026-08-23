@@ -628,27 +628,19 @@
       });
       if (res.ok) return;
       issues = issues.concat(res.issues || []);
-      if (res.windows && res.windows.length) {
-        var repaired = repairItemIntoWindows(it, res.windows, opt);
-        if (repaired.ok) {
-          fixes.push({
-            type: 'shift_into_places_hours',
-            title: it.title,
-            to: it.startTime + '-' + it.endTime
-          });
-        } else if ((res.issues || []).some(function (x) {
-          return x.type === 'closed_weekday' || x.type === 'permanently_closed';
-        })) {
-          it.__qaReject = true;
-          fixes.push({ type: 'reject_closed_poi', title: it.title });
-        } else {
-          it.__qaReject = true;
-          fixes.push({ type: 'unrepairable_hours', title: it.title });
-        }
-      } else if ((res.issues || []).some(function (x) {
+      // GUARDRAIL: Gemini owns schedule — never shift times into opening windows.
+      if ((res.issues || []).some(function (x) {
         return x.type === 'closed_weekday' || x.type === 'permanently_closed';
       })) {
         it.__qaReject = true;
+        fixes.push({ type: 'reject_closed_poi', title: it.title });
+      } else {
+        fixes.push({
+          type: 'outside_opening_hours_flag',
+          title: it.title,
+          startTime: it.startTime,
+          endTime: it.endTime
+        });
       }
     });
 

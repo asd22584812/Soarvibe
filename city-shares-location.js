@@ -6,19 +6,22 @@
   'use strict';
 
   var COUNTRIES = Object.freeze({
-    japan: Object.freeze({ id: 'japan', name: '日本' }),
-    korea: Object.freeze({ id: 'korea', name: '韓國' }),
-    thailand: Object.freeze({ id: 'thailand', name: '泰國' }),
-    vietnam: Object.freeze({ id: 'vietnam', name: '越南' }),
-    usa: Object.freeze({ id: 'usa', name: '美國' }),
-    australia: Object.freeze({ id: 'australia', name: '澳洲' }),
-    uk: Object.freeze({ id: 'uk', name: '英國' }),
-    france: Object.freeze({ id: 'france', name: '法國' }),
-    singapore: Object.freeze({ id: 'singapore', name: '新加坡' }),
-    taiwan: Object.freeze({ id: 'taiwan', name: '台灣' }),
-    china: Object.freeze({ id: 'china', name: '中國' }),
-    hongkong: Object.freeze({ id: 'hongkong', name: '香港' }),
-    macau: Object.freeze({ id: 'macau', name: '澳門' })
+    japan: Object.freeze({ id: 'japan', name: '日本', countryCode: 'JP' }),
+    korea: Object.freeze({ id: 'korea', name: '韓國', countryCode: 'KR' }),
+    thailand: Object.freeze({ id: 'thailand', name: '泰國', countryCode: 'TH' }),
+    vietnam: Object.freeze({ id: 'vietnam', name: '越南', countryCode: 'VN' }),
+    usa: Object.freeze({ id: 'usa', name: '美國', countryCode: 'US' }),
+    australia: Object.freeze({ id: 'australia', name: '澳洲', countryCode: 'AU' }),
+    uk: Object.freeze({ id: 'uk', name: '英國', countryCode: 'GB' }),
+    france: Object.freeze({ id: 'france', name: '法國', countryCode: 'FR' }),
+    singapore: Object.freeze({ id: 'singapore', name: '新加坡', countryCode: 'SG' }),
+    taiwan: Object.freeze({ id: 'taiwan', name: '台灣', countryCode: 'TW' }),
+    china: Object.freeze({ id: 'china', name: '中國', countryCode: 'CN' }),
+    hongkong: Object.freeze({ id: 'hongkong', name: '香港', countryCode: 'HK' }),
+    macau: Object.freeze({ id: 'macau', name: '澳門', countryCode: 'MO' }),
+    malaysia: Object.freeze({ id: 'malaysia', name: '馬來西亞', countryCode: 'MY' }),
+    italy: Object.freeze({ id: 'italy', name: '義大利', countryCode: 'IT' }),
+    canada: Object.freeze({ id: 'canada', name: '加拿大', countryCode: 'CA' })
   });
 
   var REGIONS = Object.freeze({
@@ -42,6 +45,9 @@
     hiroshima: city('hiroshima', '廣島', 'japan'),
     kumamoto: city('kumamoto', '熊本', 'japan'),
     takamatsu: city('takamatsu', '高松', 'japan'),
+    kobe: city('kobe', '神戶', 'japan'),
+    yokohama: city('yokohama', '橫濱', 'japan'),
+    nara: city('nara', '奈良', 'japan'),
     seoul: city('seoul', '首爾', 'korea'),
     busan: city('busan', '釜山', 'korea'),
     jeju: city('jeju', '濟州', 'korea'),
@@ -51,14 +57,25 @@
     chiangmai: city('chiangmai', '清邁', 'thailand'),
     london: city('london', '倫敦', 'uk'),
     paris: city('paris', '巴黎', 'france'),
+    rome: city('rome', '羅馬', 'italy'),
+    milan: city('milan', '米蘭', 'italy'),
     'new-york': city('new-york', '紐約', 'usa'),
     'los-angeles': city('los-angeles', '洛杉磯', 'usa'),
     'san-francisco': city('san-francisco', '舊金山', 'usa'),
+    toronto: city('toronto', '多倫多', 'canada'),
+    vancouver: city('vancouver', '溫哥華', 'canada'),
     sydney: city('sydney', '雪梨', 'australia'),
     melbourne: city('melbourne', '墨爾本', 'australia'),
     singapore: city('singapore', '新加坡', 'singapore'),
+    kualalumpur: city('kualalumpur', '吉隆坡', 'malaysia'),
     hanoi: city('hanoi', '河內', 'vietnam'),
-    'ho-chi-minh': city('ho-chi-minh', '胡志明', 'vietnam')
+    'ho-chi-minh': city('ho-chi-minh', '胡志明', 'vietnam'),
+    shanghai: city('shanghai', '上海', 'china'),
+    beijing: city('beijing', '北京', 'china'),
+    taipei: city('taipei', '台北', 'taiwan'),
+    kaohsiung: city('kaohsiung', '高雄', 'taiwan'),
+    hongkong: city('hongkong', '香港', 'hongkong'),
+    macau: city('macau', '澳門', 'macau')
   });
 
   /**
@@ -144,6 +161,14 @@
     add('kumamoto', 'kumamoto');
     add('高松', 'takamatsu');
     add('takamatsu', 'takamatsu');
+    add('神戶', 'kobe');
+    add('神戸', 'kobe');
+    add('kobe', 'kobe');
+    add('橫濱', 'yokohama');
+    add('横浜', 'yokohama');
+    add('yokohama', 'yokohama');
+    add('奈良', 'nara');
+    add('nara', 'nara');
     add('首爾', 'seoul');
     add('首尔', 'seoul');
     add('서울', 'seoul');
@@ -170,6 +195,12 @@
     add('london', 'london');
     add('巴黎', 'paris');
     add('paris', 'paris');
+    add('羅馬', 'rome');
+    add('罗马', 'rome');
+    add('rome', 'rome');
+    add('米蘭', 'milan');
+    add('米兰', 'milan');
+    add('milan', 'milan');
     add('紐約', 'new-york');
     add('纽约', 'new-york');
     add('new york', 'new-york');
@@ -181,6 +212,12 @@
     add('舊金山', 'san-francisco');
     add('旧金山', 'san-francisco');
     add('san francisco', 'san-francisco');
+    add('多倫多', 'toronto');
+    add('多伦多', 'toronto');
+    add('toronto', 'toronto');
+    add('溫哥華', 'vancouver');
+    add('温哥华', 'vancouver');
+    add('vancouver', 'vancouver');
     add('雪梨', 'sydney');
     add('悉尼', 'sydney');
     add('sydney', 'sydney');
@@ -189,12 +226,31 @@
     add('melbourne', 'melbourne');
     add('新加坡', 'singapore');
     add('singapore', 'singapore');
+    add('吉隆坡', 'kualalumpur');
+    add('kuala lumpur', 'kualalumpur');
+    add('kl', 'kualalumpur');
     add('河內', 'hanoi');
     add('河内', 'hanoi');
     add('hanoi', 'hanoi');
     add('胡志明', 'ho-chi-minh');
     add('胡志明市', 'ho-chi-minh');
     add('saigon', 'ho-chi-minh');
+    add('上海', 'shanghai');
+    add('shanghai', 'shanghai');
+    add('北京', 'beijing');
+    add('beijing', 'beijing');
+    add('台北', 'taipei');
+    add('臺北', 'taipei');
+    add('taipei', 'taipei');
+    add('高雄', 'kaohsiung');
+    add('kaohsiung', 'kaohsiung');
+    add('香港', 'hongkong');
+    add('hong kong', 'hongkong');
+    add('hongkong', 'hongkong');
+    add('澳門', 'macau');
+    add('澳门', 'macau');
+    add('macau', 'macau');
+    add('macao', 'macau');
 
     add('日本', 'country:japan');
     add('japan', 'country:japan');
@@ -220,6 +276,20 @@
     add('法國', 'country:france');
     add('法国', 'country:france');
     add('france', 'country:france');
+    add('台灣', 'country:taiwan');
+    add('臺灣', 'country:taiwan');
+    add('taiwan', 'country:taiwan');
+    add('中國', 'country:china');
+    add('中国', 'country:china');
+    add('china', 'country:china');
+    add('馬來西亞', 'country:malaysia');
+    add('马来西亚', 'country:malaysia');
+    add('malaysia', 'country:malaysia');
+    add('義大利', 'country:italy');
+    add('意大利', 'country:italy');
+    add('italy', 'country:italy');
+    add('加拿大', 'country:canada');
+    add('canada', 'country:canada');
 
     add('北海道', 'region:hokkaido');
     add('hokkaido', 'region:hokkaido');
@@ -332,6 +402,45 @@
   function resolveLocation(input, hints) {
     hints = hints || {};
     var raw = String(input || '').trim();
+    // Split legacy compound labels: "東京・日本" / "日本 / 東京" / "東京, 日本"
+    if (raw && /[・･/|,，]/.test(raw)) {
+      var parts = raw
+        .split(/[・･/|,，]+/)
+        .map(function (p) {
+          return String(p || '').trim();
+        })
+        .filter(Boolean);
+      if (parts.length >= 2) {
+        var a = resolveLocation(parts[0], hints);
+        var b = resolveLocation(parts[1], hints);
+        if (a.cityId && a.feedKind === 'city') {
+          a.locationRaw = raw;
+          return a;
+        }
+        if (b.cityId && b.feedKind === 'city') {
+          b.locationRaw = raw;
+          return b;
+        }
+        if (a.countryId && b.cityId) {
+          b.countryId = a.countryId;
+          b.countryName = a.countryName;
+          b.locationRaw = raw;
+          return b;
+        }
+        if (b.countryId && a.cityId) {
+          a.countryId = b.countryId;
+          a.countryName = b.countryName;
+          a.locationRaw = raw;
+          return a;
+        }
+        if (a.countryId && !b.countryId) {
+          return resolveLocation(parts[1], Object.assign({}, hints, { countryId: a.countryId, source: hints.source || 'legacy' }));
+        }
+        if (b.countryId && !a.countryId) {
+          return resolveLocation(parts[0], Object.assign({}, hints, { countryId: b.countryId, source: hints.source || 'legacy' }));
+        }
+      }
+    }
     var key = normalizeKey(raw);
 
     if (hints.cityId && CITIES[hints.cityId]) {
@@ -411,15 +520,22 @@
 
   function guessCountryFromText(raw) {
     var rules = [
-      [/日本|japan|tokyo|osaka|kyoto|hokkaido|okinawa|札幌|名古屋|福岡/i, 'japan'],
-      [/韓國|韩国|korea|seoul|busan|jeju|首爾|釜山|濟州/i, 'korea'],
+      [/日本|japan|tokyo|osaka|kyoto|hokkaido|okinawa|札幌|名古屋|福岡|神戶|橫濱|奈良/i, 'japan'],
+      [/韓國|韩国|korea|seoul|busan|jeju|首爾|釜山|濟州|江陵/i, 'korea'],
       [/泰國|泰国|thailand|bangkok|曼谷/i, 'thailand'],
       [/越南|vietnam|hanoi|河內|胡志明/i, 'vietnam'],
       [/美國|美国|usa|america|new\s*york|los\s*angeles|舊金山|紐約/i, 'usa'],
+      [/加拿大|canada|toronto|vancouver|多倫多|溫哥華/i, 'canada'],
       [/澳洲|australia|sydney|melbourne|雪梨|墨爾本/i, 'australia'],
-      [/英國|英国|london|london|倫敦/i, 'uk'],
+      [/英國|英国|london|倫敦/i, 'uk'],
       [/法國|法国|france|paris|巴黎/i, 'france'],
-      [/新加坡|singapore/i, 'singapore']
+      [/義大利|意大利|italy|rome|milan|羅馬|米蘭/i, 'italy'],
+      [/新加坡|singapore/i, 'singapore'],
+      [/馬來西亞|马来西亚|malaysia|kuala|吉隆坡/i, 'malaysia'],
+      [/台灣|臺灣|taiwan|台北|高雄/i, 'taiwan'],
+      [/中國|中国|china|上海|北京|shanghai|beijing/i, 'china'],
+      [/香港|hong\s*kong/i, 'hongkong'],
+      [/澳門|澳门|macau|macao/i, 'macau']
     ];
     var i;
     for (i = 0; i < rules.length; i++) {
@@ -428,23 +544,111 @@
     return null;
   }
 
+  function countryCodeOf(countryId) {
+    var c = COUNTRIES[countryId];
+    return c && c.countryCode ? c.countryCode : '';
+  }
+
+  /**
+   * Canonical publish/filter shape (compatible with existing countryId/cityId schema).
+   * countryCode / regionKey are aliases for UI + tests; Firestore keeps countryId/cityId.
+   */
+  function toCanonicalTaxonomy(tax) {
+    tax = tax || {};
+    var countryId = tax.countryId || '';
+    var cityId = tax.cityId || '';
+    var cityName = tax.cityName || '';
+    return {
+      countryId: countryId,
+      countryCode: tax.countryCode || countryCodeOf(countryId),
+      countryName: tax.countryName || (COUNTRIES[countryId] && COUNTRIES[countryId].name) || '',
+      regionId: tax.regionId || '',
+      regionKey: tax.regionKey || cityId || tax.regionId || '',
+      regionName: tax.regionName || cityName || '',
+      cityId: cityId,
+      cityName: cityName,
+      locationRaw: tax.locationRaw || '',
+      locationSource: tax.locationSource || 'manual',
+      feedKind: tax.feedKind || (cityId ? 'city' : countryId ? 'country' : 'global'),
+      displayLabel: tax.displayLabel || cityName || tax.countryName || '',
+      chipLabel: tax.chipLabel || ''
+    };
+  }
+
+  /** Runtime normalize for posts (legacy location strings included). */
+  function normalizePostDestination(post) {
+    if (!post) {
+      return {
+        countryCode: '',
+        countryName: '',
+        regionKey: '',
+        regionName: '',
+        countryId: '',
+        cityId: ''
+      };
+    }
+    normalizePostTaxonomy(post);
+    if ((!post.countryId || !post.cityId) && (post.locationRaw || post.location || post.placeLabel)) {
+      var legacyRaw = post.locationRaw || post.location || post.placeLabel || '';
+      var resolved = resolveLocation(legacyRaw, { source: 'legacy' });
+      if (resolved.countryId && !post.countryId) {
+        post.countryId = resolved.countryId;
+        post.countryName = resolved.countryName;
+      }
+      if (resolved.cityId && !post.cityId) {
+        post.cityId = resolved.cityId;
+        post.cityName = resolved.cityName || post.cityName;
+      }
+      if (resolved.regionId && !post.regionId) {
+        post.regionId = resolved.regionId;
+        post.regionName = resolved.regionName;
+      }
+      post.locationSource = post.locationSource || 'legacy';
+    }
+    var canon = toCanonicalTaxonomy(post);
+    post.countryCode = canon.countryCode;
+    post.regionKey = canon.regionKey;
+    return canon;
+  }
+
   /** Normalize a Firestore post (lazy) — never mutates server unless caller writes back. */
   function normalizePostTaxonomy(post) {
     if (!post) return post;
     if (post.countryId && COUNTRIES[post.countryId]) {
       if (!post.countryName) post.countryName = COUNTRIES[post.countryId].name;
+      if (!post.countryCode) post.countryCode = COUNTRIES[post.countryId].countryCode || '';
       if (post.regionId && REGIONS[post.regionId] && !post.regionName) {
         post.regionName = REGIONS[post.regionId].name;
       }
       if (post.cityId && CITIES[post.cityId] && !post.cityName) {
         post.cityName = CITIES[post.cityId].cityName;
       }
+      if (post.cityId && !post.regionKey) post.regionKey = post.cityId;
       return post;
+    }
+    if (post.locationRaw || post.location) {
+      var fromLegacy = resolveLocation(post.locationRaw || post.location, { source: 'legacy' });
+      if (fromLegacy.countryId) {
+        post.countryId = post.countryId || fromLegacy.countryId;
+        post.countryName = post.countryName || fromLegacy.countryName;
+        post.countryCode = post.countryCode || countryCodeOf(post.countryId);
+      }
+      if (fromLegacy.cityId) {
+        post.cityId = post.cityId || fromLegacy.cityId;
+        post.cityName = post.cityName || fromLegacy.cityName;
+        post.regionKey = post.regionKey || fromLegacy.cityId;
+      }
+      if (fromLegacy.regionId) {
+        post.regionId = post.regionId || fromLegacy.regionId;
+        post.regionName = post.regionName || fromLegacy.regionName;
+      }
+      if (post.countryId) post.locationSource = post.locationSource || 'legacy';
     }
     var legacy = LEGACY_ENTRY[post.cityId];
     if (legacy) {
       post.countryId = legacy.countryId;
       post.countryName = legacy.countryName;
+      post.countryCode = countryCodeOf(legacy.countryId);
       post.regionId = legacy.regionId || '';
       post.regionName = legacy.regionName || '';
       if (!post.cityName) post.cityName = legacy.cityName || '';
@@ -455,9 +659,11 @@
       var rec = CITIES[post.cityId];
       post.countryId = rec.countryId;
       post.countryName = rec.countryName;
+      post.countryCode = countryCodeOf(rec.countryId);
       post.regionId = rec.regionId || '';
       post.regionName = rec.regionName || '';
       post.cityName = post.cityName || rec.cityName;
+      post.regionKey = post.cityId;
       post.locationSource = post.locationSource || 'migrated';
       return post;
     }
@@ -466,10 +672,25 @@
       if (guessed) {
         post.countryId = guessed.id;
         post.countryName = guessed.name;
+        post.countryCode = guessed.countryCode || '';
         post.locationSource = post.locationSource || 'migrated';
       }
     }
     return post;
+  }
+
+  function regionBelongsToCountry(regionNameOrId, countryId) {
+    if (!countryId) return false;
+    var id = String(regionNameOrId || '').trim();
+    if (!id) return false;
+    if (CITIES[id]) return CITIES[id].countryId === countryId;
+    var list = listCitySuggestions(countryId, '');
+    var i;
+    for (i = 0; i < list.length; i++) {
+      if (list[i].cityId === id || list[i].cityName === id) return true;
+    }
+    var resolved = resolveLocation(id, { countryId: countryId, source: 'check' });
+    return !!(resolved.cityId && resolved.countryId === countryId && CITIES[resolved.cityId]);
   }
 
   function resolveEntryCard(card) {
@@ -520,6 +741,10 @@
     LEGACY_ENTRY: LEGACY_ENTRY,
     resolveLocation: resolveLocation,
     normalizePostTaxonomy: normalizePostTaxonomy,
+    normalizePostDestination: normalizePostDestination,
+    toCanonicalTaxonomy: toCanonicalTaxonomy,
+    countryCodeOf: countryCodeOf,
+    regionBelongsToCountry: regionBelongsToCountry,
     resolveEntryCard: resolveEntryCard,
     formatChip: formatChip,
     slugifyCity: slugifyCity,

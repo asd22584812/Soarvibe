@@ -685,13 +685,172 @@ describe('POST / USER access', () => {
     await assertFails(
       updateDoc(doc(db, 'posts', POST_PUB), {
         media: [
-          { mediaId: 'a', src: 'https://example.com/a.webp' },
-          { mediaId: 'b', src: 'https://example.com/b.webp' },
-          { mediaId: 'c', src: 'https://example.com/c.webp' },
-          { mediaId: 'd', src: 'https://example.com/d.webp' }
+          { mediaId: 'a', src: 'https://example.com/a.webp', type: 'image/webp', sortOrder: 0 },
+          { mediaId: 'b', src: 'https://example.com/b.webp', type: 'image/webp', sortOrder: 1 },
+          { mediaId: 'c', src: 'https://example.com/c.webp', type: 'image/webp', sortOrder: 2 },
+          { mediaId: 'd', src: 'https://example.com/d.webp', type: 'image/webp', sortOrder: 3 }
         ],
         updatedAt: serverTimestamp()
       })
+    );
+  });
+});
+
+describe('P0 compose media + create payload rules', () => {
+  function deviceMediaFixture(overrides = {}) {
+    return {
+      mediaId: 'img_device_1',
+      src: 'https://soarvibe-api.soarvibe.workers.dev/api/city-shares/media/img_device_1.webp',
+      type: 'image/webp',
+      sortOrder: 0,
+      storagePath: 'city-shares/user_a/post_x/img_device_1.webp',
+      bytes: 120000,
+      width: 1280,
+      height: 960,
+      ...overrides
+    };
+  }
+
+  function devicePostFixture(overrides = {}) {
+    return publishedPost({
+      clientPublishId: 'pub_device_fixture_001',
+      media: [deviceMediaFixture()],
+      ...overrides
+    });
+  }
+
+  it('P0-1. media 1 image create PASS (device fixture)', async () => {
+    const db = dbAs(USER_A);
+    await assertSucceeds(setDoc(doc(db, 'posts', 'p0_media_1'), devicePostFixture()));
+  });
+
+  it('P0-2. media 3 images PASS', async () => {
+    const db = dbAs(USER_A);
+    await assertSucceeds(
+      setDoc(
+        doc(db, 'posts', 'p0_media_3'),
+        devicePostFixture({
+          media: [
+            deviceMediaFixture({ mediaId: 'a', sortOrder: 0 }),
+            deviceMediaFixture({ mediaId: 'b', sortOrder: 1, src: 'https://example.com/b.webp' }),
+            deviceMediaFixture({ mediaId: 'c', sortOrder: 2, src: 'https://example.com/c.webp' })
+          ]
+        })
+      )
+    );
+  });
+
+  it('P0-3. media 4 images DENY', async () => {
+    const db = dbAs(USER_A);
+    await assertFails(
+      setDoc(
+        doc(db, 'posts', 'p0_media_4'),
+        devicePostFixture({
+          media: [
+            deviceMediaFixture({ mediaId: 'a', sortOrder: 0 }),
+            deviceMediaFixture({ mediaId: 'b', sortOrder: 1 }),
+            deviceMediaFixture({ mediaId: 'c', sortOrder: 2 }),
+            deviceMediaFixture({ mediaId: 'd', sortOrder: 3 })
+          ]
+        })
+      )
+    );
+  });
+
+  it('P0-4. media metadata correct PASS', async () => {
+    const db = dbAs(USER_A);
+    await assertSucceeds(
+      setDoc(
+        doc(db, 'posts', 'p0_media_meta'),
+        devicePostFixture({
+          media: [
+            deviceMediaFixture({
+              slot: 'cover',
+              bytes: 500000,
+              width: 1600,
+              height: 1200
+            })
+          ]
+        })
+      )
+    );
+  });
+
+  it('P0-5. media unknown field DENY', async () => {
+    const db = dbAs(USER_A);
+    await assertFails(
+      setDoc(
+        doc(db, 'posts', 'p0_media_unknown'),
+        devicePostFixture({
+          media: [deviceMediaFixture({ downloadURL: 'https://evil.example/x.webp' })]
+        })
+      )
+    );
+  });
+
+  it('P0-6. countryId/cityId correct PASS', async () => {
+    const db = dbAs(USER_A);
+    await assertSucceeds(
+      setDoc(
+        doc(db, 'posts', 'p0_tax'),
+        devicePostFixture({
+          countryId: 'japan',
+          cityId: 'tokyo',
+          media: []
+        })
+      )
+    );
+  });
+
+  it('P0-7. clientPublishId correct PASS', async () => {
+    const db = dbAs(USER_A);
+    await assertSucceeds(
+      setDoc(
+        doc(db, 'posts', 'p0_client_pub'),
+        devicePostFixture({
+          clientPublishId: 'abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789',
+          media: []
+        })
+      )
+    );
+  });
+
+  it('P0-8. foreign author DENY', async () => {
+    const db = dbAs(USER_B);
+    await assertFails(
+      setDoc(
+        doc(db, 'posts', 'p0_foreign'),
+        devicePostFixture({ authorId: USER_A, media: [] })
+      )
+    );
+  });
+
+  it('P0-9. unauthenticated DENY', async () => {
+    const db = dbGuest();
+    await assertFails(setDoc(doc(db, 'posts', 'p0_guest'), devicePostFixture({ media: [] })));
+  });
+
+  it('P0-10. published create normal PASS', async () => {
+    const db = dbAs(USER_A);
+    await assertSucceeds(
+      setDoc(doc(db, 'posts', 'p0_published'), devicePostFixture({ status: 'published', media: [] }))
+    );
+  });
+
+  it('P0-11. get missing postId as signed-in → PASS (idempotency probe)', async () => {
+    const db = dbAs(USER_A);
+    await assertSucceeds(getDoc(doc(db, 'posts', 'does_not_exist_yet_p0')));
+  });
+
+  it('P0-12. media with imageId alias key DENY (not in allowlist)', async () => {
+    const db = dbAs(USER_A);
+    await assertFails(
+      setDoc(
+        doc(db, 'posts', 'p0_imageid'),
+        devicePostFixture({
+          media: [deviceMediaFixture({ imageId: 'dup' })]
+        })
+      )
     );
   });
 });
@@ -756,5 +915,135 @@ describe('city-shares-firestore.js API against emulator', () => {
       email: 'b@test.com'
     });
     await assert.rejects(() => api.addComment(POST_DRAFT, '草稿不該能留言內容要夠長'));
+  });
+});
+
+function featuredDoc(overrides = {}) {
+  return {
+    partner: 'Test Partner',
+    title: 'Test Banner',
+    bannerImageUrl: 'https://soarvibe-api.soarvibe.workers.dev/api/featured/media/object/p1/i1.webp',
+    bannerImagePath: 'featured/p1/i1.webp',
+    affiliateUrl: 'https://example.com/aff',
+    sortOrder: 1,
+    active: true,
+    startAt: null,
+    endAt: null,
+    ctaLabel: '查看詳情 →',
+    updatedBy: USER_A,
+    createdAt: Timestamp.now(),
+    updatedAt: Timestamp.now(),
+    ...overrides
+  };
+}
+
+describe('Featured Admin v1 — featuredPartners rules', () => {
+  function dbAdmin() {
+    return testEnv.authenticatedContext(USER_A, { admin: true }).firestore();
+  }
+
+  it('guest can read active featured partner', async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), 'featuredPartners', 'fp_active'), featuredDoc());
+    });
+    const guest = testEnv.unauthenticatedContext().firestore();
+    await assertSucceeds(getDoc(doc(guest, 'featuredPartners', 'fp_active')));
+  });
+
+  it('guest cannot read inactive featured partner', async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(
+        doc(ctx.firestore(), 'featuredPartners', 'fp_off'),
+        featuredDoc({ active: false })
+      );
+    });
+    const guest = testEnv.unauthenticatedContext().firestore();
+    await assertFails(getDoc(doc(guest, 'featuredPartners', 'fp_off')));
+  });
+
+  it('non-admin signed-in user cannot create featured partner', async () => {
+    const db = dbAs(USER_B);
+    await assertFails(
+      setDoc(doc(db, 'featuredPartners', 'fp_hack'), featuredDoc({ updatedBy: USER_B }))
+    );
+  });
+
+  it('admin UID allowlist can create featured partner (no claim)', async () => {
+    const ADMIN_UID = 'MzScaSfaPCUGC9mH8CPv5Qhnntc2';
+    const db = testEnv.authenticatedContext(ADMIN_UID).firestore();
+    await assertSucceeds(
+      setDoc(
+        doc(db, 'featuredPartners', 'fp_uid_allow'),
+        featuredDoc({ updatedBy: ADMIN_UID })
+      )
+    );
+  });
+
+  it('admin can get missing featured partner doc (create probe)', async () => {
+    const ADMIN_UID = 'MzScaSfaPCUGC9mH8CPv5Qhnntc2';
+    const db = testEnv.authenticatedContext(ADMIN_UID).firestore();
+    await assertSucceeds(getDoc(doc(db, 'featuredPartners', 'fp_missing_probe')));
+  });
+
+  it('guest cannot get missing featured partner doc', async () => {
+    const guest = testEnv.unauthenticatedContext().firestore();
+    await assertFails(getDoc(doc(guest, 'featuredPartners', 'fp_missing_guest')));
+  });
+
+  it('admin claim can create featured partner', async () => {
+    const db = dbAdmin();
+    await assertSucceeds(
+      setDoc(doc(db, 'featuredPartners', 'fp_ok'), featuredDoc({ updatedBy: USER_A }))
+    );
+  });
+
+  it('admin cannot activate without https affiliateUrl', async () => {
+    const db = dbAdmin();
+    await assertFails(
+      setDoc(
+        doc(db, 'featuredPartners', 'fp_bad_aff'),
+        featuredDoc({
+          updatedBy: USER_A,
+          active: true,
+          affiliateUrl: 'http://insecure.example/aff'
+        })
+      )
+    );
+  });
+
+  it('admin can save inactive with empty affiliateUrl', async () => {
+    const db = dbAdmin();
+    await assertSucceeds(
+      setDoc(
+        doc(db, 'featuredPartners', 'fp_draft'),
+        featuredDoc({
+          updatedBy: USER_A,
+          active: false,
+          affiliateUrl: ''
+        })
+      )
+    );
+  });
+
+  it('non-admin cannot update featured partner', async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), 'featuredPartners', 'fp_lock'), featuredDoc());
+    });
+    const db = dbAs(USER_B);
+    await assertFails(
+      updateDoc(doc(db, 'featuredPartners', 'fp_lock'), {
+        title: 'Hacked',
+        updatedBy: USER_B,
+        updatedAt: Timestamp.now()
+      })
+    );
+  });
+
+  it('admin can delete featured partner', async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), 'featuredPartners', 'fp_del'), featuredDoc());
+    });
+    const db = dbAdmin();
+    await assertSucceeds(deleteDoc(doc(db, 'featuredPartners', 'fp_del')));
   });
 });

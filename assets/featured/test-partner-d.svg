@@ -1,0 +1,16 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-label="TEST Partner D">
+  <defs>
+    <linearGradient id="g" x1="1" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fce7f3"/>
+      <stop offset="40%" stop-color="#f9a8d4"/>
+      <stop offset="100%" stop-color="#9d174d"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#g)"/>
+  <circle cx="980" cy="480" r="200" fill="rgba(255,255,255,0.18)"/>
+  <rect x="72" y="72" width="168" height="44" rx="22" fill="rgba(255,255,255,0.35)"/>
+  <text x="156" y="101" text-anchor="middle" fill="#831843" font-family="Arial,sans-serif" font-size="22" font-weight="700">TEST</text>
+  <text x="72" y="280" fill="#500724" font-family="Arial,sans-serif" font-size="64" font-weight="800">Partner D</text>
+  <text x="72" y="350" fill="#831843" font-family="Arial,sans-serif" font-size="30">Beauty / Lifestyle Demo</text>
+  <text x="72" y="560" fill="rgba(80,7,36,0.75)" font-family="Arial,sans-serif" font-size="24">SoarVibe Featured · Beta Test Banner</text>
+</svg>

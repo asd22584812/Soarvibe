@@ -13,6 +13,54 @@ service cloud.firestore {
       return signedIn() && request.auth.uid == uid;
     }
 
+    // Featured Admin v1 — NEVER use users/{uid}.isAdmin (client-writable).
+    // Grant via: Firebase custom claim admin:true AND/OR UID allowlist below.
+    // Mirror the same UIDs in Worker secret ADMIN_UIDS for media upload/delete.
+    function featuredAdminUids() {
+      return [
+        'MzScaSfaPCUGC9mH8CPv5Qhnntc2'
+      ];
+    }
+
+    function isFeaturedAdmin() {
+      return signedIn() && (
+        (request.auth.token.keys().hasAny(['admin'])
+          && request.auth.token.admin == true)
+        || request.auth.uid in featuredAdminUids()
+      );
+    }
+
+    function featuredAffiliateOk(data) {
+      return data.affiliateUrl is string
+        && data.affiliateUrl.size() > 0
+        && data.affiliateUrl.size() <= 2048
+        && data.affiliateUrl.matches('^https://.*');
+    }
+
+    function isValidFeaturedPartnerData() {
+      let d = request.resource.data;
+      return d.partner is string
+        && d.partner.size() > 0
+        && d.partner.size() <= 80
+        && d.title is string
+        && d.title.size() > 0
+        && d.title.size() <= 120
+        && d.bannerImageUrl is string
+        && d.bannerImageUrl.size() > 0
+        && d.bannerImageUrl.size() <= 2048
+        && d.affiliateUrl is string
+        && d.affiliateUrl.size() <= 2048
+        && d.sortOrder is number
+        && d.sortOrder >= 0
+        && d.sortOrder <= 9999
+        && d.active is bool
+        && (!('bannerImagePath' in d) || (d.bannerImagePath is string && d.bannerImagePath.size() <= 512))
+        && (!('ctaLabel' in d) || (d.ctaLabel is string && d.ctaLabel.size() <= 40))
+        && (!('startAt' in d) || d.startAt == null || d.startAt is timestamp)
+        && (!('endAt' in d) || d.endAt == null || d.endAt is timestamp)
+        && (!d.active || featuredAffiliateOk(d));
+    }
+
     function isValidNickname(name) {
       return name is string && name.size() > 0 && name.size() <= 32;
     }
@@ -153,22 +201,86 @@ service cloud.firestore {
         && request.resource.data.countryId.size() > 0
         && request.resource.data.countryId.size() <= 40
         && request.resource.data.cityId is string
+        && request.resource.data.cityId.size() > 0
         && request.resource.data.cityId.size() <= 40
+        && (
+          !('countryCode' in request.resource.data)
+          || (request.resource.data.countryCode is string
+              && request.resource.data.countryCode.size() <= 8)
+        )
+        && (
+          !('regionKey' in request.resource.data)
+          || (request.resource.data.regionKey is string
+              && request.resource.data.regionKey.size() <= 48)
+        )
         && request.resource.data.type is string
         && request.resource.data.status in ['published', 'draft']
         && request.resource.data.source == 'user'
         && request.resource.data.likeCount == 0
         && request.resource.data.commentCount == 0
         && request.resource.data.saveCount == 0
-        && (!('media' in request.resource.data)
-            || (request.resource.data.media is list
-                && request.resource.data.media.size() <= 3));
+        && mediaListValid()
+        && (
+          !('clientPublishId' in request.resource.data)
+          || (request.resource.data.clientPublishId is string
+              && request.resource.data.clientPublishId.size() > 0
+              && request.resource.data.clientPublishId.size() <= 64)
+        );
+    }
+
+    // Media allowlist — unknown keys DENY. Cap 3 images/post.
+    function isValidMediaItem(item) {
+      return item is map
+        && item.keys().hasOnly([
+          'mediaId',
+          'src',
+          'type',
+          'sortOrder',
+          'bytes',
+          'width',
+          'height',
+          'storagePath',
+          'slot'
+        ])
+        && item.mediaId is string
+        && item.mediaId.size() > 0
+        && item.mediaId.size() <= 128
+        && item.src is string
+        && item.src.size() > 0
+        && item.src.size() <= 2048
+        && item.type is string
+        && item.type.size() > 0
+        && item.type.size() <= 64
+        && item.sortOrder is int
+        && item.sortOrder >= 0
+        && item.sortOrder <= 2
+        && (!('bytes' in item) || (item.bytes is int && item.bytes >= 0 && item.bytes <= 5000000))
+        && (!('width' in item) || (item.width is int && item.width > 0 && item.width <= 10000))
+        && (!('height' in item) || (item.height is int && item.height > 0 && item.height <= 10000))
+        && (!('storagePath' in item)
+            || (item.storagePath is string && item.storagePath.size() <= 512))
+        && (!('slot' in item)
+            || (item.slot is string && item.slot.size() <= 32));
+    }
+
+    function mediaListValid() {
+      return !('media' in request.resource.data)
+        || (request.resource.data.media is list
+            && request.resource.data.media.size() <= 3
+            && request.resource.data.media.size() >= 0
+            && (
+              request.resource.data.media.size() == 0
+              || (request.resource.data.media.size() >= 1
+                  && isValidMediaItem(request.resource.data.media[0])
+                  && (request.resource.data.media.size() < 2
+                      || isValidMediaItem(request.resource.data.media[1]))
+                  && (request.resource.data.media.size() < 3
+                      || isValidMediaItem(request.resource.data.media[2])))
+            ));
     }
 
     function mediaWithinCap() {
-      return !('media' in request.resource.data)
-        || (request.resource.data.media is list
-            && request.resource.data.media.size() <= 3);
+      return mediaListValid();
     }
 
     // ------------------------------------------------------------------
@@ -222,7 +334,12 @@ service cloud.firestore {
     // posts/{postId}
     // ------------------------------------------------------------------
     match /posts/{postId} {
-      allow read: if isPublicPost() || isPostAuthor();
+      // Missing docs: signed-in get allowed so createPost idempotency probe works.
+      // List still requires an existing matching document (public or own).
+      allow get: if resource == null
+        || isPublicPost()
+        || isPostAuthor();
+      allow list: if isPublicPost() || isPostAuthor();
 
       allow create: if isValidPostCreate();
 
@@ -304,6 +421,27 @@ service cloud.firestore {
           && counterMovedBy(postId, 'commentCount', -1)
           && postAfter(postId).opCommentId == commentId;
       }
+    }
+
+    // ------------------------------------------------------------------
+    // featuredPartners/{partnerId} — SoarVibe Featured banners (Admin v1)
+    // Public reads active docs only; writes require isFeaturedAdmin().
+    // ------------------------------------------------------------------
+    match /featuredPartners/{partnerId} {
+      // Missing docs: admin-only (create probe). Existing: public active OR admin.
+      allow get: if (resource == null && isFeaturedAdmin())
+        || (resource != null && (resource.data.active == true || isFeaturedAdmin()));
+      allow list: if resource.data.active == true || isFeaturedAdmin();
+
+      allow create: if isFeaturedAdmin()
+        && isValidFeaturedPartnerData()
+        && request.resource.data.updatedBy == request.auth.uid;
+
+      allow update: if isFeaturedAdmin()
+        && isValidFeaturedPartnerData()
+        && request.resource.data.updatedBy == request.auth.uid;
+
+      allow delete: if isFeaturedAdmin();
     }
 
     // Default deny

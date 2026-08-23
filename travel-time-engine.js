@@ -803,59 +803,29 @@
   function buildPreviewFlightPrompt(normalized) {
     var plan = (normalized && normalized.previewPlan) || null;
     var lines = [
-      '【✈️ PREVIEW_TRIP_MODE——早去晚回示範行程／靈感規劃】',
-      '・這不是真實航班。禁止顯示假的航班編號。',
+      '【✈️ PREVIEW_TRIP_MODE——NO-FLIGHT PLANNING ASSUMPTION（早去晚回）】',
+      '・這不是真實航班。禁止顯示假的航班編號／航司／真實班表／terminal。',
+      '・無完整使用者航班 HARD：採用 EARLY ARRIVAL + LATE DEPARTURE 規劃假設。',
+      '・Day 1＝COMPLETE USABLE ARRIVAL DAY：早班抵達假設；不可假裝 08:30 已在市中心；也不可塌成半日。',
+      '・Final Day＝COMPLETE USABLE DEPARTURE DAY：晚班離境假設；保留有用白天後預留機場 buffer；不可一早就送機。',
+      '・中間日＝NORMAL USABLE FULL DAY，必須通過 DAY COMPLETENESS CONTRACT。',
+      '・USER HARD FLIGHT（若之後補上）優先於本假設。',
       '・' +
         (plan && plan.notice
           ? plan.notice
-          : '尚未填寫航班，本次先以早去晚回的預設時段規劃。實際訂票後補上航班資訊，可重新精準最佳化。')
+          : '尚未填寫航班。補上真實航班後可改套用抵達／離境 usable-window HARD。')
     ];
     if (plan) {
       lines.push(
-        '・預設去程出發（示範）：' +
-          plan.outboundDepartureHhmm +
-          '（' +
-          plan.originAirport +
-          '／' +
-          plan.originTimezone +
-          '）'
+        '・以下僅供「早去晚回」節奏靈感，不是 HARD，禁止當成真實班表顯示給使用者。'
       );
       lines.push(
-        '・預估飛行時間（deterministic）：' +
+        '・示範飛行時長概念（可忽略）：' +
           plan.flightDurationLabel +
           '（約 ' +
           plan.flightDurationMinutes +
           ' 分）'
       );
-      lines.push(
-        '・預估目的地當地抵達：' +
-          plan.estimatedArrivalHhmm +
-          '（已含時差；非使用者真實航班）'
-      );
-      lines.push(
-        '・入境／提行李 buffer ' +
-          plan.arrivalBufferMinutes +
-          ' 分＋機場→市區約 ' +
-          plan.airportTransferInMinutes +
-          ' 分 → Day1 最早一般行程 ' +
-          plan.earliestSightseeingHhmm
-      );
-      lines.push(
-        '・預設回程出發（示範）：' +
-          plan.returnDepartureHhmm +
-          '；最終日最晚離開市區約 ' +
-          plan.latestLeaveForAirportHhmm
-      );
-      if (plan.haul === 'short') {
-        lines.push(
-          '・亞洲近程 Preview：Day1 應在下午以前進入城市，下午／晚上正常行程；最終日上午／下午仍可安排，傍晚前往機場。'
-        );
-        lines.push('・禁止 Day1 晚上才抵達、禁止最終日一早就結束。');
-      } else if (plan.haul === 'long') {
-        lines.push(
-          '・長程目的地：依預估飛行時間調整 Day1 開始，不要硬套亞洲近程模板；仍禁止捏造真實航班。'
-        );
-      }
     }
     lines.push('・交通分鐘數僅能標示「預估」。');
     return lines.join('\n');
@@ -1053,18 +1023,7 @@
               title: it.title,
               startTime: it.startTime
             });
-            var stay = Math.max(
-              30,
-              (hhmmToMinutes(it.endTime) || start + 60) - start
-            );
-            it.startTime = normalized.buffers.earliestSightseeingHhmm;
-            it.endTime = addMinutesToHhmm(it.startTime, stay);
-            it.timeLabel = it.startTime + ' - ' + it.endTime;
-            fixes.push({
-              type: 'shift_after_buffer',
-              title: it.title,
-              to: it.startTime
-            });
+            // GUARDRAIL: flag only — do not shift Gemini times (caused arrival-day reorder)
           }
         });
       }
@@ -1087,16 +1046,7 @@
         if (isNaN(aEnd) || isNaN(bStart)) continue;
         if (bStart < aEnd) {
           issues.push({ type: 'overlap', day: day.dayNum, from: a.title, to: b.title });
-          // Shift using absolute end + gap, then write clock times
-          var newStartAbs = aEnd + needGap;
-          var bStay = Math.max(
-            25,
-            (itemAbsEnd(b) || bStart + 45) - bStart
-          );
-          b.startTime = minutesToHhmm(newStartAbs);
-          b.endTime = minutesToHhmm(newStartAbs + bStay);
-          b.timeLabel = b.startTime + ' - ' + b.endTime;
-          fixes.push({ type: 'fix_overlap', to: b.title, start: b.startTime });
+          // GUARDRAIL: Gemini owns schedule — do not rewrite / reorder stops.
           continue;
         }
         if (bStart - aEnd < needGap) {
@@ -1108,17 +1058,7 @@
             needMinutes: needGap,
             actualGap: bStart - aEnd
           });
-          var shiftedAbs = aEnd + needGap;
-          var stay2 = Math.max(25, (itemAbsEnd(b) || bStart + 45) - bStart);
-          b.startTime = minutesToHhmm(shiftedAbs);
-          b.endTime = minutesToHhmm(shiftedAbs + stay2);
-          b.timeLabel = b.startTime + ' - ' + b.endTime;
-          fixes.push({
-            type: 'insert_transfer_gap',
-            to: b.title,
-            minutes: needGap,
-            start: b.startTime
-          });
+          // GUARDRAIL: flag only (shifting previously created 00:xx mid-day corruption)
         }
       }
 
@@ -1141,14 +1081,7 @@
               title: it.title,
               endTime: it.endTime
             });
-            it.endTime = normalized.buffers.latestLeaveForAirportHhmm;
-            var st = hhmmToMinutes(it.startTime);
-            var en = hhmmToMinutes(it.endTime);
-            if (!isNaN(st) && !isNaN(en) && en <= st) {
-              it.startTime = addMinutesToHhmm(it.endTime, -40);
-            }
-            it.timeLabel = (it.startTime || '') + ' - ' + it.endTime;
-            fixes.push({ type: 'trim_for_airport', title: it.title, end: it.endTime });
+            // GUARDRAIL: flag only — do not truncate/shift Gemini times
           }
         });
       }

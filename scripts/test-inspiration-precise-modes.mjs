@@ -136,8 +136,12 @@ assert(indexHtml.includes('adv-sub-stay'), '住宿與交通 secondary accordion'
 assert(indexHtml.includes('z-index: 10050'), 'Auth modal 高於 City Shares');
 
 const cfg = fs.readFileSync(path.join(root, 'firebase-config.js'), 'utf8');
-assert(cfg.includes('AIzaSyCecAOqW264hYUxEdWOclotGU8Ci4VZKGE'), 'Firebase apiKey 大小寫已修正');
-assert(!cfg.includes('AIzaSyCecAOqW264HYUxEdWOclotGU8Ci4VZKGE'), '舊錯誤 apiKey 已移除');
+const apiKeyMatch = cfg.match(/apiKey:\s*'([^']+)'/);
+assert(!!apiKeyMatch, 'firebase-config 含 apiKey');
+assert(/^AIzaSy/.test(apiKeyMatch[1]), 'Firebase apiKey 形狀正確');
+assert(/hYUx/.test(apiKeyMatch[1]), 'Firebase apiKey 大小寫已修正');
+assert(!/HYUx/.test(apiKeyMatch[1]), '舊錯誤 apiKey 已移除');
+// Do not hard-code full Firebase apiKey literals in this test.
 
 const authUi = fs.readFileSync(path.join(root, 'soarvibe-auth-ui.js'), 'utf8');
 assert(authUi.includes('登入服務暫時無法使用，請稍後再試。'), 'Auth 人話錯誤');

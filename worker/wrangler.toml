@@ -42,3 +42,10 @@ bucket_name = "soarvibe-city-shares"
 [[kv_namespaces]]
 binding = "CITY_SHARES_LIMITS"
 id = "4e1aebea2565456797b5f47fd6aa846b"
+
+# Featured Admin v1 (banner upload/delete):
+#   wrangler secret put ADMIN_UIDS
+#   value = your Firebase Auth UID (comma-separated if multiple)
+# Also add the same UID to firestore.rules featuredAdminUids() OR set
+# custom claim admin:true on that user (never users/{uid}.isAdmin).
+# Featured images use the same R2 bucket under prefix featured/ (not city-shares/).

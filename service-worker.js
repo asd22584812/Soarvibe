@@ -1,4 +1,4 @@
-const CACHE_NAME = 'soarvibe-v155';
+const CACHE_NAME = 'soarvibe-v191'
 /* Phase 1C.1 cache bust ??travel ledger network-first + auth/config network-first */
 const STATIC_ASSETS = [
   './index.html',
@@ -12,6 +12,7 @@ const STATIC_ASSETS = [
   './city-shares-image.js',
   './city-shares-config.js',
   './city-shares-data.js',
+  './city-shares-demo-seeds.js',
   './city-shares-ui.js',
   './city-shares-ui.css',
   './city-journal-data.js',
@@ -24,6 +25,16 @@ const STATIC_ASSETS = [
   './travel-ledger-forex.js',
   './travel-ledger-data.js',
   './travel-ledger-ui.js',
+  './featured-partners.css',
+  './featured-partners.js',
+  './featured-partners-data.js',
+  './featured-admin.css',
+  './featured-admin.js',
+  './soarvibe-ui-icons.css',
+  './assets/featured/test-partner-a.svg',
+  './assets/featured/test-partner-b.svg',
+  './assets/featured/test-partner-c.svg',
+  './assets/featured/test-partner-d.svg',
   './assets/city-journal/manifest.json',
   './assets/city-journal/placeholder-city-journal.svg',
   './cover-photos/vietnam.jpg',

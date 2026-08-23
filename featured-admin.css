@@ -1,0 +1,325 @@
+/* SoarVibe Featured Admin v2 — avoid Font Awesome `.fa-*` class collisions */
+
+#soarvibeFeaturedAdmin {
+  position: fixed;
+  inset: 0;
+  z-index: 9997;
+  display: flex;
+  flex-direction: column;
+  background: #f3f6f7;
+  color: #263238;
+  width: 100%;
+  box-sizing: border-box;
+  /*
+   * Do NOT bind height to 100dvh / --soarvibe-vh.
+   * On iOS Safari/PWA, keyboard focus updates --soarvibe-vh to the shrunk
+   * visualViewport; a fixed shell that shrinks with it leaves body (#000)
+   * visible as a black band. inset:0 covers the layout viewport instead.
+   */
+  height: auto;
+  min-height: 0;
+  max-height: none;
+}
+
+#soarvibeFeaturedAdmin.hidden {
+  display: none !important;
+}
+
+#soarvibeFeaturedAdmin .svfa-chrome {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: calc(env(safe-area-inset-top, 0px) + 12px) 16px 10px;
+  background: #eef4f5;
+  border-bottom: 1px solid rgba(55, 71, 79, 0.12);
+}
+
+#soarvibeFeaturedAdmin .svfa-chrome-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+#soarvibeFeaturedAdmin .svfa-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+#soarvibeFeaturedAdmin .svfa-close,
+#soarvibeFeaturedAdmin .svfa-add-btn {
+  border: 0;
+  background: transparent;
+  line-height: 1;
+  padding: 8px;
+  color: #455a64;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+#soarvibeFeaturedAdmin .svfa-add-btn {
+  flex-shrink: 0;
+  border-radius: 9999px;
+  background: rgba(0, 137, 123, 0.12);
+  color: #00695c;
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 8px 12px;
+}
+
+#soarvibeFeaturedAdmin .svfa-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  padding: 12px 16px calc(env(safe-area-inset-bottom, 0px) + 24px);
+  max-width: 560px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+  background: #f3f6f7;
+}
+
+.featured-admin-open {
+  border: 0;
+  background: rgba(0, 137, 123, 0.12);
+  color: #00695c;
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 10px 14px;
+  min-height: 44px;
+  min-width: 52px;
+  border-radius: 9999px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.featured-admin-open.hidden {
+  display: none !important;
+}
+
+.featured-admin-status {
+  margin: 0 0 10px;
+  font-size: 0.85rem;
+  color: #546e7a;
+}
+
+.featured-admin-status.is-error {
+  color: #c62828;
+}
+
+.featured-admin-status.is-ok {
+  color: #2e7d32;
+  font-weight: 800;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(46, 125, 50, 0.1);
+}
+
+.featured-admin-list-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0 0 8px;
+}
+
+.featured-admin-list-label {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #546e7a;
+  letter-spacing: 0.02em;
+}
+
+.featured-admin-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.featured-admin-row {
+  text-align: left;
+  border: 1px solid rgba(55, 71, 79, 0.14);
+  background: #fff;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  color: #263238;
+  cursor: pointer;
+}
+
+.featured-admin-row.is-selected {
+  border-color: rgba(0, 137, 123, 0.45);
+  box-shadow: 0 0 0 2px rgba(0, 137, 123, 0.12);
+}
+
+.featured-admin-empty {
+  margin: 0;
+  font-size: 0.88rem;
+  color: #78909c;
+}
+
+.svfa-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 14px;
+  border: 1px solid rgba(55, 71, 79, 0.1);
+}
+
+.svfa-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.svfa-section-title {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #78909c;
+}
+
+.svfa-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #546e7a;
+}
+
+.svfa-form input[type='text'],
+.svfa-form input[type='url'],
+.svfa-form input[type='number'],
+.svfa-form input[type='datetime-local'],
+.svfa-form input[type='file'] {
+  font-size: 1rem;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(55, 71, 79, 0.2);
+  background: #fafcfc;
+  color: #263238;
+}
+
+/* Sort order: text + numeric keypad — avoid iOS type=number viewport quirks */
+#faSortOrder {
+  -webkit-appearance: none;
+  appearance: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.svfa-check {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 8px !important;
+  font-size: 0.95rem !important;
+  color: #263238 !important;
+}
+
+.svfa-check input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: #00897b;
+  flex-shrink: 0;
+}
+
+.svfa-preview-wrap {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #eceff1;
+  border: 1px solid rgba(55, 71, 79, 0.1);
+}
+
+.svfa-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  background: #eceff1;
+}
+
+.svfa-preview.hidden,
+.svfa-preview-wrap.hidden {
+  display: none !important;
+}
+
+.svfa-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.svfa-actions button {
+  flex: 1 1 auto;
+  min-width: 96px;
+  border: 0;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-weight: 800;
+  font-size: 0.92rem;
+  cursor: pointer;
+}
+
+#faSaveBtn {
+  background: #00897b;
+  color: #fff;
+}
+
+#faSaveBtn:disabled {
+  opacity: 0.72;
+  cursor: wait;
+}
+
+#faDeleteBtn {
+  background: #ffebee;
+  color: #c62828;
+}
+
+#faDeleteBtn:disabled,
+#faNewBtn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+#faDeleteBtn.hidden {
+  display: none !important;
+}
+
+.svfa-hint {
+  margin: 0;
+  font-size: 0.75rem;
+  color: #90a4ae;
+  line-height: 1.4;
+}
+
+.svfa-size-hint {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #00897b;
+  line-height: 1.4;
+}

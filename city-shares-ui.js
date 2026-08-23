@@ -22,6 +22,7 @@
     kyoto: { name: '京都', dest: '京都' },
     osaka: { name: '大阪', dest: '大阪' },
     seoul: { name: '首爾', dest: '首爾' },
+    busan: { name: '釜山', dest: '釜山' },
     hokkaido: { name: '北海道', dest: '北海道' },
     bangkok: { name: '曼谷', dest: '曼谷' },
     vietnam: { name: '越南', dest: '越南' },
@@ -40,12 +41,147 @@
     saved: false,
     comments: [],
     composeMedia: [],
+    /** Persistent composer draft — survives media pick / re-render */
+    composeDraft: null,
     feedScope: null,
     composeTaxonomy: null,
     composeLocked: false,
     composeNeedsCity: false,
-    composeNeedsCountry: false
+    composeNeedsCountry: false,
+    /** One publish operation per composer session */
+    isSubmitting: false,
+    isDeleting: false,
+    composePostId: null,
+    clientPublishId: null,
+    toastTimer: null,
+    /** Monotonic open generation — stale async must not paint after close/reopen */
+    shareOpenGeneration: 0,
+    feedAbort: null
   };
+
+  function emptyComposeDraft() {
+    return {
+      postId: null,
+      clientPublishId: null,
+      countryId: '',
+      regionId: '',
+      cityId: '',
+      cityName: '',
+      cityQuery: '',
+      type: 'sightseeing',
+      title: '',
+      body: '',
+      selectedMedia: []
+    };
+  }
+
+  function ensureComposeDraft() {
+    if (!csState.composeDraft) {
+      csState.composeDraft = emptyComposeDraft();
+    }
+    if (!Array.isArray(csState.composeDraft.selectedMedia)) {
+      csState.composeDraft.selectedMedia = [];
+    }
+    // Keep legacy alias in sync for media helpers
+    csState.composeMedia = csState.composeDraft.selectedMedia;
+    if (csState.composePostId) csState.composeDraft.postId = csState.composePostId;
+    if (csState.clientPublishId) csState.composeDraft.clientPublishId = csState.clientPublishId;
+    return csState.composeDraft;
+  }
+
+  function clearComposeDraft() {
+    var media = (csState.composeDraft && csState.composeDraft.selectedMedia) || csState.composeMedia || [];
+    media.forEach(function (m) {
+      if (m && m.previewUrl) {
+        try {
+          URL.revokeObjectURL(m.previewUrl);
+        } catch (e) {
+          /* silent */
+        }
+      }
+    });
+    csState.composeDraft = null;
+    csState.composeMedia = [];
+    csState.composePostId = null;
+    csState.clientPublishId = null;
+  }
+
+  function syncComposeDraftFromDom() {
+    var draft = ensureComposeDraft();
+    var titleEl = document.getElementById('csComposeTitle');
+    var bodyEl = document.getElementById('csComposeBody');
+    var typeEl = document.getElementById('csComposeType');
+    var countryEl = document.getElementById('csComposeCountryId');
+    var regionEl = document.getElementById('csComposeRegionId');
+    var cityIdEl = document.getElementById('csComposeCityId');
+    var cityNameEl = document.getElementById('csComposeCityName');
+    var cityQueryEl = document.getElementById('csComposeCityQuery');
+    if (titleEl) draft.title = String(titleEl.value || '');
+    if (bodyEl) draft.body = String(bodyEl.value || '');
+    if (typeEl) draft.type = String(typeEl.value || 'sightseeing');
+    if (countryEl) draft.countryId = String(countryEl.value || '');
+    if (regionEl) draft.regionId = String(regionEl.value || '');
+    if (cityIdEl) draft.cityId = String(cityIdEl.value || '');
+    if (cityNameEl) draft.cityName = String(cityNameEl.value || '');
+    if (cityQueryEl) draft.cityQuery = String(cityQueryEl.value || '');
+    draft.postId = csState.composePostId || draft.postId;
+    draft.clientPublishId = csState.clientPublishId || draft.clientPublishId;
+    draft.selectedMedia = csState.composeMedia || draft.selectedMedia || [];
+    csState.composeMedia = draft.selectedMedia;
+    return draft;
+  }
+
+  function bindComposeDraftInputs() {
+    var form = document.getElementById('csComposeForm');
+    if (!form || form._csDraftBound) return;
+    form._csDraftBound = true;
+    form.addEventListener('input', function (e) {
+      var t = e && e.target;
+      if (!t || !t.id) return;
+      if (
+        t.id === 'csComposeTitle' ||
+        t.id === 'csComposeBody' ||
+        t.id === 'csComposeType' ||
+        t.id === 'csComposeCountryId' ||
+        t.id === 'csComposeCityQuery' ||
+        t.id === 'csComposeCityId' ||
+        t.id === 'csComposeCityName' ||
+        t.id === 'csComposeRegionId'
+      ) {
+        syncComposeDraftFromDom();
+      }
+    });
+    form.addEventListener('change', function (e) {
+      var t = e && e.target;
+      if (!t || !t.id) return;
+      if (t.id === 'csComposeType' || t.id === 'csComposeCountryId') {
+        syncComposeDraftFromDom();
+      }
+    });
+  }
+
+  function friendlyPublishError(err, postId) {
+    var code = (err && (err.code || err.name)) || 'unknown';
+    var raw = String((err && err.message) || '');
+    var category = 'publish_failed';
+    if (code === 'permission-denied' || /insufficient permissions|permission/i.test(raw)) {
+      category = 'permission_denied';
+    }
+    try {
+      console.warn('[SOARVIBE] publish failed', {
+        category: category,
+        code: code,
+        postId: postId || null
+      });
+    } catch (logErr) {
+      /* silent */
+    }
+    if (category === 'permission_denied' || /insufficient permissions/i.test(raw)) {
+      return '發布失敗，內容已為你保留，請再試一次。';
+    }
+    if (raw && !/insufficient permissions/i.test(raw)) return raw;
+    return '發布失敗，內容已為你保留，請再試一次。';
+  }
 
   function locApi() {
     return global.SOARVIBE_CITY_SHARES_LOCATION || null;
@@ -112,7 +248,9 @@
   function postMatchesScope(post, scope) {
     if (!post || !scope) return false;
     var loc = locApi();
-    if (loc && loc.normalizePostTaxonomy) loc.normalizePostTaxonomy(post);
+    if (loc && loc.normalizePostDestination) loc.normalizePostDestination(post);
+    else if (loc && loc.normalizePostTaxonomy) loc.normalizePostTaxonomy(post);
+    // Canonical equality — never use fuzzy string includes on location labels.
     if (scope.feedKind === 'country' && scope.countryId) {
       return post.countryId === scope.countryId;
     }
@@ -219,13 +357,19 @@
     return list;
   }
 
-  function refreshRemoteFeed(cityId) {
+  function refreshRemoteFeed(cityId, options) {
     var a = api();
     var scope = csState.feedScope || buildScopeFromEntryId(cityId || csState.cityId);
+    var opts = options || {};
+    var requestId = opts.requestId;
     if (!a) {
       csState.remotePosts = [];
       return Promise.resolve([]);
     }
+    if (csState.feedAbort && typeof csState.feedAbort.abort === 'function') {
+      try { csState.feedAbort.abort(); } catch (eAbort) { /* silent */ }
+    }
+    csState.feedAbort = typeof AbortController !== 'undefined' ? new AbortController() : null;
     var loader =
       a.listFeedForScope
         ? a.listFeedForScope(scope)
@@ -234,14 +378,35 @@
           : Promise.resolve([]);
     return loader
       .then(function (posts) {
+        if (requestId != null && requestId !== csState.shareOpenGeneration) return null;
         csState.remotePosts = posts || [];
         return csState.remotePosts;
       })
       .catch(function (e) {
+        if (requestId != null && requestId !== csState.shareOpenGeneration) return null;
         console.warn('[SOARVIBE] remote city shares feed failed', e);
         csState.remotePosts = [];
-        return [];
+        throw e;
       });
+  }
+
+  function showCitySharesLoadError(cityId, postId, requestId) {
+    var viewport = document.getElementById('csViewport');
+    if (!viewport) return;
+    if (requestId != null && requestId !== csState.shareOpenGeneration) return;
+    viewport.innerHTML =
+      '<div class="cs-page">' +
+      '<div class="cs-empty">' +
+      '<p>這篇分享暫時載入失敗，請再試一次</p>' +
+      '<button type="button" class="cs-retry-btn" data-cs-retry="1">再試一次</button>' +
+      '</div></div>';
+    var btn = viewport.querySelector('[data-cs-retry]');
+    if (btn) {
+      btn.addEventListener('click', function () {
+        if (requestId != null && requestId !== csState.shareOpenGeneration) return;
+        openCityShares(cityId, postId || null);
+      });
+    }
   }
 
   function escapeHtml(str) {
@@ -283,61 +448,202 @@
     };
   }
 
-  function getCoverMedia(post) {
-    if (!post || !post.media || !post.media.length) return null;
-    var sorted = post.media.slice().sort(function (a, b) {
-      return (a.sortOrder || 0) - (b.sortOrder || 0);
-    });
-    return sorted[0];
+  function sortedMediaList(post) {
+    if (!post || !Array.isArray(post.media)) return [];
+    return post.media
+      .slice()
+      .sort(function (a, b) {
+        return (a.sortOrder || 0) - (b.sortOrder || 0);
+      })
+      .filter(function (m) {
+        return m && m.src;
+      })
+      .slice(0, MEDIA_MAX_PER_POST);
   }
 
-  function renderMediaBlock(media, altFallback) {
-    if (media && media.src) {
-      return (
-        '<img src="' +
-        escapeHtml(media.src) +
-        '" alt="' +
-        escapeHtml(media.alt || altFallback || '') +
-        '" loading="lazy" decoding="async" onerror="this.style.display=\'none\'">'
-      );
-    }
-    return '';
+  function getCoverMedia(post) {
+    var list = sortedMediaList(post);
+    return list.length ? list[0] : null;
+  }
+
+  function renderMediaBlock(media, altFallback, opts) {
+    opts = opts || {};
+    if (!(media && media.src)) return '';
+    return (
+      '<img src="' +
+      escapeHtml(media.src) +
+      '" alt="' +
+      escapeHtml(media.alt || altFallback || '') +
+      '" loading="lazy" decoding="async"' +
+      (opts.fit === 'contain' ? ' class="cs-media-img cs-media-img--contain"' : ' class="cs-media-img"') +
+      ' onerror="this.style.display=\'none\'">'
+    );
+  }
+
+  function renderCarousel(list, altFallback, opts) {
+    opts = opts || {};
+    var variant = opts.variant || 'detail';
+    if (!list || !list.length) return '';
+    var fit = opts.fit || (variant === 'detail' ? 'contain' : 'cover');
+    var slides = list
+      .map(function (m, idx) {
+        return (
+          '<div class="cs-media-slide" data-cs-media-index="' +
+          idx +
+          '" role="group" aria-label="照片 ' +
+          (idx + 1) +
+          ' / ' +
+          list.length +
+          '">' +
+          renderMediaBlock(m, altFallback, { fit: fit }) +
+          '</div>'
+        );
+      })
+      .join('');
+    var dots =
+      list.length > 1
+        ? '<div class="cs-media-dots" aria-hidden="true">' +
+          list
+            .map(function (_m, idx) {
+              return (
+                '<span class="cs-media-dot' +
+                (idx === 0 ? ' is-active' : '') +
+                '" data-cs-dot="' +
+                idx +
+                '"></span>'
+              );
+            })
+            .join('') +
+          '</div>'
+        : '';
+    var counter =
+      list.length > 1
+        ? '<div class="cs-media-counter" data-cs-counter aria-live="polite">1 / ' +
+          list.length +
+          '</div>'
+        : '';
+    return (
+      '<div class="cs-media-carousel cs-media-carousel--' +
+      escapeHtml(variant) +
+      '" data-cs-carousel data-cs-media-count="' +
+      list.length +
+      '">' +
+      '<div class="cs-media-track" data-cs-track>' +
+      slides +
+      '</div>' +
+      counter +
+      dots +
+      '</div>'
+    );
   }
 
   function renderMediaGallery(post) {
-    var list =
-      post && Array.isArray(post.media)
-        ? post.media
-            .slice()
-            .sort(function (a, b) {
-              return (a.sortOrder || 0) - (b.sortOrder || 0);
-            })
-            .filter(function (m) {
-              return m && m.src;
-            })
-            .slice(0, MEDIA_MAX_PER_POST)
-        : [];
+    var list = sortedMediaList(post);
     if (!list.length) return '';
-    if (list.length === 1) {
-      return (
-        '<div class="cs-detail-hero">' + renderMediaBlock(list[0], post.title) + '</div>'
-      );
+    return renderCarousel(list, post.title, { variant: 'detail', fit: 'contain' });
+  }
+
+  function showCsToast(text) {
+    var shell = document.getElementById('cityShares');
+    if (!shell) return;
+    var el = document.getElementById('csToast');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'csToast';
+      el.className = 'cs-toast';
+      el.setAttribute('role', 'status');
+      shell.appendChild(el);
     }
-    return (
-      '<div class="cs-detail-gallery cs-detail-gallery--' +
-      list.length +
-      '">' +
-      list
-        .map(function (m) {
-          return (
-            '<div class="cs-detail-gallery-item">' +
-            renderMediaBlock(m, post.title) +
-            '</div>'
-          );
-        })
-        .join('') +
-      '</div>'
-    );
+    el.textContent = text || '';
+    el.classList.add('is-visible');
+    if (csState.toastTimer) clearTimeout(csState.toastTimer);
+    csState.toastTimer = setTimeout(function () {
+      el.classList.remove('is-visible');
+    }, 1800);
+  }
+
+  function ensurePhotoViewer() {
+    var shell = document.getElementById('cityShares');
+    if (!shell) return null;
+    var viewer = document.getElementById('csPhotoViewer');
+    if (viewer) return viewer;
+    viewer = document.createElement('div');
+    viewer.id = 'csPhotoViewer';
+    viewer.className = 'cs-photo-viewer hidden';
+    viewer.setAttribute('aria-hidden', 'true');
+    viewer.innerHTML =
+      '<button type="button" class="cs-photo-viewer-close" id="csPhotoViewerClose" aria-label="關閉">✕</button>' +
+      '<div class="cs-photo-viewer-track" data-cs-viewer-track></div>' +
+      '<div class="cs-photo-viewer-counter" data-cs-viewer-counter></div>';
+    shell.appendChild(viewer);
+    return viewer;
+  }
+
+  function closePhotoViewer() {
+    var viewer = document.getElementById('csPhotoViewer');
+    if (!viewer) return;
+    viewer.classList.add('hidden');
+    viewer.setAttribute('aria-hidden', 'true');
+    var track = viewer.querySelector('[data-cs-viewer-track]');
+    if (track) track.innerHTML = '';
+  }
+
+  function openPhotoViewer(list, startIndex, altFallback) {
+    var viewer = ensurePhotoViewer();
+    if (!viewer || !list || !list.length) return;
+    var idx = Math.max(0, Math.min(list.length - 1, startIndex || 0));
+    var track = viewer.querySelector('[data-cs-viewer-track]');
+    var counter = viewer.querySelector('[data-cs-viewer-counter]');
+    track.innerHTML = list
+      .map(function (m, i) {
+        return (
+          '<div class="cs-photo-viewer-slide" data-cs-viewer-index="' +
+          i +
+          '">' +
+          renderMediaBlock(m, altFallback, { fit: 'contain' }) +
+          '</div>'
+        );
+      })
+      .join('');
+    viewer.classList.remove('hidden');
+    viewer.setAttribute('aria-hidden', 'false');
+    function syncCounter() {
+      if (!counter) return;
+      var slideW = track.clientWidth || 1;
+      var cur = Math.round(track.scrollLeft / slideW);
+      cur = Math.max(0, Math.min(list.length - 1, cur));
+      counter.textContent = list.length > 1 ? cur + 1 + ' / ' + list.length : '';
+    }
+    track.onscroll = syncCounter;
+    requestAnimationFrame(function () {
+      var slideW = track.clientWidth || 1;
+      track.scrollLeft = idx * slideW;
+      syncCounter();
+    });
+  }
+
+  function bindCarousel(root) {
+    if (!root) return;
+    var carousels = root.querySelectorAll('[data-cs-carousel]');
+    Array.prototype.forEach.call(carousels, function (carousel) {
+      var track = carousel.querySelector('[data-cs-track]');
+      var counter = carousel.querySelector('[data-cs-counter]');
+      var dots = carousel.querySelectorAll('[data-cs-dot]');
+      if (!track) return;
+      function sync() {
+        var count = parseInt(carousel.getAttribute('data-cs-media-count') || '1', 10) || 1;
+        var slideW = track.clientWidth || 1;
+        var cur = Math.round(track.scrollLeft / slideW);
+        cur = Math.max(0, Math.min(count - 1, cur));
+        if (counter) counter.textContent = cur + 1 + ' / ' + count;
+        Array.prototype.forEach.call(dots, function (dot, i) {
+          if (i === cur) dot.classList.add('is-active');
+          else dot.classList.remove('is-active');
+        });
+      }
+      track.addEventListener('scroll', sync, { passive: true });
+      sync();
+    });
   }
 
   function renderFeed(cityId) {
@@ -373,11 +679,11 @@
     } else {
       cardsHtml = posts
         .map(function (post) {
-          var cover = getCoverMedia(post);
+          var mediaList = sortedMediaList(post);
           var typeLabel = TYPE_LABELS[post.type] || post.type;
-          var mediaHtml = cover
+          var mediaHtml = mediaList.length
             ? '<div class="cs-card-media">' +
-              renderMediaBlock(cover, post.title) +
+              renderCarousel(mediaList, post.title, { variant: 'feed', fit: 'cover' }) +
               '<span class="cs-card-type">' +
               escapeHtml(typeLabel) +
               '</span></div>'
@@ -386,7 +692,7 @@
               '</span></div>';
           return (
             '<button type="button" class="cs-card' +
-            (cover ? '' : ' cs-card--text') +
+            (mediaList.length ? '' : ' cs-card--text') +
             '" data-cs-post="' +
             escapeHtml(post.postId) +
             '">' +
@@ -530,8 +836,11 @@
           '</form></section>'
         : '<p class="cs-comment-empty">官方精選可瀏覽；登入後按讚／收藏／留言請先「分享投稿」建立旅人貼文。</p>');
 
+    var hasMedia = sortedMediaList(post).length > 0;
     return (
-      '<div class="cs-page">' +
+      '<div class="cs-page cs-page--detail' +
+      (hasMedia ? ' cs-page--has-media' : ' cs-page--no-media') +
+      '">' +
       renderMediaGallery(post) +
       '<div class="cs-detail-body">' +
       '<span class="cs-detail-type">' +
@@ -571,181 +880,89 @@
     var loc = locApi();
     var scope = csState.feedScope;
     var itineraryText = resolveItineraryDestinationText();
-    var tax = null;
-    var locked = false;
-    var needsCity = false;
-    var needsCountry = false;
+    var tax = loc
+      ? loc.resolveLocation('', { source: 'manual' })
+      : { countryId: '', cityId: '', cityName: '', countryName: '', chipLabel: '' };
 
-    if (opts.fromItinerary && itineraryText && loc) {
+    // Homepage / itinerary destination = PREFILL only (never lock).
+    if (itineraryText && loc) {
       tax = loc.resolveLocation(itineraryText, { source: 'itinerary' });
-      if (tax.countryId && tax.cityId) {
-        locked = true;
-      } else if (tax.countryId) {
-        needsCity = true;
-      } else {
-        needsCountry = true;
-        needsCity = true;
-      }
-    } else if (scope && scope.feedKind === 'city' && scope.taxonomy && scope.taxonomy.cityId) {
+    } else if (scope && scope.taxonomy) {
       tax = Object.assign({}, scope.taxonomy);
-      tax.locationSource = 'card';
-      locked = true;
-    } else if (scope && scope.feedKind === 'region' && scope.taxonomy) {
-      tax = Object.assign({}, scope.taxonomy);
-      tax.locationSource = 'card';
-      if (itineraryText && loc) {
-        var it = loc.resolveLocation(itineraryText, {
-          countryId: tax.countryId,
-          regionId: tax.regionId,
-          source: 'itinerary'
-        });
-        if (it.cityId) {
-          tax = it;
-          locked = true;
-        } else {
-          needsCity = true;
-        }
-      } else {
-        needsCity = true;
-      }
-    } else if (scope && scope.feedKind === 'country' && scope.taxonomy) {
-      tax = Object.assign({}, scope.taxonomy);
-      tax.locationSource = 'card';
-      if (itineraryText && loc) {
-        var it2 = loc.resolveLocation(itineraryText, {
-          countryId: tax.countryId,
-          source: 'itinerary'
-        });
-        if (it2.countryId === tax.countryId && it2.cityId) {
-          tax = it2;
-          locked = true;
-        } else {
-          needsCity = true;
-        }
-      } else {
-        needsCity = true;
-      }
-    } else if (itineraryText && loc) {
-      tax = loc.resolveLocation(itineraryText, { source: 'itinerary' });
-      if (tax.countryId && tax.cityId) locked = true;
-      else if (tax.countryId) needsCity = true;
-      else {
-        needsCountry = true;
-        needsCity = true;
-      }
-    } else {
-      needsCountry = true;
-      needsCity = true;
-      tax = loc
-        ? loc.resolveLocation('', { source: 'manual' })
-        : { countryId: '', cityId: '', chipLabel: '' };
+      tax.locationSource = tax.locationSource || 'card';
     }
 
     csState.composeTaxonomy = tax;
-    csState.composeLocked = locked;
-    csState.composeNeedsCity = needsCity && !locked;
-    csState.composeNeedsCountry = needsCountry && !locked;
+    csState.composeLocked = false;
+    csState.composeNeedsCity = true;
+    csState.composeNeedsCountry = true;
+
+    if (!csState.composeDraft) csState.composeDraft = {};
+    var draft = csState.composeDraft;
+    if (tax.countryId && !draft.countryId) draft.countryId = tax.countryId;
+    if (tax.regionId && !draft.regionId) draft.regionId = tax.regionId;
+    if ((tax.cityName || tax.cityId) && !draft.cityQuery) {
+      draft.cityQuery = tax.cityName || tax.cityId;
+      draft.cityId = tax.cityId || '';
+      draft.cityName = tax.cityName || '';
+    }
     return tax;
   }
 
   function renderComposeLocationBlock() {
     var tax = csState.composeTaxonomy || {};
-    var locked = csState.composeLocked;
-    var needsCity = csState.composeNeedsCity;
-    var needsCountry = csState.composeNeedsCountry;
-    var chip = tax.chipLabel || '';
-    if (!chip && tax.cityName) {
-      chip =
-        '📍 ' +
-        [tax.cityName, tax.regionName, tax.countryName].filter(Boolean).join('・');
-    } else if (!chip && tax.countryName) {
-      chip = '📍 ' + tax.countryName;
-    }
-
-    if (locked) {
-      return (
-        '<div class="cs-compose-location is-locked">' +
-        '<p class="cs-compose-label">這趟去了哪裡？</p>' +
-        '<p class="cs-compose-location-chip" id="csComposeLocationChip">' +
-        escapeHtml(chip || '📍 已帶入目的地') +
-        '</p>' +
-        '<input type="hidden" id="csComposeCountryId" value="' +
-        escapeHtml(tax.countryId || '') +
-        '">' +
-        '<input type="hidden" id="csComposeRegionId" value="' +
-        escapeHtml(tax.regionId || '') +
-        '">' +
-        '<input type="hidden" id="csComposeCityId" value="' +
-        escapeHtml(tax.cityId || '') +
-        '">' +
-        '<input type="hidden" id="csComposeCityName" value="' +
-        escapeHtml(tax.cityName || '') +
-        '">' +
-        '</div>'
-      );
-    }
+    var draft = csState.composeDraft || {};
+    var countries = (locApi() && locApi().listCountries && locApi().listCountries()) || [];
+    var countryId = draft.countryId || tax.countryId || '';
+    var regionValue = draft.cityQuery || draft.cityName || tax.cityName || '';
 
     var html =
-      '<div class="cs-compose-location">' +
-      '<p class="cs-compose-label">📍 這趟去了哪裡？</p>';
-    if (chip && tax.countryId && !needsCountry) {
-      html +=
-        '<p class="cs-compose-location-chip">' + escapeHtml(chip) + '</p>';
-    }
-    if (needsCountry) {
-      var countries = (locApi() && locApi().listCountries && locApi().listCountries()) || [];
-      html +=
-        '<label class="cs-compose-label">國家／地區' +
-        '<select id="csComposeCountryId" class="cs-compose-input" required>' +
-        '<option value="">請選擇</option>' +
-        countries
-          .map(function (c) {
-            return (
-              '<option value="' +
-              escapeHtml(c.id) +
-              '"' +
-              (tax.countryId === c.id ? ' selected' : '') +
-              '>' +
-              escapeHtml(c.name) +
-              '</option>'
-            );
-          })
-          .join('') +
-        '</select></label>';
-    } else {
-      html +=
-        '<input type="hidden" id="csComposeCountryId" value="' +
-        escapeHtml(tax.countryId || '') +
-        '">';
-    }
-    html +=
+      '<div class="cs-compose-location" data-cs-location-editable="1">' +
+      '<p class="cs-compose-label">📍 這趟去了哪裡？</p>' +
+      '<label class="cs-compose-field-label" for="csComposeCountryId">國家' +
+      '<select id="csComposeCountryId" class="cs-compose-input" required aria-label="國家">' +
+      '<option value="">請選擇國家</option>' +
+      countries
+        .map(function (c) {
+          return (
+            '<option value="' +
+            escapeHtml(c.id) +
+            '"' +
+            (countryId === c.id ? ' selected' : '') +
+            '>' +
+            escapeHtml(c.name) +
+            '</option>'
+          );
+        })
+        .join('') +
+      '</select></label>' +
       '<input type="hidden" id="csComposeRegionId" value="' +
-      escapeHtml(tax.regionId || '') +
-      '">';
-    if (needsCity) {
-      html +=
-        '<label class="cs-compose-label">搜尋城市或地區' +
-        '<input id="csComposeCityQuery" class="cs-compose-input" list="csComposeCityList" placeholder="例如：名古屋、札幌、濟州、釜山" autocomplete="off">' +
-        '<datalist id="csComposeCityList"></datalist></label>' +
-        '<input type="hidden" id="csComposeCityId" value="">' +
-        '<input type="hidden" id="csComposeCityName" value="">';
-    } else {
-      html +=
-        '<input type="hidden" id="csComposeCityId" value="' +
-        escapeHtml(tax.cityId || '') +
-        '">' +
-        '<input type="hidden" id="csComposeCityName" value="' +
-        escapeHtml(tax.cityName || '') +
-        '">';
-    }
-    html += '</div>';
+      escapeHtml(draft.regionId || tax.regionId || '') +
+      '">' +
+      '<label class="cs-compose-field-label" for="csComposeCityQuery">地區' +
+      '<input id="csComposeCityQuery" class="cs-compose-input" list="csComposeCityList" placeholder="可選擇建議，也可直接輸入" autocomplete="off" value="' +
+      escapeHtml(regionValue) +
+      '" aria-label="地區" aria-autocomplete="list">' +
+      '<datalist id="csComposeCityList"></datalist></label>' +
+      '<input type="hidden" id="csComposeCityId" value="' +
+      escapeHtml(draft.cityId || tax.cityId || '') +
+      '">' +
+      '<input type="hidden" id="csComposeCityName" value="' +
+      escapeHtml(draft.cityName || tax.cityName || regionValue) +
+      '">' +
+      '<p class="cs-compose-location-hint">可從清單選擇，也可以輸入冷門地區名稱。</p>' +
+      '</div>';
     return html;
   }
 
   function renderCompose() {
-    var draftMedia = csState.composeMedia || [];
+    var draft = ensureComposeDraft();
+    var draftMedia = draft.selectedMedia || csState.composeMedia || [];
     var uploadOn = mediaUploadEnabled();
-    prepareComposeTaxonomy({ fromItinerary: true });
+    // Taxonomy is prepared once in openCompose — never reset on media re-render
+    if (!csState.composeTaxonomy) {
+      prepareComposeTaxonomy({ fromItinerary: true });
+    }
     var photosBlock;
     if (!uploadOn) {
       photosBlock =
@@ -788,6 +1005,7 @@
         thumbs +
         '</div>';
     }
+    var typeVal = draft.type || 'sightseeing';
     return (
       '<div class="cs-page cs-compose-page">' +
       '<p class="cs-compose-hint">發文後所有 SoarVibe 使用者都能看到。</p>' +
@@ -800,7 +1018,9 @@
           return (
             '<option value="' +
             escapeHtml(k) +
-            '">' +
+            '"' +
+            (k === typeVal ? ' selected' : '') +
+            '>' +
             escapeHtml(TYPE_LABELS[k]) +
             '</option>'
           );
@@ -808,9 +1028,13 @@
         .join('') +
       '</select></label>' +
       '<label class="cs-compose-label">標題' +
-      '<input id="csComposeTitle" class="cs-compose-input" maxlength="80" required placeholder="例如：惠比壽這碗柚子鹽值得排隊"></label>' +
+      '<input id="csComposeTitle" class="cs-compose-input" maxlength="80" required placeholder="例如：惠比壽這碗柚子鹽值得排隊" value="' +
+      escapeHtml(draft.title || '') +
+      '"></label>' +
       '<label class="cs-compose-label">心得' +
-      '<textarea id="csComposeBody" class="cs-compose-input" maxlength="600" rows="6" required placeholder="至少 20 字，分享真實體驗…"></textarea></label>' +
+      '<textarea id="csComposeBody" class="cs-compose-input" maxlength="600" rows="6" required placeholder="至少 20 字，分享真實體驗…">' +
+      escapeHtml(draft.body || '') +
+      '</textarea></label>' +
       photosBlock +
       '<p id="csComposeMsg" class="cs-compose-msg hidden"></p>' +
       '<button type="submit" class="cs-action-btn cs-action-primary">發布</button>' +
@@ -907,16 +1131,27 @@
 
   function renderCurrentView() {
     var viewport = document.getElementById('csViewport');
+    var shell = document.getElementById('cityShares');
     if (!viewport || !csState.cityId) return;
     if (csState.view === 'compose') {
       viewport.innerHTML = renderCompose();
       bindComposeLocationInputs();
+      bindComposeDraftInputs();
     } else if (csState.view === 'detail' && csState.postId) {
       viewport.innerHTML = renderDetail(findPost(csState.postId));
     } else {
       viewport.innerHTML = renderFeed(csState.cityId);
     }
+    if (shell) {
+      shell.classList.toggle('is-detail', csState.view === 'detail');
+      shell.classList.toggle('is-detail-no-media', false);
+      if (csState.view === 'detail' && csState.postId) {
+        var p = findPost(csState.postId);
+        shell.classList.toggle('is-detail-no-media', !(p && sortedMediaList(p).length));
+      }
+    }
     updateChrome();
+    bindCarousel(viewport);
   }
 
   function bindComposeLocationInputs() {
@@ -940,17 +1175,63 @@
     function applyQuery() {
       if (!queryEl || !locApi()) return;
       var countryId = countryEl ? countryEl.value : '';
-      var tax = locApi().resolveLocation(queryEl.value, {
+      var raw = String(queryEl.value || '').trim();
+      var tax = locApi().resolveLocation(raw, {
         countryId: countryId,
         source: 'search'
       });
-      if (cityIdEl) cityIdEl.value = tax.cityId || '';
-      if (cityNameEl) cityNameEl.value = tax.cityName || queryEl.value || '';
-      if (regionEl && tax.regionId) regionEl.value = tax.regionId;
-      if (countryEl && tax.countryId && countryEl.tagName === 'SELECT') {
-        countryEl.value = tax.countryId;
+      // Keep typed custom region even if unknown city — slugify under selected country.
+      if (raw && countryId && (!tax.cityId || (tax.countryId && tax.countryId !== countryId))) {
+        tax = locApi().resolveLocation(raw, {
+          countryId: countryId,
+          source: 'manual'
+        });
+        if (!tax.cityId && locApi().slugifyCity) {
+          tax.cityId = locApi().slugifyCity(raw);
+          tax.cityName = raw;
+          tax.countryId = countryId;
+          tax.countryName =
+            (locApi().COUNTRIES[countryId] && locApi().COUNTRIES[countryId].name) || '';
+          tax.feedKind = 'city';
+        }
       }
-      csState.composeTaxonomy = Object.assign({}, csState.composeTaxonomy || {}, tax);
+      if (cityIdEl) cityIdEl.value = tax.cityId || '';
+      if (cityNameEl) cityNameEl.value = tax.cityName || raw || '';
+      if (regionEl) regionEl.value = tax.regionId || '';
+      if (!csState.composeDraft) csState.composeDraft = {};
+      csState.composeDraft.cityQuery = raw;
+      csState.composeDraft.cityId = tax.cityId || '';
+      csState.composeDraft.cityName = tax.cityName || raw;
+      csState.composeDraft.countryId = countryId || tax.countryId || '';
+      csState.composeDraft.regionId = tax.regionId || '';
+      csState.composeTaxonomy = Object.assign({}, csState.composeTaxonomy || {}, tax, {
+        countryId: countryId || tax.countryId || ''
+      });
+    }
+    function clearIncompatibleRegion(newCountryId) {
+      var raw = queryEl ? String(queryEl.value || '').trim() : '';
+      if (!raw || !newCountryId || !locApi()) return;
+      var belongs =
+        locApi().regionBelongsToCountry &&
+        (locApi().regionBelongsToCountry(raw, newCountryId) ||
+          locApi().regionBelongsToCountry((cityIdEl && cityIdEl.value) || '', newCountryId));
+      if (!belongs) {
+        if (queryEl) queryEl.value = '';
+        if (cityIdEl) cityIdEl.value = '';
+        if (cityNameEl) cityNameEl.value = '';
+        if (regionEl) regionEl.value = '';
+        if (!csState.composeDraft) csState.composeDraft = {};
+        csState.composeDraft.cityQuery = '';
+        csState.composeDraft.cityId = '';
+        csState.composeDraft.cityName = '';
+        csState.composeDraft.regionId = '';
+        if (csState.composeTaxonomy) {
+          csState.composeTaxonomy.cityId = '';
+          csState.composeTaxonomy.cityName = '';
+          csState.composeTaxonomy.regionId = '';
+          csState.composeTaxonomy.regionName = '';
+        }
+      }
     }
     if (queryEl) {
       queryEl.addEventListener('input', function () {
@@ -962,15 +1243,23 @@
     }
     if (countryEl && countryEl.tagName === 'SELECT') {
       countryEl.addEventListener('change', function () {
+        var newCountryId = countryEl.value;
+        clearIncompatibleRegion(newCountryId);
         refreshSuggestions();
+        if (!csState.composeDraft) csState.composeDraft = {};
+        csState.composeDraft.countryId = newCountryId;
         if (csState.composeTaxonomy) {
-          csState.composeTaxonomy.countryId = countryEl.value;
+          csState.composeTaxonomy.countryId = newCountryId;
           var c =
             locApi() &&
             locApi().COUNTRIES &&
-            locApi().COUNTRIES[countryEl.value];
-          if (c) csState.composeTaxonomy.countryName = c.name;
+            locApi().COUNTRIES[newCountryId];
+          if (c) {
+            csState.composeTaxonomy.countryName = c.name;
+            csState.composeTaxonomy.countryCode = c.countryCode || '';
+          }
         }
+        applyQuery();
       });
     }
   }
@@ -980,6 +1269,7 @@
     var viewport = document.getElementById('csViewport');
     if (!shell || !viewport) return;
 
+    var requestId = ++csState.shareOpenGeneration;
     var scope = buildScopeFromEntryId(cityId);
     csState.feedScope = scope;
     csState.cityId = cityId;
@@ -1000,19 +1290,34 @@
     updateChrome();
     viewport.innerHTML = '<div class="cs-page"><p class="cs-empty">載入分享中…</p></div>';
 
-    refreshRemoteFeed(cityId).then(function () {
-      if (csState.view === 'detail' && csState.postId) {
-        return loadDetailExtras(csState.postId).then(function () {
-          renderCurrentView();
-        });
-      }
-      renderCurrentView();
-    });
+    refreshRemoteFeed(cityId, { requestId: requestId })
+      .then(function (posts) {
+        if (requestId !== csState.shareOpenGeneration) return;
+        if (posts === null) return;
+        if (csState.view === 'detail' && csState.postId) {
+          return loadDetailExtras(csState.postId).then(function () {
+            if (requestId !== csState.shareOpenGeneration) return;
+            renderCurrentView();
+          });
+        }
+        renderCurrentView();
+      })
+      .catch(function (err) {
+        if (requestId !== csState.shareOpenGeneration) return;
+        console.warn('[SOARVIBE] openCityShares failed', err);
+        showCitySharesLoadError(cityId, postId, requestId);
+      });
   }
 
   function closeCityShares() {
     var shell = document.getElementById('cityShares');
     if (!shell) return;
+    csState.shareOpenGeneration += 1;
+    if (csState.feedAbort && typeof csState.feedAbort.abort === 'function') {
+      try { csState.feedAbort.abort(); } catch (eCloseAbort) { /* silent */ }
+    }
+    csState.feedAbort = null;
+    closePhotoViewer();
     shell.classList.add('hidden');
     shell.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
@@ -1022,13 +1327,28 @@
     csState.typeFilter = 'all';
     csState.feedScope = null;
     csState.composeTaxonomy = null;
+    csState.isSubmitting = false;
+    csState.isDeleting = false;
+    csState.remotePosts = [];
+    csState.comments = [];
+    clearComposeDraft();
     clearHashIfShares();
+    var viewport = document.getElementById('csViewport');
+    if (viewport) viewport.innerHTML = '';
   }
 
   function goBackCityShares() {
+    var viewer = document.getElementById('csPhotoViewer');
+    if (viewer && !viewer.classList.contains('hidden')) {
+      closePhotoViewer();
+      return;
+    }
     if (csState.view === 'compose' && csState.cityId) {
+      clearComposeDraft();
       csState.view = 'feed';
       csState.postId = null;
+      csState.isSubmitting = false;
+      csState.composeTaxonomy = null;
       renderCurrentView();
       setHash(csState.cityId, null);
       return;
@@ -1073,7 +1393,17 @@
       }
       csState.view = 'compose';
       csState.postId = null;
-      if (!Array.isArray(csState.composeMedia)) csState.composeMedia = [];
+      csState.isSubmitting = false;
+      // Fresh composer session — new draft (keeps nothing from prior cancel/success)
+      clearComposeDraft();
+      ensureComposeDraft();
+      prepareComposeTaxonomy({ fromItinerary: true });
+      var tax = csState.composeTaxonomy || {};
+      var draft = ensureComposeDraft();
+      draft.countryId = tax.countryId || '';
+      draft.regionId = tax.regionId || '';
+      draft.cityId = tax.cityId || '';
+      draft.cityName = tax.cityName || '';
       renderCurrentView();
     }
     function gate() {
@@ -1295,20 +1625,38 @@
       return;
     }
     if (!a || !csState.postId) return;
+    if (csState.isDeleting) return;
     if (!confirm('確定刪除這篇貼文？留言與按讚也會一併無法瀏覽。')) return;
+
     var cityId = csState.cityId;
-    a.deletePost(csState.postId)
+    var postId = csState.postId;
+    var removedSnapshot = findPost(postId);
+    csState.isDeleting = true;
+
+    // Optimistic UI: leave detail immediately (< 300ms feel).
+    csState.remotePosts = (csState.remotePosts || []).filter(function (p) {
+      return !(p && p.postId === postId);
+    });
+    csState.view = 'feed';
+    csState.postId = null;
+    setHash(cityId, null);
+    renderCurrentView();
+    showCsToast('貼文已刪除');
+
+    a.deletePost(postId)
       .then(function () {
         return refreshRemoteFeed(cityId);
       })
-      .then(function () {
-        csState.view = 'feed';
-        csState.postId = null;
-        setHash(cityId, null);
-        renderCurrentView();
-      })
       .catch(function (err) {
-        alert((err && err.message) || '刪除失敗');
+        // Firestore soft-remove failed → restore
+        if (removedSnapshot) {
+          csState.remotePosts = (csState.remotePosts || []).concat([removedSnapshot]);
+        }
+        renderCurrentView();
+        alert((err && err.message) || '刪除失敗，請再試一次。');
+      })
+      .then(function () {
+        csState.isDeleting = false;
       });
   }
 
@@ -1316,8 +1664,12 @@
     if (!mediaUploadEnabled()) return;
     var files = Array.prototype.slice.call(fileList || []);
     if (!files.length) return;
-    if (!Array.isArray(csState.composeMedia)) csState.composeMedia = [];
-    var room = Math.max(0, MEDIA_MAX_PER_POST - csState.composeMedia.length);
+    // Capture title/body/type before any async work / re-render
+    syncComposeDraftFromDom();
+    var draft = ensureComposeDraft();
+    if (!Array.isArray(draft.selectedMedia)) draft.selectedMedia = [];
+    csState.composeMedia = draft.selectedMedia;
+    var room = Math.max(0, MEDIA_MAX_PER_POST - draft.selectedMedia.length);
     if (!room) {
       alert('每篇最多 ' + MEDIA_MAX_PER_POST + ' 張照片');
       return;
@@ -1333,7 +1685,7 @@
     var chain = Promise.resolve();
     picked.forEach(function (file) {
       chain = chain.then(function () {
-        if (csState.composeMedia.length >= MEDIA_MAX_PER_POST) return null;
+        if (draft.selectedMedia.length >= MEDIA_MAX_PER_POST) return null;
         if (!file) return null;
         if (imgApi && typeof imgApi.isAcceptedInput === 'function' && !imgApi.isAcceptedInput(file)) {
           alert('請選擇 JPG、PNG、WebP 或 iPhone 照片');
@@ -1358,14 +1710,14 @@
             alert(text);
             return null;
           }
-          if (csState.composeMedia.length >= MEDIA_MAX_PER_POST) return null;
+          if (draft.selectedMedia.length >= MEDIA_MAX_PER_POST) return null;
           var previewUrl = '';
           try {
             previewUrl = URL.createObjectURL(result.blob || result.file);
           } catch (e) {
             previewUrl = '';
           }
-          csState.composeMedia.push({
+          draft.selectedMedia.push({
             file: result.file || result.blob,
             imageId: result.imageId,
             previewUrl: previewUrl,
@@ -1374,6 +1726,7 @@
             width: result.width,
             height: result.height
           });
+          csState.composeMedia = draft.selectedMedia;
           return null;
         });
       });
@@ -1398,27 +1751,32 @@
 
   function handleComposeSubmit() {
     var a = api();
-    var titleEl = document.getElementById('csComposeTitle');
-    var bodyEl = document.getElementById('csComposeBody');
-    var typeEl = document.getElementById('csComposeType');
-    var countryEl = document.getElementById('csComposeCountryId');
-    var regionEl = document.getElementById('csComposeRegionId');
-    var cityIdEl = document.getElementById('csComposeCityId');
-    var cityNameEl = document.getElementById('csComposeCityName');
-    var cityQueryEl = document.getElementById('csComposeCityQuery');
     var msg = document.getElementById('csComposeMsg');
+    var submitBtn = document.querySelector('#csComposeForm button[type="submit"]');
     if (!a) return;
+    if (csState.isSubmitting) return;
+
+    var draft = syncComposeDraftFromDom();
+
+    function setSubmitting(on) {
+      csState.isSubmitting = !!on;
+      if (submitBtn) {
+        submitBtn.disabled = !!on;
+        submitBtn.setAttribute('aria-busy', on ? 'true' : 'false');
+      }
+    }
+
     if (msg) {
       msg.textContent = '發布中…';
       msg.classList.remove('hidden');
     }
     var uploadOn = mediaUploadEnabled();
-    var mediaDraft = uploadOn ? (csState.composeMedia || []).slice(0, MEDIA_MAX_PER_POST) : [];
-    var countryId = countryEl ? String(countryEl.value || '').trim() : '';
-    var regionId = regionEl ? String(regionEl.value || '').trim() : '';
-    var cityId = cityIdEl ? String(cityIdEl.value || '').trim() : '';
-    var cityName = cityNameEl ? String(cityNameEl.value || '').trim() : '';
-    var cityQuery = cityQueryEl ? String(cityQueryEl.value || '').trim() : '';
+    var mediaDraft = uploadOn ? (draft.selectedMedia || []).slice(0, MEDIA_MAX_PER_POST) : [];
+    var countryId = String(draft.countryId || '').trim();
+    var regionId = String(draft.regionId || '').trim();
+    var cityId = String(draft.cityId || '').trim();
+    var cityName = String(draft.cityName || '').trim();
+    var cityQuery = String(draft.cityQuery || '').trim();
     if (!cityId && cityQuery && locApi()) {
       var resolved = locApi().resolveLocation(cityQuery, {
         countryId: countryId,
@@ -1428,67 +1786,101 @@
       cityName = resolved.cityName || cityQuery;
       if (resolved.countryId) countryId = resolved.countryId;
       if (resolved.regionId) regionId = resolved.regionId;
+      draft.cityId = cityId;
+      draft.cityName = cityName;
+      draft.countryId = countryId;
+      draft.regionId = regionId;
     }
     if (!countryId) {
       if (msg) {
-        msg.textContent = '請選擇國家／地區';
+        msg.textContent = '請選擇國家';
         msg.classList.remove('hidden');
       }
       return;
     }
-    if (csState.composeNeedsCity && !cityId && !cityQuery) {
+    if (!cityId && !cityQuery) {
       if (msg) {
-        msg.textContent = '請輸入這趟去了哪裡';
+        msg.textContent = '請選擇或輸入地區';
         msg.classList.remove('hidden');
       }
       return;
     }
+    if (!cityId && cityQuery && locApi() && locApi().slugifyCity) {
+      cityId = locApi().slugifyCity(cityQuery);
+      cityName = cityQuery;
+      draft.cityId = cityId;
+      draft.cityName = cityName;
+    }
+
+    // Allocate one postId / clientPublishId for this composer session (retry-safe).
+    if (!csState.composePostId && a.allocatePostId) {
+      try {
+        csState.composePostId = a.allocatePostId();
+      } catch (allocErr) {
+        csState.composePostId = null;
+      }
+    }
+    if (!csState.clientPublishId) {
+      try {
+        csState.clientPublishId =
+          global.crypto && global.crypto.randomUUID
+            ? global.crypto.randomUUID().replace(/-/g, '')
+            : 'pub' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+      } catch (idErr) {
+        csState.clientPublishId = 'pub' + Date.now();
+      }
+    }
+    draft.postId = csState.composePostId;
+    draft.clientPublishId = csState.clientPublishId;
+
     var payload = {
-      title: titleEl ? titleEl.value : '',
-      body: bodyEl ? bodyEl.value : '',
+      postId: csState.composePostId || undefined,
+      clientPublishId: csState.clientPublishId,
+      title: draft.title || '',
+      body: draft.body || '',
       countryId: countryId,
+      countryCode:
+        (locApi() && locApi().countryCodeOf && locApi().countryCodeOf(countryId)) || '',
+      countryName:
+        (csState.composeTaxonomy && csState.composeTaxonomy.countryName) ||
+        (locApi() && locApi().COUNTRIES && locApi().COUNTRIES[countryId] && locApi().COUNTRIES[countryId].name) ||
+        '',
       regionId: regionId,
+      regionKey: cityId,
+      regionName: cityName || cityQuery,
       cityId: cityId,
       cityName: cityName || cityQuery,
       locationRaw: cityQuery || cityName || cityId,
-      locationSource: csState.composeLocked
-        ? (csState.composeTaxonomy && csState.composeTaxonomy.locationSource) || 'card'
-        : cityQuery
-          ? 'search'
-          : 'manual',
-      type: typeEl ? typeEl.value : 'sightseeing',
+      locationSource: cityQuery ? 'search' : 'manual',
+      type: draft.type || 'sightseeing',
       media: [],
       mediaFiles: uploadOn
-        ? mediaDraft.map(function (m) {
-            return m.imageId ? { file: m.file, imageId: m.imageId } : m.file;
+        ? mediaDraft.map(function (m, idx) {
+            var file = m.imageId ? { file: m.file, imageId: m.imageId } : m.file;
+            if (file && typeof file === 'object' && file.file) {
+              file.sortOrder = idx;
+              if (m.width) file.width = m.width;
+              if (m.height) file.height = m.height;
+            }
+            return file;
           })
         : []
     };
     if (csState.composeTaxonomy) {
-      if (!payload.countryName && csState.composeTaxonomy.countryName) {
-        payload.countryName = csState.composeTaxonomy.countryName;
-      }
       if (!payload.regionName && csState.composeTaxonomy.regionName) {
         payload.regionName = csState.composeTaxonomy.regionName;
       }
     }
+
+    setSubmitting(true);
     a.createPost(payload)
       .then(function (post) {
-        (csState.composeMedia || []).forEach(function (m) {
-          if (m && m.previewUrl) {
-            try {
-              URL.revokeObjectURL(m.previewUrl);
-            } catch (e) {
-              /* silent */
-            }
-          }
-        });
-        csState.composeMedia = [];
+        clearComposeDraft();
+        csState.composeTaxonomy = null;
         var feedKey = csState.cityId;
         if (post.countryId && csState.feedScope && csState.feedScope.feedKind === 'country') {
           feedKey = csState.feedScope.entryId;
         } else if (post.cityId) {
-          // Stay on current feed if post belongs; else jump to city feed
           if (csState.feedScope && postMatchesScope(post, csState.feedScope)) {
             feedKey = csState.cityId;
           } else {
@@ -1502,10 +1894,14 @@
         });
       })
       .catch(function (err) {
+        // Keep draft (title/body/media/ids) so user can retry
         if (msg) {
-          msg.textContent = (err && err.message) || '發布失敗';
+          msg.textContent = friendlyPublishError(err, csState.composePostId);
           msg.classList.remove('hidden');
         }
+      })
+      .then(function () {
+        setSubmitting(false);
       });
   }
 
@@ -1600,8 +1996,34 @@
       }
       var cardBtn = e.target.closest('[data-cs-post]');
       if (cardBtn) {
+        // Ignore taps that began as a horizontal swipe on a feed carousel.
+        if (e.target.closest('[data-cs-track]') && cardBtn.getAttribute('data-cs-swiping') === '1') {
+          cardBtn.removeAttribute('data-cs-swiping');
+          e.preventDefault();
+          return;
+        }
         e.preventDefault();
         openCityShareDetail(cardBtn.getAttribute('data-cs-post'));
+        return;
+      }
+      var mediaSlide = e.target.closest('.cs-media-slide[data-cs-media-index]');
+      if (mediaSlide && mediaSlide.closest('.cs-media-carousel--detail')) {
+        e.preventDefault();
+        e.stopPropagation();
+        var detailPost = findPost(csState.postId);
+        var list = sortedMediaList(detailPost);
+        var startIdx = parseInt(mediaSlide.getAttribute('data-cs-media-index'), 10) || 0;
+        openPhotoViewer(list, startIdx, detailPost && detailPost.title);
+        return;
+      }
+      if (e.target.id === 'csPhotoViewerClose' || e.target.closest('#csPhotoViewerClose')) {
+        e.preventDefault();
+        closePhotoViewer();
+        return;
+      }
+      if (e.target.id === 'csPhotoViewer') {
+        e.preventDefault();
+        closePhotoViewer();
         return;
       }
       if (e.target.id === 'csComposeOpenBtn' || e.target.closest('#csComposeOpenBtn') || e.target.id === 'csComposeBtn') {
@@ -1617,9 +2039,11 @@
       var removeMedia = e.target.closest('[data-cs-remove-media]');
       if (removeMedia) {
         e.preventDefault();
+        syncComposeDraftFromDom();
+        var draftRm = ensureComposeDraft();
         var rmIdx = parseInt(removeMedia.getAttribute('data-cs-remove-media'), 10);
-        if (!isNaN(rmIdx) && Array.isArray(csState.composeMedia)) {
-          var removed = csState.composeMedia.splice(rmIdx, 1)[0];
+        if (!isNaN(rmIdx) && Array.isArray(draftRm.selectedMedia)) {
+          var removed = draftRm.selectedMedia.splice(rmIdx, 1)[0];
           if (removed && removed.previewUrl) {
             try {
               URL.revokeObjectURL(removed.previewUrl);
@@ -1627,6 +2051,7 @@
               /* silent */
             }
           }
+          csState.composeMedia = draftRm.selectedMedia;
           renderCurrentView();
         }
         return;
@@ -1686,6 +2111,33 @@
       }
     });
 
+    // Feed carousel: mark horizontal swipes so card click does not open detail.
+    var swipeStartX = 0;
+    shell.addEventListener(
+      'touchstart',
+      function (e) {
+        var track = e.target.closest('[data-cs-track]');
+        if (!track) return;
+        swipeStartX = e.touches && e.touches[0] ? e.touches[0].clientX : 0;
+        var card = track.closest('[data-cs-post]');
+        if (card) card.removeAttribute('data-cs-swiping');
+      },
+      { passive: true }
+    );
+    shell.addEventListener(
+      'touchmove',
+      function (e) {
+        var track = e.target.closest('[data-cs-track]');
+        if (!track || !e.touches || !e.touches[0]) return;
+        var dx = Math.abs(e.touches[0].clientX - swipeStartX);
+        if (dx > 12) {
+          var card = track.closest('[data-cs-post]');
+          if (card) card.setAttribute('data-cs-swiping', '1');
+        }
+      },
+      { passive: true }
+    );
+
     shell.addEventListener('submit', function (e) {
       if (e.target && e.target.id === 'csCommentForm') {
         e.preventDefault();
@@ -1719,6 +2171,11 @@
 
     document.addEventListener('keydown', function (e) {
       if (e.key !== 'Escape' || shell.classList.contains('hidden')) return;
+      var viewer = document.getElementById('csPhotoViewer');
+      if (viewer && !viewer.classList.contains('hidden')) {
+        closePhotoViewer();
+        return;
+      }
       if (csState.view === 'detail') goBackCityShares();
       else closeCityShares();
     });
@@ -1794,6 +2251,31 @@
   global.openCityShareComposer = openCityShareComposer;
   global.closeCityShares = closeCityShares;
   global.openCityDestination = openCityDestination;
+  /** Test hooks (City Shares UX P0 / P0.4) */
+  global.SOARVIBE_CITY_SHARES_UI_TEST = {
+    sortedMediaList: sortedMediaList,
+    renderCarousel: renderCarousel,
+    renderMediaGallery: renderMediaGallery,
+    prepareComposeTaxonomy: prepareComposeTaxonomy,
+    renderComposeLocationBlock: renderComposeLocationBlock,
+    postMatchesScope: postMatchesScope,
+    buildScopeFromEntryId: buildScopeFromEntryId,
+    getState: function () {
+      return csState;
+    },
+    setSubmitting: function (v) {
+      csState.isSubmitting = !!v;
+    },
+    isSubmitting: function () {
+      return !!csState.isSubmitting;
+    },
+    resetComposeForTest: function () {
+      csState.composeTaxonomy = null;
+      csState.composeDraft = null;
+      csState.composeLocked = false;
+      csState.feedScope = null;
+    }
+  };
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initCityShares);

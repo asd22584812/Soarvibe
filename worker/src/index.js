@@ -23,12 +23,18 @@ import {
   isCitySharesMediaPath,
   routeCitySharesMedia
 } from './city-shares-media.js';
+import {
+  isFeaturedMediaPath,
+  routeFeaturedMedia
+} from './featured-media.js';
+import { handleRoutesDuration } from './routes-duration.js';
 
 const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta/models/';
 const DEFAULT_MODEL = 'gemini-2.5-flash';
 const CORS_HEADERS = {
   'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-SOARVIBE-Token, X-Post-Id, X-Image-Id',
+  'Access-Control-Allow-Headers':
+    'Content-Type, Authorization, X-SOARVIBE-Token, X-Post-Id, X-Image-Id, X-Partner-Id',
   'Access-Control-Max-Age': '86400'
 };
 
@@ -241,11 +247,16 @@ async function handleGemini(request, env, auth) {
   var startIdx = pickRoundRobinStartIndex(keys.length);
   var lastFailure = null;
   var keysTried = 0;
+  var lastKeySlot = null;
+  var cf = request.cf || {};
+  var executionColo = cf.colo || null;
+  var inboundCountry = cf.country || null;
 
   for (var attempt = 0; attempt < keys.length; attempt++) {
     var keyIndex = (startIdx + attempt) % keys.length;
     var apiKey = keys[keyIndex];
     keysTried++;
+    lastKeySlot = keyIndex + 1;
     var upstream = await callGeminiUpstream(prompt, modelId, apiKey);
 
     if (upstream.ok) {
@@ -282,6 +293,23 @@ async function handleGemini(request, env, auth) {
     if (status === 503 || status === 500 || status === 502 || status === 529) {
       continue;
     }
+    // Location / FAILED_PRECONDITION may be key-specific — try remaining keys.
+    var msg = '';
+    try {
+      msg = String(
+        (result && result.error && result.error.message) ||
+        (result && result.message) ||
+        ''
+      );
+    } catch (e) {
+      msg = '';
+    }
+    if (
+      status === 400 &&
+      /User location is not supported|FAILED_PRECONDITION|not supported for the API use/i.test(msg)
+    ) {
+      continue;
+    }
     break;
   }
 
@@ -291,6 +319,10 @@ async function handleGemini(request, env, auth) {
       message: 'All Gemini keys exhausted',
       keysTried: keysTried,
       keyTotal: keys.length,
+      keySlot: lastKeySlot,
+      executionColo: executionColo,
+      inboundCountry: inboundCountry,
+      timestamp: new Date().toISOString(),
       details: lastFailure.result
     }, 429, auth.origin, env);
   }
@@ -300,6 +332,10 @@ async function handleGemini(request, env, auth) {
     status: lastFailure ? lastFailure.status : 502,
     keysTried: keysTried,
     keyTotal: keys.length,
+    keySlot: lastKeySlot,
+    executionColo: executionColo,
+    inboundCountry: inboundCountry,
+    timestamp: new Date().toISOString(),
     details: lastFailure ? lastFailure.result : null
   }, lastFailure && lastFailure.status ? lastFailure.status : 502, auth.origin, env);
 }
@@ -806,8 +842,12 @@ export default {
         geminiKeyCount: geminiKeys.length,
         geminiRotation: geminiKeys.length > 1,
         maps: !!(env.GOOGLE_MAPS_SERVER_KEY || env.GOOGLE_MAPS_API_KEY),
+        mapsServerKey: !!env.GOOGLE_MAPS_SERVER_KEY,
+        routesDuration: true,
         citySharesR2: env.CITY_SHARES_BUCKET ? 'configured' : 'not_configured',
-        citySharesLimits: env.CITY_SHARES_LIMITS ? 'configured' : 'not_configured'
+        citySharesLimits: env.CITY_SHARES_LIMITS ? 'configured' : 'not_configured',
+        featuredR2: env.CITY_SHARES_BUCKET ? 'configured' : 'not_configured',
+        featuredAdminUids: env.ADMIN_UIDS ? 'configured' : 'not_configured'
       }, 200, origin, env);
     }
 
@@ -824,6 +864,18 @@ export default {
       );
       if (mediaGet) return mediaGet;
     }
+    if (
+      url.pathname.indexOf('/api/featured/media/object/') === 0 &&
+      request.method === 'GET'
+    ) {
+      var featuredGet = await routeFeaturedMedia(
+        request,
+        env,
+        { ok: true, origin: origin || '*' },
+        jsonResponse
+      );
+      if (featuredGet) return featuredGet;
+    }
 
     var auth = authorizeRequest(request, env);
     if (!auth.ok) {
@@ -833,6 +885,11 @@ export default {
     if (isCitySharesMediaPath(url.pathname)) {
       var mediaRes = await routeCitySharesMedia(request, env, auth, jsonResponse);
       if (mediaRes) return mediaRes;
+    }
+
+    if (isFeaturedMediaPath(url.pathname)) {
+      var featuredRes = await routeFeaturedMedia(request, env, auth, jsonResponse);
+      if (featuredRes) return featuredRes;
     }
 
     if (url.pathname === '/api/gemini' && request.method === 'POST') {
@@ -848,6 +905,11 @@ export default {
         return jsonResponse(placesPhotoDisabledResponse(), 410, auth.origin, env);
       }
       return handlePlacesResolve(request, env, auth);
+    }
+
+    // Planner v2.2 — adjacent-leg Google Routes / Distance Matrix duration (no NxN)
+    if (url.pathname === '/api/routes/duration' && request.method === 'POST') {
+      return handleRoutesDuration(request, env, auth, jsonResponse);
     }
 
     if (url.pathname === '/api/editorial/resolve' && request.method === 'POST') {

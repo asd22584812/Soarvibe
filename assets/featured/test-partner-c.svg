@@ -1,0 +1,18 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-label="TEST Partner C">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#102a43"/>
+      <stop offset="60%" stop-color="#243b53"/>
+      <stop offset="100%" stop-color="#334e68"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#g)"/>
+  <rect x="70" y="430" width="1060" height="8" rx="4" fill="#38bdf8"/>
+  <circle cx="980" cy="220" r="110" fill="none" stroke="#38bdf8" stroke-width="10"/>
+  <circle cx="980" cy="220" r="48" fill="#38bdf8"/>
+  <rect x="72" y="72" width="168" height="44" rx="22" fill="rgba(56,189,248,0.2)"/>
+  <text x="156" y="101" text-anchor="middle" fill="#e0f2fe" font-family="Arial,sans-serif" font-size="22" font-weight="700">TEST</text>
+  <text x="72" y="280" fill="#f0f9ff" font-family="Arial,sans-serif" font-size="64" font-weight="800">Partner C</text>
+  <text x="72" y="350" fill="#bae6fd" font-family="Arial,sans-serif" font-size="30">eSIM / Connectivity Demo</text>
+  <text x="72" y="560" fill="rgba(186,230,253,0.85)" font-family="Arial,sans-serif" font-size="24">SoarVibe Featured · Beta Test Banner</text>
+</svg>
