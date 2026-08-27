@@ -40,11 +40,11 @@
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="./city-shares-ui.css?v=v193">
-    <link rel="stylesheet" href="./travel-ledger.css?v=v193">
-    <link rel="stylesheet" href="./soarvibe-ui-icons.css?v=v193">
-    <link rel="stylesheet" href="./featured-admin.css?v=v193">
-    <link rel="stylesheet" href="./featured-partners.css?v=v193">
+    <link rel="stylesheet" href="./city-shares-ui.css?v=v194">
+    <link rel="stylesheet" href="./travel-ledger.css?v=v194">
+    <link rel="stylesheet" href="./soarvibe-ui-icons.css?v=v194">
+    <link rel="stylesheet" href="./featured-admin.css?v=v194">
+    <link rel="stylesheet" href="./featured-partners.css?v=v194">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;900&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         html, body {
@@ -1584,10 +1584,10 @@
         .saved-trip-wrap .saved-trip-card:active {
             transform: scale(0.98);
         }
-        .saved-trip-trash-btn {
+        .saved-trip-trash-btn,
+        .saved-trip-rename-btn {
             position: absolute;
             right: 0.55rem;
-            bottom: 0.55rem;
             width: 2rem;
             height: 2rem;
             display: flex;
@@ -1602,7 +1602,15 @@
             cursor: pointer;
             z-index: 2;
         }
-        .saved-trip-trash-btn:active {
+        .saved-trip-trash-btn {
+            bottom: 0.55rem;
+        }
+        .saved-trip-rename-btn {
+            top: 0.55rem;
+            box-shadow: 0 2px 8px rgba(66, 165, 245, 0.22);
+        }
+        .saved-trip-trash-btn:active,
+        .saved-trip-rename-btn:active {
             transform: scale(0.92);
         }
         #kkdayAffiliateMenu {
@@ -3757,16 +3765,16 @@
         </div>
     </div>
 
-    <script src="./firebase-config.js?v=v193"></script>
+    <script src="./firebase-config.js?v=v194"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
-    <script src="./firebase-init.js?v=v193"></script>
-    <script src="./soarvibe-auth.js?v=v193"></script>
-    <script src="./city-shares-image.js?v=v193"></script>
-    <script src="./city-shares-firestore.js?v=v193"></script>
-    <script src="./soarvibe-auth-ui.js?v=v193"></script>
+    <script src="./firebase-init.js?v=v194"></script>
+    <script src="./soarvibe-auth.js?v=v194"></script>
+    <script src="./city-shares-image.js?v=v194"></script>
+    <script src="./city-shares-firestore.js?v=v194"></script>
+    <script src="./soarvibe-auth-ui.js?v=v194"></script>
     <script>
       // Auth boot must run before City Shares / personal-center UI so redirect
       // completion + persistence restore finish before any "未登入" gate.
@@ -3783,33 +3791,33 @@
         }
       })();
     </script>
-    <script src="./feature-flags.js?v=v193"></script>
-    <script src="./featured-partners-data.js?v=v193"></script>
-    <script src="./featured-partners.js?v=v193"></script>
-    <script src="./featured-admin.js?v=v193"></script>
+    <script src="./feature-flags.js?v=v194"></script>
+    <script src="./featured-partners-data.js?v=v194"></script>
+    <script src="./featured-partners.js?v=v194"></script>
+    <script src="./featured-admin.js?v=v194"></script>
     <script src="./city-journal-editorial-engine.js"></script>
     <script src="./city-journal-image-manifest.js"></script>
     <script src="./city-journal-photo-scoring.js"></script>
     <script src="./city-journal-image-library.js"></script>
     <script src="./city-journal-caption.js"></script>
     <script src="./city-journal-data.js"></script>
-    <script src="./city-shares-config.js?v=v193"></script>
-    <script src="./city-shares-location.js?v=v193"></script>
-    <script src="./city-shares-cards.js?v=v193"></script>
-    <script src="./city-shares-data.js?v=v193"></script>
-    <script src="./city-shares-ui.js?v=v193"></script>
-    <script src="./travel-time-engine.js?v=v193"></script>
-    <script src="./itinerary-time-integrity.js?v=v193"></script>
-    <script src="./itinerary-places-hours.js?v=v193"></script>
-    <script src="./itinerary-destination-intelligence.js?v=v193"></script>
-    <script src="./itinerary-guide-intelligence.js?v=v193"></script>
-    <script src="./itinerary-route-duration.js?v=v193"></script>
-    <script src="./itinerary-style-engine.js?v=v193"></script>
-    <script src="./itinerary-planner-v2.js?v=v193"></script>
-    <script src="./travel-ledger-config.js?v=v193"></script>
-    <script src="./travel-ledger-forex.js?v=v193"></script>
-    <script src="./travel-ledger-data.js?v=v193"></script>
-    <script src="./travel-ledger-ui.js?v=v193"></script>
+    <script src="./city-shares-config.js?v=v194"></script>
+    <script src="./city-shares-location.js?v=v194"></script>
+    <script src="./city-shares-cards.js?v=v194"></script>
+    <script src="./city-shares-data.js?v=v194"></script>
+    <script src="./city-shares-ui.js?v=v194"></script>
+    <script src="./travel-time-engine.js?v=v194"></script>
+    <script src="./itinerary-time-integrity.js?v=v194"></script>
+    <script src="./itinerary-places-hours.js?v=v194"></script>
+    <script src="./itinerary-destination-intelligence.js?v=v194"></script>
+    <script src="./itinerary-guide-intelligence.js?v=v194"></script>
+    <script src="./itinerary-route-duration.js?v=v194"></script>
+    <script src="./itinerary-style-engine.js?v=v194"></script>
+    <script src="./itinerary-planner-v2.js?v=v194"></script>
+    <script src="./travel-ledger-config.js?v=v194"></script>
+    <script src="./travel-ledger-forex.js?v=v194"></script>
+    <script src="./travel-ledger-data.js?v=v194"></script>
+    <script src="./travel-ledger-ui.js?v=v194"></script>
     <script>
         (function () {
             const TRAVEL_STYLE_LABELS = {
@@ -4682,7 +4690,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
-            const SOARVIBE_APP_BUILD = 'v193'
+            const SOARVIBE_APP_BUILD = 'v194'
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
@@ -11017,6 +11025,47 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                 renderSavedTrips();
             }
 
+            function getSavedTripDisplayTitle(trip) {
+                if (!trip) return '未命名行程';
+                var custom = trip.customTitle != null ? String(trip.customTitle).trim() : '';
+                if (custom) return custom;
+                var base = trip.title != null ? String(trip.title).trim() : '';
+                return base || '未命名行程';
+            }
+
+            /** Display-only rename: sets/clears customTitle; never mutates title/markdown/meta/hiddenData. */
+            function applySavedTripCustomTitle(trip, rawInput) {
+                if (!trip) return trip;
+                var trimmed = rawInput == null ? '' : String(rawInput).trim();
+                if (trimmed) {
+                    trip.customTitle = trimmed;
+                } else {
+                    delete trip.customTitle;
+                }
+                return trip;
+            }
+
+            function renameSavedTrip(tripId) {
+                var trips = getSavedTrips();
+                var trip = null;
+                for (var i = 0; i < trips.length; i++) {
+                    if (String(trips[i].id) === String(tripId)) {
+                        trip = trips[i];
+                        break;
+                    }
+                }
+                if (!trip) return;
+                var preset =
+                    (trip.customTitle && String(trip.customTitle).trim()) ||
+                    (trip.title && String(trip.title).trim()) ||
+                    '';
+                var input = window.prompt('幫這趟行程取名', preset);
+                if (input === null) return;
+                applySavedTripCustomTitle(trip, input);
+                setSavedTrips(trips);
+                renderSavedTrips();
+            }
+
             function renderSavedTrips() {
                 var trips = getSavedTrips();
                 savedTripsList.innerHTML = '';
@@ -11038,7 +11087,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
 
                     var titleEl = document.createElement('div');
                     titleEl.className = 'saved-trip-card-title';
-                    titleEl.textContent = trip.title || '未命名行程';
+                    titleEl.textContent = getSavedTripDisplayTitle(trip);
 
                     var metaEl = document.createElement('div');
                     metaEl.className = 'saved-trip-card-meta';
@@ -11057,6 +11106,18 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                         closeSavedTripsMenu();
                     });
 
+                    var renameBtn = document.createElement('button');
+                    renameBtn.type = 'button';
+                    renameBtn.className = 'saved-trip-rename-btn';
+                    renameBtn.setAttribute('aria-label', '改名');
+                    renameBtn.title = '改名';
+                    renameBtn.textContent = '✏️';
+                    renameBtn.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        renameSavedTrip(trip.id);
+                    });
+
                     var delBtn = document.createElement('button');
                     delBtn.type = 'button';
                     delBtn.className = 'saved-trip-trash-btn';
@@ -11069,6 +11130,7 @@ days 陣列長度必須恰好 ${dayCount} 個，day 依序從 ${startDay} 到 ${
                     });
 
                     wrap.appendChild(card);
+                    wrap.appendChild(renameBtn);
                     wrap.appendChild(delBtn);
                     savedTripsList.appendChild(wrap);
                 });
