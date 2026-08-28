@@ -49,8 +49,18 @@ assert(
   'actions use flex row'
 );
 assert(
+  /\.saved-trip-actions\s*\{[^}]*position:\s*absolute[^}]*top:/s.test(index),
+  'actions container sits inside card top-right'
+);
+assert(
+  /border-radius:\s*999px/.test(index) &&
+    /saved-trip-rename-btn[\s\S]{0,120}rgba\(240,\s*98,\s*146/.test(index) &&
+    /saved-trip-trash-btn[\s\S]{0,120}rgba\(239,\s*83,\s*80/.test(index),
+  'circular soft-tint icon buttons'
+);
+assert(
   !/\.saved-trip-trash-btn,\s*\.saved-trip-rename-btn\s*\{[^}]*position:\s*absolute/s.test(index),
-  'rename/delete no longer absolute-stacked'
+  'rename/delete no longer absolute-stacked individually'
 );
 assert(/aria-label',\s*'改名'/.test(index) || /aria-label="改名"/.test(index), 'rename aria-label 改名');
 assert(

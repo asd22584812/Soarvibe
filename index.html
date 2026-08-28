@@ -40,11 +40,11 @@
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="./city-shares-ui.css?v=v195">
-    <link rel="stylesheet" href="./travel-ledger.css?v=v195">
-    <link rel="stylesheet" href="./soarvibe-ui-icons.css?v=v195">
-    <link rel="stylesheet" href="./featured-admin.css?v=v195">
-    <link rel="stylesheet" href="./featured-partners.css?v=v195">
+    <link rel="stylesheet" href="./city-shares-ui.css?v=v196">
+    <link rel="stylesheet" href="./travel-ledger.css?v=v196">
+    <link rel="stylesheet" href="./soarvibe-ui-icons.css?v=v196">
+    <link rel="stylesheet" href="./featured-admin.css?v=v196">
+    <link rel="stylesheet" href="./featured-partners.css?v=v196">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;900&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         html, body {
@@ -1568,18 +1568,13 @@
             word-break: break-word;
         }
         .saved-trip-wrap {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            gap: 0.5rem;
+            position: relative;
             margin-bottom: 0.5rem;
         }
         .saved-trip-wrap .saved-trip-card {
-            flex: 1 1 auto;
-            min-width: 0;
-            width: auto;
+            width: 100%;
             text-align: left;
-            padding: 0.875rem 1rem;
+            padding: 0.875rem 5.75rem 0.875rem 1rem;
             border-radius: 16px;
             background: rgba(255, 255, 255, 0.85);
             border: 1px solid rgba(255, 255, 255, 0.7);
@@ -1590,38 +1585,45 @@
             transform: scale(0.98);
         }
         .saved-trip-actions {
+            position: absolute;
+            top: 0.55rem;
+            right: 0.55rem;
             display: flex;
             flex-direction: row;
             align-items: center;
-            gap: 7px;
-            flex: 0 0 auto;
+            gap: 6px;
+            z-index: 2;
         }
         .saved-trip-trash-btn,
         .saved-trip-rename-btn {
-            position: static;
-            width: 2.5rem;
-            height: 2.5rem;
-            min-width: 2.5rem;
-            min-height: 2.5rem;
+            width: 2.25rem;
+            height: 2.25rem;
+            min-width: 2.25rem;
+            min-height: 2.25rem;
             display: flex;
             align-items: center;
             justify-content: center;
             border: none;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.95);
-            box-shadow: 0 2px 8px rgba(236, 64, 122, 0.2);
-            font-size: 1rem;
+            border-radius: 999px;
+            box-shadow: none;
+            font-size: 0.9375rem;
             line-height: 1;
             cursor: pointer;
-            z-index: 2;
             flex: 0 0 auto;
+            padding: 0;
         }
         .saved-trip-rename-btn {
-            box-shadow: 0 2px 8px rgba(66, 165, 245, 0.22);
+            background: rgba(240, 98, 146, 0.12);
+            color: #AD1457;
+        }
+        .saved-trip-trash-btn {
+            background: rgba(239, 83, 80, 0.14);
+            color: #C62828;
         }
         .saved-trip-trash-btn:active,
         .saved-trip-rename-btn:active {
             transform: scale(0.92);
+            opacity: 0.9;
         }
         #kkdayAffiliateMenu {
             position: absolute;
@@ -3781,16 +3783,16 @@
         </div>
     </div>
 
-    <script src="./firebase-config.js?v=v195"></script>
+    <script src="./firebase-config.js?v=v196"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
-    <script src="./firebase-init.js?v=v195"></script>
-    <script src="./soarvibe-auth.js?v=v195"></script>
-    <script src="./city-shares-image.js?v=v195"></script>
-    <script src="./city-shares-firestore.js?v=v195"></script>
-    <script src="./soarvibe-auth-ui.js?v=v195"></script>
+    <script src="./firebase-init.js?v=v196"></script>
+    <script src="./soarvibe-auth.js?v=v196"></script>
+    <script src="./city-shares-image.js?v=v196"></script>
+    <script src="./city-shares-firestore.js?v=v196"></script>
+    <script src="./soarvibe-auth-ui.js?v=v196"></script>
     <script>
       // Auth boot must run before City Shares / personal-center UI so redirect
       // completion + persistence restore finish before any "未登入" gate.
@@ -3807,33 +3809,33 @@
         }
       })();
     </script>
-    <script src="./feature-flags.js?v=v195"></script>
-    <script src="./featured-partners-data.js?v=v195"></script>
-    <script src="./featured-partners.js?v=v195"></script>
-    <script src="./featured-admin.js?v=v195"></script>
+    <script src="./feature-flags.js?v=v196"></script>
+    <script src="./featured-partners-data.js?v=v196"></script>
+    <script src="./featured-partners.js?v=v196"></script>
+    <script src="./featured-admin.js?v=v196"></script>
     <script src="./city-journal-editorial-engine.js"></script>
     <script src="./city-journal-image-manifest.js"></script>
     <script src="./city-journal-photo-scoring.js"></script>
     <script src="./city-journal-image-library.js"></script>
     <script src="./city-journal-caption.js"></script>
     <script src="./city-journal-data.js"></script>
-    <script src="./city-shares-config.js?v=v195"></script>
-    <script src="./city-shares-location.js?v=v195"></script>
-    <script src="./city-shares-cards.js?v=v195"></script>
-    <script src="./city-shares-data.js?v=v195"></script>
-    <script src="./city-shares-ui.js?v=v195"></script>
-    <script src="./travel-time-engine.js?v=v195"></script>
-    <script src="./itinerary-time-integrity.js?v=v195"></script>
-    <script src="./itinerary-places-hours.js?v=v195"></script>
-    <script src="./itinerary-destination-intelligence.js?v=v195"></script>
-    <script src="./itinerary-guide-intelligence.js?v=v195"></script>
-    <script src="./itinerary-route-duration.js?v=v195"></script>
-    <script src="./itinerary-style-engine.js?v=v195"></script>
-    <script src="./itinerary-planner-v2.js?v=v195"></script>
-    <script src="./travel-ledger-config.js?v=v195"></script>
-    <script src="./travel-ledger-forex.js?v=v195"></script>
-    <script src="./travel-ledger-data.js?v=v195"></script>
-    <script src="./travel-ledger-ui.js?v=v195"></script>
+    <script src="./city-shares-config.js?v=v196"></script>
+    <script src="./city-shares-location.js?v=v196"></script>
+    <script src="./city-shares-cards.js?v=v196"></script>
+    <script src="./city-shares-data.js?v=v196"></script>
+    <script src="./city-shares-ui.js?v=v196"></script>
+    <script src="./travel-time-engine.js?v=v196"></script>
+    <script src="./itinerary-time-integrity.js?v=v196"></script>
+    <script src="./itinerary-places-hours.js?v=v196"></script>
+    <script src="./itinerary-destination-intelligence.js?v=v196"></script>
+    <script src="./itinerary-guide-intelligence.js?v=v196"></script>
+    <script src="./itinerary-route-duration.js?v=v196"></script>
+    <script src="./itinerary-style-engine.js?v=v196"></script>
+    <script src="./itinerary-planner-v2.js?v=v196"></script>
+    <script src="./travel-ledger-config.js?v=v196"></script>
+    <script src="./travel-ledger-forex.js?v=v196"></script>
+    <script src="./travel-ledger-data.js?v=v196"></script>
+    <script src="./travel-ledger-ui.js?v=v196"></script>
     <script>
         (function () {
             const TRAVEL_STYLE_LABELS = {
@@ -4706,7 +4708,7 @@
                 || window.location.protocol === 'file:';
             const isBossMode = isBoss || isLocalDev;
             /** Cloudflare Worker 後端（Gemini 多金鑰輪替 + Maps） */
-            const SOARVIBE_APP_BUILD = 'v195'
+            const SOARVIBE_APP_BUILD = 'v196'
             const SOARVIBE_API_BASE = 'https://soarvibe-api.soarvibe.workers.dev';
             const SOARVIBE_BACKEND_KEY_SENTINEL = 'backend-proxy';
             const GOOGLE_MAPS_API_KEY = '';
