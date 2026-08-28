@@ -43,6 +43,15 @@ assert(/function getSavedTripDisplayTitle\(/.test(index), 'getSavedTripDisplayTi
 assert(/function applySavedTripCustomTitle\(/.test(index), 'applySavedTripCustomTitle present');
 assert(/function renameSavedTrip\(/.test(index), 'renameSavedTrip present');
 assert(/saved-trip-rename-btn/.test(index), 'pencil rename button class present');
+assert(/saved-trip-actions/.test(index), 'action container present');
+assert(
+  /\.saved-trip-actions\s*\{[^}]*display:\s*flex[^}]*flex-direction:\s*row/s.test(index),
+  'actions use flex row'
+);
+assert(
+  !/\.saved-trip-trash-btn,\s*\.saved-trip-rename-btn\s*\{[^}]*position:\s*absolute/s.test(index),
+  'rename/delete no longer absolute-stacked'
+);
 assert(/aria-label',\s*'改名'/.test(index) || /aria-label="改名"/.test(index), 'rename aria-label 改名');
 assert(
   /getSavedTripDisplayTitle\(trip\)/.test(index) &&
