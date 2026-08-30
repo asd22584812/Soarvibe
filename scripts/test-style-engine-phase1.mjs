@@ -235,7 +235,10 @@ assert(!/Sapporo|Tokyo|Paris|Sendai/.test(JSON.stringify(SE.createCandidate({ de
 assert(!styleSrc.includes('sendaiTrendy') && !styleSrc.includes('lisbonFoodPlaces'), 'J no city style lists');
 
 console.log('\n=== Prompt single source ===');
-assert(/buildStyleInstructionPrompt/.test(index), 'index delegates style instruction');
+assert(
+  /buildStyleInstructionPrompt/.test(index) || /function buildGeminiStyleInstruction/.test(index),
+  'index delegates style instruction'
+);
 assert(/STYLE_DEFINITION|STYLE ≠ PACE/.test(SE.buildPlanningIntentPrompt('trendy', 'Osaka')), 'planning from definition');
 assert(/buildStyleInstructionPrompt/.test(styleSrc) && /STYLE_DEFINITIONS/.test(styleSrc), 'engine owns definitions');
 

@@ -1936,6 +1936,26 @@
     return item;
   }
 
+  function normalizeVenueIdentity(title) {
+    var t = String(title || '').trim();
+    t = t.replace(
+      /^(移動|前往|交通|早餐|早午餐|午餐|晚餐|宵夜|下午茶|探索|逛逛|漫步|散步|打卡|拍照)[：:\s]*/g,
+      ''
+    );
+    t = t.replace(
+      /^(移動|前往|交通|早餐|早午餐|午餐|晚餐|宵夜|下午茶|探索|逛逛|漫步|散步|打卡|拍照)+/g,
+      ''
+    );
+    return t.trim().toLowerCase();
+  }
+
+  function isGenericPlaceholderTitle(title) {
+    var t = String(title || '');
+    return /在地晚餐或|或夜景|附近超商|自由活動|特色早餐|當地美食|在地早餐|在地特色|附近的便利|飯店旁超商/.test(
+      t
+    );
+  }
+
   function isMeaningfulCompletenessItem(item) {
     var type = item.eventType || classifyEventType(item);
     if (type === 'transport' || type === 'arrival' || type === 'departure') return false;
@@ -1944,6 +1964,7 @@
     var t = titleOf(item);
     if (/^前往\s|交通：|轉乘|搭乘|步行至/.test(t) && !/餐廳|美食|景點|咖啡/.test(t)) return false;
     if (/返回飯店|回飯店|check-?in|入住|自由活動|自由時間|預留彈性/.test(t)) return false;
+    if (isGenericPlaceholderTitle(t)) return false;
     return type === 'attraction' || type === 'shopping' || type === 'experience' || type === 'food';
   }
 
@@ -2009,8 +2030,13 @@
     });
     var allItems = sortByAbs(flattenDay(dayCopy, 0));
     var meaningful = allItems.filter(isMeaningfulCompletenessItem);
+    var rawMeaningfulItemCount = meaningful.length;
+    var uniqueKeys = new Set();
     var periodCounts = { 上午: 0, 下午: 0, 晚上: 0 };
+    var seenPeriodKey = new Set();
     meaningful.forEach(function (it) {
+      var key = normalizeVenueIdentity(titleOf(it));
+      if (key) uniqueKeys.add(key);
       var m = isNaN(it.startMinutes)
         ? isNaN(it.startAbs)
           ? 12 * 60
@@ -2018,10 +2044,15 @@
         : it.startMinutes;
       var label = m < 12 * 60 ? '上午' : m < 17 * 60 ? '下午' : '晚上';
       if (it.period && periodCounts[it.period] != null) label = it.period;
+      if (!key) return;
+      var periodKey = label + '|' + key;
+      if (seenPeriodKey.has(periodKey)) return;
+      seenPeriodKey.add(periodKey);
       periodCounts[label]++;
     });
+    var uniqueMeaningfulCount = uniqueKeys.size;
+    var meaningfulCount = uniqueMeaningfulCount;
 
-    var meaningfulCount = meaningful.length;
     if (meaningfulCount <= 3) {
       issues.push({
         type: 'too_few_meaningful_activities',
@@ -2074,7 +2105,9 @@
       }
     }
 
-    var severe = meaningfulCount <= 3 && (longGaps.length >= 1 || sparseThreeBlock);
+    var severe =
+      (uniqueMeaningfulCount <= 3 && (longGaps.length >= 1 || sparseThreeBlock)) ||
+      (longGaps.length >= 1 && uniqueMeaningfulCount <= 4);
 
     return {
       severe: !!severe,
@@ -2082,6 +2115,8 @@
       skippedReason: '',
       planningRole: role,
       meaningfulItemCount: meaningfulCount,
+      uniqueMeaningfulItemCount: uniqueMeaningfulCount,
+      rawMeaningfulItemCount: rawMeaningfulItemCount,
       longGaps: longGaps,
       issues: issues,
       periodMeaningfulCounts: periodCounts,
@@ -2120,7 +2155,9 @@
     minutesToHhmm: minutesToHhmm,
     evaluateDayCompletenessQa: evaluateDayCompletenessQa,
     ensureItemClockFields: ensureItemClockFields,
-    isMeaningfulCompletenessItem: isMeaningfulCompletenessItem
+    isMeaningfulCompletenessItem: isMeaningfulCompletenessItem,
+    normalizeVenueIdentity: normalizeVenueIdentity,
+    isGenericPlaceholderTitle: isGenericPlaceholderTitle
   };
 
   global.SOARVIBE_PLANNER_V2 = api;
