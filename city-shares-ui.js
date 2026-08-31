@@ -469,14 +469,21 @@
   function renderMediaBlock(media, altFallback, opts) {
     opts = opts || {};
     if (!(media && media.src)) return '';
+    // First slide: eager + high priority so feed first-paint is not blocked by lazy.
+    // Remaining slides stay lazy — do not wait for all carousel images.
+    var eager = opts.eager === true;
+    var cls =
+      'cs-media-img' + (opts.fit === 'contain' ? ' cs-media-img--contain' : '');
     return (
       '<img src="' +
       escapeHtml(media.src) +
       '" alt="' +
       escapeHtml(media.alt || altFallback || '') +
-      '" loading="lazy" decoding="async"' +
-      (opts.fit === 'contain' ? ' class="cs-media-img cs-media-img--contain"' : ' class="cs-media-img"') +
-      ' onerror="this.style.display=\'none\'">'
+      '" ' +
+      (eager ? 'loading="eager" fetchpriority="high" ' : 'loading="lazy" ') +
+      'decoding="async" class="' +
+      cls +
+      '">'
     );
   }
 
@@ -495,7 +502,7 @@
           ' / ' +
           list.length +
           '">' +
-          renderMediaBlock(m, altFallback, { fit: fit }) +
+          renderMediaBlock(m, altFallback, { fit: fit, eager: idx === 0 }) +
           '</div>'
         );
       })
@@ -622,8 +629,35 @@
     });
   }
 
+  function markMediaImgReady(img) {
+    if (!img || !img.classList) return;
+    img.classList.add('is-loaded');
+  }
+
+  function bindMediaFadeIn(root) {
+    if (!root || !root.querySelectorAll) return;
+    var imgs = root.querySelectorAll('.cs-media-img');
+    Array.prototype.forEach.call(imgs, function (img) {
+      if (img.dataset && img.dataset.csFadeBound === '1') return;
+      if (img.dataset) img.dataset.csFadeBound = '1';
+      if (img.complete && img.naturalWidth > 0) {
+        img.classList.add('is-cached');
+        markMediaImgReady(img);
+        return;
+      }
+      img.addEventListener(
+        'load',
+        function () {
+          markMediaImgReady(img);
+        },
+        { once: true }
+      );
+    });
+  }
+
   function bindCarousel(root) {
     if (!root) return;
+    bindMediaFadeIn(root);
     var carousels = root.querySelectorAll('[data-cs-carousel]');
     Array.prototype.forEach.call(carousels, function (carousel) {
       var track = carousel.querySelector('[data-cs-track]');
@@ -858,10 +892,6 @@
         ? '<p class="cs-attribution">照片：' + escapeHtml(cover.attribution) + '</p>'
         : '') +
       socialHtml +
-      '</div>' +
-      '<div class="cs-actions">' +
-      '<button type="button" class="cs-action-btn cs-action-primary" id="csPlanAiBtn">用 AI 規劃含此景點</button>' +
-      '<button type="button" class="cs-action-btn cs-action-secondary" id="csAddTripBtn">加入我的行程規劃</button>' +
       '</div></div>'
     );
   }
@@ -2194,15 +2224,6 @@
         handleDeleteComment(delC.getAttribute('data-cs-del-comment'));
         return;
       }
-      if (e.target.id === 'csAddTripBtn' || e.target.closest('#csAddTripBtn')) {
-        var post = findPost(csState.postId);
-        applyShareToTrip(post);
-        return;
-      }
-      if (e.target.id === 'csPlanAiBtn' || e.target.closest('#csPlanAiBtn')) {
-        var postAi = findPost(csState.postId);
-        planShareWithAI(postAi);
-      }
     });
 
     shell.addEventListener('change', function (e) {
@@ -2261,8 +2282,10 @@
         img.replaceWith(
           (function () {
             var div = document.createElement('div');
-            div.className = img.closest('.cs-detail-hero') ? 'cs-card-placeholder' : 'cs-card-placeholder';
-            div.innerHTML = '<span aria-hidden="true">📷</span><span>照片準備中</span>';
+            div.className = 'cs-card-placeholder';
+            div.setAttribute('role', 'img');
+            div.setAttribute('aria-label', '照片無法載入');
+            div.innerHTML = '<span class="cs-placeholder-mark">SV</span><span>照片暫時無法顯示</span>';
             return div;
           })()
         );

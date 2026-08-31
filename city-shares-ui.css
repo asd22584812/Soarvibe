@@ -214,6 +214,12 @@
     height: 100%;
     display: block;
     object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+#cityShares .cs-media-img.is-loaded,
+#cityShares .cs-media-img.is-cached {
+    opacity: 1;
 }
 #cityShares .cs-media-img--contain {
     object-fit: contain;
@@ -222,11 +228,11 @@
 #cityShares .cs-media-carousel {
     position: relative;
     width: 100%;
-    background: #111;
+    background: linear-gradient(135deg, #eceff1 0%, #f5f7f8 55%, #e8eef2 100%);
 }
 #cityShares .cs-media-carousel--detail {
     max-height: min(72vh, 560px);
-    background: #1a1a1a;
+    background: linear-gradient(135deg, #eceff1 0%, #f5f7f8 55%, #e8eef2 100%);
 }
 #cityShares .cs-media-track {
     display: flex;
@@ -249,7 +255,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #111;
+    background: linear-gradient(135deg, #eceff1 0%, #f5f7f8 55%, #e8eef2 100%);
     min-height: 12rem;
 }
 #cityShares .cs-media-carousel--detail .cs-media-slide {
@@ -308,6 +314,7 @@
 #cityShares .cs-card-placeholder {
     width: 100%;
     height: 100%;
+    min-height: 8rem;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -317,6 +324,19 @@
     font-size: 0.82rem;
     font-weight: 700;
     background: linear-gradient(135deg, #eceff1, #f5f7f8);
+}
+#cityShares .cs-placeholder-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 999px;
+    background: rgba(0, 131, 143, 0.12);
+    color: #00838f;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
 }
 #cityShares .cs-card-type {
     position: absolute;
@@ -384,7 +404,14 @@
     transform: scale(0.98);
 }
 #cityShares .cs-detail-body {
-    padding: 1rem 1.15rem 1.5rem;
+    padding: 1rem 1.15rem calc(env(safe-area-inset-bottom, 0px) + 1.35rem);
+}
+#cityShares .cs-page--detail .cs-comments {
+    margin-bottom: 0;
+}
+#cityShares .cs-page--detail .cs-comment-form {
+    margin-bottom: 0;
+    padding-bottom: 0;
 }
 #cityShares .cs-toast {
     position: fixed;
