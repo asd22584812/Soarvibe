@@ -753,7 +753,6 @@
     var stats = post.stats || {};
     var likeCount = stats.likeCount != null ? stats.likeCount : post.likeCount || 0;
     var commentCount = stats.commentCount != null ? stats.commentCount : post.commentCount || 0;
-    var saveCount = stats.saveCount != null ? stats.saveCount : post.saveCount || 0;
     var socialEnabled = isFirestorePost(post);
     var metaChips = [];
     if (vm.stayDuration) metaChips.push('停留 ' + vm.stayDuration);
@@ -804,17 +803,9 @@
       '">♡ 按讚 <span id="csLikeCount">' +
       escapeHtml(String(likeCount)) +
       '</span></button>' +
-      '<button type="button" class="cs-social-btn' +
-      (csState.saved ? ' is-on' : '') +
-      '" id="csSaveBtn" aria-pressed="' +
-      (csState.saved ? 'true' : 'false') +
-      '">☆ 收藏 <span id="csSaveCount">' +
-      escapeHtml(String(saveCount)) +
-      '</span></button>' +
       '<button type="button" class="cs-social-btn" id="csCommentFocusBtn">💬 留言 <span>' +
       escapeHtml(String(commentCount)) +
       '</span></button>' +
-      '<button type="button" class="cs-social-btn" id="csComposeBtn">＋ 分享投稿</button>' +
       (socialEnabled &&
       auth() &&
       auth().isSignedIn() &&
@@ -834,7 +825,7 @@
           '<textarea id="csCommentInput" class="cs-comment-input" maxlength="500" rows="3" placeholder="寫下你的補充或提問…"></textarea>' +
           '<button type="submit" class="cs-action-btn cs-action-primary">送出留言</button>' +
           '</form></section>'
-        : '<p class="cs-comment-empty">官方精選可瀏覽；登入後按讚／收藏／留言請先「分享投稿」建立旅人貼文。</p>');
+        : '<p class="cs-comment-empty">官方精選可瀏覽；登入後可按讚／留言（請先從「分享這次旅行」建立旅人貼文）。</p>');
 
     var hasMedia = sortedMediaList(post).length > 0;
     return (
@@ -1085,48 +1076,120 @@
   function loadDetailExtras(postId) {
     var a = api();
     var post = findPost(postId);
+    var au = auth();
     csState.comments = [];
     csState.liked = false;
     csState.saved = false;
     if (!a || !postId || !isFirestorePost(post)) return Promise.resolve();
-    var tasks = [];
-    if (a.listComments) {
-      tasks.push(
-        a
-          .listComments(postId)
-          .then(function (list) {
-            csState.comments = list || [];
-          })
-          .catch(function () {
-            csState.comments = [];
-          })
-      );
+
+    function runQueries() {
+      var tasks = [];
+      if (a.listComments) {
+        tasks.push(
+          a
+            .listComments(postId)
+            .then(function (list) {
+              csState.comments = list || [];
+            })
+            .catch(function () {
+              csState.comments = [];
+            })
+        );
+      }
+      if (a.hasLiked) {
+        tasks.push(
+          a
+            .hasLiked(postId)
+            .then(function (liked) {
+              csState.liked = !!liked;
+            })
+            .catch(function () {
+              csState.liked = false;
+            })
+        );
+      }
+      if (a.hasSaved) {
+        tasks.push(
+          a
+            .hasSaved(postId)
+            .then(function (saved) {
+              csState.saved = !!saved;
+            })
+            .catch(function () {
+              csState.saved = false;
+            })
+        );
+      }
+      return Promise.all(tasks);
     }
-    if (a.hasLiked) {
-      tasks.push(
-        a
-          .hasLiked(postId)
-          .then(function (liked) {
-            csState.liked = !!liked;
-          })
-          .catch(function () {
-            csState.liked = false;
-          })
-      );
+
+    // Wait for auth so hasLiked sees the current user (otherwise first paint = unliked).
+    if (au && au.whenAuthReady && !(au.isAuthReady && au.isAuthReady())) {
+      return au.whenAuthReady().then(runQueries).catch(runQueries);
     }
-    if (a.hasSaved) {
-      tasks.push(
-        a
-          .hasSaved(postId)
-          .then(function (saved) {
-            csState.saved = !!saved;
-          })
-          .catch(function () {
-            csState.saved = false;
-          })
-      );
+    return runQueries();
+  }
+
+  function patchLikeUi() {
+    var btn = document.getElementById('csLikeBtn');
+    var countEl = document.getElementById('csLikeCount');
+    var post = findPost(csState.postId);
+    var likeCount = 0;
+    if (post) {
+      var stats = post.stats || {};
+      likeCount = stats.likeCount != null ? stats.likeCount : post.likeCount || 0;
     }
-    return Promise.all(tasks);
+    if (btn) {
+      btn.classList.toggle('is-on', !!csState.liked);
+      btn.setAttribute('aria-pressed', csState.liked ? 'true' : 'false');
+    }
+    if (countEl) {
+      countEl.textContent = String(likeCount);
+    }
+  }
+
+  function patchCommentsUi() {
+    var listEl = document.getElementById('csCommentList');
+    if (!listEl) return;
+    var a = auth();
+    var uid = a && a.currentUser && a.currentUser() ? a.currentUser().uid : null;
+    var comments = csState.comments || [];
+    if (!comments.length) {
+      listEl.innerHTML = '<p class="cs-comment-empty">還沒有留言，來當第一個吧。</p>';
+      return;
+    }
+    listEl.innerHTML = comments
+      .map(function (c) {
+        var canDelete = !!(uid && c.authorId && c.authorId === uid);
+        return (
+          '<div class="cs-comment" data-cs-comment="' +
+          escapeHtml(c.commentId || '') +
+          '">' +
+          '<p class="cs-comment-author">' +
+          escapeHtml(c.authorDisplayName || '旅人') +
+          '</p>' +
+          '<p class="cs-comment-text">' +
+          escapeHtml(c.text || '') +
+          '</p>' +
+          (canDelete
+            ? '<button type="button" class="cs-comment-del" data-cs-del-comment="' +
+              escapeHtml(c.commentId || '') +
+              '">刪除</button>'
+            : '') +
+          '</div>'
+        );
+      })
+      .join('');
+    var focusBtn = document.getElementById('csCommentFocusBtn');
+    if (focusBtn) {
+      var span = focusBtn.querySelector('span');
+      if (span) span.textContent = String(comments.length);
+    }
+  }
+
+  function patchDetailSocialFromExtras() {
+    patchLikeUi();
+    patchCommentsUi();
   }
 
   function renderCurrentView() {
@@ -1288,15 +1351,52 @@
     viewport.scrollTop = 0;
     setHash(cityId, postId || null);
     updateChrome();
-    viewport.innerHTML = '<div class="cs-page"><p class="cs-empty">載入分享中…</p></div>';
+    // Paint shell immediately (local feed / skeleton) — never leave a blank white panel
+    // while waiting on Firestore. Images fill async; they must not block first paint.
+    if (csState.view === 'detail' && csState.postId && findPost(csState.postId)) {
+      renderCurrentView();
+      // Hydrate like/comments ASAP (auth-ready); patch only — no second full detail paint.
+      loadDetailExtras(csState.postId).then(function () {
+        if (requestId !== csState.shareOpenGeneration) return;
+        if (csState.view === 'detail' && csState.postId) patchDetailSocialFromExtras();
+      });
+    } else if (csState.view === 'feed') {
+      renderCurrentView();
+      if (!getPosts(cityId, csState.typeFilter).length) {
+        var cardsHost = viewport.querySelector('.cs-feed') || viewport.querySelector('.cs-page');
+        if (cardsHost && !viewport.querySelector('.cs-skeleton-card')) {
+          var sk = document.createElement('div');
+          sk.className = 'cs-skeleton-grid';
+          sk.setAttribute('aria-busy', 'true');
+          sk.innerHTML =
+            '<div class="cs-skeleton-card"></div><div class="cs-skeleton-card"></div><div class="cs-skeleton-card"></div>';
+          var emptyEl = viewport.querySelector('.cs-empty');
+          if (emptyEl && emptyEl.parentNode) {
+            emptyEl.parentNode.replaceChild(sk, emptyEl);
+          } else {
+            cardsHost.appendChild(sk);
+          }
+        }
+      }
+    } else {
+      viewport.innerHTML =
+        '<div class="cs-page"><div class="cs-skeleton-grid" aria-busy="true">' +
+        '<div class="cs-skeleton-card"></div><div class="cs-skeleton-card"></div>' +
+        '<div class="cs-skeleton-card"></div></div></div>';
+    }
 
     refreshRemoteFeed(cityId, { requestId: requestId })
       .then(function (posts) {
         if (requestId !== csState.shareOpenGeneration) return;
         if (posts === null) return;
         if (csState.view === 'detail' && csState.postId) {
+          var alreadyPainted = !!document.getElementById('csLikeBtn');
           return loadDetailExtras(csState.postId).then(function () {
             if (requestId !== csState.shareOpenGeneration) return;
+            if (alreadyPainted && document.getElementById('csLikeBtn')) {
+              patchDetailSocialFromExtras();
+              return;
+            }
             renderCurrentView();
           });
         }
@@ -1491,7 +1591,8 @@
             if (!post.stats) post.stats = {};
             post.stats.likeCount = post.likeCount;
           }
-          renderCurrentView();
+          // Patch only — never full detail rerender (avoids scroll jump / carousel rebuild).
+          patchLikeUi();
         })
         .catch(function (err) {
           if (err && err.message === 'AUTH_REQUIRED') return;
@@ -2026,7 +2127,7 @@
         closePhotoViewer();
         return;
       }
-      if (e.target.id === 'csComposeOpenBtn' || e.target.closest('#csComposeOpenBtn') || e.target.id === 'csComposeBtn') {
+      if (e.target.id === 'csComposeOpenBtn' || e.target.closest('#csComposeOpenBtn')) {
         e.preventDefault();
         openCompose();
         return;
