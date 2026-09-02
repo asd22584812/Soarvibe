@@ -383,6 +383,36 @@
     font-size: 0.88rem;
     color: #90a4ae;
 }
+#cityShares .cs-feed-loading {
+    padding: 0.35rem 0 0.5rem;
+}
+#cityShares .cs-feed-loading-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    padding: 0.15rem 1rem 0.55rem;
+}
+#cityShares .cs-feed-loading-copy {
+    margin: 0;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #78909c;
+    line-height: 1.4;
+}
+#cityShares .cs-feed-loading-spinner {
+    width: 14px;
+    height: 14px;
+    flex: 0 0 14px;
+    border-radius: 999px;
+    box-sizing: border-box;
+    border: 2px solid rgba(55, 71, 79, 0.16);
+    border-top-color: #00838f;
+    animation: cs-ptr-spin 0.7s linear infinite;
+}
+#cityShares .cs-feed-error {
+    padding-top: 1.5rem;
+}
 #cityShares .cs-ptr {
     position: absolute;
     top: calc(env(safe-area-inset-top, 0px) + 10px);

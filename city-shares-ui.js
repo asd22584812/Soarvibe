@@ -54,6 +54,8 @@
     composePostId: null,
     clientPublishId: null,
     toastTimer: null,
+    /** Feed list phase: loading | ready | error — never mix with empty. */
+    feedLoadPhase: 'ready',
     /** Monotonic open generation — stale async must not paint after close/reopen */
     shareOpenGeneration: 0,
     feedAbort: null
@@ -432,10 +434,12 @@
       csState.remotePosts = csState.remotePosts || [];
       return Promise.resolve(csState.remotePosts);
     }
-    if (csState.feedAbort && typeof csState.feedAbort.abort === 'function') {
-      try { csState.feedAbort.abort(); } catch (eAbort) { /* silent */ }
+    if (!opts.keepPending) {
+      if (csState.feedAbort && typeof csState.feedAbort.abort === 'function') {
+        try { csState.feedAbort.abort(); } catch (eAbort) { /* silent */ }
+      }
+      csState.feedAbort = typeof AbortController !== 'undefined' ? new AbortController() : null;
     }
-    csState.feedAbort = typeof AbortController !== 'undefined' ? new AbortController() : null;
 
     function runLoader() {
       ensureFirebaseReady();
@@ -473,12 +477,20 @@
   var PTR_THRESHOLD = 64;
   var PTR_MAX = 96;
   var PTR_RESISTANCE = 0.42;
+  var PTR_MIN_MS = 400;
+  var PTR_TIMEOUT_MS = 7000;
   var ptrState = {
     tracking: false,
     startY: 0,
     pull: 0,
     refreshing: false
   };
+
+  function waitMs(ms) {
+    return new Promise(function (resolve) {
+      setTimeout(resolve, Math.max(0, ms || 0));
+    });
+  }
 
   function getPtrEl() {
     var shell = document.getElementById('cityShares');
@@ -525,15 +537,26 @@
   }
 
   function resetPtrVisual() {
+    finishPtrRefresh();
+  }
+
+  function finishPtrRefresh() {
+    ptrState.refreshing = false;
     ptrState.tracking = false;
     ptrState.pull = 0;
-    setPtrVisual('idle', 0);
-    window.setTimeout(function () {
-      var viewport = document.getElementById('csViewport');
-      if (viewport && !ptrState.refreshing) {
-        viewport.style.transition = '';
-      }
-    }, 300);
+    var el = document.getElementById('csPtr');
+    if (el) {
+      el.classList.remove('is-visible', 'is-ready', 'is-refreshing');
+      el.setAttribute('aria-hidden', 'true');
+    }
+    var viewport = document.getElementById('csViewport');
+    if (viewport) {
+      viewport.style.transition = 'transform 0.22s ease';
+      viewport.style.transform = '';
+      window.setTimeout(function () {
+        if (!ptrState.refreshing && viewport) viewport.style.transition = '';
+      }, 240);
+    }
   }
 
   function feedSignature(cityId, typeFilter) {
@@ -565,6 +588,30 @@
 
   function renderFeedCardsHtml(cityId) {
     var posts = getPosts(cityId, csState.typeFilter);
+    var phase = csState.feedLoadPhase || 'ready';
+    if (phase === 'loading' && !posts.length) {
+      return (
+        '<div class="cs-feed-loading" aria-busy="true" aria-live="polite">' +
+        '<div class="cs-feed-loading-row">' +
+        '<span class="cs-feed-loading-spinner" aria-hidden="true"></span>' +
+        '<p class="cs-feed-loading-copy">正在載入旅人們的最新分享 ✈️</p>' +
+        '</div>' +
+        '<div class="cs-skeleton-grid">' +
+        '<div class="cs-skeleton-card"></div>' +
+        '<div class="cs-skeleton-card"></div>' +
+        '<div class="cs-skeleton-card"></div>' +
+        '</div></div>'
+      );
+    }
+    if (phase === 'error' && !posts.length) {
+      return (
+        '<div class="cs-empty cs-feed-error">' +
+        '<p class="cs-empty-title">分享暫時載入失敗</p>' +
+        '<p class="cs-empty-sub">請檢查網路後再試一次</p>' +
+        '<button type="button" class="cs-retry-btn" data-cs-retry="1">再試一次</button>' +
+        '</div>'
+      );
+    }
     if (!posts.length) {
       if (csState.typeFilter && csState.typeFilter !== 'all') {
         return (
@@ -629,18 +676,28 @@
   function runFeedPullRefresh() {
     if (ptrState.refreshing) return Promise.resolve();
     if (csState.view !== 'feed' || !csState.cityId) {
-      resetPtrVisual();
+      finishPtrRefresh();
       return Promise.resolve();
     }
     // Guest-allowed: only refreshRemoteFeed — no login gate, no location.reload().
     ptrState.refreshing = true;
+    ptrState.tracking = false;
     setPtrVisual('refreshing', 0);
     var cityId = csState.cityId;
     var keptFilter = csState.typeFilter || 'all';
     var requestId = csState.shareOpenGeneration;
     var priorRemote = (csState.remotePosts || []).slice();
     var priorSig = feedSignature(cityId, keptFilter);
-    return refreshRemoteFeed(cityId, { requestId: requestId, throwOnError: true })
+    var started = Date.now();
+
+    var work = refreshRemoteFeed(cityId, { requestId: requestId, throwOnError: true });
+    var timeoutP = waitMs(PTR_TIMEOUT_MS).then(function () {
+      var err = new Error('PTR_TIMEOUT');
+      err.code = 'PTR_TIMEOUT';
+      return Promise.reject(err);
+    });
+
+    return Promise.race([work, timeoutP])
       .then(function (posts) {
         if (requestId !== csState.shareOpenGeneration) return;
         csState.typeFilter = keptFilter;
@@ -662,12 +719,22 @@
         csState.typeFilter = keptFilter;
         csState.cityId = cityId;
         csState.remotePosts = priorRemote;
-        // Failure must keep the current DOM — toast only, no feed rebuild.
+        // Failure / timeout / exception must keep the current DOM — toast only.
         showCsToast('更新失敗，請稍後再試');
       })
+      .then(
+        function () {
+          return waitMs(Math.max(0, PTR_MIN_MS - (Date.now() - started)));
+        },
+        function () {
+          return waitMs(Math.max(0, PTR_MIN_MS - (Date.now() - started)));
+        }
+      )
       .then(function () {
-        ptrState.refreshing = false;
-        resetPtrVisual();
+        // finally: success, failure, exception, timeout all reset spinner / transform.
+        finishPtrRefresh();
+      }, function () {
+        finishPtrRefresh();
       });
   }
 
@@ -1680,23 +1747,9 @@
         if (csState.view === 'detail' && csState.postId) patchDetailSocialFromExtras();
       });
     } else if (csState.view === 'feed') {
+      var hasCachedPosts = getPosts(cityId, csState.typeFilter).length > 0;
+      csState.feedLoadPhase = hasCachedPosts ? 'ready' : 'loading';
       renderCurrentView();
-      if (!getPosts(cityId, csState.typeFilter).length) {
-        var cardsHost = viewport.querySelector('.cs-feed') || viewport.querySelector('.cs-page');
-        if (cardsHost && !viewport.querySelector('.cs-skeleton-card')) {
-          var sk = document.createElement('div');
-          sk.className = 'cs-skeleton-grid';
-          sk.setAttribute('aria-busy', 'true');
-          sk.innerHTML =
-            '<div class="cs-skeleton-card"></div><div class="cs-skeleton-card"></div><div class="cs-skeleton-card"></div>';
-          var emptyEl = viewport.querySelector('.cs-empty');
-          if (emptyEl && emptyEl.parentNode) {
-            emptyEl.parentNode.replaceChild(sk, emptyEl);
-          } else {
-            cardsHost.appendChild(sk);
-          }
-        }
-      }
     } else {
       viewport.innerHTML =
         '<div class="cs-page"><div class="cs-skeleton-grid" aria-busy="true">' +
@@ -1718,32 +1771,73 @@
           renderCurrentView();
         });
       }
+      csState.feedLoadPhase = 'ready';
       renderCurrentView();
     }
 
-    refreshRemoteFeed(cityId, { requestId: requestId })
+    var hasCachedPosts = getPosts(cityId, csState.typeFilter).length > 0;
+    function loadRemoteFeed() {
+      return refreshRemoteFeed(cityId, {
+        requestId: requestId,
+        throwOnError: !hasCachedPosts
+      });
+    }
+
+    loadRemoteFeed()
       .then(paintAfterRemote)
       .catch(function (err) {
         if (requestId !== csState.shareOpenGeneration) return;
         console.warn('[SOARVIBE] openCityShares failed', err);
-        // Prefer painting local/remote cards over a full-screen error when anything is showable.
         if (getPosts(cityId, csState.typeFilter).length || findPost(csState.postId)) {
+          csState.feedLoadPhase = 'ready';
           renderCurrentView();
+          return;
+        }
+        if (csState.view === 'feed') {
+          // Stay in loading until the one cold-start retry finishes — do not mix error with skeleton.
           return;
         }
         showCitySharesLoadError(cityId, postId, requestId);
       });
 
-    // Cold start: Firebase may not be ready on first tap — one follow-up fetch.
+    // Cold start retry once if first open still has no posts (Firebase may not be ready).
     window.setTimeout(function () {
       if (requestId !== csState.shareOpenGeneration) return;
-      if (csState.view !== 'feed' && csState.view !== 'detail') return;
-      var hasRemote = (csState.remotePosts || []).some(function (p) {
-        return p && p.source === 'user';
-      });
-      if (hasRemote) return;
-      refreshRemoteFeed(cityId, { requestId: requestId }).then(paintAfterRemote);
+      if (csState.view !== 'feed') return;
+      if (csState.feedLoadPhase === 'ready') return;
+      if (getPosts(cityId, csState.typeFilter).length) {
+        csState.feedLoadPhase = 'ready';
+        renderCurrentView();
+        return;
+      }
+      refreshRemoteFeed(cityId, {
+        requestId: requestId,
+        throwOnError: true,
+        keepPending: true
+      })
+        .then(paintAfterRemote)
+        .catch(function () {
+          if (requestId !== csState.shareOpenGeneration) return;
+          if (getPosts(cityId, csState.typeFilter).length) {
+            csState.feedLoadPhase = 'ready';
+          } else {
+            csState.feedLoadPhase = 'error';
+          }
+          if (csState.view === 'feed') renderCurrentView();
+        });
     }, 700);
+
+    window.setTimeout(function () {
+      if (requestId !== csState.shareOpenGeneration) return;
+      if (csState.view !== 'feed') return;
+      if (csState.feedLoadPhase !== 'loading') return;
+      if (getPosts(cityId, csState.typeFilter).length) {
+        csState.feedLoadPhase = 'ready';
+      } else {
+        csState.feedLoadPhase = 'error';
+      }
+      renderCurrentView();
+    }, 8000);
   }
 
   function closeCityShares() {
@@ -2429,6 +2523,12 @@
     }
 
     shell.addEventListener('click', function (e) {
+      var retryBtn = e.target.closest('[data-cs-retry]');
+      if (retryBtn) {
+        e.preventDefault();
+        if (csState.cityId) openCityShares(csState.cityId, csState.postId || null);
+        return;
+      }
       var filterBtn = e.target.closest('[data-cs-filter]');
       if (filterBtn) {
         e.preventDefault();
@@ -2720,7 +2820,11 @@
     getFeedTypeFilters: getFeedTypeFilters,
     runFeedPullRefresh: runFeedPullRefresh,
     patchFeedAfterRefresh: patchFeedAfterRefresh,
+    finishPtrRefresh: finishPtrRefresh,
+    renderFeedCardsHtml: renderFeedCardsHtml,
     PTR_THRESHOLD: PTR_THRESHOLD,
+    PTR_MIN_MS: PTR_MIN_MS,
+    PTR_TIMEOUT_MS: PTR_TIMEOUT_MS,
     getState: function () {
       return csState;
     },

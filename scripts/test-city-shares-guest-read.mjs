@@ -53,9 +53,11 @@ assert(
   '1e2. exhausted list failure rejects (does not fake [])'
 );
 assert(/remoteFeedCache|hydrateRemoteFromCache|rememberRemoteFeed/.test(ui), '1g. session cache for remote UGC');
-assert(/Cold start: Firebase may not be ready/.test(ui), '1h. follow-up fetch when UGC still missing');
+assert(/Cold start retry once if first open still has no posts/.test(ui), '1h. follow-up fetch when UGC still missing');
 assert(/Firestore-only: never merge local official\/demo seeds|never merge local official\/demo seeds/.test(ui), '1i. feed is Firestore-only (no seed merge)');
 assert(/還沒有旅人分享/.test(ui), '1j. empty state when no published posts');
+assert(/正在載入旅人們的最新分享/.test(ui), '1k. initial feed loading copy');
+assert(/function finishPtrRefresh/.test(ui) && /PTR_TIMEOUT_MS/.test(ui), '1l. PTR spinner always finishes');
 assert(
   /where\('status',\s*'==',\s*'published'\)/.test(api),
   '3. feed query filters status == published'

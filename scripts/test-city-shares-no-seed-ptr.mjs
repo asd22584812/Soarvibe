@@ -58,14 +58,28 @@ assert(/keptFilter/.test(ui) && /csState\.typeFilter = keptFilter/.test(ui), 'PT
 assert(/csState\.cityId = cityId/.test(ui), 'PTR keeps city');
 assert(
   /csState\.remotePosts = priorRemote/.test(ui) &&
-    /Failure must keep the current DOM/.test(ui) &&
+    /Failure \/ timeout \/ exception must keep the current DOM/.test(ui) &&
     /更新失敗，請稍後再試/.test(ui),
   'PTR failure keeps existing feed + toast, no rebuild'
 );
 assert(/function patchFeedAfterRefresh/.test(ui) && /Keep hero/.test(ui), 'PTR success patches cards, not whole feed DOM');
 assert(/throwOnError:\s*true/.test(ui), 'PTR treats fetch errors as failure (not empty success)');
+assert(/function finishPtrRefresh/.test(ui), 'PTR finish helper resets spinner/transform');
+assert(/PTR_MIN_MS = 400/.test(ui) && /PTR_TIMEOUT_MS = 7000/.test(ui), 'PTR min 400ms and 7s safety timeout');
+assert(/finishPtrRefresh\(\)/.test(ui.slice(ui.indexOf('function runFeedPullRefresh'))), 'PTR always calls finishPtrRefresh');
 assert(/\.cs-ptr/.test(css) && /cs-ptr-spin/.test(css), 'PTR indicator styles present');
 assert(!/重新整理<\/button>/.test(ui), 'no fixed refresh toolbar button');
+
+console.log('\n=== loading / empty / error ===');
+assert(/正在載入旅人們的最新分享/.test(ui), 'initial load shows loading copy');
+assert(/cs-feed-loading-copy/.test(ui) && /cs-feed-loading-spinner/.test(css), 'lightweight loading spinner styles');
+assert(/phase === 'loading'/.test(ui) && /phase === 'error'/.test(ui), 'loading vs error phases');
+assert(/feedLoadPhase = 'ready'/.test(ui), 'loaded phase clears loading');
+assert(
+  /phase === 'loading'[\s\S]*cs-feed-loading[\s\S]*if \(!posts\.length\)[\s\S]*還沒有旅人分享/.test(ui),
+  'empty state is separate branch from loading'
+);
+assert(/cs-feed-error/.test(ui) && /data-cs-retry/.test(ui), 'query failure uses error + retry, not endless skeleton');
 
 console.log('\n=== runtime sandbox: getPosts Firestore-only ===');
 const sandbox = {
@@ -129,8 +143,27 @@ st.typeFilter = 'anime';
 const filtered = testApi.getPosts('tokyo', 'anime');
 assert(filtered.length === 1 && filtered[0].type === 'anime', 'category filter works');
 assert(st.cityId === 'tokyo' && st.typeFilter === 'anime', 'city + category state retained');
-assert(typeof testApi.runFeedPullRefresh === 'function', 'guest/logged-in share same PTR runner');
-assert(typeof testApi.PTR_THRESHOLD === 'number' && testApi.PTR_THRESHOLD > 0, 'PTR threshold configured');
+st.typeFilter = 'all';
+st.remotePosts = [];
+st.feedLoadPhase = 'loading';
+const loadingHtml = testApi.renderFeedCardsHtml('tokyo');
+assert(
+  /正在載入旅人們的最新分享/.test(loadingHtml) && !/還沒有旅人分享/.test(loadingHtml),
+  'initial load shows loading copy; empty not mixed'
+);
+st.feedLoadPhase = 'ready';
+const emptyHtml = testApi.renderFeedCardsHtml('tokyo');
+assert(
+  /還沒有旅人分享/.test(emptyHtml) && !/正在載入旅人們的最新分享/.test(emptyHtml),
+  'loaded empty state without loading copy'
+);
+st.feedLoadPhase = 'error';
+const errHtml = testApi.renderFeedCardsHtml('tokyo');
+assert(/再試一次/.test(errHtml) && !/正在載入旅人們的最新分享/.test(errHtml), 'error state not mixed with loading');
+assert(typeof testApi.finishPtrRefresh === 'function', 'refresh success/fail/exception/timeout share finishPtrRefresh');
+assert(testApi.PTR_MIN_MS === 400 && testApi.PTR_TIMEOUT_MS === 7000, 'PTR min 400ms, timeout 7s');
+testApi.finishPtrRefresh();
+assert(testApi.getState(), 'finishPtrRefresh safe with missing DOM (spinner reset path)');
 
 console.log('\n=== syntax ===');
 ['city-shares-ui.js', 'city-shares-data.js', 'city-shares-firestore.js'].forEach((file) => {
