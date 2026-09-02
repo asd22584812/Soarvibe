@@ -28,23 +28,34 @@ const rules = fs.readFileSync(path.join(root, 'firestore.rules'), 'utf8');
 const authUi = fs.readFileSync(path.join(root, 'soarvibe-auth-ui.js'), 'utf8');
 
 console.log('\n=== guest feed path ===');
-assert(/function whenAuthSettled/.test(ui), '1. waits for auth settled (not signed-in)');
+assert(/function whenAuthSettled/.test(ui), '1. whenAuthSettled helper exists (timeout race)');
+assert(/Promise\.race/.test(ui) && /whenAuthSettled/.test(ui), '1a. auth wait races a timeout (no hang)');
 assert(
-  /whenAuthSettled\(\)\.then\(runLoader\)/.test(ui) &&
+  /Published posts are guest-readable[\s\S]*return runLoader\(\)/.test(ui) &&
     !/refreshRemoteFeed[\s\S]*requireUser|refreshRemoteFeed[\s\S]*isSignedIn\(\)\s*\)\s*return/.test(
       ui.slice(ui.indexOf('function refreshRemoteFeed'), ui.indexOf('function showCitySharesLoadError'))
     ),
-  '1b. refreshRemoteFeed does not require sign-in'
+  '1b. refreshRemoteFeed loads immediately — no Auth gate / no sign-in required'
 );
 assert(
-  /Soft-fail: keep any prior remote posts/.test(ui) || /soft-fail/i.test(ui),
-  '1c. feed soft-fails instead of wiping guest browse'
+  /Soft-fail: NEVER replace last-good UGC|keep any prior remote posts|soft-fail/i.test(ui),
+  '1c. feed soft-fails without wiping last-good UGC'
 );
+assert(/throwOnError/.test(ui) && /更新失敗，請稍後再試/.test(ui), '1c2. PTR failure toast, keep current screen');
 assert(
   /onAuthStateChanged[\s\S]*refreshRemoteFeed/.test(ui),
   '1d. auth settle re-refreshes open feed (guest or signed-in)'
 );
-assert(/function listByCity[\s\S]*\.catch\(function \(err\)/.test(api), '1e. listByCity soft-fails');
+assert(/function ensureFirebaseReady/.test(ui), '1f. ensures Firebase init before public list');
+assert(/function withListRetry/.test(api), '1e. list queries retry before failing');
+assert(
+  /never pretend "empty feed"|Promise\.reject\(err/.test(api),
+  '1e2. exhausted list failure rejects (does not fake [])'
+);
+assert(/remoteFeedCache|hydrateRemoteFromCache|rememberRemoteFeed/.test(ui), '1g. session cache for remote UGC');
+assert(/Cold start: Firebase may not be ready/.test(ui), '1h. follow-up fetch when UGC still missing');
+assert(/Firestore-only: never merge local official\/demo seeds|never merge local official\/demo seeds/.test(ui), '1i. feed is Firestore-only (no seed merge)');
+assert(/還沒有旅人分享/.test(ui), '1j. empty state when no published posts');
 assert(
   /where\('status',\s*'==',\s*'published'\)/.test(api),
   '3. feed query filters status == published'

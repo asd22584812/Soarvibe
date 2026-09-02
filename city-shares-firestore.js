@@ -6,7 +6,7 @@
  * - posts.likeCount denormalized via transaction (±1)
  *
  * Public browse: query status == 'published'
- * Official local seeds remain as fallback via city-shares-data.js
+ * Feed is Firestore published posts only (no local seed fallback in UI).
  */
 (function (global) {
   'use strict';
@@ -126,76 +126,110 @@
     return listByCity(cityId, opt);
   }
 
+  function delay(ms) {
+    return new Promise(function (resolve) {
+      setTimeout(resolve, ms);
+    });
+  }
+
+  function withListRetry(label, id, opt, runQuery) {
+    opt = opt || {};
+    var attempt = opt._attempt || 0;
+    try {
+      return runQuery()
+        .then(function (snap) {
+          return snap.docs.map(mapPostDoc);
+        })
+        .catch(function (err) {
+          console.warn(
+            '[SOARVIBE] ' + label + ' failed',
+            id,
+            err && err.message,
+            'attempt',
+            attempt
+          );
+          if (attempt < 2) {
+            return delay(280 * (attempt + 1)).then(function () {
+              return withListRetry(
+                label,
+                id,
+                Object.assign({}, opt, { _attempt: attempt + 1 }),
+                runQuery
+              );
+            });
+          }
+          // Reject so UI can keep last-good cache — never pretend "empty feed".
+          return Promise.reject(err || new Error(label + ' failed'));
+        });
+    } catch (syncErr) {
+      console.warn('[SOARVIBE] ' + label + ' sync failed', id, syncErr && syncErr.message);
+      if (attempt < 2) {
+        return delay(280 * (attempt + 1)).then(function () {
+          return withListRetry(
+            label,
+            id,
+            Object.assign({}, opt, { _attempt: attempt + 1 }),
+            runQuery
+          );
+        });
+      }
+      return Promise.reject(syncErr || new Error(label + ' sync failed'));
+    }
+  }
+
   function listByCity(cityId, opt) {
-    var database = requireDb();
     opt = opt || {};
     var limit = opt.limit || 40;
     var id = String(cityId || '').trim();
     if (!id) return Promise.resolve([]);
-    var q = database
-      .collection('posts')
-      .where('status', '==', 'published')
-      .where('cityId', '==', id)
-      .orderBy('createdAt', 'desc')
-      .limit(limit);
-    return q
-      .get()
-      .then(function (snap) {
-        return snap.docs.map(mapPostDoc);
-      })
-      .catch(function (err) {
-        // Soft-fail empty — guest browse must not hard-crash the feed UI.
-        console.warn('[SOARVIBE] listByCity failed', id, err && err.message);
-        return [];
-      });
+    return withListRetry('listByCity', id, opt, function () {
+      var database = requireDb();
+      return database
+        .collection('posts')
+        .where('status', '==', 'published')
+        .where('cityId', '==', id)
+        .orderBy('createdAt', 'desc')
+        .limit(limit)
+        .get();
+    });
   }
 
   function listByCountry(countryId, opt) {
-    var database = requireDb();
     opt = opt || {};
     var limit = opt.limit || 40;
     var id = String(countryId || '').trim();
     if (!id) return Promise.resolve([]);
-    var q = database
-      .collection('posts')
-      .where('status', '==', 'published')
-      .where('countryId', '==', id)
-      .orderBy('createdAt', 'desc')
-      .limit(limit);
-    return q
-      .get()
-      .then(function (snap) {
-        return snap.docs.map(mapPostDoc);
-      })
-      .catch(function (err) {
-        // Index may still be building — soft-fail empty for country feed.
-        console.warn('[SOARVIBE] listByCountry failed', id, err && err.message);
-        return [];
-      });
+    return withListRetry('listByCountry', id, opt, function () {
+      var database = requireDb();
+      return database
+        .collection('posts')
+        .where('status', '==', 'published')
+        .where('countryId', '==', id)
+        .orderBy('createdAt', 'desc')
+        .limit(limit)
+        .get();
+    });
   }
 
   function listByRegion(regionId, opt) {
-    var database = requireDb();
     opt = opt || {};
     var limit = opt.limit || 40;
     var id = String(regionId || '').trim();
     if (!id) return Promise.resolve([]);
-    var q = database
-      .collection('posts')
-      .where('status', '==', 'published')
-      .where('regionId', '==', id)
-      .orderBy('createdAt', 'desc')
-      .limit(limit);
-    return q
-      .get()
-      .then(function (snap) {
-        return snap.docs.map(mapPostDoc);
-      })
-      .catch(function (err) {
-        console.warn('[SOARVIBE] listByRegion failed', id, err && err.message);
-        // Legacy fallback: region cards previously used cityId == regionId (e.g. hokkaido)
-        return listByCity(id, opt);
-      });
+    return withListRetry('listByRegion', id, opt, function () {
+      var database = requireDb();
+      return database
+        .collection('posts')
+        .where('status', '==', 'published')
+        .where('regionId', '==', id)
+        .orderBy('createdAt', 'desc')
+        .limit(limit)
+        .get();
+    }).catch(function (err) {
+      console.warn('[SOARVIBE] listByRegion fallback to cityId', id, err && err.message);
+      // Legacy fallback: region cards previously used cityId == regionId (e.g. hokkaido)
+      return listByCity(id, opt);
+    });
   }
 
   function listFeedForScope(scope, opt) {
@@ -906,7 +940,7 @@
         return dedupePostsById([].concat(localPosts || [], remote || []));
       })
       .catch(function (e) {
-        console.warn('[SOARVIBE] Firestore feed fallback to local seeds', e);
+        console.warn('[SOARVIBE] Firestore feed merge failed; returning local arg only', e);
         return dedupePostsById(localPosts || []);
       });
   }

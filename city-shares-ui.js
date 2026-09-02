@@ -59,6 +59,36 @@
     feedAbort: null
   };
 
+  /** Session cache: scopeKey → remote posts. Survives close so reopen paints Firestore posts immediately. */
+  var remoteFeedCache = Object.create(null);
+
+  function feedCacheKey(scope) {
+    scope = scope || {};
+    if (scope.feedKind === 'country' && scope.countryId) return 'country:' + scope.countryId;
+    if (scope.feedKind === 'region' && scope.regionId) return 'region:' + scope.regionId;
+    if (scope.cityId) return 'city:' + scope.cityId;
+    if (scope.entryId) return 'entry:' + scope.entryId;
+    return 'feed:unknown';
+  }
+
+  function hydrateRemoteFromCache(scope) {
+    var key = feedCacheKey(scope);
+    var cached = remoteFeedCache[key];
+    if (cached && cached.length) {
+      csState.remotePosts = cached.slice();
+      return true;
+    }
+    return false;
+  }
+
+  function rememberRemoteFeed(scope, posts) {
+    var key = feedCacheKey(scope);
+    var list = Array.isArray(posts) ? posts.slice() : [];
+    remoteFeedCache[key] = list;
+    csState.remotePosts = list;
+    return list;
+  }
+
   function emptyComposeDraft() {
     return {
       postId: null,
@@ -288,9 +318,7 @@
     for (i = 0; i < (csState.remotePosts || []).length; i++) {
       if (csState.remotePosts[i].postId === postId) return csState.remotePosts[i];
     }
-    if (typeof global.getCityShareById === 'function') {
-      return global.getCityShareById(postId);
-    }
+    // No local seed fallback — City Shares feed is Firestore published only.
     return null;
   }
 
@@ -306,11 +334,9 @@
 
   function postSortTimeMs(post) {
     if (!post) return 0;
-    var raw = post.createdAt || post.publishedAt || post.updatedAt || null;
-    if (!raw) {
-      // Official static seeds without timestamps stay below fresh user posts.
-      return post.source === 'user' ? Date.now() : 0;
-    }
+    // Production publish order = createdAt DESC (no publishedAt schema this round).
+    var raw = post.createdAt || post.updatedAt || null;
+    if (!raw) return 0;
     if (typeof raw.toMillis === 'function') {
       try {
         return raw.toMillis();
@@ -327,18 +353,11 @@
 
   function getPosts(cityId, typeFilter) {
     var scope = csState.feedScope || buildScopeFromEntryId(cityId);
-    var seedKey = scope.cityId || scope.entryId || cityId;
-    var local =
-      typeof global.getCityShares === 'function' ? global.getCityShares(seedKey) : [];
-    var merged = {};
-    (local || []).forEach(function (p) {
-      if (p && p.postId && postMatchesScope(p, scope)) merged[p.postId] = p;
-    });
-    (csState.remotePosts || []).forEach(function (p) {
-      if (p && p.postId && postMatchesScope(p, scope)) merged[p.postId] = p;
-    });
-    var list = Object.keys(merged).map(function (k) {
-      return merged[k];
+    // Firestore-only: never merge local official/demo seeds into the feed.
+    var list = (csState.remotePosts || []).filter(function (p) {
+      if (!p || !p.postId) return false;
+      if (p.status && p.status !== 'published') return false;
+      return postMatchesScope(p, scope);
     });
     if (typeFilter && typeFilter !== 'all') {
       list = list.filter(function (p) {
@@ -349,24 +368,57 @@
       var tb = postSortTimeMs(b);
       var ta = postSortTimeMs(a);
       if (tb !== ta) return tb - ta;
-      if ((a.source === 'user') !== (b.source === 'user')) {
-        return a.source === 'user' ? -1 : 1;
-      }
       return String(b.postId || '').localeCompare(String(a.postId || ''));
     });
     return list;
   }
 
-  function whenAuthSettled() {
-    // Wait for first Auth event (signed-in OR confirmed guest).
-    // Do NOT require sign-in — public feed must work for guests.
-    var au = auth();
-    if (au && typeof au.whenAuthReady === 'function' && !(au.isAuthReady && au.isAuthReady())) {
-      return au.whenAuthReady().catch(function () {
-        return null;
-      });
+  function getFeedTypeFilters(cityId) {
+    var seen = {};
+    var out = [];
+    getPosts(cityId, 'all').forEach(function (p) {
+      if (p && p.type && !seen[p.type]) {
+        seen[p.type] = true;
+        out.push(p.type);
+      }
+    });
+    return out;
+  }
+
+  function ensureFirebaseReady() {
+    try {
+      if (global.SOARVIBE_FIREBASE && typeof global.SOARVIBE_FIREBASE.init === 'function') {
+        global.SOARVIBE_FIREBASE.init();
+      }
+    } catch (eInit) {
+      /* silent — list soft-fails if db still missing */
     }
-    return Promise.resolve(null);
+  }
+
+  function whenAuthSettled(timeoutMs) {
+    // Optional: wait briefly for first Auth event (guest OR signed-in).
+    // Public published feed does NOT require Auth — never block forever if Auth hangs
+    // (seen on some PWA / Safari persistence paths → seeds-only forever).
+    var au = auth();
+    if (!au || typeof au.whenAuthReady !== 'function') {
+      return Promise.resolve(null);
+    }
+    if (au.isAuthReady && au.isAuthReady()) {
+      return Promise.resolve(null);
+    }
+    var wait = au.whenAuthReady().catch(function () {
+      return null;
+    });
+    var ms = typeof timeoutMs === 'number' ? timeoutMs : 800;
+    if (ms <= 0) return Promise.resolve(null);
+    return Promise.race([
+      wait,
+      new Promise(function (resolve) {
+        setTimeout(function () {
+          resolve(null);
+        }, ms);
+      })
+    ]);
   }
 
   function refreshRemoteFeed(cityId, options) {
@@ -374,7 +426,9 @@
     var scope = csState.feedScope || buildScopeFromEntryId(cityId || csState.cityId);
     var opts = options || {};
     var requestId = opts.requestId;
+    var cacheKey = feedCacheKey(scope);
     if (!a) {
+      hydrateRemoteFromCache(scope);
       csState.remotePosts = csState.remotePosts || [];
       return Promise.resolve(csState.remotePosts);
     }
@@ -384,6 +438,7 @@
     csState.feedAbort = typeof AbortController !== 'undefined' ? new AbortController() : null;
 
     function runLoader() {
+      ensureFirebaseReady();
       var loader =
         a.listFeedForScope
           ? a.listFeedForScope(scope)
@@ -393,19 +448,290 @@
       return loader
         .then(function (posts) {
           if (requestId != null && requestId !== csState.shareOpenGeneration) return null;
-          csState.remotePosts = posts || [];
-          return csState.remotePosts;
+          // Successful network result (including genuine empty) updates cache.
+          return rememberRemoteFeed(scope, posts || []);
         })
         .catch(function (e) {
           if (requestId != null && requestId !== csState.shareOpenGeneration) return null;
           console.warn('[SOARVIBE] remote city shares feed failed', e);
-          // Soft-fail: keep any prior remote posts; never block guest browse.
+          if (opts.throwOnError) return Promise.reject(e);
+          // Soft-fail: NEVER replace last-good UGC with [] on transient errors.
+          if (!Array.isArray(csState.remotePosts) || !csState.remotePosts.length) {
+            hydrateRemoteFromCache(scope);
+          }
           if (!Array.isArray(csState.remotePosts)) csState.remotePosts = [];
           return csState.remotePosts;
         });
     }
 
-    return whenAuthSettled().then(runLoader);
+    // Published posts are guest-readable — load immediately; do not gate on Auth.
+    // Auth hang must not leave the UI stuck without remote posts.
+    return runLoader();
+  }
+
+  /** Pull-to-refresh — feed only; never location.reload / full app rebuild. */
+  var PTR_THRESHOLD = 64;
+  var PTR_MAX = 96;
+  var PTR_RESISTANCE = 0.42;
+  var ptrState = {
+    tracking: false,
+    startY: 0,
+    pull: 0,
+    refreshing: false
+  };
+
+  function getPtrEl() {
+    var shell = document.getElementById('cityShares');
+    if (!shell) return null;
+    var el = document.getElementById('csPtr');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'csPtr';
+      el.className = 'cs-ptr';
+      el.setAttribute('aria-hidden', 'true');
+      el.innerHTML = '<div class="cs-ptr-spinner" role="status" aria-label="重新整理"></div>';
+      shell.appendChild(el);
+    }
+    return el;
+  }
+
+  function setPtrVisual(mode, pullPx) {
+    var el = getPtrEl();
+    var viewport = document.getElementById('csViewport');
+    if (!el) return;
+    var pull = Math.max(0, pullPx || 0);
+    el.classList.remove('is-visible', 'is-ready', 'is-refreshing');
+    if (mode === 'refreshing') {
+      el.classList.add('is-visible', 'is-refreshing');
+      if (viewport) {
+        viewport.style.transition = 'transform 0.22s ease';
+        viewport.style.transform = 'translateY(48px)';
+      }
+      return;
+    }
+    if (mode === 'pull' && pull > 2) {
+      el.classList.add('is-visible');
+      if (pull >= PTR_THRESHOLD) el.classList.add('is-ready');
+      if (viewport) {
+        viewport.style.transition = 'none';
+        viewport.style.transform = 'translateY(' + Math.min(PTR_MAX, pull) + 'px)';
+      }
+      return;
+    }
+    if (viewport) {
+      viewport.style.transition = 'transform 0.28s ease';
+      viewport.style.transform = '';
+    }
+  }
+
+  function resetPtrVisual() {
+    ptrState.tracking = false;
+    ptrState.pull = 0;
+    setPtrVisual('idle', 0);
+    window.setTimeout(function () {
+      var viewport = document.getElementById('csViewport');
+      if (viewport && !ptrState.refreshing) {
+        viewport.style.transition = '';
+      }
+    }, 300);
+  }
+
+  function feedSignature(cityId, typeFilter) {
+    return getPosts(cityId, typeFilter)
+      .map(function (p) {
+        return String(p.postId || '') + '\t' + String(p.title || '') + '\t' + String(p.status || '');
+      })
+      .join('\n');
+  }
+
+  function renderFilterHtml(cityId) {
+    var types = getFeedTypeFilters(cityId);
+    var html =
+      '<button type="button" class="cs-filter-chip' +
+      (csState.typeFilter === 'all' ? ' is-active' : '') +
+      '" data-cs-filter="all">全部</button>';
+    types.forEach(function (type) {
+      html +=
+        '<button type="button" class="cs-filter-chip' +
+        (csState.typeFilter === type ? ' is-active' : '') +
+        '" data-cs-filter="' +
+        escapeHtml(type) +
+        '">' +
+        escapeHtml(TYPE_LABELS[type] || type) +
+        '</button>';
+    });
+    return html;
+  }
+
+  function renderFeedCardsHtml(cityId) {
+    var posts = getPosts(cityId, csState.typeFilter);
+    if (!posts.length) {
+      if (csState.typeFilter && csState.typeFilter !== 'all') {
+        return (
+          '<div class="cs-empty">' +
+          '<p class="cs-empty-title">這個分類暫時還沒有分享</p>' +
+          '</div>'
+        );
+      }
+      return (
+        '<div class="cs-empty">' +
+        '<p class="cs-empty-title">還沒有旅人分享</p>' +
+        '<p class="cs-empty-sub">成為第一個分享這趟旅程的人 ✈️</p>' +
+        '</div>'
+      );
+    }
+    return posts
+      .map(function (post) {
+        var mediaList = sortedMediaList(post);
+        var typeLabel = TYPE_LABELS[post.type] || post.type;
+        var mediaHtml = mediaList.length
+          ? '<div class="cs-card-media">' +
+            renderCarousel(mediaList, post.title, { variant: 'feed', fit: 'cover' }) +
+            '<span class="cs-card-type">' +
+            escapeHtml(typeLabel) +
+            '</span></div>'
+          : '<div class="cs-card-media cs-card-media--text"><span class="cs-card-type">' +
+            escapeHtml(typeLabel) +
+            '</span></div>';
+        return (
+          '<button type="button" class="cs-card' +
+          (mediaList.length ? '' : ' cs-card--text') +
+          '" data-cs-post="' +
+          escapeHtml(post.postId) +
+          '">' +
+          mediaHtml +
+          '<div class="cs-card-body">' +
+          '<h3 class="cs-card-title">' +
+          escapeHtml(post.title) +
+          '</h3>' +
+          '<p class="cs-card-place">' +
+          escapeHtml(post.place && post.place.displayName ? post.place.displayName : '') +
+          '</p></div></button>'
+        );
+      })
+      .join('');
+  }
+
+  function patchFeedAfterRefresh(cityId) {
+    var viewport = document.getElementById('csViewport');
+    var feedEl = viewport && viewport.querySelector('.cs-feed');
+    var filtersEl = viewport && viewport.querySelector('.cs-filters');
+    // Keep hero / chrome; only swap the card list (avoids full-feed flash).
+    if (!feedEl) {
+      renderCurrentView();
+      return;
+    }
+    feedEl.innerHTML = renderFeedCardsHtml(cityId);
+    if (filtersEl) filtersEl.innerHTML = renderFilterHtml(cityId);
+    bindCarousel(feedEl);
+  }
+
+  function runFeedPullRefresh() {
+    if (ptrState.refreshing) return Promise.resolve();
+    if (csState.view !== 'feed' || !csState.cityId) {
+      resetPtrVisual();
+      return Promise.resolve();
+    }
+    // Guest-allowed: only refreshRemoteFeed — no login gate, no location.reload().
+    ptrState.refreshing = true;
+    setPtrVisual('refreshing', 0);
+    var cityId = csState.cityId;
+    var keptFilter = csState.typeFilter || 'all';
+    var requestId = csState.shareOpenGeneration;
+    var priorRemote = (csState.remotePosts || []).slice();
+    var priorSig = feedSignature(cityId, keptFilter);
+    return refreshRemoteFeed(cityId, { requestId: requestId, throwOnError: true })
+      .then(function (posts) {
+        if (requestId !== csState.shareOpenGeneration) return;
+        csState.typeFilter = keptFilter;
+        csState.cityId = cityId;
+        if (posts === null) {
+          csState.remotePosts = priorRemote;
+          return;
+        }
+        if (csState.view !== 'feed') return;
+        var nextSig = feedSignature(cityId, keptFilter);
+        if (nextSig !== priorSig) {
+          patchFeedAfterRefresh(cityId);
+        }
+        var viewport = document.getElementById('csViewport');
+        if (viewport) viewport.scrollTop = 0;
+      })
+      .catch(function () {
+        if (requestId !== csState.shareOpenGeneration) return;
+        csState.typeFilter = keptFilter;
+        csState.cityId = cityId;
+        csState.remotePosts = priorRemote;
+        // Failure must keep the current DOM — toast only, no feed rebuild.
+        showCsToast('更新失敗，請稍後再試');
+      })
+      .then(function () {
+        ptrState.refreshing = false;
+        resetPtrVisual();
+      });
+  }
+
+  function bindPullToRefresh(viewport) {
+    if (!viewport || viewport.getAttribute('data-cs-ptr-bound') === '1') return;
+    viewport.setAttribute('data-cs-ptr-bound', '1');
+    getPtrEl();
+
+    viewport.addEventListener(
+      'touchstart',
+      function (e) {
+        if (ptrState.refreshing) return;
+        if (csState.view !== 'feed') return;
+        if (!e.touches || !e.touches.length) return;
+        if (viewport.scrollTop > 0) {
+          ptrState.tracking = false;
+          return;
+        }
+        ptrState.tracking = true;
+        ptrState.startY = e.touches[0].clientY;
+        ptrState.pull = 0;
+      },
+      { passive: true }
+    );
+
+    viewport.addEventListener(
+      'touchmove',
+      function (e) {
+        if (!ptrState.tracking || ptrState.refreshing) return;
+        if (csState.view !== 'feed') return;
+        if (!e.touches || !e.touches.length) return;
+        if (viewport.scrollTop > 0) {
+          ptrState.tracking = false;
+          resetPtrVisual();
+          return;
+        }
+        var dy = e.touches[0].clientY - ptrState.startY;
+        if (dy <= 0) {
+          ptrState.pull = 0;
+          setPtrVisual('idle', 0);
+          return;
+        }
+        ptrState.pull = Math.min(PTR_MAX, dy * PTR_RESISTANCE);
+        if (ptrState.pull > 4 && e.cancelable) {
+          e.preventDefault();
+        }
+        setPtrVisual('pull', ptrState.pull);
+      },
+      { passive: false }
+    );
+
+    function endPull() {
+      if (!ptrState.tracking) return;
+      var shouldRefresh = ptrState.pull >= PTR_THRESHOLD && csState.view === 'feed';
+      ptrState.tracking = false;
+      if (shouldRefresh) {
+        runFeedPullRefresh();
+      } else {
+        resetPtrVisual();
+      }
+    }
+
+    viewport.addEventListener('touchend', endPull, { passive: true });
+    viewport.addEventListener('touchcancel', endPull, { passive: true });
   }
 
   function showCitySharesLoadError(cityId, postId, requestId) {
@@ -701,65 +1027,7 @@
   function renderFeed(cityId) {
     var meta = getCityMeta(cityId);
     var hero = resolveHero(meta, cityId);
-    var types =
-      typeof global.getCityShareTypes === 'function' ? global.getCityShareTypes(cityId) : [];
-    var posts = getPosts(cityId, csState.typeFilter);
-
-    var filterHtml =
-      '<button type="button" class="cs-filter-chip' +
-      (csState.typeFilter === 'all' ? ' is-active' : '') +
-      '" data-cs-filter="all">全部</button>';
-    types.forEach(function (type) {
-      filterHtml +=
-        '<button type="button" class="cs-filter-chip' +
-        (csState.typeFilter === type ? ' is-active' : '') +
-        '" data-cs-filter="' +
-        escapeHtml(type) +
-        '">' +
-        escapeHtml(TYPE_LABELS[type] || type) +
-        '</button>';
-    });
-
-    var cardsHtml = '';
-    if (!posts.length) {
-      cardsHtml =
-        '<div class="cs-empty">' +
-        (types.length
-          ? '這個分類暫時還沒有分享。'
-          : '這座城市的旅人分享準備中，先從首頁規劃行程吧。') +
-        '</div>';
-    } else {
-      cardsHtml = posts
-        .map(function (post) {
-          var mediaList = sortedMediaList(post);
-          var typeLabel = TYPE_LABELS[post.type] || post.type;
-          var mediaHtml = mediaList.length
-            ? '<div class="cs-card-media">' +
-              renderCarousel(mediaList, post.title, { variant: 'feed', fit: 'cover' }) +
-              '<span class="cs-card-type">' +
-              escapeHtml(typeLabel) +
-              '</span></div>'
-            : '<div class="cs-card-media cs-card-media--text"><span class="cs-card-type">' +
-              escapeHtml(typeLabel) +
-              '</span></div>';
-          return (
-            '<button type="button" class="cs-card' +
-            (mediaList.length ? '' : ' cs-card--text') +
-            '" data-cs-post="' +
-            escapeHtml(post.postId) +
-            '">' +
-            mediaHtml +
-            '<div class="cs-card-body">' +
-            '<h3 class="cs-card-title">' +
-            escapeHtml(post.title) +
-            '</h3>' +
-            '<p class="cs-card-place">' +
-            escapeHtml(post.place && post.place.displayName ? post.place.displayName : '') +
-            '</p></div></button>'
-          );
-        })
-        .join('');
-    }
+    var cardsHtml = renderFeedCardsHtml(cityId);
 
     return (
       '<div class="cs-page">' +
@@ -790,7 +1058,7 @@
       '<button type="button" class="cs-compose-open" id="csComposeOpenBtn">＋ 分享這次旅行</button>' +
       '</div>' +
       '<div class="cs-filters">' +
-      filterHtml +
+      renderFilterHtml(cityId) +
       '</div>' +
       '<div class="cs-feed">' +
       cardsHtml +
@@ -1393,13 +1661,16 @@
       csState.postId = null;
     }
 
+    // Reopen may hydrate cached Firestore posts for first paint (not local seeds).
+    hydrateRemoteFromCache(scope);
+
     shell.classList.remove('hidden');
     shell.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
     viewport.scrollTop = 0;
     setHash(cityId, postId || null);
     updateChrome();
-    // Paint shell immediately (local feed / skeleton) — never leave a blank white panel
+    // Paint shell immediately (local feed + cache / skeleton) — never leave a blank white panel
     // while waiting on Firestore. Images fill async; they must not block first paint.
     if (csState.view === 'detail' && csState.postId && findPost(csState.postId)) {
       renderCurrentView();
@@ -1433,23 +1704,25 @@
         '<div class="cs-skeleton-card"></div></div></div>';
     }
 
+    function paintAfterRemote(posts) {
+      if (requestId !== csState.shareOpenGeneration) return;
+      if (posts === null) return;
+      if (csState.view === 'detail' && csState.postId) {
+        var alreadyPainted = !!document.getElementById('csLikeBtn');
+        return loadDetailExtras(csState.postId).then(function () {
+          if (requestId !== csState.shareOpenGeneration) return;
+          if (alreadyPainted && document.getElementById('csLikeBtn')) {
+            patchDetailSocialFromExtras();
+            return;
+          }
+          renderCurrentView();
+        });
+      }
+      renderCurrentView();
+    }
+
     refreshRemoteFeed(cityId, { requestId: requestId })
-      .then(function (posts) {
-        if (requestId !== csState.shareOpenGeneration) return;
-        if (posts === null) return;
-        if (csState.view === 'detail' && csState.postId) {
-          var alreadyPainted = !!document.getElementById('csLikeBtn');
-          return loadDetailExtras(csState.postId).then(function () {
-            if (requestId !== csState.shareOpenGeneration) return;
-            if (alreadyPainted && document.getElementById('csLikeBtn')) {
-              patchDetailSocialFromExtras();
-              return;
-            }
-            renderCurrentView();
-          });
-        }
-        renderCurrentView();
-      })
+      .then(paintAfterRemote)
       .catch(function (err) {
         if (requestId !== csState.shareOpenGeneration) return;
         console.warn('[SOARVIBE] openCityShares failed', err);
@@ -1460,6 +1733,17 @@
         }
         showCitySharesLoadError(cityId, postId, requestId);
       });
+
+    // Cold start: Firebase may not be ready on first tap — one follow-up fetch.
+    window.setTimeout(function () {
+      if (requestId !== csState.shareOpenGeneration) return;
+      if (csState.view !== 'feed' && csState.view !== 'detail') return;
+      var hasRemote = (csState.remotePosts || []).some(function (p) {
+        return p && p.source === 'user';
+      });
+      if (hasRemote) return;
+      refreshRemoteFeed(cityId, { requestId: requestId }).then(paintAfterRemote);
+    }, 700);
   }
 
   function closeCityShares() {
@@ -1482,6 +1766,7 @@
     csState.composeTaxonomy = null;
     csState.isSubmitting = false;
     csState.isDeleting = false;
+    // Clear active list only — remoteFeedCache kept so next open paints UGC immediately.
     csState.remotePosts = [];
     csState.comments = [];
     clearComposeDraft();
@@ -2124,6 +2409,9 @@
       cardsApi().mountHomepageCards();
     }
 
+    var viewport = document.getElementById('csViewport');
+    if (viewport) bindPullToRefresh(viewport);
+
     var closeBtn = document.getElementById('csCloseBtn');
     var backBtn = document.getElementById('csBackBtn');
 
@@ -2428,6 +2716,11 @@
     renderComposeLocationBlock: renderComposeLocationBlock,
     postMatchesScope: postMatchesScope,
     buildScopeFromEntryId: buildScopeFromEntryId,
+    getPosts: getPosts,
+    getFeedTypeFilters: getFeedTypeFilters,
+    runFeedPullRefresh: runFeedPullRefresh,
+    patchFeedAfterRefresh: patchFeedAfterRefresh,
+    PTR_THRESHOLD: PTR_THRESHOLD,
     getState: function () {
       return csState;
     },

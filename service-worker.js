@@ -1,4 +1,4 @@
-const CACHE_NAME = 'soarvibe-v201'
+const CACHE_NAME = 'soarvibe-v204'
 /* Phase 1C.1 cache bust ??travel ledger network-first + auth/config network-first */
 const STATIC_ASSETS = [
   './index.html',
@@ -12,7 +12,6 @@ const STATIC_ASSETS = [
   './city-shares-image.js',
   './city-shares-config.js',
   './city-shares-data.js',
-  './city-shares-demo-seeds.js',
   './city-shares-ui.js',
   './city-shares-ui.css',
   './city-journal-data.js',

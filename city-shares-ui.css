@@ -372,6 +372,54 @@
     font-size: 0.92rem;
     line-height: 1.55;
 }
+#cityShares .cs-empty-title {
+    margin: 0 0 0.4rem;
+    font-size: 1rem;
+    font-weight: 800;
+    color: #546e7a;
+}
+#cityShares .cs-empty-sub {
+    margin: 0;
+    font-size: 0.88rem;
+    color: #90a4ae;
+}
+#cityShares .cs-ptr {
+    position: absolute;
+    top: calc(env(safe-area-inset-top, 0px) + 10px);
+    left: 50%;
+    z-index: 10010;
+    width: 28px;
+    height: 28px;
+    margin-left: -14px;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-6px) scale(0.85);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+}
+#cityShares .cs-ptr.is-visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+#cityShares .cs-ptr-spinner {
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    box-sizing: border-box;
+    border: 2px solid rgba(55, 71, 79, 0.18);
+    border-top-color: #00838f;
+    background: rgba(255, 253, 247, 0.92);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+#cityShares .cs-ptr.is-ready .cs-ptr-spinner {
+    border-top-color: #f06292;
+    border-right-color: rgba(240, 98, 146, 0.35);
+}
+#cityShares .cs-ptr.is-refreshing .cs-ptr-spinner {
+    animation: cs-ptr-spin 0.7s linear infinite;
+}
+@keyframes cs-ptr-spin {
+    to { transform: rotate(360deg); }
+}
 #cityShares .cs-skeleton-grid {
     display: grid;
     gap: 0.85rem;

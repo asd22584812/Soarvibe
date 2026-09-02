@@ -38,42 +38,32 @@ assert(fs.existsSync(path.join(root, 'assets/featured/tokyo-airport-demo.svg')),
 assert(/查看東京體驗/.test(featuredJs) && /查看 eSIM 方案/.test(featuredJs) && /查看機場交通/.test(featuredJs), 'CTAs');
 
 console.log('\n=== City Shares wiring ===');
-assert(/city-shares-demo-seeds\.js/.test(index), 'demo seeds script wired');
+assert(!/city-shares-demo-seeds\.js/.test(index), 'demo seeds script NOT wired in production index');
 assert(/busan: \{ name: '釜山'/.test(uiJs), 'busan label');
 assert(/shareOpenGeneration/.test(uiJs), 'race guard still present');
+assert(/還沒有旅人分享/.test(uiJs), 'empty state present');
+assert(/function runFeedPullRefresh/.test(uiJs), 'pull-to-refresh present');
 
 const sandbox = { console, window: {}, globalThis: {} };
 sandbox.window = sandbox;
 sandbox.globalThis = sandbox;
 vm.runInNewContext(dataJs, sandbox, { filename: 'city-shares-data.js' });
-vm.runInNewContext(demoSeeds, sandbox, { filename: 'city-shares-demo-seeds.js' });
 
 const DATA = sandbox.SOARVIBE_CITY_SHARES;
-const tokyoBefore = (DATA.cities.tokyo.posts || []).length;
-assert(tokyoBefore >= 3, 'tokyo posts preserved (' + tokyoBefore + ')');
+assert((DATA.cities.tokyo.posts || []).length === 0, 'tokyo local seed posts empty');
+assert(/tokyo-hero-kaminarimon/.test(DATA.cities.tokyo.heroImage || ''), 'tokyo hero retained');
 assert(typeof sandbox.getCityShares === 'function', 'getCityShares');
+assert(sandbox.getCityShares('tokyo').length === 0, 'getCityShares(tokyo) empty for feed');
+assert(!sandbox.getCityShareById('tokyo-sensoji-001'), 'official seed ids gone from data');
 
+// Demo seed file may still exist on disk but must not be production-mounted.
+assert(fs.existsSync(path.join(root, 'city-shares-demo-seeds.js')), 'demo seeds file kept offline only');
+vm.runInNewContext(demoSeeds, sandbox, { filename: 'city-shares-demo-seeds.js' });
 const cities = ['kyoto', 'osaka', 'seoul', 'busan', 'hokkaido', 'bangkok', 'vietnam'];
-let total = 0;
 cities.forEach((id) => {
   const list = sandbox.getCityShares(id);
-  assert(list.length === 3, id + ' has 3 readable posts (got ' + list.length + ')');
-  total += list.length;
-  list.forEach((p) => {
-    assert(p.media && p.media[0] && p.media[0].src, id + ' ' + p.postId + ' has media');
-    assert(fs.existsSync(path.join(root, p.media[0].src.replace(/^\.\//, ''))), id + ' media file exists');
-    assert(p.body && p.body.length >= 80, id + ' body long enough');
-    assert(p.title && !/百科|Wiki/i.test(p.title), id + ' traveler title');
-  });
-  const types = new Set(list.map((p) => p.type));
-  assert(types.size >= 2, id + ' theme diversity');
+  assert(list.length === 3, 'offline demo file still has ' + id + ' samples (not production feed)');
 });
-assert(total === 21, '21 demo posts total');
-
-// detail lookup
-const sample = sandbox.getCityShareById('kyoto-gion-stroll-001');
-assert(!!sample && sample.cityId === 'kyoto', 'detail lookup works');
-assert(!!sandbox.getCityShareById('tokyo-sensoji-001'), 'tokyo detail still works');
 
 console.log('\n=== RESULT ===');
 console.log('passed=' + passed + ' failed=' + failed);
