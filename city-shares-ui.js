@@ -357,37 +357,55 @@
     return list;
   }
 
+  function whenAuthSettled() {
+    // Wait for first Auth event (signed-in OR confirmed guest).
+    // Do NOT require sign-in — public feed must work for guests.
+    var au = auth();
+    if (au && typeof au.whenAuthReady === 'function' && !(au.isAuthReady && au.isAuthReady())) {
+      return au.whenAuthReady().catch(function () {
+        return null;
+      });
+    }
+    return Promise.resolve(null);
+  }
+
   function refreshRemoteFeed(cityId, options) {
     var a = api();
     var scope = csState.feedScope || buildScopeFromEntryId(cityId || csState.cityId);
     var opts = options || {};
     var requestId = opts.requestId;
     if (!a) {
-      csState.remotePosts = [];
-      return Promise.resolve([]);
+      csState.remotePosts = csState.remotePosts || [];
+      return Promise.resolve(csState.remotePosts);
     }
     if (csState.feedAbort && typeof csState.feedAbort.abort === 'function') {
       try { csState.feedAbort.abort(); } catch (eAbort) { /* silent */ }
     }
     csState.feedAbort = typeof AbortController !== 'undefined' ? new AbortController() : null;
-    var loader =
-      a.listFeedForScope
-        ? a.listFeedForScope(scope)
-        : a.listPublishedPosts
-          ? a.listPublishedPosts(scope.cityId || scope.entryId || cityId)
-          : Promise.resolve([]);
-    return loader
-      .then(function (posts) {
-        if (requestId != null && requestId !== csState.shareOpenGeneration) return null;
-        csState.remotePosts = posts || [];
-        return csState.remotePosts;
-      })
-      .catch(function (e) {
-        if (requestId != null && requestId !== csState.shareOpenGeneration) return null;
-        console.warn('[SOARVIBE] remote city shares feed failed', e);
-        csState.remotePosts = [];
-        throw e;
-      });
+
+    function runLoader() {
+      var loader =
+        a.listFeedForScope
+          ? a.listFeedForScope(scope)
+          : a.listPublishedPosts
+            ? a.listPublishedPosts(scope.cityId || scope.entryId || cityId)
+            : Promise.resolve([]);
+      return loader
+        .then(function (posts) {
+          if (requestId != null && requestId !== csState.shareOpenGeneration) return null;
+          csState.remotePosts = posts || [];
+          return csState.remotePosts;
+        })
+        .catch(function (e) {
+          if (requestId != null && requestId !== csState.shareOpenGeneration) return null;
+          console.warn('[SOARVIBE] remote city shares feed failed', e);
+          // Soft-fail: keep any prior remote posts; never block guest browse.
+          if (!Array.isArray(csState.remotePosts)) csState.remotePosts = [];
+          return csState.remotePosts;
+        });
+    }
+
+    return whenAuthSettled().then(runLoader);
   }
 
   function showCitySharesLoadError(cityId, postId, requestId) {
@@ -1435,6 +1453,11 @@
       .catch(function (err) {
         if (requestId !== csState.shareOpenGeneration) return;
         console.warn('[SOARVIBE] openCityShares failed', err);
+        // Prefer painting local/remote cards over a full-screen error when anything is showable.
+        if (getPosts(cityId, csState.typeFilter).length || findPost(csState.postId)) {
+          renderCurrentView();
+          return;
+        }
         showCitySharesLoadError(cityId, postId, requestId);
       });
   }
@@ -2317,6 +2340,27 @@
     });
 
     initCitySharesFromHash();
+
+    // After Auth settles (guest OR signed-in), refresh open feed so early
+    // pre-auth queries cannot leave guests without public posts.
+    if (global.SOARVIBE_AUTH && typeof global.SOARVIBE_AUTH.onAuthStateChanged === 'function') {
+      global.SOARVIBE_AUTH.onAuthStateChanged(function () {
+        if (csState.view !== 'feed' && csState.view !== 'detail') return;
+        if (!csState.cityId) return;
+        var rid = csState.shareOpenGeneration;
+        refreshRemoteFeed(csState.cityId, { requestId: rid }).then(function (posts) {
+          if (rid !== csState.shareOpenGeneration || posts === null) return;
+          if (csState.view === 'detail' && csState.postId) {
+            return loadDetailExtras(csState.postId).then(function () {
+              if (rid !== csState.shareOpenGeneration) return;
+              if (document.getElementById('csLikeBtn')) patchDetailSocialFromExtras();
+              else renderCurrentView();
+            });
+          }
+          renderCurrentView();
+        });
+      });
+    }
 
     if (global.SOARVIBE_AUTH && global.SOARVIBE_AUTH.registerPendingActionHandler) {
       global.SOARVIBE_AUTH.registerPendingActionHandler('city_share_compose', function (payload) {

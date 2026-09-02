@@ -138,9 +138,16 @@
       .where('cityId', '==', id)
       .orderBy('createdAt', 'desc')
       .limit(limit);
-    return q.get().then(function (snap) {
-      return snap.docs.map(mapPostDoc);
-    });
+    return q
+      .get()
+      .then(function (snap) {
+        return snap.docs.map(mapPostDoc);
+      })
+      .catch(function (err) {
+        // Soft-fail empty — guest browse must not hard-crash the feed UI.
+        console.warn('[SOARVIBE] listByCity failed', id, err && err.message);
+        return [];
+      });
   }
 
   function listByCountry(countryId, opt) {

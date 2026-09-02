@@ -16,10 +16,13 @@ import {
 import {
   doc,
   getDoc,
+  getDocs,
   setDoc,
   updateDoc,
   deleteDoc,
   collection,
+  query,
+  where,
   runTransaction,
   increment,
   serverTimestamp,
@@ -610,6 +613,12 @@ describe('COMMENT atomic consistency', () => {
 describe('POST / USER access', () => {
   it('22. guest read published post → PASS', async () => {
     await assertSucceeds(getDoc(doc(dbGuest(), 'posts', POST_PUB)));
+  });
+
+  it('22b. guest list published posts query → PASS', async () => {
+    const db = dbGuest();
+    const q = query(collection(db, 'posts'), where('status', '==', 'published'));
+    await assertSucceeds(getDocs(q));
   });
 
   it('23. guest read draft post → DENY', async () => {
