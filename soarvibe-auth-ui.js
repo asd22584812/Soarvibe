@@ -156,12 +156,37 @@
     if (logoutBtn) logoutBtn.classList.remove('hidden');
   }
 
+  function clearUserCenterNicknameUi() {
+    var nick = document.getElementById('user-nickname');
+    if (nick) nick.value = '';
+    if (typeof global.clearSoarvibeUserCenterNickname === 'function') {
+      global.clearSoarvibeUserCenterNickname();
+      return;
+    }
+    try {
+      localStorage.removeItem('soarvibe_user_nickname');
+    } catch (e) {
+      /* silent */
+    }
+  }
+
   function syncProfileToUserCenter() {
     var AUTH = global.SOARVIBE_AUTH;
-    if (!AUTH || !AUTH.isSignedIn()) return;
-    var p = AUTH.getProfile() || {};
     var nick = document.getElementById('user-nickname');
-    if (nick && p.nickname) nick.value = p.nickname;
+    if (!AUTH || !AUTH.isSignedIn()) {
+      // Do not wipe guest local nickname on cold start; isolation clear happens on logout.
+      return;
+    }
+    var p = AUTH.getProfile() || {};
+    var next = p.nickname && String(p.nickname).trim() ? String(p.nickname).trim() : '';
+    if (next === '義翔 Roderick') next = '';
+    if (nick) nick.value = next;
+    try {
+      if (next) localStorage.setItem('soarvibe_user_nickname', next);
+      else localStorage.removeItem('soarvibe_user_nickname');
+    } catch (e) {
+      /* silent */
+    }
     if (p.avatarUrl && typeof global.applyUserAvatar === 'function') {
       global.applyUserAvatar(p.avatarUrl);
     } else if (p.avatarUrl) {
@@ -218,7 +243,15 @@
     }
     if (logoutBtn) {
       logoutBtn.addEventListener('click', function () {
-        AUTH.signOut().then(renderAuthStatus);
+        AUTH.signOut()
+          .then(function () {
+            clearUserCenterNicknameUi();
+            renderAuthStatus();
+          })
+          .catch(function () {
+            clearUserCenterNicknameUi();
+            renderAuthStatus();
+          });
       });
     }
     if (form) {
@@ -262,12 +295,19 @@
       });
     }
 
+    var wasSignedIn = !!(AUTH.isSignedIn && AUTH.isSignedIn());
     AUTH.onAuthStateChanged(function (snap) {
       renderAuthStatus();
-      syncProfileToUserCenter();
       if (snap && snap.signedIn) {
+        wasSignedIn = true;
+        syncProfileToUserCenter();
         closeSoarvibeAuthModal();
         if (AUTH.resumePendingAction) AUTH.resumePendingAction();
+      } else {
+        if (wasSignedIn) {
+          clearUserCenterNicknameUi();
+        }
+        wasSignedIn = false;
       }
     });
 
