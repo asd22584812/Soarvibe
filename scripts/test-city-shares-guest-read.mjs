@@ -53,7 +53,7 @@ assert(
   '1e2. exhausted list failure rejects (does not fake [])'
 );
 assert(/remoteFeedCache|hydrateRemoteFromCache|rememberRemoteFeed/.test(ui), '1g. session cache for remote UGC');
-assert(/Cold start retry once if first open still has no posts/.test(ui), '1h. follow-up fetch when UGC still missing');
+assert(/Chain one retry/.test(ui) && /never error while a fetch is still in flight/.test(ui), '1h. chained retry; no false 8s error while in flight');
 assert(/Firestore-only: never merge local official\/demo seeds|never merge local official\/demo seeds/.test(ui), '1i. feed is Firestore-only (no seed merge)');
 assert(/還沒有旅人分享/.test(ui), '1j. empty state when no published posts');
 assert(/正在載入旅人們的最新分享/.test(ui), '1k. initial feed loading copy');

@@ -80,6 +80,9 @@ assert(
   'empty state is separate branch from loading'
 );
 assert(/cs-feed-error/.test(ui) && /data-cs-retry/.test(ui), 'query failure uses error + retry, not endless skeleton');
+assert(/feedLoadInFlight/.test(ui), 'tracks in-flight feed fetch');
+assert(/, 20000\)/.test(ui.slice(ui.indexOf('Last-resort hung query'))), 'hung timeout is 20s last-resort');
+assert(/if \(csState\.feedLoadInFlight\) return;/.test(ui), 'timeout does not error while fetch in flight');
 
 console.log('\n=== runtime sandbox: getPosts Firestore-only ===');
 const sandbox = {

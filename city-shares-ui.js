@@ -1783,9 +1783,27 @@
       });
     }
 
+    csState.feedLoadInFlight = true;
     loadRemoteFeed()
-      .then(paintAfterRemote)
       .catch(function (err) {
+        console.warn('[SOARVIBE] openCityShares first fetch failed', err);
+        // Chain one retry — do not race a timer that can abort / false-error a slow query.
+        return waitMs(700).then(function () {
+          if (requestId !== csState.shareOpenGeneration) return null;
+          return refreshRemoteFeed(cityId, {
+            requestId: requestId,
+            throwOnError: !hasCachedPosts,
+            keepPending: true
+          });
+        });
+      })
+      .then(function (posts) {
+        csState.feedLoadInFlight = false;
+        if (requestId !== csState.shareOpenGeneration) return;
+        paintAfterRemote(posts);
+      })
+      .catch(function (err) {
+        csState.feedLoadInFlight = false;
         if (requestId !== csState.shareOpenGeneration) return;
         console.warn('[SOARVIBE] openCityShares failed', err);
         if (getPosts(cityId, csState.typeFilter).length || findPost(csState.postId)) {
@@ -1794,50 +1812,26 @@
           return;
         }
         if (csState.view === 'feed') {
-          // Stay in loading until the one cold-start retry finishes — do not mix error with skeleton.
+          csState.feedLoadPhase = 'error';
+          renderCurrentView();
           return;
         }
         showCitySharesLoadError(cityId, postId, requestId);
       });
 
-    // Cold start retry once if first open still has no posts (Firebase may not be ready).
-    window.setTimeout(function () {
-      if (requestId !== csState.shareOpenGeneration) return;
-      if (csState.view !== 'feed') return;
-      if (csState.feedLoadPhase === 'ready') return;
-      if (getPosts(cityId, csState.typeFilter).length) {
-        csState.feedLoadPhase = 'ready';
-        renderCurrentView();
-        return;
-      }
-      refreshRemoteFeed(cityId, {
-        requestId: requestId,
-        throwOnError: true,
-        keepPending: true
-      })
-        .then(paintAfterRemote)
-        .catch(function () {
-          if (requestId !== csState.shareOpenGeneration) return;
-          if (getPosts(cityId, csState.typeFilter).length) {
-            csState.feedLoadPhase = 'ready';
-          } else {
-            csState.feedLoadPhase = 'error';
-          }
-          if (csState.view === 'feed') renderCurrentView();
-        });
-    }, 700);
-
+    // Last-resort hung query only — never error while a fetch is still in flight.
     window.setTimeout(function () {
       if (requestId !== csState.shareOpenGeneration) return;
       if (csState.view !== 'feed') return;
       if (csState.feedLoadPhase !== 'loading') return;
+      if (csState.feedLoadInFlight) return;
       if (getPosts(cityId, csState.typeFilter).length) {
         csState.feedLoadPhase = 'ready';
       } else {
         csState.feedLoadPhase = 'error';
       }
       renderCurrentView();
-    }, 8000);
+    }, 20000);
   }
 
   function closeCityShares() {

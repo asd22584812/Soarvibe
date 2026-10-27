@@ -57,7 +57,10 @@
     if (transferKind === 'DEPARTURE_TRANSFER' || /送機|前往機場|機場報到|辦理登機|出境手續/i.test(blob)) {
       return 'departure';
     }
-    if (/移動|前往|搭乘|轉乘|步行至|transfer|transit/i.test(t) && !/餐廳|美食|景點/.test(t)) {
+    if (
+      /移動|前往|搭乘|轉乘|步行至|transfer|transit/i.test(t) &&
+      !/餐廳|美食|景點|晚餐|午餐|早餐|下午茶|宵夜|咖啡|咖哩/.test(t)
+    ) {
       return 'transport';
     }
     if (/返回飯店|回飯店|回住宿|check-?in|入住|飯店休息|酒店休息|休息整頓/i.test(blob)) {
@@ -1021,17 +1024,22 @@
       return false;
     });
 
-    // Soft-drop duplicate major landmarks (not user-requested) — title-identical only
+    items = items.filter(function (it) {
+      if (isGoToNamedVenueTitle(titleOf(it)) && !isUserRequested(it) && !isAirportOrArrivalEvent(it)) {
+        repairs.push({ type: 'drop_goto_venue_card', day: dayNum, title: titleOf(it) });
+        return false;
+      }
+      return true;
+    });
+
+    // Soft-drop duplicate venues (meals + POIs), not user-requested
     var seenCanon = {};
     items = items.filter(function (it) {
       var type = it.eventType || classifyEventType(it);
       if (type === 'transport' || type === 'rest' || type === 'optional') return true;
       if (isAirportOrArrivalEvent(it)) return true;
-      var canon = String(titleOf(it))
-        .replace(/[（(].*$/, '')
-        .replace(/\s+/g, '')
-        .slice(0, 24);
-      if (!canon) return true;
+      var canon = canonicalPoiKey(titleOf(it));
+      if (!canon || canon.length < 3) return true;
       if (seenCanon[canon]) {
         if (isUserRequested(it)) return true;
         repairs.push({ type: 'drop_duplicate_poi', day: dayNum, title: titleOf(it) });
@@ -1066,11 +1074,20 @@
   }
 
   function canonicalPoiKey(title) {
-    return String(title || '')
-      .replace(/^(早餐|早午餐|午餐|下午茶|晚餐|宵夜)[：:]\s*/i, '')
-      .replace(/[（(].*$/, '')
-      .replace(/\s+/g, '')
-      .slice(0, 28);
+    var t = String(title || '').trim();
+    t = t.replace(/^(前往|移動至|步行至)(早餐|早午餐|午餐|下午茶|晚餐|宵夜)?(地點)?[：:\s]*/i, '');
+    t = t.replace(/^(早餐|早午餐|午餐|下午茶|晚餐|宵夜)[：:]\s*/i, '');
+    t = t.replace(/^(前往|移動至|步行至)[：:\s]*/i, '');
+    t = t.replace(/[（(].*$/, '');
+    return t.replace(/\s+/g, '').toLowerCase().slice(0, 28);
+  }
+
+  function isGoToNamedVenueTitle(title) {
+    var t = String(title || '');
+    return (
+      /^(前往|移動至|步行至)/.test(t) &&
+      /(地點|晚餐|午餐|早餐|下午茶|宵夜|餐廳)/.test(t)
+    );
   }
 
   function isMeaningfulPoiItem(it) {
@@ -1519,7 +1536,7 @@
       });
     });
     Object.keys(counts).forEach(function (exp) {
-      if (counts[exp] >= 3) {
+      if (counts[exp] >= 2) {
         flags.push({
           type: 'experienceRepeatWarning',
           experience: exp,
@@ -1532,11 +1549,69 @@
 
   function experienceFamily(title) {
     var t = String(title || '');
+    if (/飯店|酒店|Hotel|住宿|返回/.test(t)) return '';
     if (/成吉思|ジンギスカン|jingisukan|Genghis|達摩|だるま/i.test(t)) return 'jingisukan';
     if (/拉麵|ラーメン|ramen/i.test(t)) return 'ramen';
     if (/湯咖哩|スープカレー|soup\s*curry/i.test(t)) return 'soup_curry';
     if (/壽司|寿司|sushi|花まる/i.test(t)) return 'sushi';
+    if (/蟹|カニ|たらば|毛蟹|帝王蟹|海鮮丼|海鮮市場|二条市場|螃蟹/i.test(t)) return 'crab_seafood';
     return '';
+  }
+
+  function landmarkClusterKey(title) {
+    var t = String(title || '');
+    if (/飯店|酒店|Hotel|住宿|返回|車站|駅|站/.test(t)) return '';
+    if (/電視塔|テレビ塔|TV\s*Tower|さっぽろテレビ/i.test(t)) return 'sapporo_odori_core';
+    if (/時計台|Tokeidai|Clock Tower/i.test(t)) return 'sapporo_odori_core';
+    if (/大通公園|Odori\s*Park/i.test(t)) return 'sapporo_odori_core';
+    if (/大通/.test(t) && !/狸/.test(t)) return 'sapporo_odori_core';
+    return '';
+  }
+
+  function collectItemTitlesFromDay(day) {
+    var titles = [];
+    (day && day.phases ? day.phases : []).forEach(function (phase) {
+      (phase.items || []).forEach(function (it) {
+        var t = titleOf(it);
+        if (t) titles.push(t);
+      });
+    });
+    return titles;
+  }
+
+  function evaluateDayGuideVerifyQa(dayObj, priorDays) {
+    var canons = Object.create(null);
+    var clusters = Object.create(null);
+    var cuisines = Object.create(null);
+    (priorDays || []).forEach(function (day) {
+      collectItemTitlesFromDay(day).forEach(function (t) {
+        var c = canonicalPoiKey(t);
+        if (c) canons[c] = true;
+        var cl = landmarkClusterKey(t);
+        if (cl) clusters[cl] = true;
+        var ex = experienceFamily(t);
+        if (ex) cuisines[ex] = true;
+      });
+    });
+    var issues = [];
+    collectItemTitlesFromDay(dayObj || {}).forEach(function (t) {
+      if (/返回飯店|返回住宿|休息|車站|駅|機場/.test(t)) return;
+      var c = canonicalPoiKey(t);
+      if (c && canons[c]) {
+        issues.push({ type: 'repeat_poi', title: t });
+        return;
+      }
+      var cl = landmarkClusterKey(t);
+      if (cl && clusters[cl]) {
+        issues.push({ type: 'repeat_landmark_cluster', title: t, cluster: cl });
+        return;
+      }
+      var ex = experienceFamily(t);
+      if (ex && cuisines[ex]) {
+        issues.push({ type: 'repeat_cuisine', title: t, cuisine: ex });
+      }
+    });
+    return { hasConflict: issues.length > 0, issues: issues };
   }
 
   function detectTripDuplicates(hidden, flags) {
@@ -1566,6 +1641,8 @@
     var repairs = [];
     var days = working.days || [];
     var tripVisited = Object.create(null);
+    var tripClusters = Object.create(null);
+    var tripExps = Object.create(null);
 
     days.forEach(function (day, dayIndex) {
       var dayNum = day.dayNum || dayIndex + 1;
@@ -1577,22 +1654,53 @@
         if (type === 'transport' || type === 'rest' || type === 'optional') return true;
         if (isAirportOrArrivalEvent(it)) return true;
         if (/車站|駅|Station|JR |地鐵|捷運|巴士|機場/.test(titleOf(it))) return true;
-        var canon = String(titleOf(it))
-          .replace(/^(早餐|午餐|下午茶|晚餐|宵夜)[：:]\s*/i, '')
-          .replace(/[（(].*$/, '')
-          .replace(/\s+/g, '')
-          .slice(0, 24);
-        if (!canon || canon.length < 3) return true;
-        if (tripVisited[canon]) {
-          if (isUserRequested(it)) return true;
+        if (isGoToNamedVenueTitle(titleOf(it)) && !isUserRequested(it)) {
           repairs.push({
-            type: 'drop_trip_duplicate_poi',
+            type: 'drop_goto_venue_card',
             day: dayNum,
             title: titleOf(it)
           });
           return false;
         }
-        tripVisited[canon] = true;
+        if (!isUserRequested(it)) {
+          var cluster = landmarkClusterKey(titleOf(it));
+          if (cluster && tripClusters[cluster] != null && tripClusters[cluster] !== dayNum) {
+            repairs.push({
+              type: 'drop_trip_duplicate_cluster',
+              day: dayNum,
+              title: titleOf(it),
+              cluster: cluster
+            });
+            return false;
+          }
+          var exp = experienceFamily(titleOf(it));
+          if (exp && tripExps[exp]) {
+            repairs.push({
+              type: 'drop_trip_duplicate_experience',
+              day: dayNum,
+              title: titleOf(it),
+              experience: exp
+            });
+            return false;
+          }
+        }
+        var canon = canonicalPoiKey(titleOf(it));
+        if (canon && canon.length >= 3) {
+          if (tripVisited[canon]) {
+            if (isUserRequested(it)) return true;
+            repairs.push({
+              type: 'drop_trip_duplicate_poi',
+              day: dayNum,
+              title: titleOf(it)
+            });
+            return false;
+          }
+          tripVisited[canon] = true;
+        }
+        var keepCluster = landmarkClusterKey(titleOf(it));
+        if (keepCluster && tripClusters[keepCluster] == null) tripClusters[keepCluster] = dayNum;
+        var keepExp = experienceFamily(titleOf(it));
+        if (keepExp) tripExps[keepExp] = true;
         return true;
       });
       rebuildDayPhases(day, items);
@@ -2128,6 +2236,7 @@
     DAY_MINUTES: DAY_MINUTES,
     MEAL_WINDOWS: MEAL_WINDOWS,
     classifyEventType: classifyEventType,
+    isGoToNamedVenueTitle: isGoToNamedVenueTitle,
     classifyAirportTransfer: classifyAirportTransfer,
     isDepartureTransfer: isDepartureTransfer,
     isArrivalTransfer: isArrivalTransfer,
@@ -2151,6 +2260,9 @@
     measureIntentPreservation: measureIntentPreservation,
     deriveNeedsReplan: deriveNeedsReplan,
     canonicalPoiKey: canonicalPoiKey,
+    landmarkClusterKey: landmarkClusterKey,
+    experienceFamily: experienceFamily,
+    evaluateDayGuideVerifyQa: evaluateDayGuideVerifyQa,
     hhmmToMinutes: hhmmToMinutes,
     minutesToHhmm: minutesToHhmm,
     evaluateDayCompletenessQa: evaluateDayCompletenessQa,

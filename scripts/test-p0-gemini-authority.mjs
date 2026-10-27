@@ -105,6 +105,16 @@ const TTE = env.SOARVIBE_TRAVEL_TIME_ENGINE;
 const TI = env.SOARVIBE_TIME_INTEGRITY;
 
 assert(!!SE && !!P && !!TTE, 'modules loaded');
+{
+  const indexHtml = readFileSync(join(root, 'index.html'), 'utf8');
+  assert(/禁止在不同 day 或同一 day 重複相同店名／餐廳／景點/.test(indexHtml), 'timing rule 5 includes restaurants');
+  assert(/前往○○地點／前往晚餐/.test(indexHtml), 'timing rule 5 forbids go-to + meal split');
+  assert(/禁止與【已規劃日子】重複相同景點／餐廳／同一店名／核心商圈/.test(indexHtml), 'multi-day request forbids restaurant repeats');
+  assert(/禁止同一家店拆成「前往」\+「用餐」兩張卡/.test(indexHtml), 'multi-day request forbids go-to + meal cards');
+  assert(/大通公園、電視塔、時計台/.test(indexHtml) || /大通公園＋電視塔＋時計台/.test(indexHtml), 'Odori cluster in guide duty');
+  assert(/maybeReplanDayForGuideVerify/.test(indexHtml), 'day-by-day guide verify before next day');
+  assert(/已用料理類型/.test(indexHtml), 'prior-day memory includes cuisine types');
+}
 assert(SE.canCreateContent === false, 'Style Engine canCreateContent false');
 assert(typeof SE.buildPlanningIntentPrompt === 'function', 'planning intent helper');
 assert(/food becomes|美食主軸|食物為行程錨點/.test(SE.buildPlanningIntentPrompt('foodie', '札幌')), 'foodie intent');
@@ -309,6 +319,91 @@ const towerDays = flatItems(r6.hidden)
     return x.day;
   });
 assert(towerDays.length === 1, 'CASE6 TV tower once (days=' + towerDays.join(',') + ')');
+
+console.log('\n=== CASE6b Suage+ go-to card + trip duplicate meal ===');
+assert(P.classifyEventType({ title: '前往晚餐地點：Suage+ 湯咖哩' }) === 'food', '前往晚餐地點 is food not transport');
+assert(!P.isGoToNamedVenueTitle('前往機場'), 'airport transfer is not a named-venue go-to');
+assert(P.isGoToNamedVenueTitle('前往晚餐地點：Suage+ 湯咖哩'), '前往晚餐地點 is a named-venue go-to');
+assert(
+  P.canonicalPoiKey('前往晚餐地點：Suage+ 湯咖哩') === P.canonicalPoiKey('晚餐：Suage+ 湯咖哩'),
+  'go-to and meal share canonical key'
+);
+const case6b = {
+  meta: { destination: '札幌' },
+  days: [
+    {
+      dayNum: 1,
+      phases: [{
+        items: [
+          { title: '前往晚餐地點：Suage+ 湯咖哩', startTime: '17:30', endTime: '18:00' },
+          { title: '晚餐：Suage+ 湯咖哩', startTime: '18:00', endTime: '19:30', eventType: 'food' }
+        ]
+      }]
+    },
+    {
+      dayNum: 2,
+      phases: [{
+        items: [
+          { title: '午餐：Suage+ 湯咖哩', startTime: '12:00', endTime: '13:30', eventType: 'food' }
+        ]
+      }]
+    }
+  ]
+};
+const r6b = P.repairItinerary(clone(case6b), case6b.meta);
+const suageTitles = titles(r6b.hidden).filter(function (t) { return /Suage/.test(t); });
+assert(suageTitles.length === 1, 'CASE6b keep one Suage+ stop (got ' + suageTitles.join('|') + ')');
+assert(!suageTitles.some(function (t) { return /^前往/.test(t); }), 'CASE6b dropped 前往-venue card');
+assert(suageTitles.some(function (t) { return /晚餐/.test(t); }), 'CASE6b kept the meal card');
+
+console.log('\n=== CASE6c landmark cluster + cuisine family ===');
+assert(P.landmarkClusterKey('大通公園') === P.landmarkClusterKey('札幌電視塔'), 'Odori park and TV tower are one cluster');
+assert(P.landmarkClusterKey('札幌時計台') === 'sapporo_odori_core', 'clock tower in Odori cluster');
+assert(P.experienceFamily('晚餐：Suage+ 湯咖哩') === 'soup_curry', 'soup curry family');
+assert(P.experienceFamily('成吉思汗達摩') === 'jingisukan', 'jingisukan family');
+assert(P.experienceFamily('午餐：二条市場海鮮丼') === 'crab_seafood', 'seafood family');
+const case6c = {
+  meta: { destination: '札幌' },
+  days: [
+    {
+      dayNum: 1,
+      phases: [{ items: [
+        { title: '大通公園', startTime: '10:00', endTime: '11:30' },
+        { title: '晚餐：Suage+ 湯咖哩', startTime: '18:00', endTime: '19:30', eventType: 'food' }
+      ] }]
+    },
+    {
+      dayNum: 2,
+      phases: [{ items: [
+        { title: '札幌電視塔', startTime: '10:00', endTime: '11:00' },
+        { title: '午餐：GARAKU 湯咖哩', startTime: '12:00', endTime: '13:30', eventType: 'food' }
+      ] }]
+    }
+  ]
+};
+const r6c = P.repairItinerary(clone(case6c), case6c.meta);
+assert(!titles(r6c.hidden, 2).some(function (t) { return /電視塔/.test(t); }), 'CASE6c drop day2 TV tower after Odori');
+assert(titles(r6c.hidden, 1).some(function (t) { return /大通公園/.test(t); }), 'CASE6c keep day1 Odori');
+assert(!titles(r6c.hidden, 2).some(function (t) { return /GARAKU|湯咖哩/.test(t); }), 'CASE6c drop second soup curry shop');
+{
+  const sameDayCluster = {
+    meta: { destination: '札幌' },
+    days: [{
+      dayNum: 1,
+      phases: [{ items: [
+        { title: '大通公園', startTime: '10:00', endTime: '11:00' },
+        { title: '札幌電視塔', startTime: '11:10', endTime: '12:00' }
+      ] }]
+    }]
+  };
+  const rSame = P.repairItinerary(clone(sameDayCluster), sameDayCluster.meta);
+  assert(
+    titles(rSame.hidden, 1).filter(function (t) { return /大通公園|電視塔/.test(t); }).length === 2,
+    'CASE6c same-day Odori + TV tower kept as one visit'
+  );
+}
+const verifyQa = P.evaluateDayGuideVerifyQa(case6c.days[1], [case6c.days[0]]);
+assert(verifyQa.hasConflict, 'CASE6c guide-verify flags day2 vs day1');
 
 console.log('\n=== Style Engine audit-only (no inject / no drop) ===');
 const gemGood = {
