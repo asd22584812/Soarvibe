@@ -1551,20 +1551,53 @@
     var t = String(title || '');
     if (/飯店|酒店|Hotel|住宿|返回/.test(t)) return '';
     if (/成吉思|ジンギスカン|jingisukan|Genghis|達摩|だるま/i.test(t)) return 'jingisukan';
-    if (/拉麵|ラーメン|ramen/i.test(t)) return 'ramen';
     if (/湯咖哩|スープカレー|soup\s*curry/i.test(t)) return 'soup_curry';
+    if (/拉麵|ラーメン|ramen/i.test(t)) return 'ramen';
     if (/壽司|寿司|sushi|花まる/i.test(t)) return 'sushi';
-    if (/蟹|カニ|たらば|毛蟹|帝王蟹|海鮮丼|海鮮市場|二条市場|螃蟹/i.test(t)) return 'crab_seafood';
+    if (/蟹|カニ|たらば|毛蟹|帝王蟹|海鮮丼|海鮮市場|二条市場|螃蟹|chili\s*crab|辣椒螃蟹/i.test(t)) return 'crab_seafood';
+    if (/韓式烤肉|韓國烤肉|삼겹|烤肉.*韓|韓.*烤肉/i.test(t)) return 'korean_bbq';
+    if (/韓式炸雞|韓國炸雞|치맥|橋村|bb\.q|BBQ Chicken/i.test(t)) return 'korean_chicken';
+    if (/拌飯|石鍋拌飯|비빔밥|bibimbap/i.test(t)) return 'bibimbap';
+    if (/Pad\s*Thai|泰式炒河粉|帕泰/i.test(t)) return 'pad_thai';
+    if (/冬陰功|Tom\s*Yum|tom yum/i.test(t)) return 'tom_yum';
+    if (/河粉|Pho\b|越南河粉/i.test(t)) return 'pho';
+    if (/小籠包|湯包|鼎泰豐/i.test(t)) return 'xiaolongbao';
+    if (/北京烤鴨|烤鴨/i.test(t)) return 'peking_duck';
+    if (/章魚燒|章魚小丸子|takoyaki/i.test(t)) return 'takoyaki';
+    if (/大阪燒|okonomiyaki/i.test(t)) return 'okonomiyaki';
+    if (/海南雞|海南雞飯/i.test(t)) return 'hainan_chicken';
+    if (/叻沙|Laksa/i.test(t)) return 'laksa';
+    if (/\bTaco|塔可餅|墨西哥塔可/i.test(t)) return 'taco';
+    if (/沖繩soba|沖繩麵|沖縄そば/i.test(t)) return 'okinawa_soba';
     return '';
   }
+
+  var LANDMARK_CLUSTERS = [
+    { id: 'sapporo_odori_core', re: /札幌電視塔|さっぽろテレビ|大通公園|Odori\s*Park|札幌時計台|Tokeidai|(?:^|｜|：)大通(?!狸)/i },
+    { id: 'tokyo_sensoji_core', re: /淺草寺|雷門|仲見世|Kaminarimon|Senso-?ji/i },
+    { id: 'osaka_dotonbori_core', re: /道頓堀|固力果|戎橋|Glico|Dotonbori/i },
+    { id: 'kyoto_kiyomizu_core', re: /清水寺|二年坂|三年坂|產寧坂|Kiyomizu/i },
+    { id: 'seoul_gyeongbok_core', re: /景福宮|光化門|青瓦台|Gyeongbok/i },
+    { id: 'paris_eiffel_core', re: /艾菲爾|埃菲爾|Eiffel|戰神廣場|Champ de Mars/i },
+    { id: 'london_westminster_core', re: /大笨鐘|Big Ben|西敏寺|Westminster Abbey|國會大廈|Palace of Westminster/i },
+    { id: 'rome_colosseum_core', re: /競技場|Colosseum|君士坦丁凱旋門/i },
+    { id: 'bangkok_grandpalace_core', re: /大皇宮|玉佛寺|Grand Palace|Wat Phra Kaew/i },
+    { id: 'singapore_merlion_core', re: /魚尾獅|Merlion/i }
+  ];
 
   function landmarkClusterKey(title) {
     var t = String(title || '');
     if (/飯店|酒店|Hotel|住宿|返回|車站|駅|站/.test(t)) return '';
-    if (/電視塔|テレビ塔|TV\s*Tower|さっぽろテレビ/i.test(t)) return 'sapporo_odori_core';
-    if (/時計台|Tokeidai|Clock Tower/i.test(t)) return 'sapporo_odori_core';
-    if (/大通公園|Odori\s*Park/i.test(t)) return 'sapporo_odori_core';
-    if (/大通/.test(t) && !/狸/.test(t)) return 'sapporo_odori_core';
+    if (/電視塔|テレビ塔|TV\s*Tower/i.test(t) && /札幌|さっぽろ|大通|Odori/i.test(t)) {
+      return 'sapporo_odori_core';
+    }
+    if (/電視塔|テレビ塔/i.test(t) && !/東京|大阪|名古屋|通天閣/.test(t)) {
+      return 'sapporo_odori_core';
+    }
+    var i;
+    for (i = 0; i < LANDMARK_CLUSTERS.length; i++) {
+      if (LANDMARK_CLUSTERS[i].re.test(t)) return LANDMARK_CLUSTERS[i].id;
+    }
     return '';
   }
 

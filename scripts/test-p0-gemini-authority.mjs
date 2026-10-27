@@ -112,6 +112,7 @@ assert(!!SE && !!P && !!TTE, 'modules loaded');
   assert(/禁止與【已規劃日子】重複相同景點／餐廳／同一店名／核心商圈/.test(indexHtml), 'multi-day request forbids restaurant repeats');
   assert(/禁止同一家店拆成「前往」\+「用餐」兩張卡/.test(indexHtml), 'multi-day request forbids go-to + meal cards');
   assert(/大通公園、電視塔、時計台/.test(indexHtml) || /大通公園＋電視塔＋時計台/.test(indexHtml), 'Odori cluster in guide duty');
+  assert(/適用用戶要去的任何國家／地區，不限札幌/.test(indexHtml), 'guide duty applies to every destination');
   assert(/maybeReplanDayForGuideVerify/.test(indexHtml), 'day-by-day guide verify before next day');
   assert(/已用料理類型/.test(indexHtml), 'prior-day memory includes cuisine types');
 }
@@ -359,6 +360,8 @@ assert(suageTitles.some(function (t) { return /晚餐/.test(t); }), 'CASE6b kept
 console.log('\n=== CASE6c landmark cluster + cuisine family ===');
 assert(P.landmarkClusterKey('大通公園') === P.landmarkClusterKey('札幌電視塔'), 'Odori park and TV tower are one cluster');
 assert(P.landmarkClusterKey('札幌時計台') === 'sapporo_odori_core', 'clock tower in Odori cluster');
+assert(P.landmarkClusterKey('淺草寺') === P.landmarkClusterKey('雷門'), 'Asakusa temple approach is one cluster');
+assert(P.experienceFamily('午餐：韓式烤肉') === 'korean_bbq', 'korean bbq family');
 assert(P.experienceFamily('晚餐：Suage+ 湯咖哩') === 'soup_curry', 'soup curry family');
 assert(P.experienceFamily('成吉思汗達摩') === 'jingisukan', 'jingisukan family');
 assert(P.experienceFamily('午餐：二条市場海鮮丼') === 'crab_seafood', 'seafood family');
