@@ -1024,13 +1024,7 @@
       return false;
     });
 
-    items = items.filter(function (it) {
-      if (isGoToNamedVenueTitle(titleOf(it)) && !isUserRequested(it) && !isAirportOrArrivalEvent(it)) {
-        repairs.push({ type: 'drop_goto_venue_card', day: dayNum, title: titleOf(it) });
-        return false;
-      }
-      return true;
-    });
+    items = foldStandaloneMoveCards(items, repairs, dayNum);
 
     // Soft-drop duplicate venues (meals + POIs), not user-requested
     var seenCanon = {};
@@ -1088,6 +1082,56 @@
       /^(前往|移動至|步行至)/.test(t) &&
       /(地點|晚餐|午餐|早餐|下午茶|宵夜|餐廳)/.test(t)
     );
+  }
+
+  function isStandaloneMoveCard(item) {
+    var t = titleOf(item);
+    if (!t) return false;
+    if (isAirportOrArrivalEvent(item) || isDepartureTransfer(item)) return false;
+    if (/機場|空港|入境|出境|登機|送機/.test(t)) return false;
+    if (/^移動[：:\s]/.test(t) || /^移動至/.test(t) || /^純移動/.test(t)) return true;
+    if (/^轉乘/.test(t) || /^步行至/.test(t) || /^步行前往/.test(t)) return true;
+    if (/^前往/.test(t)) return true;
+    if (/^搭乘/.test(t) && /前往|移動/.test(t)) return true;
+    if ((item.eventType || classifyEventType(item)) === 'transport' && /移動|前往|轉乘|步行至/.test(t)) {
+      return true;
+    }
+    return false;
+  }
+
+  function foldStandaloneMoveCards(items, repairs, dayNum) {
+    var out = [];
+    var i;
+    for (i = 0; i < items.length; i++) {
+      var it = items[i];
+      if (!isStandaloneMoveCard(it) || isUserRequested(it)) {
+        out.push(it);
+        continue;
+      }
+      var j = i + 1;
+      while (j < items.length && isStandaloneMoveCard(items[j]) && !isUserRequested(items[j])) {
+        j += 1;
+      }
+      var dest = j < items.length ? items[j] : null;
+      var moveBits = [];
+      var k;
+      for (k = i; k < j; k++) {
+        var piece = String(items[k].note || items[k].highlight || titleOf(items[k]) || '').trim();
+        if (piece) moveBits.push(piece);
+        repairs.push({
+          type: dest ? 'fold_standalone_move_into_next' : 'drop_standalone_move_card',
+          day: dayNum,
+          title: titleOf(items[k]),
+          into: dest ? titleOf(dest) : ''
+        });
+      }
+      if (dest && moveBits.length) {
+        var extra = moveBits.join('；');
+        dest.note = dest.note ? extra + '；' + dest.note : extra;
+      }
+      i = j - 1;
+    }
+    return out;
   }
 
   function isMeaningfulPoiItem(it) {
@@ -1357,6 +1401,7 @@
         }
         return it;
       });
+      items = foldStandaloneMoveCards(items, repairs, dayNum);
       // Flag-only validators (no reorder / no drop)
       detectGeographicPingPong(items, flags, dayNum);
       detectMidnightInMiddle(items, flags, dayNum);
@@ -1687,9 +1732,9 @@
         if (type === 'transport' || type === 'rest' || type === 'optional') return true;
         if (isAirportOrArrivalEvent(it)) return true;
         if (/車站|駅|Station|JR |地鐵|捷運|巴士|機場/.test(titleOf(it))) return true;
-        if (isGoToNamedVenueTitle(titleOf(it)) && !isUserRequested(it)) {
+        if (isStandaloneMoveCard(it) && !isUserRequested(it)) {
           repairs.push({
-            type: 'drop_goto_venue_card',
+            type: 'drop_standalone_move_card',
             day: dayNum,
             title: titleOf(it)
           });
@@ -2270,6 +2315,7 @@
     MEAL_WINDOWS: MEAL_WINDOWS,
     classifyEventType: classifyEventType,
     isGoToNamedVenueTitle: isGoToNamedVenueTitle,
+    isStandaloneMoveCard: isStandaloneMoveCard,
     classifyAirportTransfer: classifyAirportTransfer,
     isDepartureTransfer: isDepartureTransfer,
     isArrivalTransfer: isArrivalTransfer,

@@ -115,6 +115,8 @@ assert(!!SE && !!P && !!TTE, 'modules loaded');
   assert(/適用用戶要去的任何國家／地區，不限札幌/.test(indexHtml), 'guide duty applies to every destination');
   assert(/maybeReplanDayForGuideVerify/.test(indexHtml), 'day-by-day guide verify before next day');
   assert(/已用料理類型/.test(indexHtml), 'prior-day memory includes cuisine types');
+  assert(/禁止每一段都寫 15 分鐘/.test(indexHtml), 'prompt forbids default 15-minute transfers');
+  assert(/禁止把「移動／前往／轉乘／步行至」做成獨立一站卡片/.test(indexHtml), 'prompt forbids standalone move cards');
 }
 assert(SE.canCreateContent === false, 'Style Engine canCreateContent false');
 assert(typeof SE.buildPlanningIntentPrompt === 'function', 'planning intent helper');
@@ -356,6 +358,36 @@ const suageTitles = titles(r6b.hidden).filter(function (t) { return /Suage/.test
 assert(suageTitles.length === 1, 'CASE6b keep one Suage+ stop (got ' + suageTitles.join('|') + ')');
 assert(!suageTitles.some(function (t) { return /^前往/.test(t); }), 'CASE6b dropped 前往-venue card');
 assert(suageTitles.some(function (t) { return /晚餐/.test(t); }), 'CASE6b kept the meal card');
+
+console.log('\n=== CASE6d fold standalone move cards (any city) ===');
+assert(P.isStandaloneMoveCard({ title: '移動：前往札幌時計台' }), '移動：前往 is a standalone move card');
+assert(P.isStandaloneMoveCard({ title: '前往明洞逛街' }), '前往 POI is a standalone move card');
+assert(!P.isStandaloneMoveCard({ title: '前往機場' }), 'airport transfer is not folded as a filler move');
+const case6d = {
+  meta: { destination: '首爾' },
+  days: [{
+    dayNum: 1,
+    phases: [{ items: [
+      { title: '午餐：廣藏市場', startTime: '12:00', endTime: '13:30', eventType: 'food', note: '地鐵鐘路三街站' },
+      { title: '移動：前往景福宮', startTime: '13:30', endTime: '13:45', highlight: '短程步行', note: '步行約 15 分鐘即可抵達景福宮' },
+      { title: '景福宮', startTime: '13:45', endTime: '15:30', note: '正門光化門' }
+    ] }]
+  }]
+};
+const r6d = P.repairItinerary(clone(case6d), case6d.meta);
+assert(!titles(r6d.hidden, 1).some(function (t) { return /^移動/.test(t); }), 'CASE6d no standalone 移動 card');
+assert(titles(r6d.hidden, 1).some(function (t) { return t === '景福宮'; }), 'CASE6d kept destination');
+let palaceNote = '';
+(r6d.hidden.days || []).forEach(function (d) {
+  (d.phases || []).forEach(function (ph) {
+    (ph.items || []).forEach(function (it) {
+      if (it.title === '景福宮') palaceNote = String(it.note || '');
+    });
+  });
+});
+assert(/步行/.test(palaceNote), 'CASE6d moved transit into destination note');
+const auditedMove = P.auditGeminiItinerary(clone(case6d), case6d.meta, { applyStyleEngine: false });
+assert(!titles(auditedMove.hidden, 1).some(function (t) { return /^移動/.test(t); }), 'CASE6d audit path also folds 移動 cards');
 
 console.log('\n=== CASE6c landmark cluster + cuisine family ===');
 assert(P.landmarkClusterKey('大通公園') === P.landmarkClusterKey('札幌電視塔'), 'Odori park and TV tower are one cluster');
